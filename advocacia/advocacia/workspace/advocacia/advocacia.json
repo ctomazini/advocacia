@@ -1,0 +1,33 @@
+{
+ "name": "Advocacia",
+ "doctype": "Workspace",
+ "module": "Advocacia",
+ "label": "Advocacia",
+ "title": "Advocacia",
+ "icon": "justice",
+ "is_hidden": 0,
+ "public": 1,
+ "content": "[{\"type\":\"header\",\"data\":{\"text\":\"Advocacia\",\"col\":12}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Servi\\u00e7os\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Acordos\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Registro de Atos\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Audi\\u00eancias\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Prazos\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Faturas\",\"col\":4}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Clientes\",\"col\":4}}]",
+ "shortcuts": [
+  {"type": "DocType", "label": "Servi\u00e7os", "link_to": "Servico", "color": "Blue", "format": "{} Ativos", "stats_filter": "{\"status\": \"Em andamento\"}"},
+  {"type": "DocType", "label": "Acordos", "link_to": "Acordo de Honorarios Processuais", "color": "Purple"},
+  {"type": "DocType", "label": "Registro de Atos", "link_to": "Registro de Atos", "color": "Orange"},
+  {"type": "DocType", "label": "Audi\u00eancias", "link_to": "Audiencia", "color": "Blue"},
+  {"type": "DocType", "label": "Prazos", "link_to": "Controle de Prazos", "color": "Red", "format": "{} Pendentes", "stats_filter": "{\"status\": \"Pendente\"}"},
+  {"type": "DocType", "label": "Faturas", "link_to": "Sales Invoice", "color": "Green"},
+  {"type": "DocType", "label": "Clientes", "link_to": "Customer", "color": "Grey"}
+ ],
+ "links": [
+  {"type": "Card Break", "label": "Gest\u00e3o Jur\u00eddica", "hidden": 0},
+  {"type": "Link", "label": "Servi\u00e7o", "link_to": "Servico", "link_type": "DocType", "onboard": 1},
+  {"type": "Link", "label": "Acordo de Honor\u00e1rios", "link_to": "Acordo de Honorarios Processuais", "link_type": "DocType", "onboard": 1},
+  {"type": "Link", "label": "Registro de Atos", "link_to": "Registro de Atos", "link_type": "DocType", "onboard": 1},
+  {"type": "Link", "label": "Audi\u00eancia", "link_to": "Audiencia", "link_type": "DocType", "onboard": 1},
+  {"type": "Link", "label": "Controle de Prazos", "link_to": "Controle de Prazos", "link_type": "DocType", "onboard": 1},
+  {"type": "Card Break", "label": "Financeiro", "hidden": 0},
+  {"type": "Link", "label": "Faturas", "link_to": "Sales Invoice", "link_type": "DocType", "onboard": 1},
+  {"type": "Link", "label": "Clientes", "link_to": "Customer", "link_type": "DocType", "onboard": 1}
+ ],
+ "charts": [],
+ "number_cards": []
+}
