@@ -87,8 +87,9 @@ frappe.pages["painel"].on_page_load = function(wrapper) {
         if(au.length===0){ h += '<div class="em">Nenhuma audiencia agendada</div>'; }
         au.forEach(function(a){
             var d = a.data_hora ? a.data_hora.split(" ")[0] : "";
+            var hr = a.data_hora && a.data_hora.split(" ")[1] ? a.data_hora.split(" ")[1].substring(0,5) : "";
             var dd = du(d);
-            var tag = dd===0?'<span class="tag-r">HOJE</span>':dd===1?'<span class="tag-o">AMANHA</span>':'<span class="tag-g">'+fd(d)+'</span>';
+            var tag = dd===0?'<span class="tag-r">HOJE '+hr+'</span>':dd===1?'<span class="tag-o">AMANHA '+hr+'</span>':'<span class="tag-g">'+fd(d)+' '+hr+'</span>';
             var ic = a.modalidade==="Virtual" ? "[V]" : "[P]";
             h += '<div class="ri" onclick="frappe.set_route(\'Form\',\'Audiencia\',\''+a.name+'\')">';
             h += '<div class="rm">'+tag+' '+ic+' '+(a.tipo||'')+'</div>';
