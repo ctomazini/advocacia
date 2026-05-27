@@ -17,16 +17,16 @@ fixtures = [
     {
         "dt": "Workspace",
         "filters": [["name", "=", "Advocacia"]]
-    },
-    {
-        "dt": "Client Script",
-        "filters": [["name", "=", "Navegacao Advocacia"]]
     }
 ]
 
 doctype_js = {
     "Servico": "public/js/servico.js"
 }
+
+app_include_js = [
+    "/assets/advocacia/js/navegacao.js"
+]
 
 scheduler_events = {
     "daily": [
