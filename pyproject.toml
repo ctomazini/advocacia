@@ -1,0 +1,16 @@
+[project]
+name = "advocacia"
+version = "0.4.0"
+description = "Gestao juridica para escritorios de advocacia"
+authors = [
+    {name = "Charles Tomazini", email = "charles.tomazini@gmail.com"}
+]
+license = {text = "MIT"}
+requires-python = ">=3.10"
+dependencies = [
+    "docxtpl>=0.18.0"
+]
+
+[build-system]
+requires = ["flit_core>=3.4"]
+build-backend = "flit_core.buildapi"
