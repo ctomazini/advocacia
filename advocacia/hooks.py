@@ -11,6 +11,10 @@ fixtures = [
         "filters": [["dt", "in", ["Sales Invoice", "Customer"]], ["fieldname", "like", "custom_%"]]
     },
     {
+        "dt": "Custom Field",
+        "filters": [["name", "=", "Audiencia-link_audiencia"]]
+    },
+    {
         "dt": "Server Script",
         "filters": [["name", "in", ["Gerar Faturas Acordo", "Atualizar Faturas Acordo", "Contar Faturas Acordo", "Gerar Faturas Atos"]]]
     },
