@@ -1,0 +1,13 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Servico",
+  "enabled": 1,
+  "modified": "2026-05-27 08:53:08.537622",
+  "module": null,
+  "name": "Navegacao Advocacia",
+  "script": "\n(function() {\n    var FAB_ID = \"fab-painel-global\";\n    var DTS = [\"Servico\",\"Controle de Prazos\",\"Audiencia\",\"Registro de Atos\",\"Acordo de Honorarios Processuais\",\"Sales Invoice\",\"Customer\",\"Template Documento\"];\n\n    function addFab() {\n        if(document.getElementById(FAB_ID)) return;\n        var b = document.createElement(\"button\");\n        b.id = FAB_ID;\n        b.innerHTML = \"&#8592; Painel\";\n        b.style.cssText = \"position:fixed;bottom:28px;right:28px;background:var(--primary);color:#fff;border:none;border-radius:50px;padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;display:none;box-shadow:0 4px 12px rgba(0,0,0,.25);z-index:9999\";\n        b.onclick = function(){ frappe.set_route(\"painel\"); };\n        document.body.appendChild(b);\n    }\n\n    function showFab(show) {\n        var fab = document.getElementById(FAB_ID);\n        if(fab) fab.style.display = show ? \"block\" : \"none\";\n    }\n\n    function addHeaderBtn(frm) {\n        if(frm.page.__painel_btn) return;\n        frm.page.add_button(\"Painel\", function(){ frappe.set_route(\"painel\"); }, {btn_class:\"btn-default\"});\n        frm.page.__painel_btn = true;\n    }\n\n    $(document).on(\"page-change\", function() {\n        var route = frappe.get_route();\n        var inScope = (route[0]===\"Form\"||route[0]===\"List\") && DTS.indexOf(route[1])>-1;\n        addFab();\n        showFab(inScope);\n    });\n\n    DTS.forEach(function(dt) {\n        frappe.ui.form.on(dt, {\n            refresh: function(frm) {\n                addHeaderBtn(frm);\n                addFab();\n                showFab(true);\n            }\n        });\n    });\n})();\n",
+  "view": "Form"
+ }
+]
