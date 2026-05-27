@@ -25,7 +25,7 @@ frappe.pages["painel"].on_page_load = function(wrapper) {
         frappe.xcall("frappe.client.get_count",{doctype:"Servico",filters:{status:"Em andamento"}}),
         frappe.xcall("frappe.client.get_count",{doctype:"Acordo de Honorarios Processuais"}),
         frappe.xcall("frappe.client.get_list",{doctype:"Controle de Prazos",filters:{status:"Pendente",data_prazo:["<=",frappe.datetime.add_days(frappe.datetime.get_today(),7)]},fields:["name","servico","cliente","data_prazo","descricao","prioridade"],order_by:"data_prazo asc",limit_page_length:10}),
-        frappe.xcall("frappe.client.get_list",{doctype:"Audiencia",filters:{data_hora:[">=",frappe.datetime.get_today()]},fields:["name","servico","cliente","data_hora","tipo","modalidade","local_vara"],order_by:"data_hora asc",limit_page_length:10}),
+        frappe.xcall("frappe.client.get_list",{doctype:"Audiencia",filters:{data_hora:[">=",frappe.datetime.get_today()]},fields:["name","servico","cliente","data_hora","tipo","modalidade","local_vara","link_audiencia"],order_by:"data_hora asc",limit_page_length:10}),
         frappe.xcall("frappe.client.get_list",{doctype:"Sales Invoice",filters:{docstatus:1,outstanding_amount:[">",0],due_date:["<",frappe.datetime.get_today()],company:"Carine Pagel Advocacia"},fields:["name","customer","grand_total","outstanding_amount","due_date"],order_by:"due_date asc",limit_page_length:10}),
         frappe.xcall("frappe.client.get_list",{doctype:"Sales Invoice",filters:{docstatus:1,outstanding_amount:[">",0],due_date:["between",[frappe.datetime.get_today(),frappe.datetime.add_days(frappe.datetime.get_today(),7)]],company:"Carine Pagel Advocacia"},fields:["name","customer","grand_total","outstanding_amount","due_date"],order_by:"due_date asc",limit_page_length:10}),
         frappe.xcall("frappe.client.get_count",{doctype:"Controle de Prazos",filters:{status:"Pendente"}}),
@@ -91,9 +91,10 @@ frappe.pages["painel"].on_page_load = function(wrapper) {
             var dd = du(d);
             var tag = dd===0?'<span class="tag-r">HOJE '+hr+'</span>':dd===1?'<span class="tag-o">AMANHA '+hr+'</span>':'<span class="tag-g">'+fd(d)+' '+hr+'</span>';
             var ic = a.modalidade==="Virtual" ? "[V]" : "[P]";
+            var entrar = (a.modalidade==="Virtual" && a.link_audiencia) ? '<a href="'+a.link_audiencia+'" target="_blank" style="margin-left:8px;background:#16a34a;color:#fff;padding:2px 10px;border-radius:8px;font-size:11px;font-weight:600;text-decoration:none">Entrar</a>' : '';
             h += '<div class="ri" onclick="frappe.set_route(\'Form\',\'Audiencia\',\''+a.name+'\')">';
             h += '<div class="rm">'+tag+' '+ic+' '+(a.tipo||'')+'</div>';
-            h += '<div class="rs">'+(a.cliente||'')+(a.local_vara?' - '+a.local_vara:'')+'</div></div>';
+            h += '<div class="rs">'+(a.cliente||'')+(a.local_vara?' - '+a.local_vara:'')+entrar+'</div></div>';
         });
         h += '</div></div>';
 
