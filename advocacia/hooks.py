@@ -21,6 +21,10 @@ fixtures = [
     {
         "dt": "Workspace",
         "filters": [["name", "=", "Advocacia"]]
+    },
+    {
+        "dt": "Client Script",
+        "filters": [["name", "=", "Link Audiencia Virtual"]]
     }
 ]
 
