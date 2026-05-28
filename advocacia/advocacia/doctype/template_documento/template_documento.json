@@ -63,21 +63,35 @@
    "fieldname": "placeholders_info",
    "fieldtype": "HTML",
    "label": "Info Placeholders",
-   "options": "<div style='font-size:12px;line-height:1.8;'><b>Dados do Cliente:</b> {{ nome }}, {{ cpf }}, {{ rg }}, {{ nacionalidade }}, {{ estado_civil }}, {{ profissao }}, {{ telefone }}, {{ email }}<br><b>Endereco:</b> {{ endereco }}, {{ complemento }}, {{ bairro }}, {{ cidade }}, {{ estado }}, {{ cep }}<br><b>Servico:</b> {{ servico }}, {{ tipo_servico }}, {{ titulo_servico }}, {{ numero_processo }}, {{ area }}, {{ vara }}, {{ comarca }}, {{ parte_contraria }}, {{ valor_causa }}, {{ data_abertura }}<br><b>Data:</b> {{ data_hoje }}, {{ data_hoje_extenso }}</div>"
+   "options": "<div style='font-size:12px;line-height:2;'>\n<b>Dados do Cliente (Pessoa Física):</b><br>\n{{ nome }}, {{ cpf }}, {{ rg }}, {{ nacionalidade }}, {{ estado_civil }}, {{ profissao }}, {{ telefone }}, {{ email }}\n<br><br>\n<b>Dados do Cliente (Pessoa Jurídica):</b><br>\n{{ nome }}, {{ cnpj }}, {{ representante }}, {{ cpf_representante }}, {{ telefone }}, {{ email }}\n<br><br>\n<b>Endereço:</b><br>\n{{ endereco }}, {{ numero }}, {{ complemento }}, {{ bairro }}, {{ cidade }}, {{ estado }}, {{ cep }}\n<br><br>\n<b>Serviço:</b><br>\n{{ servico }}, {{ tipo_servico }}, {{ numero_processo }}, {{ area }}, {{ vara }}, {{ comarca }}, {{ parte_contraria }}, {{ valor_causa }}, {{ data_abertura }}\n<br><br>\n<b>Data:</b><br>\n{{ data_hoje }}, {{ data_hoje_extenso }}\n</div>"
   }
  ],
  "permissions": [
   {
    "role": "System Manager",
-   "read": 1, "write": 1, "create": 1, "delete": 1, "email": 1, "print": 1
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1
   },
   {
    "role": "Projects Manager",
-   "read": 1, "write": 1, "create": 1, "delete": 1, "email": 1, "print": 1
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1
   },
   {
    "role": "Projects User",
-   "read": 1, "write": 0, "create": 0, "email": 1, "print": 1
+   "read": 1,
+   "write": 0,
+   "create": 0,
+   "email": 1,
+   "print": 1
   }
  ],
  "sort_field": "titulo",

@@ -12,18 +12,15 @@ def gerar_documento(servico_name, template_name):
         frappe.throw(_("Biblioteca docxtpl nao instalada. Contate o administrador."))
 
     servico = frappe.get_doc("Servico", servico_name)
-    cliente = frappe.get_doc("Cliente", servico.cliente)
+    cliente = frappe.get_doc("Customer", servico.cliente)
 
-    # Pega primeiro endereço principal ou o primeiro da lista
     addr = None
-    if cliente.enderecos:
-        principal = next((e for e in cliente.enderecos if e.principal), None)
-        addr = principal or cliente.enderecos[0]
+    if cliente.customer_primary_address:
+        addr = frappe.get_doc("Address", cliente.customer_primary_address)
 
-    # Pega primeiro contato ou usa dados diretos do cliente
     contato = None
-    if cliente.contatos:
-        contato = cliente.contatos[0]
+    if cliente.customer_primary_contact:
+        contato = frappe.get_doc("Contact", cliente.customer_primary_contact)
 
     template_doc = frappe.get_doc("Template Documento", template_name)
     if not template_doc.arquivo:
@@ -36,46 +33,33 @@ def gerar_documento(servico_name, template_name):
         frappe.throw(_("Arquivo do template nao encontrado no servidor."))
 
     hoje = frappe.utils.today()
-
-    # Determina telefone — contato ou direto no cliente
-    telefone = ""
-    if contato:
-        telefone = contato.celular or contato.telefone or ""
-    else:
-        telefone = cliente.celular or cliente.telefone or ""
-
     context = {
         "servico": servico_name,
         "tipo_servico": servico.tipo or "",
-        "titulo_servico": getattr(servico, 'title', '') or "",
-        "numero_processo": getattr(servico, 'numero_processo', '') or "",
-        "area": getattr(servico, 'area', '') or "",
-        "vara": getattr(servico, 'vara', '') or "",
-        "comarca": getattr(servico, 'comarca', '') or "",
-        "parte_contraria": getattr(servico, 'parte_contraria', '') or "",
-        "valor_causa": frappe.utils.fmt_money(servico.valor_causa, currency="BRL") if getattr(servico, 'valor_causa', None) else "",
-        "data_abertura": frappe.utils.formatdate(servico.data_abertura, "dd/MM/yyyy") if getattr(servico, 'data_abertura', None) else "",
-        # Dados do cliente
-        "nome": cliente.nome or "",
-        "cpf": cliente.cpf or "",
-        "cnpj": cliente.cnpj or "",
-        "rg": cliente.rg or "",
-        "nacionalidade": cliente.nacionalidade or "",
-        "estado_civil": cliente.estado_civil or "",
-        "profissao": cliente.profissao or "",
-        "telefone": telefone,
-        "email": (contato.email if contato and contato.email else cliente.email) or "",
-        "representante": cliente.representante or "",
-        "cpf_representante": cliente.cpf_representante or "",
-        # Endereço
-        "endereco": addr.logradouro if addr else "",
-        "numero": addr.numero if addr else "",
-        "complemento": addr.complemento if addr else "",
-        "bairro": addr.bairro if addr else "",
-        "cidade": addr.cidade if addr else "",
-        "estado": addr.estado if addr else "",
-        "cep": addr.cep if addr else "",
-        # Datas
+        "titulo_servico": servico.title or "",
+        "numero_processo": servico.numero_processo or "",
+        "area": servico.area or "",
+        "vara": servico.vara or "",
+        "comarca": servico.comarca or "",
+        "parte_contraria": servico.parte_contraria or "",
+        "valor_causa": frappe.utils.fmt_money(servico.valor_causa, currency="BRL") if servico.valor_causa else "",
+        "data_abertura": frappe.utils.formatdate(servico.data_abertura, "dd/MM/yyyy") if servico.data_abertura else "",
+        "nome": cliente.customer_name or "",
+        "cpf": cliente.tax_id or "",
+        "cnpj": cliente.tax_id or "",
+        "rg": cliente.custom_rg or "",
+        "nacionalidade": cliente.custom_nacionalidade or "",
+        "estado_civil": cliente.custom_estado_civil or "",
+        "profissao": cliente.custom_profissao or "",
+        "telefone": cliente.mobile_no or "",
+        "email": cliente.email_id or "",
+        "endereco": addr.address_line1 if addr else "",
+        "complemento": addr.address_line2 if addr and addr.address_line2 else "",
+        "bairro": addr.county if addr and addr.county else "",
+        "cidade": addr.city if addr else "",
+        "estado": addr.state if addr else "",
+        "cep": addr.pincode if addr else "",
+        "telefone_contato": contato.mobile_no if contato else (cliente.mobile_no or ""),
         "data_hoje": frappe.utils.formatdate(hoje, "dd/MM/yyyy"),
         "data_hoje_extenso": _formatar_data_extenso(hoje),
     }

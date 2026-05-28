@@ -31,6 +31,5 @@ app_include_js = [
 scheduler_events = {
     "daily": [
         "advocacia.advocacia.notificacoes.notificar_prazos_diario",
-        "advocacia.advocacia.notificacoes.atualizar_status_faturas"
-    ]
+]
 }

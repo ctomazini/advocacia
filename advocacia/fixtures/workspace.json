@@ -304,6 +304,24 @@
     "stats_filter": "{\"status\": \"Pendente\"}",
     "type": "DocType",
     "url": null
+   },
+   {
+    "type": "DocType",
+    "label": "Clientes",
+    "link_to": "Cliente",
+    "parent": "Advocacia",
+    "parentfield": "shortcuts",
+    "parenttype": "Workspace",
+    "doctype": "Workspace Shortcut"
+   },
+   {
+    "type": "DocType",
+    "label": "Tarefas",
+    "link_to": "Tarefa",
+    "parent": "Advocacia",
+    "parentfield": "shortcuts",
+    "parenttype": "Workspace",
+    "doctype": "Workspace Shortcut"
    }
   ],
   "title": "Advocacia",

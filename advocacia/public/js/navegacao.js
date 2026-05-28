@@ -1,7 +1,6 @@
-
 (function() {
     var FAB_ID = "fab-painel-global";
-    var DTS = ["Servico","Controle de Prazos","Audiencia","Registro de Atos","Acordo de Honorarios Processuais","Sales Invoice","Customer","Template Documento"];
+    var DTS = ["Servico","Controle de Prazos","Audiencia","Registro de Atos","Acordo de Honorarios Processuais","Tarefa","Cliente","Template Documento"];
 
     function addFab() {
         if(document.getElementById(FAB_ID)) return;
@@ -24,7 +23,6 @@
         frm.page.__painel_btn = true;
     }
 
-    // Mostrar FAB em qualquer pagina do ERPNext — sempre visivel
     frappe.after_ajax(function() {
         addFab();
         var route = frappe.get_route();
@@ -49,7 +47,6 @@
         });
     });
 
-    // Registrar calendarios antes das list views carregarem
     frappe.views.calendar["Audiencia"] = {
         field_map: { start:"data_hora", end:"data_hora", id:"name", title:"tipo", allDay:false },
         get_css_class: function(d){ return d.modalidade==="Virtual"?"green":"blue"; }

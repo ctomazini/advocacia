@@ -1,6 +1,6 @@
 (function() {
     var FAB_ID = "fab-painel-global";
-    var DTS = ["Servico","Controle de Prazos","Audiencia","Registro de Atos","Acordo de Honorarios Processuais","Fatura","Cliente","Template Documento"];
+    var DTS = ["Servico","Controle de Prazos","Audiencia","Registro de Atos","Acordo de Honorarios Processuais","Tarefa","Cliente","Template Documento"];
 
     function addFab() {
         if(document.getElementById(FAB_ID)) return;
