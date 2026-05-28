@@ -1,10 +1,20 @@
-
 frappe.ui.form.on('Acordo de Honorarios Processuais', {
     refresh: function(frm) {
         controlar_campos(frm);
         somar_totais(frm);
-
-        // TODO: botões de ação futuros aqui
+    },
+    modo_honorarios: function(frm) {
+        controlar_campos(frm);
+        if (eh_direto(frm)) {
+            // Limpa campos de divisão quando muda para Direto
+            frm.set_value('percentual_advogada', 0);
+            frm.set_value('percentual_cliente', 0);
+            frm.set_value('valor_advogada', 0);
+            frm.set_value('valor_cliente', 0);
+            frm.set_value('valor_fixo_de_honorarios', 0);
+            frm.set_value('honorários_de_sucumbência', 0);
+            frm.set_value('percentual_sucumbência', 0);
+        }
     },
     tipo_de_cobrança: function(frm) {
         controlar_campos(frm);
@@ -62,6 +72,12 @@ frappe.ui.form.on('Parcela de Honorarios', {
     }
 });
 
+// === HELPERS ===
+
+function eh_direto(frm) {
+    return frm.doc.modo_honorarios === 'Honorários Diretos';
+}
+
 function recalcular_total_linha(cdt, cdn) {
     var row = locals[cdt][cdn];
     var total = (row.valor_advogada || 0) + (row.valor_cliente || 0) + (row.valor_sucumbência || 0);
@@ -69,29 +85,66 @@ function recalcular_total_linha(cdt, cdn) {
 }
 
 function controlar_campos(frm) {
-    var tipo = frm.doc.tipo_de_cobrança;
-    if (tipo === 'Valor fixo') {
-        frm.set_df_property('percentual_advogada', 'hidden', 1);
-        frm.set_df_property('valor_fixo_de_honorarios', 'hidden', 0);
-    } else if (tipo === 'Misto') {
-        frm.set_df_property('percentual_advogada', 'hidden', 0);
-        frm.set_df_property('valor_fixo_de_honorarios', 'hidden', 0);
-    } else {
-        frm.set_df_property('percentual_advogada', 'hidden', 0);
-        frm.set_df_property('valor_fixo_de_honorarios', 'hidden', 1);
-    }
-    var tipo_suc = frm.doc.tipo_de_cálculo;
-    if (tipo_suc === 'Valor fixo') {
-        frm.set_df_property('percentual_sucumbência', 'hidden', 1);
-        frm.set_df_property('honorários_de_sucumbência', 'read_only', 0);
-    } else {
-        frm.set_df_property('percentual_sucumbência', 'hidden', 0);
-        frm.set_df_property('honorários_de_sucumbência', 'read_only', 1);
+    var direto = eh_direto(frm);
+
+    // --- Campos de divisão (ocultos no modo Direto) ---
+    var campos_divisao = [
+        'tipo_de_cobrança', 'percentual_advogada', 'percentual_cliente',
+        'valor_fixo_de_honorarios', 'valor_advogada', 'valor_cliente'
+    ];
+    campos_divisao.forEach(function(f) {
+        frm.set_df_property(f, 'hidden', direto ? 1 : 0);
+    });
+
+    // --- Seção Sucumbência (oculta no modo Direto) ---
+    frm.set_df_property('sucumbência_section', 'hidden', direto ? 1 : 0);
+
+    // --- Seção Totais: no modo Direto mostra só o total geral ---
+    frm.set_df_property('total_advogada', 'label', direto ? 'Total Honorários' : 'Total Advogada');
+    frm.set_df_property('total_cliente', 'hidden', direto ? 1 : 0);
+
+    // --- Lógica original dos sub-campos (só quando modo = Acordo com Divisão) ---
+    if (!direto) {
+        var tipo = frm.doc.tipo_de_cobrança;
+        if (tipo === 'Valor fixo') {
+            frm.set_df_property('percentual_advogada', 'hidden', 1);
+            frm.set_df_property('valor_fixo_de_honorarios', 'hidden', 0);
+        } else if (tipo === 'Misto') {
+            frm.set_df_property('percentual_advogada', 'hidden', 0);
+            frm.set_df_property('valor_fixo_de_honorarios', 'hidden', 0);
+        } else {
+            frm.set_df_property('percentual_advogada', 'hidden', 0);
+            frm.set_df_property('valor_fixo_de_honorarios', 'hidden', 1);
+        }
+
+        var tipo_suc = frm.doc.tipo_de_cálculo;
+        if (tipo_suc === 'Valor fixo') {
+            frm.set_df_property('percentual_sucumbência', 'hidden', 1);
+            frm.set_df_property('honorários_de_sucumbência', 'read_only', 0);
+        } else {
+            frm.set_df_property('percentual_sucumbência', 'hidden', 0);
+            frm.set_df_property('honorários_de_sucumbência', 'read_only', 1);
+        }
     }
 }
 
 function calcular_valores(frm) {
     var total = frm.doc.valor_total_do_acordo || 0;
+
+    if (eh_direto(frm)) {
+        // Modo Direto: valor total = honorários integrais
+        frm.set_value('valor_advogada', 0);
+        frm.set_value('valor_cliente', 0);
+        var parcelas = frm.doc.número_de_parcelas || 0;
+        if (parcelas > 0) {
+            frm.set_value('valor_da_parcela', total / parcelas);
+        }
+        frm.set_value('total_advogada', total);
+        frm.set_value('total_cliente', 0);
+        return;
+    }
+
+    // Modo Acordo com Divisão (lógica original)
     var tipo = frm.doc.tipo_de_cobrança;
     if (tipo === 'Valor fixo') {
         var fixo = frm.doc.valor_fixo_de_honorarios || 0;
@@ -124,6 +177,7 @@ function calcular_valores(frm) {
 }
 
 function calcular_sucumbencia(frm) {
+    if (eh_direto(frm)) return;
     var total = frm.doc.valor_total_do_acordo || 0;
     var tipo_suc = frm.doc.tipo_de_cálculo;
     if (tipo_suc !== 'Valor fixo') {
@@ -134,6 +188,11 @@ function calcular_sucumbencia(frm) {
 }
 
 function calcular_totais(frm) {
+    if (eh_direto(frm)) {
+        frm.set_value('total_advogada', frm.doc.valor_total_do_acordo || 0);
+        frm.set_value('total_cliente', 0);
+        return;
+    }
     var valor_adv = frm.doc.valor_advogada || 0;
     var sucumbencia = frm.doc.honorários_de_sucumbência || 0;
     var valor_cli = frm.doc.valor_cliente || 0;
@@ -145,9 +204,8 @@ function gerar_tabela_parcelas(frm) {
     var parcelas = frm.doc.número_de_parcelas || 0;
     var data_inicio = frm.doc.data_primeira_parcela;
     var total = frm.doc.valor_total_do_acordo || 0;
-    var valor_adv = frm.doc.valor_advogada || 0;
-    var valor_cli = frm.doc.valor_cliente || 0;
-    var sucumbencia = frm.doc.honorários_de_sucumbência || 0;
+    var direto = eh_direto(frm);
+
     if (!parcelas || parcelas <= 0) {
         frappe.msgprint('Preencha o número de parcelas.');
         return;
@@ -160,6 +218,33 @@ function gerar_tabela_parcelas(frm) {
         frappe.msgprint('Preencha o valor total do acordo.');
         return;
     }
+
+    if (direto) {
+        // Modo Direto: parcelas simples, sem divisão nem sucumbência
+        var valor_parcela = total / parcelas;
+        frm.clear_table('table_ztjx');
+        for (var i = 0; i < parcelas; i++) {
+            var dt = frappe.datetime.add_months(data_inicio, i);
+            var row = frm.add_child('table_ztjx');
+            row.vencimento = dt;
+            row.valor_advogada = 0;
+            row.valor_cliente = 0;
+            row.valor_sucumbência = 0;
+            row.valor_total = valor_parcela;
+            row.descrição = 'Parcela ' + (i + 1) + ' de ' + parcelas;
+            row.status = 'Pendente';
+        }
+        frm.refresh_field('table_ztjx');
+        somar_totais(frm);
+        frappe.msgprint(parcelas + ' parcelas geradas com sucesso!');
+        return;
+    }
+
+    // Modo Acordo com Divisão (lógica original com prompt de sucumbência)
+    var valor_adv = frm.doc.valor_advogada || 0;
+    var valor_cli = frm.doc.valor_cliente || 0;
+    var sucumbencia = frm.doc.honorários_de_sucumbência || 0;
+
     frappe.prompt([
         {
             fieldname: 'incluir_sucumbencia',
@@ -200,6 +285,15 @@ function gerar_tabela_parcelas(frm) {
 }
 
 function somar_totais(frm) {
+    if (eh_direto(frm)) {
+        var total_parcelas = 0;
+        (frm.doc.table_ztjx || []).forEach(function(row) {
+            total_parcelas += row.valor_total || 0;
+        });
+        frm.set_value('total_advogada', total_parcelas || frm.doc.valor_total_do_acordo || 0);
+        frm.set_value('total_cliente', 0);
+        return;
+    }
     var total_adv = 0;
     var total_cli = 0;
     var total_suc = 0;
@@ -214,51 +308,68 @@ function somar_totais(frm) {
 
 function validar_tudo(frm) {
     if (!frm.doc.table_ztjx || frm.doc.table_ztjx.length === 0) return;
+
     var erros = [];
-    var total_adv_tabela = 0;
-    var total_cli_tabela = 0;
-    var total_suc_tabela = 0;
-    var total_geral_tabela = 0;
-    frm.doc.table_ztjx.forEach(function(row) {
-        var soma_linha = (row.valor_advogada || 0) + (row.valor_cliente || 0) + (row.valor_sucumbência || 0);
-        var diff = Math.abs(soma_linha - (row.valor_total || 0));
-        if (diff > 0.02) {
-            erros.push('Parcela ' + row.idx + ': a soma dos valores (R$ ' + soma_linha.toFixed(2) +
-                ') não fecha com Valor Total (R$ ' + (row.valor_total || 0).toFixed(2) + ')');
+
+    if (eh_direto(frm)) {
+        // Modo Direto: só valida se soma das parcelas = valor total
+        var total_parcelas = 0;
+        frm.doc.table_ztjx.forEach(function(row) {
+            total_parcelas += row.valor_total || 0;
+        });
+        var total_acordo = frm.doc.valor_total_do_acordo || 0;
+        if (Math.abs(total_parcelas - total_acordo) > 0.02) {
+            erros.push('Soma das parcelas (R$ ' + total_parcelas.toFixed(2) +
+                ') ≠ Valor Total do Acordo (R$ ' + total_acordo.toFixed(2) + ')');
         }
-        if ((row.valor_cliente || 0) < 0) {
-            erros.push('Parcela ' + row.idx + ': Valor Cliente negativo (R$ ' + (row.valor_cliente || 0).toFixed(2) + ')');
+    } else {
+        // Modo Divisão: validação completa
+        var total_adv_tabela = 0;
+        var total_cli_tabela = 0;
+        var total_suc_tabela = 0;
+        var total_geral_tabela = 0;
+        frm.doc.table_ztjx.forEach(function(row) {
+            var soma_linha = (row.valor_advogada || 0) + (row.valor_cliente || 0) + (row.valor_sucumbência || 0);
+            var diff = Math.abs(soma_linha - (row.valor_total || 0));
+            if (diff > 0.02) {
+                erros.push('Parcela ' + row.idx + ': soma (R$ ' + soma_linha.toFixed(2) +
+                    ') ≠ Valor Total (R$ ' + (row.valor_total || 0).toFixed(2) + ')');
+            }
+            if ((row.valor_cliente || 0) < 0) {
+                erros.push('Parcela ' + row.idx + ': Valor Cliente negativo (R$ ' + (row.valor_cliente || 0).toFixed(2) + ')');
+            }
+            total_adv_tabela += row.valor_advogada || 0;
+            total_cli_tabela += row.valor_cliente || 0;
+            total_suc_tabela += row.valor_sucumbência || 0;
+            total_geral_tabela += row.valor_total || 0;
+        });
+        var valor_adv_esperado = frm.doc.valor_advogada || 0;
+        var valor_cli_esperado = frm.doc.valor_cliente || 0;
+        var suc_esperada = frm.doc.honorários_de_sucumbência || 0;
+        var total_esperado = valor_adv_esperado + valor_cli_esperado + suc_esperada;
+        if (Math.abs(total_adv_tabela - valor_adv_esperado) > 0.02) {
+            erros.push('Soma Advogada parcelas (R$ ' + total_adv_tabela.toFixed(2) +
+                ') ≠ formulário (R$ ' + valor_adv_esperado.toFixed(2) + ')');
         }
-        total_adv_tabela += row.valor_advogada || 0;
-        total_cli_tabela += row.valor_cliente || 0;
-        total_suc_tabela += row.valor_sucumbência || 0;
-        total_geral_tabela += row.valor_total || 0;
-    });
-    var valor_adv_esperado = frm.doc.valor_advogada || 0;
-    var valor_cli_esperado = frm.doc.valor_cliente || 0;
-    var suc_esperada = frm.doc.honorários_de_sucumbência || 0;
-    var total_esperado = valor_adv_esperado + valor_cli_esperado + suc_esperada;
-    if (Math.abs(total_adv_tabela - valor_adv_esperado) > 0.02) {
-        erros.push('Soma Valor Advogada nas parcelas (R$ ' + total_adv_tabela.toFixed(2) +
-            ') ≠ Valor Advogada do formulário (R$ ' + valor_adv_esperado.toFixed(2) + ')');
+        if (Math.abs(total_cli_tabela - valor_cli_esperado) > 0.02) {
+            erros.push('Soma Cliente parcelas (R$ ' + total_cli_tabela.toFixed(2) +
+                ') ≠ formulário (R$ ' + valor_cli_esperado.toFixed(2) + ')');
+        }
+        if (Math.abs(total_suc_tabela - suc_esperada) > 0.02) {
+            erros.push('Soma Sucumbência parcelas (R$ ' + total_suc_tabela.toFixed(2) +
+                ') ≠ formulário (R$ ' + suc_esperada.toFixed(2) + ')');
+        }
+        if (Math.abs(total_geral_tabela - total_esperado) > 0.02) {
+            erros.push('Soma total parcelas (R$ ' + total_geral_tabela.toFixed(2) +
+                ') ≠ Total esperado (R$ ' + total_esperado.toFixed(2) + ')');
+        }
     }
-    if (Math.abs(total_cli_tabela - valor_cli_esperado) > 0.02) {
-        erros.push('Soma Valor Cliente nas parcelas (R$ ' + total_cli_tabela.toFixed(2) +
-            ') ≠ Valor Cliente do formulário (R$ ' + valor_cli_esperado.toFixed(2) + ')');
-    }
-    if (Math.abs(total_suc_tabela - suc_esperada) > 0.02) {
-        erros.push('Soma Sucumbência nas parcelas (R$ ' + total_suc_tabela.toFixed(2) +
-            ') ≠ Honorários de Sucumbência do formulário (R$ ' + suc_esperada.toFixed(2) + ')');
-    }
-    if (Math.abs(total_geral_tabela - total_esperado) > 0.02) {
-        erros.push('Soma total das parcelas (R$ ' + total_geral_tabela.toFixed(2) +
-            ') ≠ Total esperado do formulário (R$ ' + total_esperado.toFixed(2) + ')');
-    }
+
     if (erros.length > 0) {
         frappe.msgprint({
             title: 'Erro de validação',
             indicator: 'red',
-            message: '<strong>Não é possível salvar. Corrija os seguintes problemas:</strong><br><br>' +
+            message: '<strong>Corrija os seguintes problemas:</strong><br><br>' +
                 erros.join('<br><br>')
         });
         frappe.validated = false;
