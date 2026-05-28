@@ -7,7 +7,7 @@
   "doctype": "Workspace",
   "for_user": null,
   "hide_custom": 0,
-  "icon": "hr",
+  "icon": "octicon octicon-briefcase",
   "indicator_color": null,
   "is_hidden": 0,
   "label": "Advocacia",
@@ -218,7 +218,7 @@
     "restrict_to_domain": null,
     "stats_filter": null,
     "type": "URL",
-    "url": "https://erp.carinepageladvocacia.com.br/app/painel"
+    "url": "/app/painel"
    },
    {
     "color": "Purple",
@@ -252,7 +252,7 @@
     "restrict_to_domain": null,
     "stats_filter": null,
     "type": "URL",
-    "url": "https://erp.carinepageladvocacia.com.br/app/template-documento"
+    "url": "/app/template-documento"
    },
    {
     "color": "Orange",
@@ -304,42 +304,10 @@
     "stats_filter": "{\"status\": \"Pendente\"}",
     "type": "DocType",
     "url": null
-   },
-   {
-    "color": "Green",
-    "doc_view": null,
-    "format": null,
-    "icon": null,
-    "kanban_board": null,
-    "label": "Faturas",
-    "link_to": "Sales Invoice",
-    "parent": "Advocacia",
-    "parentfield": "shortcuts",
-    "parenttype": "Workspace",
-    "report_ref_doctype": null,
-    "restrict_to_domain": null,
-    "stats_filter": null,
-    "type": "DocType",
-    "url": null
-   },
-   {
-    "color": "Grey",
-    "doc_view": null,
-    "format": null,
-    "icon": null,
-    "kanban_board": null,
-    "label": "Clientes",
-    "link_to": "Customer",
-    "parent": "Advocacia",
-    "parentfield": "shortcuts",
-    "parenttype": "Workspace",
-    "report_ref_doctype": null,
-    "restrict_to_domain": null,
-    "stats_filter": null,
-    "type": "DocType",
-    "url": null
    }
   ],
-  "title": "Advocacia"
+  "title": "Advocacia",
+  "type": "Workspace",
+  "app_icon": "octicon octicon-briefcase"
  }
 ]

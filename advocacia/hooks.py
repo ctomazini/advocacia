@@ -7,14 +7,6 @@ app_license = "mit"
 
 fixtures = [
     {
-        "dt": "Custom Field",
-        "filters": [["dt", "in", ["Sales Invoice", "Customer"]], ["fieldname", "like", "custom_%"]]
-    },
-    {
-        "dt": "Custom Field",
-        "filters": [["name", "=", "Audiencia-link_audiencia"]]
-    },
-    {
         "dt": "Server Script",
         "filters": [["name", "in", ["Gerar Faturas Acordo", "Atualizar Faturas Acordo", "Contar Faturas Acordo", "Gerar Faturas Atos"]]]
     },
@@ -38,6 +30,7 @@ app_include_js = [
 
 scheduler_events = {
     "daily": [
-        "advocacia.advocacia.notificacoes.notificar_prazos_diario"
+        "advocacia.advocacia.notificacoes.notificar_prazos_diario",
+        "advocacia.advocacia.notificacoes.atualizar_status_faturas"
     ]
 }

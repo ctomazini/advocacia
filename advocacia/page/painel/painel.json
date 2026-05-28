@@ -1,0 +1,16 @@
+{
+ "doctype": "Page",
+ "module": "Advocacia",
+ "name": "painel",
+ "page_name": "painel",
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "All"
+  }
+ ],
+ "standard": "Yes",
+ "title": "Painel"
+}
