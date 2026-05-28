@@ -57,39 +57,56 @@ def get_painel_data():
     # Prazos enriquecidos
     prazos = frappe.get_all("Controle de Prazos",
         filters={"status": "Pendente", "data_prazo": ["between", [hoje, set7]]},
-        fields=["name","descricao","data_prazo","prioridade","servico"],
+        fields=["name","descricao","data_prazo","prioridade","servico","cliente"],
         order_by="data_prazo asc", limit_page_length=10)
     for p in prazos:
         p["dias_restantes"] = date_diff(p.get("data_prazo"), hoje) if p.get("data_prazo") else 0
+        # Cliente vem direto do DocType; enriquecer com dados do Serviço
+        p["cliente_nome"] = p.get("cliente", "")
         if p.get("servico"):
-            sv = frappe.db.get_value("Servico", p.servico, ["cliente","tipo","numero_processo"], as_dict=True)
+            sv = frappe.db.get_value("Servico", p.servico,
+                ["cliente","tipo","numero_processo"], as_dict=True)
             if sv:
-                p["cliente_nome"] = sv.get("cliente", "")
+                if not p["cliente_nome"]:
+                    p["cliente_nome"] = sv.get("cliente", "")
                 p["servico_tipo"] = sv.get("tipo", "")
                 p["numero_processo"] = sv.get("numero_processo", "")
 
     # Tarefas enriquecidas
     tarefas = frappe.get_all("Tarefa",
         filters={"status": ["in", ["Pendente", "Em Andamento"]]},
-        fields=["name","titulo","status","prioridade","data_limite","descricao"],
+        fields=["name","titulo","status","prioridade","data_limite","servico"],
         order_by="prioridade desc, data_limite asc", limit_page_length=10)
     for t in tarefas:
         if t.get("data_limite"):
             t["dias_restantes"] = date_diff(t.get("data_limite"), hoje)
         else:
             t["dias_restantes"] = None
+        # Enriquecer com dados do Serviço vinculado
+        t["cliente_nome"] = ""
+        t["servico_tipo"] = ""
+        if t.get("servico"):
+            sv = frappe.db.get_value("Servico", t.servico,
+                ["cliente","tipo","numero_processo"], as_dict=True)
+            if sv:
+                t["cliente_nome"] = sv.get("cliente", "")
+                t["servico_tipo"] = sv.get("tipo", "")
 
     # Audiências próximas
     audiencias = frappe.get_all("Audiencia",
         filters={"data_hora": ["between", [hoje, set7]]},
-        fields=["name","servico","data_hora","tipo","local_vara","observacoes","cliente"],
+        fields=["name","servico","data_hora","tipo","local_vara","observacoes",
+                "cliente","modalidade","link_virtual"],
         order_by="data_hora asc", limit_page_length=10)
     for a in audiencias:
         a["dias_restantes"] = date_diff(str(a.get("data_hora"))[:10], hoje) if a.get("data_hora") else 0
+        a["cliente_nome"] = a.get("cliente", "")
         if a.get("servico"):
-            sv = frappe.db.get_value("Servico", a.servico, ["cliente","tipo","numero_processo"], as_dict=True)
+            sv = frappe.db.get_value("Servico", a.servico,
+                ["cliente","tipo","numero_processo"], as_dict=True)
             if sv:
-                a["cliente_nome"] = sv.get("cliente", "")
+                if not a["cliente_nome"]:
+                    a["cliente_nome"] = sv.get("cliente", "")
                 a["numero_processo"] = sv.get("numero_processo", "")
 
     clientes = frappe.db.count("Cliente")

@@ -5,11 +5,13 @@ frappe.pages['painel'].on_page_load = function(wrapper) {
         single_column: true
     });
 
-    page.add_button("+ Serviço",     function(){ frappe.new_doc("Servico"); },                          {btn_class:"btn-default"});
-    page.add_button("+ Cliente",     function(){ frappe.new_doc("Cliente"); },                          {btn_class:"btn-default"});
-    page.add_button("+ Honorários",  function(){ frappe.new_doc("Acordo de Honorarios Processuais"); }, {btn_class:"btn-default"});
-    page.add_button("+ Tarefa",      function(){ frappe.new_doc("Tarefa"); },                          {btn_class:"btn-default"});
-    page.add_button("↺ Atualizar",   function(){ render_painel(page); },                               {btn_class:"btn-default"});
+    page.add_button("+ Serviço",    function(){ frappe.new_doc("Servico"); },                          {btn_class:"btn-default"});
+    page.add_button("+ Cliente",    function(){ frappe.new_doc("Cliente"); },                          {btn_class:"btn-default"});
+    page.add_button("+ Honorários", function(){ frappe.new_doc("Acordo de Honorarios Processuais"); }, {btn_class:"btn-default"});
+    page.add_button("+ Audiência",  function(){ frappe.new_doc("Audiencia"); },                        {btn_class:"btn-default"});
+    page.add_button("+ Prazo",      function(){ frappe.new_doc("Controle de Prazos"); },               {btn_class:"btn-default"});
+    page.add_button("+ Tarefa",     function(){ frappe.new_doc("Tarefa"); },                           {btn_class:"btn-default"});
+    page.add_button("↺ Atualizar",  function(){ render_painel(page); },                                {btn_class:"btn-default"});
 
     $(wrapper).find('.page-content').html('<div id="painel-root" style="padding:20px;max-width:1200px"></div>');
     render_painel(page);
@@ -43,7 +45,7 @@ function render_painel(page) {
         var t = d.totais;
         var h = '';
 
-        // KPIs — clicam e scrollam para a seção
+        // KPIs
         h += '<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:28px">';
         h += kpi(fc(t.vencido),   'Vencido',            '#dc2626', 'sec-vencidas',  d.vencidas.length);
         h += kpi(fc(t.proximos),  'Vence em 7 dias',    '#d97706', 'sec-proximas',  d.proximas.length);
@@ -69,7 +71,6 @@ function render_painel(page) {
         }
         h += '</div>';
 
-        // Futuro placeholder
         h += '<div id="sec-futuro"></div>';
 
         // Repasses
@@ -94,18 +95,33 @@ function render_painel(page) {
         if (d.audiencias && d.audiencias.length) {
             h += secao('🏛️ Audiências Esta Semana (' + d.audiencias.length + ')', '#0891b2');
             h += '<div style="background:#fff;border-radius:8px;overflow:hidden;margin-bottom:24px;box-shadow:0 1px 4px rgba(0,0,0,.08)">';
-            h += grid_header(['Data/Hora','Cliente','Processo','Tipo/Local'], '150px 1fr 1fr 1fr');
+            h += grid_header(['Data/Hora','Cliente','Processo','Modalidade','Tipo/Local',''], '140px 1fr 1fr 100px 1fr 80px');
             d.audiencias.forEach(function(a) {
                 var dias = a.dias_restantes || 0;
-                var badge_dias = dias === 0 ? '<span style="background:#dc262622;color:#dc2626;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:600;margin-left:6px">HOJE</span>'
-                    : dias === 1 ? '<span style="background:#d9770622;color:#d97706;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:600;margin-left:6px">AMANHÃ</span>'
-                    : '<span style="color:#6b7280;font-size:11px;margin-left:6px">em ' + dias + 'd</span>';
+                var badge_dias = dias === 0 ? '<span style="background:#dc262622;color:#dc2626;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:600;margin-left:4px">HOJE</span>'
+                    : dias === 1 ? '<span style="background:#d9770622;color:#d97706;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:600;margin-left:4px">AMANHÃ</span>'
+                    : '<span style="color:#6b7280;font-size:11px;margin-left:4px">em ' + dias + 'd</span>';
 
-                h += '<div style="display:grid;grid-template-columns:150px 1fr 1fr 1fr;padding:12px 16px;border-bottom:1px solid #f3f4f6;cursor:pointer;align-items:center;gap:8px" onclick="frappe.set_route(\'Form\',\'Audiencia\',\'' + a.name + '\')">';
-                h += '<span style="font-weight:600;color:#0891b2">' + fmt_data((a.data_hora || '').substring(0,10)) + ' ' + fmt_hora((a.data_hora || '').substring(11,16)) + badge_dias + '</span>';
-                h += '<span style="font-weight:500">' + (a.cliente_nome || '-') + '</span>';
+                var is_virtual = a.modalidade === 'Virtual';
+                var badge_mod = is_virtual
+                    ? '<span style="background:#7c3aed22;color:#7c3aed;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">🖥️ Virtual</span>'
+                    : '<span style="background:#0891b222;color:#0891b2;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">🏢 Presencial</span>';
+
+                var btn_entrar = '';
+                if (is_virtual && a.link_virtual) {
+                    btn_entrar = '<a href="' + a.link_virtual + '" target="_blank" onclick="event.stopPropagation()" style="background:#7c3aed;color:#fff;padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;text-decoration:none;white-space:nowrap;display:inline-block">Entrar ↗</a>';
+                }
+
+                var local_info = (a.tipo || '');
+                if (a.local_vara) local_info += ' — ' + a.local_vara;
+
+                h += '<div style="display:grid;grid-template-columns:140px 1fr 1fr 100px 1fr 80px;padding:12px 16px;border-bottom:1px solid #f3f4f6;cursor:pointer;align-items:center;gap:8px" onclick="frappe.set_route(\'Form\',\'Audiencia\',\'' + a.name + '\')">';
+                h += '<div><span style="font-weight:600;color:#0891b2">' + fmt_data((a.data_hora || '').substring(0,10)) + '</span><br><span style="font-size:12px;color:#6b7280">' + fmt_hora((a.data_hora || '').substring(11,16)) + badge_dias + '</span></div>';
+                h += '<span style="font-weight:500">' + (a.cliente_nome || a.cliente || '-') + '</span>';
                 h += '<span style="font-size:12px;color:#6b7280">' + (a.numero_processo || a.servico || '') + '</span>';
-                h += '<span style="font-size:12px;color:#374151">' + (a.tipo || '') + (a.local_vara ? ' — ' + a.local_vara : '') + '</span>';
+                h += '<span>' + badge_mod + '</span>';
+                h += '<span style="font-size:12px;color:#374151">' + local_info + '</span>';
+                h += '<span style="text-align:center">' + btn_entrar + '</span>';
                 h += '</div>';
             });
             h += '</div>';
@@ -117,14 +133,15 @@ function render_painel(page) {
             h += '<div style="background:#fff;border-radius:8px;overflow:hidden;margin-bottom:24px;box-shadow:0 1px 4px rgba(0,0,0,.08)">';
             h += grid_header(['Prazo','Cliente','Serviço','Vence em','Prioridade'], '1.5fr 1fr 1fr 80px 90px');
             d.prazos.forEach(function(p) {
-                var cor = p.prioridade === 'Alta' ? '#dc2626' : p.prioridade === 'Media' ? '#d97706' : '#6b7280';
+                var cor = p.prioridade === 'Alta' ? '#dc2626' : p.prioridade === 'Média' ? '#d97706' : '#6b7280';
                 var dias = p.dias_restantes || 0;
                 var badge_dias = dias === 0 ? '<span style="color:#dc2626;font-weight:700">HOJE</span>'
                     : dias === 1 ? '<span style="color:#d97706;font-weight:600">Amanhã</span>'
+                    : dias < 0 ? '<span style="color:#dc2626;font-weight:700">VENCIDO ' + Math.abs(dias) + 'd</span>'
                     : '<span style="color:#6b7280">' + dias + ' dias</span>';
 
                 h += '<div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 80px 90px;padding:12px 16px;border-bottom:1px solid #f3f4f6;cursor:pointer;align-items:center;gap:8px" onclick="frappe.set_route(\'Form\',\'Controle de Prazos\',\'' + p.name + '\')">';
-                h += '<div><span style="font-weight:500">' + p.descricao + '</span><br><span style="font-size:11px;color:#9ca3af">' + fmt_data(p.data_prazo) + '</span></div>';
+                h += '<div><span style="font-weight:500">' + (p.descricao || '') + '</span><br><span style="font-size:11px;color:#9ca3af">' + fmt_data(p.data_prazo) + '</span></div>';
                 h += '<span style="font-size:12px">' + (p.cliente_nome || '-') + '</span>';
                 h += '<span style="font-size:12px;color:#6b7280">' + (p.servico_tipo || '') + (p.numero_processo ? ' — ' + p.numero_processo : '') + '</span>';
                 h += '<span style="text-align:center">' + badge_dias + '</span>';
@@ -138,7 +155,7 @@ function render_painel(page) {
         if (d.tarefas.length) {
             h += secao('📋 Tarefas (' + d.tarefas.length + ')', '#2563eb');
             h += '<div style="background:#fff;border-radius:8px;overflow:hidden;margin-bottom:24px;box-shadow:0 1px 4px rgba(0,0,0,.08)">';
-            h += grid_header(['Tarefa','Status','Prazo','Prioridade'], '1.5fr 120px 120px 90px');
+            h += grid_header(['Tarefa','Serviço/Cliente','Status','Prazo','Prioridade'], '1.3fr 1fr 110px 110px 90px');
             d.tarefas.forEach(function(t) {
                 var cor_p = t.prioridade === 'Urgente' ? '#dc2626' : t.prioridade === 'Alta' ? '#d97706' : '#6b7280';
                 var cor_s = t.status === 'Em Andamento' ? '#2563eb' : '#d97706';
@@ -157,8 +174,15 @@ function render_painel(page) {
                     prazo_label = '<span style="color:#9ca3af;font-size:11px">Sem prazo</span>';
                 }
 
-                h += '<div style="display:grid;grid-template-columns:1.5fr 120px 120px 90px;padding:12px 16px;border-bottom:1px solid #f3f4f6;cursor:pointer;align-items:center;gap:8px" onclick="frappe.set_route(\'Form\',\'Tarefa\',\'' + t.name + '\')">';
-                h += '<span style="font-weight:500">' + t.titulo + '</span>';
+                // Serviço/Cliente
+                var ctx = '';
+                if (t.cliente_nome) ctx = '<span style="font-weight:500;font-size:12px">' + t.cliente_nome + '</span>';
+                if (t.servico_tipo) ctx += (ctx ? '<br>' : '') + '<span style="font-size:11px;color:#9ca3af">' + t.servico_tipo + '</span>';
+                if (!ctx) ctx = '<span style="color:#9ca3af;font-size:11px">—</span>';
+
+                h += '<div style="display:grid;grid-template-columns:1.3fr 1fr 110px 110px 90px;padding:12px 16px;border-bottom:1px solid #f3f4f6;cursor:pointer;align-items:center;gap:8px" onclick="frappe.set_route(\'Form\',\'Tarefa\',\'' + t.name + '\')">';
+                h += '<span style="font-weight:500">' + (t.titulo || '') + '</span>';
+                h += '<span>' + ctx + '</span>';
                 h += '<span><span style="background:' + cor_s + '22;color:' + cor_s + ';padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">' + t.status + '</span></span>';
                 h += '<span style="font-size:12px;text-align:center">' + prazo_label + '</span>';
                 h += '<span style="text-align:center"><span style="background:' + cor_p + '22;color:' + cor_p + ';padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">' + t.prioridade + '</span></span>';
@@ -198,9 +222,8 @@ function secao(titulo, cor) {
 
 function grid_header(cols, template) {
     var h = '<div style="display:grid;grid-template-columns:' + template + ';padding:8px 16px;background:#f9fafb;font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;gap:8px">';
-    cols.forEach(function(c, i) {
-        var align = i >= cols.length - 2 ? 'text-align:center' : '';
-        h += '<span style="' + align + '">' + c + '</span>';
+    cols.forEach(function(c) {
+        h += '<span>' + c + '</span>';
     });
     h += '</div>';
     return h;
@@ -209,9 +232,6 @@ function grid_header(cols, template) {
 function tabela_parcelas(lista, cor, mostrar_atraso) {
     var cols = mostrar_atraso ? '1.5fr 1.2fr 1fr auto 70px' : '1.5fr 1.2fr 1fr auto';
     var h = '<div style="background:#fff;border-radius:8px;overflow:hidden;margin-bottom:24px;box-shadow:0 1px 4px rgba(0,0,0,.08)">';
-
-    var header_cols = ['Cliente','Serviço','Parcela','Valor'];
-    if (mostrar_atraso) header_cols.push('Atraso');
 
     h += '<div style="display:grid;grid-template-columns:' + cols + ';padding:8px 16px;background:#f9fafb;font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;gap:8px">';
     h += '<span>Cliente</span><span>Serviço</span><span>Parcela</span><span style="text-align:right">Valor</span>';
