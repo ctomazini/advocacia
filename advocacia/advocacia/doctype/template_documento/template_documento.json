@@ -63,7 +63,7 @@
    "fieldname": "placeholders_info",
    "fieldtype": "HTML",
    "label": "Info Placeholders",
-   "options": "<div style='font-size:12px;line-height:2;'>\n<b>Dados do Cliente (Pessoa Física):</b><br>\n{{ nome }}, {{ cpf }}, {{ rg }}, {{ nacionalidade }}, {{ estado_civil }}, {{ profissao }}, {{ telefone }}, {{ email }}\n<br><br>\n<b>Dados do Cliente (Pessoa Jurídica):</b><br>\n{{ nome }}, {{ cnpj }}, {{ representante }}, {{ cpf_representante }}, {{ telefone }}, {{ email }}\n<br><br>\n<b>Endereço:</b><br>\n{{ endereco }}, {{ numero }}, {{ complemento }}, {{ bairro }}, {{ cidade }}, {{ estado }}, {{ cep }}\n<br><br>\n<b>Serviço:</b><br>\n{{ servico }}, {{ tipo_servico }}, {{ numero_processo }}, {{ area }}, {{ vara }}, {{ comarca }}, {{ parte_contraria }}, {{ valor_causa }}, {{ data_abertura }}\n<br><br>\n<b>Data:</b><br>\n{{ data_hoje }}, {{ data_hoje_extenso }}\n</div>"
+   "options": "<div><b>PF:</b> {{ nome }}, {{ cpf }}, {{ rg }}, {{ nacionalidade }}, {{ estado_civil }}, {{ profissao }}, {{ telefone }}, {{ email }}<br><b>PJ:</b> {{ nome }}, {{ cnpj }}, {{ representante }}, {{ cpf_representante }}<br><b>Endereco:</b> {{ endereco }}, {{ numero }}, {{ complemento }}, {{ bairro }}, {{ cidade }}, {{ estado }}, {{ cep }}<br><b>Servico:</b> {{ servico }}, {{ tipo_servico }}, {{ numero_processo }}, {{ area }}, {{ vara }}, {{ comarca }}, {{ parte_contraria }}, {{ valor_causa }}, {{ data_abertura }}<br><b>Data:</b> {{ data_hoje }}, {{ data_hoje_extenso }}</div>"
   }
  ],
  "permissions": [

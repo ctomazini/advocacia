@@ -7,10 +7,6 @@ app_license = "mit"
 
 fixtures = [
     {
-        "dt": "Server Script",
-        "filters": [["name", "in", ["Gerar Faturas Acordo", "Atualizar Faturas Acordo", "Contar Faturas Acordo", "Gerar Faturas Atos"]]]
-    },
-    {
         "dt": "Workspace",
         "filters": [["name", "=", "Advocacia"]]
     },
@@ -33,3 +29,7 @@ scheduler_events = {
         "advocacia.advocacia.notificacoes.notificar_prazos_diario",
 ]
 }
+
+after_migrate = [
+    "advocacia.advocacia.setup.reinstalar_istable_doctypes"
+]

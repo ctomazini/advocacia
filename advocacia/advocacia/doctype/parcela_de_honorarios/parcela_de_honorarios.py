@@ -3,7 +3,7 @@ from frappe.model.document import Document
 from frappe.utils import today
 
 
-class ParcelaDeHonorarios(Document):
+class ParceladeHonorarios(Document):
     def before_save(self):
         self.atualizar_status()
 

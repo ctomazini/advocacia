@@ -4,73 +4,7 @@ frappe.ui.form.on('Acordo de Honorarios Processuais', {
         controlar_campos(frm);
         somar_totais(frm);
 
-        if (!frm.is_new()) {
-            frappe.call({
-                method: 'contar_faturas_acordo',
-                args: { acordo_name: frm.doc.name },
-                async: false,
-                callback: function(r) {
-                    if (r.message) {
-                        frm._faturas = r.message;
-                    }
-                }
-            });
-
-            var fat = frm._faturas || {total: 0, nao_pagas: 0, pagas: 0};
-
-            if (fat.total === 0 && frm.doc.table_ztjx && frm.doc.table_ztjx.length > 0) {
-                frm.add_custom_button('Gerar Faturas', function() {
-                    frappe.confirm(
-                        'Isso vai criar uma Fatura de Venda para cada parcela não paga. Deseja continuar?',
-                        function() {
-                            frappe.call({
-                                method: 'gerar_faturas_acordo',
-                                args: { acordo_name: frm.doc.name },
-                                callback: function(r) {
-                                    frappe.msgprint(r.message + ' faturas criadas com sucesso!');
-                                    frm.reload_doc();
-                                }
-                            });
-                        }
-                    );
-                }, 'Ações');
-            }
-
-            if (fat.total > 0) {
-                frm.dashboard.add_comment(
-                    'Este acordo possui ' + fat.total + ' fatura(s) vinculada(s) (' +
-                    fat.pagas + ' paga(s), ' + fat.nao_pagas + ' pendente(s)). ' +
-                    'Alterações nas parcelas não atualizam as faturas automaticamente.',
-                    'blue', true
-                );
-
-                frm.add_custom_button('Atualizar Faturas', function() {
-                    frappe.confirm(
-                        '<strong>Atenção:</strong> Isso vai excluir as ' + fat.nao_pagas +
-                        ' fatura(s) não paga(s) e criar novas com os valores atuais das parcelas.<br><br>' +
-                        fat.pagas + ' fatura(s) já paga(s) serão mantidas.<br><br>Deseja continuar?',
-                        function() {
-                            frappe.call({
-                                method: 'atualizar_faturas_acordo',
-                                args: { acordo_name: frm.doc.name },
-                                callback: function(r) {
-                                    if (r.message) {
-                                        frappe.msgprint(r.message.excluidas + ' faturas excluídas. ' + r.message.criadas + ' novas faturas criadas.');
-                                    }
-                                    frm.reload_doc();
-                                }
-                            });
-                        }
-                    );
-                }, 'Ações');
-
-                frm.add_custom_button('Ver Faturas', function() {
-                    frappe.set_route('List', 'Sales Invoice', {
-                        remarks: ['like', '%ACOR:' + frm.doc.name + '%']
-                    });
-                }, 'Ações');
-            }
-        }
+        // TODO: botões de ação futuros aqui
     },
     tipo_de_cobrança: function(frm) {
         controlar_campos(frm);
@@ -247,7 +181,7 @@ function gerar_tabela_parcelas(frm) {
             row.valor_cliente = parcela_cli;
             row.valor_sucumbência = 0;
             row.descrição = 'Parcela ' + (i + 1) + ' de ' + parcelas;
-            row.status = 'A vencer';
+            row.status = 'Pendente';
             if (values.incluir_sucumbencia === 'Na primeira parcela' && i === 0) {
                 row.valor_sucumbência = sucumbencia;
                 row.descrição += ' + Sucumbência';
