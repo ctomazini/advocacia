@@ -406,7 +406,7 @@ function render_alertas(alertas) {
         painel_icon("alert-triangle") +
         " " +
         __("Alertas") +
-        "</h3><div class="painel-alertas">";
+        '</h3><div class="painel-alertas">';
     alertas.forEach(function (a) {
         var nivel = a.nivel === "red" ? "red" : "yellow";
         var texto = "";
