@@ -1,4 +1,4 @@
-frappe.query_reports["Carteira Ativa"] = {
+frappe.query_reports["carteira_ativa"] = {
 	filters: [
 		{
 			fieldname: "cliente",

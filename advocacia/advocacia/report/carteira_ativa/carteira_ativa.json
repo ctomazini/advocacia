@@ -5,10 +5,10 @@
  "doctype": "Report",
  "is_standard": "Yes",
  "module": "Advocacia",
- "name": "Carteira Ativa",
+ "name": "carteira_ativa",
  "owner": "Administrator",
  "ref_doctype": "Servico",
- "report_name": "Carteira Ativa",
+ "report_name": "carteira_ativa",
  "report_type": "Script Report",
  "roles": [
   {

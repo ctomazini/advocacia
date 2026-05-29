@@ -1,4 +1,4 @@
-frappe.query_reports["Fluxo de Caixa Projetado"] = {
+frappe.query_reports["fluxo_de_caixa"] = {
 	filters: [
 		{
 			fieldname: "meses",

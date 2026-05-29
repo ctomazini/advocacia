@@ -5,10 +5,10 @@
  "doctype": "Report",
  "is_standard": "Yes",
  "module": "Advocacia",
- "name": "Fluxo de Caixa Projetado",
+ "name": "fluxo_de_caixa",
  "owner": "Administrator",
  "ref_doctype": "Pagamento",
- "report_name": "Fluxo de Caixa Projetado",
+ "report_name": "fluxo_de_caixa",
  "report_type": "Script Report",
  "roles": [
   {

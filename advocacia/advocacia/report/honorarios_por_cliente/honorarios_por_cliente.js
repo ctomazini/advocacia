@@ -1,4 +1,4 @@
-frappe.query_reports["Honorários por Cliente"] = {
+frappe.query_reports["honorarios_por_cliente"] = {
 	filters: [
 		{
 			fieldname: "cliente",

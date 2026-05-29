@@ -77,4 +77,6 @@ after_migrate = [
     "advocacia.advocacia.setup.install.after_install",
     "advocacia.advocacia.setup.translations.ensure_doctype_translations",
     "advocacia.advocacia.setup.sidebar.ensure_advocacia_sidebar",
+    "advocacia.advocacia.setup.workspace.ensure_advocacia_workspace",
+    "advocacia.advocacia.setup.reports.ensure_advocacia_reports",
 ]
