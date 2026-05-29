@@ -598,7 +598,7 @@
    "oldfieldname": null,
    "fieldtype": "Select",
    "oldfieldtype": null,
-   "options": "Em andamento\nEncerrado\nSuspenso",
+   "options": "Em andamento\nEncerrado\nSuspenso\nArquivado",
    "search_index": 0,
    "show_dashboard": 0,
    "hidden": 0,

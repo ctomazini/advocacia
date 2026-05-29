@@ -164,3 +164,54 @@ def _send_system_notification(users, doctype, docname, subject, message):
 			"from_user": frappe.session.user or "Administrator",
 		},
 	)
+
+
+def verificar_status_servicos():
+	"""Verifica servicos Em andamento que podem ser arquivados."""
+	hoje = today()
+
+	servicos = frappe.get_all(
+		"Servico",
+		filters={"status": "Em andamento"},
+		fields=["name"],
+	)
+
+	for s in servicos:
+		nome = s.name
+
+		acordos = frappe.get_all(
+			"Acordo de Honorarios Processuais",
+			filters={"servico": nome, "status": ["in", ["Vigente"]]},
+			fields=["name"],
+		)
+		tem_parcela_aberta = False
+		for ac in acordos:
+			count = frappe.db.count(
+				"Parcela de Honorarios",
+				{"parent": ac.name, "status": ["in", ["Pendente", "Vencida"]]},
+			)
+			if count > 0:
+				tem_parcela_aberta = True
+				break
+
+		if tem_parcela_aberta:
+			continue
+
+		tem_prazo = frappe.db.count(
+			"Controle de Prazos",
+			{"servico": nome, "status": "Pendente"},
+		)
+		if tem_prazo:
+			continue
+
+		tem_audiencia = frappe.db.count(
+			"Audiencia",
+			{"servico": nome, "data_hora": [">=", f"{hoje} 00:00:00"]},
+		)
+		if tem_audiencia:
+			continue
+
+		frappe.db.set_value("Servico", nome, "status", "Arquivado")
+		frappe.logger().info("Servico {0} arquivado automaticamente".format(nome))
+
+	frappe.db.commit()

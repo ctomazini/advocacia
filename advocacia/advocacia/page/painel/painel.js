@@ -26,6 +26,7 @@ frappe.pages.painel.on_page_load = function (wrapper) {
         load_painel(page);
     });
 
+    frappe.pages.painel.page = page;
     load_painel(page);
 };
 
@@ -81,6 +82,15 @@ function inject_painel_styles() {
         .painel-kpi-icon {
             color: var(--text-muted);
             margin-bottom: 8px;
+        }
+        .painel-kpi-card.painel-kpi-green .painel-kpi-value {
+            color: var(--green-500);
+        }
+        .painel-kpi-card.painel-kpi-green .painel-kpi-icon {
+            color: var(--green-500);
+        }
+        .painel-parcelas-actions {
+            white-space: nowrap;
         }
         .painel-alertas {
             display: flex;
@@ -325,8 +335,7 @@ function get_kpi_routes() {
             scroll_painel_section("painel-parcelas");
         },
         function () {
-            frappe.route_options = { status: "Recebida" };
-            frappe.set_route("List", "Acordo de Honorarios Processuais");
+            scroll_painel_section("painel-parcelas");
         },
         function () {
             scroll_painel_section("painel-audiencias");
@@ -360,9 +369,10 @@ function render_kpis(k) {
         {
             key: "recebido",
             icon: "money",
-            label: __("Recebido no mês"),
+            label: __("Recebido este mês"),
             value: fmt_currency(k.recebido_mes.valor),
             sub: __("{0} parcela(s)", [k.recebido_mes.count]),
+            green: true,
         },
         { key: "audiencias", icon: "milestone", label: __("Audiências (7 dias)"), value: k.audiencias_semana },
         { key: "prazos", icon: "time", label: __("Prazos urgentes"), value: k.prazos_urgentes },
@@ -371,7 +381,9 @@ function render_kpis(k) {
     var h = '<div class="painel-section"><div class="kpi-grid">';
     items.forEach(function (item) {
         h +=
-            '<div class="painel-kpi-card" data-kpi="' +
+            '<div class="painel-kpi-card' +
+            (item.green ? " painel-kpi-green" : "") +
+            '" data-kpi="' +
             item.key +
             '">' +
             '<div class="painel-kpi-icon">' +
@@ -474,6 +486,8 @@ function render_parcelas(parcelas) {
         __("Status") +
         "</th><th>" +
         __("Prazo") +
+        "</th><th>" +
+        __("Ações") +
         "</th></tr></thead><tbody>";
     parcelas.forEach(function (p) {
         var servico =
@@ -489,6 +503,15 @@ function render_parcelas(parcelas) {
                 p.dias_para_vencer === 0
                     ? __("Hoje")
                     : __("Em {0}d", [p.dias_para_vencer]);
+        }
+        var btn_recebida = "";
+        if (p.status === "Vencida" || p.status === "Pendente") {
+            btn_recebida =
+                '<button type="button" class="btn btn-xs btn-success painel-btn-recebida" data-parcela="' +
+                frappe.utils.escape_html(p.name || "") +
+                '">✓ ' +
+                __("Recebida") +
+                "</button>";
         }
         h +=
             '<tr class="painel-row-click" data-acordo="' +
@@ -511,6 +534,8 @@ function render_parcelas(parcelas) {
             "</td>" +
             '<td class="painel-muted">' +
             frappe.utils.escape_html(prazo_txt) +
+            '</td><td class="painel-parcelas-actions">' +
+            btn_recebida +
             "</td></tr>";
     });
     h += "</tbody></table></div></div>";
@@ -669,7 +694,40 @@ $(document).on("click", ".painel-list-item", function () {
     if (dt && dn) frappe.set_route("Form", dt, dn);
 });
 
-$(document).on("click", "tr.painel-row-click", function () {
+$(document).on("click", "tr.painel-row-click", function (e) {
+    if ($(e.target).closest(".painel-btn-recebida").length) return;
     var acordo = $(this).attr("data-acordo");
     if (acordo) frappe.set_route("Form", "Acordo de Honorarios Processuais", acordo);
+});
+
+$(document).on("click", ".painel-btn-recebida", function (e) {
+    e.stopPropagation();
+    var btn = $(this);
+    var parcela = btn.attr("data-parcela");
+    if (!parcela) return;
+
+    frappe.confirm(
+        __("Marcar parcela como recebida hoje?"),
+        function () {
+            btn.prop("disabled", true).text("...");
+            frappe
+                .xcall("advocacia.advocacia.painel_api.marcar_parcela_recebida", {
+                    parcela_name: parcela,
+                })
+                .then(function () {
+                    frappe.show_alert({
+                        message: __("Parcela marcada como Recebida"),
+                        indicator: "green",
+                    });
+                    var page =
+                        (frappe.pages.painel && frappe.pages.painel.page) ||
+                        (cur_page && cur_page.page ? cur_page.page : null);
+                    if (page && typeof load_painel === "function") load_painel(page);
+                })
+                .catch(function (err) {
+                    btn.prop("disabled", false).text("✓ " + __("Recebida"));
+                    frappe.msgprint(err.message || __("Erro ao marcar parcela"));
+                });
+        }
+    );
 });

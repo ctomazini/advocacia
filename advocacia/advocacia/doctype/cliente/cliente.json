@@ -149,6 +149,28 @@
    "fieldtype": "Text Editor"
   }
  ],
+ "links": [
+  {
+   "link_doctype": "Servico",
+   "link_fieldname": "cliente",
+   "group": "Jurídico"
+  },
+  {
+   "link_doctype": "Audiencia",
+   "link_fieldname": "cliente",
+   "group": "Jurídico"
+  },
+  {
+   "link_doctype": "Controle de Prazos",
+   "link_fieldname": "cliente",
+   "group": "Jurídico"
+  },
+  {
+   "link_doctype": "Acordo de Honorarios Processuais",
+   "link_fieldname": "cliente",
+   "group": "Financeiro"
+  }
+ ],
  "permissions": [
   {
    "role": "Advocacia Manager",

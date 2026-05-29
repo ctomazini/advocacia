@@ -39,11 +39,14 @@ app_include_js = [
 
 scheduler_events = {
     "daily": [
-        "advocacia.advocacia.notificacoes.notificar_prazos_diario",
         "advocacia.advocacia.tasks.verificar_parcelas_vencidas",
         "advocacia.advocacia.tasks.notificar_parcelas_vencidas",
         "advocacia.advocacia.tasks.notificar_audiencias_hoje",
-    ]
+        "advocacia.advocacia.notificacoes.notificar_prazos_diario",
+    ],
+    "weekly": [
+        "advocacia.advocacia.tasks.verificar_status_servicos",
+    ],
 }
 
 doc_events = {

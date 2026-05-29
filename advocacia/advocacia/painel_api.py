@@ -349,3 +349,21 @@ def _vara_label(vara_link):
         return frappe.db.get_value("Vara", vara_link, "vara_name") or vara_link
     except Exception:
         return vara_link
+
+
+@frappe.whitelist()
+def marcar_parcela_recebida(parcela_name):
+    """Marca uma Parcela de Honorarios como Recebida direto do Painel."""
+    if not frappe.has_permission("Parcela de Honorarios", "write"):
+        frappe.throw(_("Sem permissão"), frappe.PermissionError)
+
+    doc = frappe.get_doc("Parcela de Honorarios", parcela_name)
+    if doc.status in ("Recebida", "Repassada"):
+        frappe.throw(_("Parcela já está {0}").format(doc.status))
+
+    doc.status = "Recebida"
+    doc.data_recebimento = today()
+    doc.save(ignore_permissions=False)
+    frappe.db.commit()
+
+    return {"ok": True, "name": doc.name, "parent": doc.parent}

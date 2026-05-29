@@ -1,7 +1,7 @@
 {
  "app": "advocacia",
  "charts": [],
- "content": "[{\"id\":\"y6jyGLhYSL\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Advocacia</span>\",\"col\":12}},{\"id\":\"PSN05e8CxZ\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Painel\",\"col\":4}},{\"id\":\"nawvi31r5Y\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Servi\u00e7os\",\"col\":4}},{\"id\":\"J5WPMFc2_V\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Acordos\",\"col\":4}},{\"id\":\"DHXaeJMkpO\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Registro de Atos\",\"col\":4}},{\"id\":\"aWDH4Gn1c-\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Audi\u00eancias\",\"col\":4}},{\"id\":\"Ym70T1YLul\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Prazos\",\"col\":4}},{\"id\":\"GfL5RgG27M\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Faturas\",\"col\":4}},{\"id\":\"gr1JciaxgZ\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Clientes\",\"col\":4}},{\"id\":\"yNDKY4sR0b\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Cadastro de documentos\",\"col\":4}}]",
+ "content": "[{\"id\":\"y6jyGLhYSL\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Advocacia</span>\",\"col\":12}},{\"id\":\"PSN05e8CxZ\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Painel\",\"col\":4}},{\"id\":\"nawvi31r5Y\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Servi\u00e7os\",\"col\":4}},{\"id\":\"J5WPMFc2_V\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Honorários\",\"col\":4}},{\"id\":\"DHXaeJMkpO\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Registro de Atos\",\"col\":4}},{\"id\":\"aWDH4Gn1c-\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Audi\u00eancias\",\"col\":4}},{\"id\":\"Ym70T1YLul\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Prazos\",\"col\":4}},{\"id\":\"GfL5RgG27M\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Faturas\",\"col\":4}},{\"id\":\"gr1JciaxgZ\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Clientes\",\"col\":4}},{\"id\":\"yNDKY4sR0b\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Cadastro de documentos\",\"col\":4}}]",
  "creation": "2026-05-28 14:56:08.206767",
  "custom_blocks": [],
  "docstatus": 0,
@@ -180,7 +180,7 @@
   },
   {
    "color": "Purple",
-   "label": "Acordos",
+   "label": "Honorários",
    "link_to": "Acordo de Honorarios Processuais",
    "type": "DocType"
   },
