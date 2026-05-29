@@ -1,0 +1,73 @@
+{
+ "doctype": "DocType",
+ "name": "Tribunal",
+ "module": "Advocacia",
+ "custom": 0,
+ "istable": 0,
+ "track_changes": 1,
+ "autoname": "field:tribunal_name",
+ "title_field": "tribunal_name",
+ "search_fields": "tribunal_name,abbreviation,jurisdiction",
+ "fields": [
+  {
+   "fieldname": "tribunal_name",
+   "label": "Nome do Tribunal",
+   "fieldtype": "Data",
+   "reqd": 1,
+   "unique": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "abbreviation",
+   "label": "Sigla",
+   "fieldtype": "Data",
+   "reqd": 1,
+   "unique": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "jurisdiction",
+   "label": "Esfera",
+   "fieldtype": "Select",
+   "reqd": 1,
+   "options": "Estadual\nFederal\nTrabalho\nSuperior\nMilitar\nEleitoral",
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  }
+ ],
+ "permissions": [
+  {
+   "role": "Advocacia Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Advocacia User",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 0,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  }
+ ],
+ "sort_field": "tribunal_name",
+ "sort_order": "ASC"
+}

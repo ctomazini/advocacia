@@ -101,6 +101,55 @@
    "link_type": "Page",
    "onboard": 1,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Cadastros",
+   "link_count": 0,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Comarca",
+   "link_count": 0,
+   "link_to": "Comarca",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Vara",
+   "link_count": 0,
+   "link_to": "Vara",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Tribunal",
+   "link_count": 0,
+   "link_to": "Tribunal",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Fase Processual",
+   "link_count": 0,
+   "link_to": "Fase Processual",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
  "modified": "2026-05-28 20:25:10.412864",
@@ -170,6 +219,30 @@
   {
    "label": "Tarefas",
    "link_to": "Tarefa",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "label": "Comarca",
+   "link_to": "Comarca",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "label": "Vara",
+   "link_to": "Vara",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "label": "Tribunal",
+   "link_to": "Tribunal",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "label": "Fase Processual",
+   "link_to": "Fase Processual",
    "type": "DocType"
   }
  ],
