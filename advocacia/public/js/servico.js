@@ -1,5 +1,23 @@
 frappe.ui.form.on('Servico', {
     refresh: function(frm) {
+        if (frm.fields_dict.numero_processo) {
+            var $cnj = frm.fields_dict.numero_processo.$input;
+            if ($cnj && $cnj.length) {
+                if ($.fn.inputmask) {
+                    $cnj.inputmask('9999999-99.9999.9.99.9999');
+                } else {
+                    $cnj.off('input.advocacia_cnj').on('input.advocacia_cnj', function() {
+                        var digits = $cnj.val().replace(/\D/g, '').slice(0, 20);
+                        $cnj.val(digits
+                            .replace(/^(\d{7})(\d)/, '$1-$2')
+                            .replace(/^(\d{7})-(\d{2})(\d)/, '$1-$2.$3')
+                            .replace(/\.(\d{4})(\d)/, '.$1.$2')
+                            .replace(/\.(\d{4})\.(\d)(\d{2})/, '.$1.$2.$3')
+                            .replace(/\.(\d{4})\.(\d)\.(\d{2})(\d)/, '.$1.$2.$3.$4'));
+                    });
+                }
+            }
+        }
         if (!frm.is_new()) {
             frm.add_custom_button(__('Gerar Documento'), function() {
                 frappe.call({
