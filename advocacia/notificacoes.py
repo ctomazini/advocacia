@@ -87,24 +87,3 @@ def notificar_prazos_diario():
             message=html,
             now=True
         )
-
-
-def atualizar_status_faturas():
-    """Scheduler diário — atualiza faturas vencidas"""
-    from frappe.utils import today
-    faturas = frappe.get_all(
-        "Fatura",
-        filters={
-            "status": "Pendente",
-            "data_vencimento": ["<", today()],
-            "data_pagamento": ["is", "not set"]
-        },
-        fields=["name"]
-    )
-    count = 0
-    for f in faturas:
-        frappe.db.set_value("Fatura", f.name, "status", "Vencida")
-        count += 1
-    if count:
-        frappe.db.commit()
-    return count
