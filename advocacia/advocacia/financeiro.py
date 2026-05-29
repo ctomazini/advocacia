@@ -1,6 +1,6 @@
 import frappe
 from frappe import _
-from frappe.utils import add_days, flt, getdate, now_datetime, today
+from frappe.utils import add_days, cstr, flt, getdate, now_datetime, today
 
 STATUS_PARCELA_TO_PAGAMENTO = {
 	"Pendente": "Pendente",
@@ -79,12 +79,14 @@ def _sincronizar_pagamentos_do_acordo_impl(acordo, commit=False):
 		if not pagamento_name:
 			doc = frappe.get_doc({"doctype": "Pagamento", **payload})
 			doc.insert(ignore_permissions=True)
+			_vincular_pagamento_na_parcela(origem_id, doc.name)
 			criados += 1
 			continue
 
 		pagamento = frappe.get_doc("Pagamento", pagamento_name)
 		if is_pagamento_atos(pagamento):
 			continue
+		_vincular_pagamento_na_parcela(origem_id, pagamento_name)
 		if _pode_atualizar_pagamento(pagamento):
 			changed = _apply_pagamento_payload(pagamento, payload)
 			if changed:
@@ -124,7 +126,7 @@ def migrar_pagamentos_existentes():
 
 
 def sync_parcela_from_pagamento(pagamento):
-	"""Propaga recebimento do Pagamento para a parcela contratual."""
+	"""Propaga status do Pagamento para a parcela contratual."""
 	if is_pagamento_atos(pagamento):
 		return
 	if not pagamento.parcela_origem_id:
@@ -154,8 +156,96 @@ def sync_parcela_from_pagamento(pagamento):
 	elif pagamento.status == "Pendente":
 		updates["status"] = "Pendente"
 
+	if pagamento.name:
+		updates["pagamento"] = pagamento.name
+
 	if updates:
 		frappe.db.set_value("Parcela de Honorarios", parcela_name, updates, update_modified=True)
+
+
+def sync_pagamento_from_parcela(parcela):
+	"""Propaga status da parcela contratual para o Pagamento vinculado."""
+	if not parcela.get("parcela_origem_id"):
+		return
+	if str(parcela.parcela_origem_id).startswith("ATOS-"):
+		return
+
+	pagamento_name = frappe.db.get_value(
+		"Pagamento", {"parcela_origem_id": parcela.parcela_origem_id}, "name"
+	)
+	if not pagamento_name:
+		return
+
+	pagamento = frappe.get_doc("Pagamento", pagamento_name)
+	if is_pagamento_atos(pagamento) or pagamento.status == "Cancelado":
+		return
+	if pagamento.manual_override or pagamento.status in ("Recebido", "Repassado"):
+		_vincular_pagamento_na_parcela(parcela.parcela_origem_id, pagamento_name)
+		return
+
+	new_status = STATUS_PARCELA_TO_PAGAMENTO.get(parcela.status or "Pendente", "Pendente")
+	updates = {}
+	if pagamento.status != new_status and pagamento.status in ("Pendente", "Vencido"):
+		updates["status"] = new_status
+	if parcela.status in ("Recebida", "Repassada") and parcela.get("data_recebimento"):
+		if not pagamento.data_recebimento:
+			updates["data_recebimento"] = parcela.data_recebimento
+
+	_vincular_pagamento_na_parcela(parcela.parcela_origem_id, pagamento_name)
+
+	if not updates:
+		return
+
+	already_syncing = getattr(frappe.flags, "in_pagamento_sync", False)
+	if not already_syncing:
+		frappe.flags.in_pagamento_sync = True
+	try:
+		updates["sincronizado_em"] = now_datetime()
+		frappe.db.set_value("Pagamento", pagamento_name, updates, update_modified=True)
+	finally:
+		if not already_syncing:
+			frappe.flags.in_pagamento_sync = False
+
+
+def _vincular_pagamento_na_parcela(parcela_origem_id, pagamento_name):
+	"""Grava Link Pagamento na linha da parcela contratual (via parcela_origem_id)."""
+	if not parcela_origem_id or not pagamento_name:
+		return
+	parcela_name = frappe.db.get_value(
+		"Parcela de Honorarios",
+		{"parcela_origem_id": parcela_origem_id},
+		"name",
+	)
+	if not parcela_name:
+		return
+	current = frappe.db.get_value("Parcela de Honorarios", parcela_name, "pagamento")
+	if current != pagamento_name:
+		frappe.db.set_value(
+			"Parcela de Honorarios",
+			parcela_name,
+			"pagamento",
+			pagamento_name,
+			update_modified=False,
+		)
+
+
+def _limpar_vinculo_pagamento_na_parcela(pagamento):
+	"""Remove Link pagamento das parcelas antes de excluir (evita LinkExistsError)."""
+	if not pagamento.name:
+		return
+	parcelas = frappe.get_all(
+		"Parcela de Honorarios",
+		filters={"pagamento": pagamento.name},
+		pluck="name",
+	)
+	for parcela_name in parcelas:
+		frappe.db.set_value(
+			"Parcela de Honorarios",
+			parcela_name,
+			"pagamento",
+			"",
+			update_modified=False,
+		)
 
 
 def on_pagamento_trash(doc, method=None):
@@ -170,18 +260,21 @@ def on_pagamento_trash(doc, method=None):
 			title=_("Exclusão Bloqueada"),
 		)
 
+	_limpar_vinculo_pagamento_na_parcela(doc)
+
 
 def on_pagamento_update_honorarios(doc, method=None):
-	"""Propaga cancelamento de pagamento de honorários para a parcela contratual."""
+	"""Propaga status do Pagamento de honorários para parcela e recalcula acordo."""
 	if getattr(frappe.flags, "in_pagamento_sync", False):
 		return
 	if is_pagamento_atos(doc):
 		return
-	if doc.status != "Cancelado":
-		return
 
 	sync_parcela_from_pagamento(doc)
-	if doc.acordo:
+
+	if not doc.acordo:
+		return
+	if doc.status == "Cancelado":
 		verificar_acordo_quitado(doc.acordo)
 
 
@@ -237,6 +330,84 @@ def resync_pagamentos_acordo(acordo_name):
 		indicator="green",
 	)
 	return {"status": "ok"}
+
+
+@frappe.whitelist()
+def bulk_delete_pagamentos(names):
+	"""Exclusão em massa síncrona com feedback (contorna fila padrão do Frappe para >10)."""
+	import json
+
+	STATUS_BULK_PERMITIDOS = ("Pendente", "Cancelado")
+
+	if isinstance(names, str):
+		names = json.loads(names)
+	if not names:
+		frappe.throw(_("Nenhum pagamento selecionado."))
+	frappe.has_permission("Pagamento", "delete", throw=True)
+
+	excluidos = []
+	ignorados = []
+
+	for name in names:
+		if not frappe.db.exists("Pagamento", name):
+			ignorados.append({"name": name, "motivo": _("Registro não encontrado.")})
+			continue
+
+		doc = frappe.get_doc("Pagamento", name)
+		if doc.status not in STATUS_BULK_PERMITIDOS:
+			if doc.status in ("Recebido", "Repassado"):
+				motivo = _(
+					"Status '{0}' não permite exclusão em massa. Cancele primeiro."
+				).format(doc.status)
+			else:
+				motivo = _(
+					"Status '{0}' não permite exclusão em massa. "
+					"Exclua individualmente abrindo o registro."
+				).format(doc.status)
+			ignorados.append({"name": doc.name, "motivo": motivo})
+			continue
+
+		try:
+			frappe.flags.in_bulk_delete = True
+			frappe.delete_doc("Pagamento", doc.name, force=0, ignore_permissions=False)
+			frappe.db.commit()
+			excluidos.append(doc.name)
+		except Exception as e:
+			frappe.db.rollback()
+			ignorados.append({"name": doc.name, "motivo": cstr(e)})
+
+	return {
+		"excluidos": excluidos,
+		"ignorados": ignorados,
+		"total": len(names),
+	}
+
+
+def _exibir_resultado_bulk_delete(deleted, skipped):
+	if deleted and not skipped:
+		frappe.msgprint(
+			_("Excluídos {0} pagamento(s).").format(len(deleted)),
+			title=_("Exclusão em massa"),
+			indicator="green",
+		)
+	elif deleted and skipped:
+		frappe.msgprint(
+			_(
+				"Excluídos {0} pagamento(s). Ignorados {1} "
+				"(recebidos/repassados ou bloqueados)."
+			).format(len(deleted), len(skipped)),
+			title=_("Exclusão parcial"),
+			indicator="orange",
+		)
+	elif skipped:
+		frappe.msgprint(
+			_(
+				"Nenhum pagamento excluído. {0} registro(s) bloqueado(s). "
+				"Pagamentos recebidos/repassados precisam ser cancelados antes."
+			).format(len(skipped)),
+			title=_("Exclusão bloqueada"),
+			indicator="red",
+		)
 
 
 @frappe.whitelist()
