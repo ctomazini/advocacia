@@ -7,21 +7,10 @@ frappe.pages.painel.on_page_load = function (wrapper) {
         single_column: true,
     });
 
-    page.painel_container = $('<div class="painel-container"></div>').appendTo(page.main);
+    page.painel_container = $('<div class="painel-root"></div>').appendTo(page.main);
     inject_painel_styles();
+    painel_polish_frappe_chrome();
 
-    page.add_button(__("+ Serviço"), function () {
-        frappe.new_doc("Servico");
-    });
-    page.add_button(__("+ Honorários"), function () {
-        frappe.new_doc("Acordo de Honorarios Processuais");
-    });
-    page.add_button(__("+ Audiência"), function () {
-        frappe.new_doc("Audiencia");
-    });
-    page.add_button(__("+ Prazo"), function () {
-        frappe.new_doc("Controle de Prazos");
-    });
     page.add_button(__("↺ Atualizar"), function () {
         load_painel(page);
     });
@@ -30,196 +19,568 @@ frappe.pages.painel.on_page_load = function (wrapper) {
     load_painel(page);
 };
 
+frappe.pages.painel.on_page_hide = function () {
+    $(document.body).removeClass("advocacia-painel-active");
+};
+
+function painel_polish_frappe_chrome() {
+    $(document.body).addClass("advocacia-painel-active");
+}
+
 function inject_painel_styles() {
-    if (document.getElementById("painel-advocacia-styles")) return;
+    $("#painel-advocacia-styles").remove();
     var css = `
-        .painel-container {
-            padding: 16px;
-            max-width: 1280px;
-            background: var(--bg-default);
+        body.advocacia-painel-active .page-head {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 4px;
         }
-        .painel-section {
-            margin-bottom: 32px;
-        }
-        .painel-section-title {
-            font-size: var(--text-base);
-            font-weight: 600;
-            color: var(--text-color);
-            margin: 0 0 12px 0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .kpi-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-        }
-        .painel-kpi-card {
-            border-radius: var(--border-radius-lg);
-            border: 1px solid var(--border-color);
-            background: var(--card-bg);
-            padding: 16px;
-            min-height: 88px;
-            cursor: pointer;
-            transition: box-shadow 0.2s ease;
-            box-shadow: var(--shadow-sm);
-        }
-        .painel-kpi-card:hover {
-            box-shadow: var(--shadow-sm);
-        }
-        .painel-kpi-value {
-            font-size: var(--text-lg);
-            font-weight: 700;
-            color: var(--text-color);
-            line-height: 1.2;
-        }
-        .painel-kpi-label {
-            font-size: var(--text-sm);
-            color: var(--text-muted);
-            margin-top: 8px;
-        }
-        .painel-kpi-icon {
-            color: var(--text-muted);
-            margin-bottom: 8px;
-        }
-        .painel-kpi-card.painel-kpi-green .painel-kpi-value {
-            color: var(--green-500);
-        }
-        .painel-kpi-card.painel-kpi-green .painel-kpi-icon {
-            color: var(--green-500);
-        }
-        .painel-parcelas-actions {
-            white-space: nowrap;
-        }
-        .painel-alertas {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .painel-alerta {
-            border-radius: var(--border-radius-lg);
-            border: 1px solid var(--border-color);
-            padding: 12px 16px;
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            cursor: pointer;
-            min-height: 44px;
-        }
-        .painel-alerta.red {
-            background: color-mix(in srgb, var(--red-500) 12%, var(--card-bg));
-            border-color: var(--red-500);
-        }
-        .painel-alerta.yellow {
-            background: color-mix(in srgb, var(--yellow-500) 12%, var(--card-bg));
-            border-color: var(--yellow-500);
-        }
-        .painel-card {
-            border-radius: var(--border-radius-lg);
-            border: 1px solid var(--border-color);
-            background: var(--card-bg);
-            box-shadow: var(--shadow-sm);
+        body.advocacia-painel-active .page-head .title-area .title-text {
+            visibility: hidden;
+            height: 0;
+            margin: 0;
             overflow: hidden;
         }
-        .painel-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: var(--text-sm);
+        body.advocacia-painel-active .layout-main-section {
+            padding-top: 0;
         }
-        .painel-table th {
-            text-align: left;
-            padding: 12px 16px;
-            background: var(--subtle-fg);
-            color: var(--text-muted);
-            font-weight: 600;
-            font-size: var(--text-sm);
-            text-transform: uppercase;
-            letter-spacing: 0.02em;
-        }
-        .painel-table td {
-            padding: 12px 16px;
-            border-top: 1px solid var(--border-color);
+        .painel-root {
+            --painel-radius: 16px;
+            --painel-radius-sm: 12px;
+            --painel-gap: 40px;
+            --painel-gap-md: 28px;
+            --painel-gap-sm: 16px;
+            --painel-shadow: 0 1px 2px color-mix(in srgb, var(--gray-900) 4%, transparent),
+                0 8px 24px color-mix(in srgb, var(--gray-900) 5%, transparent);
+            --painel-shadow-hover: 0 2px 4px color-mix(in srgb, var(--gray-900) 5%, transparent),
+                0 12px 32px color-mix(in srgb, var(--gray-900) 8%, transparent);
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 12px 28px 64px;
             color: var(--text-color);
-            vertical-align: middle;
+            -webkit-font-smoothing: antialiased;
         }
-        .painel-table tr.painel-row-click {
-            cursor: pointer;
+        .painel-content {
+            animation: painel-fade-in 0.45s ease-out;
         }
-        .painel-table tr.painel-row-click:hover td {
-            background: var(--subtle-fg);
+        @keyframes painel-fade-in {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .painel-section-table {
-            overflow-x: auto;
+        .painel-hero {
+            padding: 36px 0 28px;
+            margin-bottom: var(--painel-gap-md);
+            border-bottom: none;
         }
-        .painel-list-item {
-            padding: 12px 16px;
-            border-top: 1px solid var(--border-color);
-            cursor: pointer;
-            min-height: 44px;
+        .painel-hero-greeting {
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            font-weight: 600;
+            letter-spacing: -0.035em;
+            line-height: 1.15;
+            margin: 0 0 10px;
+            color: var(--text-color);
+        }
+        .painel-hero-date {
+            font-size: var(--text-base);
+            color: var(--text-muted);
+            margin: 0 0 8px;
+            font-weight: 400;
+        }
+        .painel-hero-context {
+            font-size: var(--text-sm);
+            color: var(--text-muted);
+            line-height: 1.55;
+            max-width: 52rem;
+            margin: 0 0 20px;
+        }
+        .painel-hero-pulse {
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            gap: 8px 16px;
+            gap: 12px 24px;
+            font-size: var(--text-sm);
+            color: var(--text-muted);
+            line-height: 1.5;
         }
-        .painel-list-item:first-child {
-            border-top: none;
+        .painel-hero-pulse strong {
+            color: var(--text-color);
+            font-weight: 600;
         }
-        .painel-list-item:hover {
-            background: var(--subtle-fg);
+        .painel-hero-pulse .dot {
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            opacity: 0.35;
+        }
+        .painel-urgency-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.01em;
+        }
+        .painel-urgency-badge.alta {
+            background: color-mix(in srgb, var(--red-500) 10%, var(--card-bg));
+            color: var(--red-600);
+            border: 1px solid color-mix(in srgb, var(--red-500) 22%, transparent);
+        }
+        .painel-urgency-badge.normal {
+            background: color-mix(in srgb, var(--green-500) 8%, var(--card-bg));
+            color: var(--green-700);
+            border: 1px solid color-mix(in srgb, var(--green-500) 18%, transparent);
+        }
+        .painel-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: var(--painel-gap-md);
+        }
+        .painel-action-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 18px;
+            border-radius: var(--painel-radius-sm);
+            border: 1px solid color-mix(in srgb, var(--border-color) 80%, transparent);
+            background: var(--card-bg);
+            color: var(--text-color);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: border-color 0.22s ease, box-shadow 0.22s ease, transform 0.18s ease, background 0.22s ease;
+            min-height: 44px;
+            box-shadow: var(--painel-shadow);
+        }
+        .painel-action-chip:hover {
+            border-color: color-mix(in srgb, var(--primary) 35%, var(--border-color));
+            box-shadow: var(--painel-shadow-hover);
+            transform: translateY(-1px);
+            background: color-mix(in srgb, var(--primary) 4%, var(--card-bg));
+        }
+        .painel-section { margin-bottom: var(--painel-gap); }
+        .painel-section--primary { margin-bottom: calc(var(--painel-gap) + 8px); }
+        .painel-section-head {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            gap: 16px;
+        }
+        .painel-section-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: var(--text-color);
+            margin: 0;
+            line-height: 1.3;
+        }
+        .painel-section-sub {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin: 6px 0 0;
+            font-weight: 400;
+            line-height: 1.45;
+        }
+        .painel-section-link {
+            font-size: 13px;
+            color: var(--primary);
+            cursor: pointer;
+            font-weight: 500;
+            opacity: 0.9;
+            transition: opacity 0.15s ease;
+            white-space: nowrap;
+        }
+        .painel-section-link:hover { opacity: 1; }
+        .painel-kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        .painel-kpi {
+            position: relative;
+            padding: 28px 24px 24px;
+            border-radius: var(--painel-radius);
+            background: var(--card-bg);
+            border: 1px solid color-mix(in srgb, var(--border-color) 70%, transparent);
+            cursor: pointer;
+            transition: box-shadow 0.28s ease, border-color 0.22s ease, transform 0.22s ease;
+            overflow: hidden;
+            box-shadow: var(--painel-shadow);
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+        .painel-kpi::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: color-mix(in srgb, var(--border-color) 90%, transparent);
+        }
+        .painel-kpi:hover {
+            box-shadow: var(--painel-shadow-hover);
+            transform: translateY(-2px);
+            border-color: color-mix(in srgb, var(--primary) 18%, var(--border-color));
+        }
+        .painel-kpi.urgent::before {
+            background: color-mix(in srgb, var(--red-500) 70%, transparent);
+            height: 2px;
+        }
+        .painel-kpi.positive::before {
+            background: color-mix(in srgb, var(--green-500) 70%, transparent);
+        }
+        .painel-kpi.warn::before {
+            background: color-mix(in srgb, var(--orange-500) 70%, transparent);
+        }
+        .painel-kpi-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+            order: 1;
+            margin-bottom: 10px;
+            line-height: 1.35;
+        }
+        .painel-kpi-value {
+            font-size: clamp(1.5rem, 2.5vw, 1.85rem);
+            font-weight: 650;
+            letter-spacing: -0.04em;
+            line-height: 1.05;
+            margin: 0;
+            color: var(--text-color);
+            order: 2;
+        }
+        .painel-kpi-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 10px;
+            order: 3;
+            opacity: 0.85;
+        }
+        .painel-kpi.urgent .painel-kpi-value {
+            color: var(--red-600);
+        }
+        .painel-kpi.positive .painel-kpi-value {
+            color: var(--green-700);
+        }
+        .painel-operacao-grid {
+            display: grid;
+            grid-template-columns: 1.05fr 0.95fr;
+            gap: 24px;
+        }
+        .painel-panel {
+            border-radius: var(--painel-radius);
+            border: 1px solid color-mix(in srgb, var(--border-color) 65%, transparent);
+            background: var(--card-bg);
+            overflow: hidden;
+            box-shadow: var(--painel-shadow);
+            transition: box-shadow 0.25s ease;
+        }
+        .painel-panel:hover {
+            box-shadow: var(--painel-shadow-hover);
+        }
+        .painel-panel-head {
+            padding: 18px 22px;
+            border-bottom: 1px solid color-mix(in srgb, var(--border-color) 50%, transparent);
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            color: var(--text-color);
+            background: color-mix(in srgb, var(--subtle-fg) 40%, var(--card-bg));
+        }
+        .painel-op-list { padding: 8px 0 12px; }
+        .painel-op-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 18px 22px;
+            margin: 0 12px 8px;
+            border-radius: var(--painel-radius-sm);
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-left: 3px solid transparent;
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.18s ease;
+            min-height: 48px;
+        }
+        .painel-op-item:last-child { margin-bottom: 4px; }
+        .painel-op-item:hover {
+            background: color-mix(in srgb, var(--subtle-fg) 65%, var(--card-bg));
+            border-color: color-mix(in srgb, var(--border-color) 80%, transparent);
+            transform: translateX(2px);
+        }
+        .painel-op-item--hot {
+            border-left-color: color-mix(in srgb, var(--red-500) 55%, transparent);
+            background: color-mix(in srgb, var(--red-500) 4%, var(--card-bg));
+        }
+        .painel-op-item--hot:hover {
+            background: color-mix(in srgb, var(--red-500) 7%, var(--card-bg));
+        }
+        .painel-op-time {
+            flex-shrink: 0;
+            width: 56px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            padding-top: 3px;
+            font-variant-numeric: tabular-nums;
+        }
+        .painel-op-body { flex: 1; min-width: 0; }
+        .painel-op-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-color);
+            margin: 0 0 5px;
+            line-height: 1.4;
+            letter-spacing: -0.01em;
+        }
+        .painel-op-sub {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.45;
+        }
+        .painel-op-side {
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+        }
+        .painel-op-side .indicator-pill {
+            font-size: 11px;
+            padding: 3px 10px;
+        }
+        .painel-finance-grid {
+            display: grid;
+            grid-template-columns: 1.15fr 1fr;
+            gap: 24px;
+        }
+        .painel-finance-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            padding: 22px;
+        }
+        .painel-stat {
+            padding: 18px 18px 16px;
+            border-radius: var(--painel-radius-sm);
+            background: color-mix(in srgb, var(--subtle-fg) 50%, var(--card-bg));
+            border: 1px solid color-mix(in srgb, var(--border-color) 45%, transparent);
+            transition: border-color 0.2s ease;
+        }
+        .painel-stat:hover {
+            border-color: color-mix(in srgb, var(--border-color) 90%, transparent);
+        }
+        .painel-stat-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        .painel-stat-value {
+            font-size: 1.25rem;
+            font-weight: 650;
+            letter-spacing: -0.03em;
+            line-height: 1.15;
+        }
+        .painel-stat-value.danger { color: var(--red-600); }
+        .painel-stat-value.success { color: var(--green-700); }
+        .painel-chart { padding: 22px 24px 28px; }
+        .painel-chart-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+        .painel-chart-row:last-child { margin-bottom: 0; }
+        .painel-chart-label {
+            width: 96px;
+            flex-shrink: 0;
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        .painel-chart-track {
+            flex: 1;
+            height: 6px;
+            border-radius: 999px;
+            background: color-mix(in srgb, var(--subtle-fg) 80%, transparent);
+            overflow: hidden;
+        }
+        .painel-chart-fill {
+            height: 100%;
+            border-radius: 999px;
+            transition: width 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .painel-chart-fill.danger {
+            background: color-mix(in srgb, var(--red-500) 75%, var(--orange-500));
+        }
+        .painel-chart-fill.success {
+            background: color-mix(in srgb, var(--green-500) 80%, transparent);
+        }
+        .painel-chart-fill.warning {
+            background: color-mix(in srgb, var(--orange-500) 75%, transparent);
+        }
+        .painel-chart-fill.neutral {
+            background: color-mix(in srgb, var(--gray-500) 45%, transparent);
+        }
+        .painel-chart-amt {
+            width: 108px;
+            text-align: right;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-color);
+            font-variant-numeric: tabular-nums;
+        }
+        .painel-section--secondary .painel-section-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+        .painel-parcela-card {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px 20px;
+            padding: 20px 22px;
+            margin: 0 12px 10px;
+            border-radius: var(--painel-radius-sm);
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: background 0.2s ease, border-color 0.2s ease;
+        }
+        .painel-parcela-card:last-child { margin-bottom: 12px; }
+        .painel-parcela-card:hover {
+            background: color-mix(in srgb, var(--subtle-fg) 55%, var(--card-bg));
+            border-color: color-mix(in srgb, var(--border-color) 70%, transparent);
+        }
+        .painel-parcela-main { flex: 1; min-width: 180px; }
+        .painel-parcela-valor {
+            font-weight: 650;
+            font-size: 15px;
+            letter-spacing: -0.03em;
+        }
+        .painel-btn-recebida {
+            min-height: 36px;
+            padding: 8px 14px;
+            border-radius: var(--painel-radius-sm);
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid color-mix(in srgb, var(--green-500) 25%, transparent);
+            background: color-mix(in srgb, var(--green-500) 12%, var(--card-bg));
+            color: var(--green-700);
+            cursor: pointer;
+            transition: background 0.18s ease, transform 0.15s ease;
+        }
+        .painel-btn-recebida:hover {
+            background: color-mix(in srgb, var(--green-500) 20%, var(--card-bg));
+            transform: scale(1.02);
+        }
+        .painel-btn-entrar {
+            padding: 8px 14px;
+            border-radius: var(--painel-radius-sm);
+            background: var(--primary);
+            color: var(--primary-color, #fff);
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: opacity 0.15s ease;
+        }
+        .painel-btn-entrar:hover { opacity: 0.92; }
+        .painel-empty {
+            padding: 48px 28px 52px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+        .painel-empty-icon {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 16px;
+            opacity: 0.45;
+            color: var(--text-muted);
+        }
+        .painel-empty-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-color);
+            margin: 0 0 8px;
+            letter-spacing: -0.01em;
+        }
+        .painel-empty-hint {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.5;
+            max-width: 280px;
+            margin: 0 auto;
         }
         .painel-muted {
             color: var(--text-muted);
-            font-size: var(--text-sm);
+            font-size: 13px;
+            white-space: nowrap;
         }
-        .painel-btn-entrar {
-            min-height: 44px;
-            min-width: 44px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 8px 12px;
-            border-radius: var(--border-radius);
-            background: var(--btn-primary-bg);
-            color: var(--btn-primary-color);
-            text-decoration: none;
-            font-size: var(--text-sm);
-            font-weight: 600;
+        .painel-skeleton-hero {
+            height: 100px;
+            border-radius: var(--painel-radius);
+            margin-bottom: 24px;
+            background: linear-gradient(90deg, var(--subtle-fg) 25%, var(--gray-100) 50%, var(--subtle-fg) 75%);
+            background-size: 200% 100%;
+            animation: painel-shimmer 1.4s ease infinite;
         }
-        .painel-empty {
-            text-align: center;
-            padding: 32px 16px;
-            color: var(--text-muted);
-            font-size: var(--text-sm);
-        }
-        .painel-skeleton-grid {
+        .painel-skeleton-kpis {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 16px;
-        }
-        .painel-skeleton-block {
-            height: 88px;
-            border-radius: var(--border-radius-lg);
-            background: var(--gray-100);
-            animation: painel-pulse 1.5s ease-in-out infinite;
-        }
-        .painel-skeleton-section {
-            height: 200px;
-            border-radius: var(--border-radius-lg);
-            background: var(--gray-100);
-            animation: painel-pulse 1.5s ease-in-out infinite;
             margin-bottom: 24px;
         }
-        @keyframes painel-pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.45; }
+        .painel-skeleton-kpi {
+            height: 110px;
+            border-radius: var(--painel-radius);
+            background: linear-gradient(90deg, var(--subtle-fg) 25%, var(--gray-100) 50%, var(--subtle-fg) 75%);
+            background-size: 200% 100%;
+            animation: painel-shimmer 1.4s ease infinite;
         }
-        @media (max-width: 768px) {
-            .kpi-grid { grid-template-columns: 1fr 1fr; }
-            .painel-section-table { overflow-x: auto; }
+        .painel-skeleton-panel {
+            height: 280px;
+            border-radius: var(--painel-radius);
+            margin-bottom: 16px;
+            background: linear-gradient(90deg, var(--subtle-fg) 25%, var(--gray-100) 50%, var(--subtle-fg) 75%);
+            background-size: 200% 100%;
+            animation: painel-shimmer 1.4s ease infinite;
         }
-        @media (max-width: 480px) {
-            .kpi-grid { grid-template-columns: 1fr; }
+        @keyframes painel-shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        @media (max-width: 1024px) {
+            .painel-root { padding: 8px 20px 48px; }
+            .painel-kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+            .painel-operacao-grid, .painel-finance-grid { grid-template-columns: 1fr; }
+            .painel-parcela-main { min-width: 100%; }
+        }
+        @media (max-width: 640px) {
+            .painel-root { padding: 4px 16px 40px; --painel-gap: 32px; }
+            .painel-hero { padding: 24px 0 20px; }
+            .painel-kpi-grid { grid-template-columns: 1fr; }
+            .painel-kpi { min-height: 100px; padding: 22px 20px; }
+            .painel-finance-stats { grid-template-columns: 1fr; }
+            .painel-actions { gap: 8px; }
+            .painel-action-chip {
+                flex: 1 1 calc(50% - 4px);
+                justify-content: center;
+                padding: 10px 12px;
+            }
+            .painel-op-item, .painel-parcela-card {
+                margin-left: 8px;
+                margin-right: 8px;
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+            .painel-chart-label { width: 72px; font-size: 12px; }
+            .painel-chart-amt { width: 88px; }
         }
     `;
     $('<style id="painel-advocacia-styles">' + css + "</style>").appendTo("head");
@@ -237,34 +598,680 @@ function load_painel(page) {
 }
 
 function mostrar_skeleton($container) {
-    var html = '<div class="painel-skeleton-grid">';
-    for (var i = 0; i < 7; i++) html += '<div class="painel-skeleton-block"></div>';
-    html += "</div>";
-    html += '<div class="painel-skeleton-section"></div>';
-    html += '<div class="painel-skeleton-section"></div>';
+    var html =
+        '<div class="painel-skeleton-hero"></div>' +
+        '<div class="painel-skeleton-kpis">' +
+        '<div class="painel-skeleton-kpi"></div><div class="painel-skeleton-kpi"></div><div class="painel-skeleton-kpi"></div>' +
+        "</div>" +
+        '<div class="painel-skeleton-panel"></div><div class="painel-skeleton-panel"></div>';
     $container.html(html);
 }
 
 function handle_error($container, err) {
     var msg = (err && err.message) || String(err);
     $container.html(
-        '<div class="painel-card"><div class="painel-empty" style="color: var(--red-500);">' +
+        '<div class="painel-panel"><div class="painel-empty" style="color: var(--red-500);">' +
             __("Erro ao carregar o painel: {0}", [msg]) +
             "</div></div>"
     );
 }
 
 function render_painel($container, d) {
-    var html = "";
     var kpi_routes = get_kpi_routes();
+    var html = '<div class="painel-content">';
+    html += render_header(d.resumo, d.kpis);
+    html += render_acoes_rapidas();
     html += render_kpis(d.kpis);
-    html += render_alertas(d.alertas);
+    html += render_operacao_dia(d);
+    html += render_financeiro(d.financeiro);
     html += render_parcelas(d.parcelas);
-    html += render_audiencias(d.audiencias);
-    html += render_prazos(d.prazos);
-    html += render_tarefas(d.tarefas);
+    html += render_secundario(
+        __("Agenda — 7 dias"),
+        "milestone",
+        render_audiencia_items(d.audiencias),
+        "painel-audiencias",
+        __("Nenhuma audiência nesta semana"),
+        __("Quando houver compromissos agendados, eles aparecerão aqui.")
+    );
+    html += render_secundario(
+        __("Prazos"),
+        "time",
+        render_prazo_items(d.prazos),
+        "painel-prazos",
+        __("Nenhum prazo pendente"),
+        __("Sua fila processual está em dia neste período.")
+    );
+    html += render_secundario(
+        __("Tarefas"),
+        "checklist",
+        render_tarefa_items(d.tarefas),
+        "painel-tarefas",
+        __("Nenhuma tarefa aberta"),
+        __("Ótimo momento para planejar o próximo passo do escritório.")
+    );
+    html += "</div>";
     $container.html(html);
     bind_kpi_routes($container, kpi_routes);
+}
+
+function render_empty_state(icon, title, hint) {
+    return (
+        '<div class="painel-empty">' +
+        '<div class="painel-empty-icon">' +
+        painel_icon(icon || "inbox") +
+        "</div>" +
+        '<p class="painel-empty-title">' +
+        frappe.utils.escape_html(title) +
+        "</p>" +
+        (hint
+            ? '<p class="painel-empty-hint">' + frappe.utils.escape_html(hint) + "</p>"
+            : "") +
+        "</div>"
+    );
+}
+
+function painel_context_line(resumo, kpis) {
+    resumo = resumo || {};
+    kpis = kpis || {};
+    if (resumo.urgencia !== "alta") {
+        return __("Nenhuma urgência crítica no radar — bom dia para execução focada.");
+    }
+    var parts = [];
+    if (resumo.audiencias_hoje) {
+        parts.push(
+            __("{0} audiência(s) hoje exigem presença ou preparo", [resumo.audiencias_hoje])
+        );
+    }
+    if (resumo.parcelas_vencidas) {
+        parts.push(__("{0} parcela(s) vencida(s) aguardam recebimento", [resumo.parcelas_vencidas]));
+    }
+    if (resumo.prazos_urgentes) {
+        parts.push(__("{0} prazo(s) com vencimento iminente", [resumo.prazos_urgentes]));
+    }
+    if (kpis.previsto_mes && kpis.previsto_mes.valor) {
+        parts.push(
+            __("Fluxo previsto no mês: {0}", [fmt_currency(kpis.previsto_mes.valor)])
+        );
+    }
+    return parts.join(". ") + ".";
+}
+
+function painel_greeting() {
+    var h = new Date().getHours();
+    if (h < 12) return __("Bom dia");
+    if (h < 18) return __("Boa tarde");
+    return __("Boa noite");
+}
+
+function render_header(resumo, kpis) {
+    resumo = resumo || {};
+    kpis = kpis || {};
+    var urg = resumo.urgencia === "alta" ? "alta" : "normal";
+    var pulse =
+        '<span><strong>' +
+        (resumo.audiencias_hoje || 0) +
+        "</strong> " +
+        __("audiência(s) hoje") +
+        '</span><span class="dot"></span><span><strong>' +
+        (resumo.parcelas_vencidas || 0) +
+        "</strong> " +
+        __("parcela(s) vencida(s)") +
+        '</span><span class="dot"></span><span><strong>' +
+        fmt_currency(resumo.previsto_semana_valor || 0) +
+        "</strong> " +
+        __("previsto esta semana") +
+        "</span>";
+    if (resumo.prazos_urgentes) {
+        pulse +=
+            '<span class="dot"></span><span><strong>' +
+            resumo.prazos_urgentes +
+            "</strong> " +
+            __("prazo(s) crítico(s)") +
+            "</span>";
+    }
+    return (
+        '<header class="painel-hero">' +
+        '<h1 class="painel-hero-greeting">' +
+        painel_greeting() +
+        "</h1>" +
+        '<p class="painel-hero-date">' +
+        frappe.utils.escape_html(resumo.data_hoje || "") +
+        "</p>" +
+        '<p class="painel-hero-context">' +
+        frappe.utils.escape_html(painel_context_line(resumo, kpis)) +
+        "</p>" +
+        '<div class="painel-hero-pulse">' +
+        pulse +
+        '<span class="painel-urgency-badge ' +
+        urg +
+        '">' +
+        (urg === "alta" ? __("Atenção hoje") : __("Operação estável")) +
+        "</span></div></header>"
+    );
+}
+
+function render_acoes_rapidas() {
+    var actions = [
+        { label: __("Novo Serviço"), icon: "folder", dt: "Servico" },
+        { label: __("Nova Audiência"), icon: "milestone", dt: "Audiencia" },
+        { label: __("Novo Prazo"), icon: "time", dt: "Controle de Prazos" },
+        { label: __("Novo Honorário"), icon: "money", dt: "Acordo de Honorarios Processuais" },
+        { label: __("Novo Cliente"), icon: "users", dt: "Cliente" },
+    ];
+    var h = '<div class="painel-actions">';
+    actions.forEach(function (a) {
+        h +=
+            '<button type="button" class="painel-action-chip" data-new-dt="' +
+            a.dt +
+            '">' +
+            painel_icon(a.icon) +
+            "<span>" +
+            a.label +
+            "</span></button>";
+    });
+    h += "</div>";
+    return h;
+}
+
+function get_kpi_routes() {
+    return [
+        function () {
+            scroll_painel_section("painel-parcelas");
+        },
+        function () {
+            scroll_painel_section("painel-parcelas");
+        },
+        function () {
+            scroll_painel_section("painel-parcelas");
+        },
+        function () {
+            scroll_painel_section("painel-audiencias");
+        },
+        function () {
+            scroll_painel_section("painel-prazos");
+        },
+        function () {
+            frappe.route_options = { status: "Em andamento" };
+            frappe.set_route("List", "Servico");
+        },
+    ];
+}
+
+function render_kpis(k) {
+    if (!k) return "";
+    var items = [
+        {
+            key: "vencidas",
+            label: __("Parcelas vencidas"),
+            value: fmt_currency(k.parcelas_vencidas.valor),
+            meta: __("{0} parcela(s)", [k.parcelas_vencidas.count]),
+            urgent: true,
+        },
+        {
+            key: "recebido",
+            label: __("Recebido este mês"),
+            value: fmt_currency(k.recebido_mes.valor),
+            meta: __("{0} recebida(s)", [k.recebido_mes.count]),
+            positive: true,
+        },
+        {
+            key: "previsto",
+            label: __("Previsto no mês"),
+            value: fmt_currency((k.previsto_mes && k.previsto_mes.valor) || 0),
+            meta: __("{0} pendente(s)", [(k.previsto_mes && k.previsto_mes.count) || 0]),
+            warn: true,
+        },
+        {
+            key: "audiencias",
+            label: __("Audiências hoje"),
+            value: String(k.audiencias_hoje != null ? k.audiencias_hoje : 0),
+            meta: __("{0} na semana", [k.audiencias_semana]),
+        },
+        {
+            key: "prazos",
+            label: __("Prazos urgentes"),
+            value: String(k.prazos_urgentes),
+            meta: __("até 3 dias"),
+            urgent: k.prazos_urgentes > 0,
+        },
+        {
+            key: "servicos",
+            label: __("Serviços ativos"),
+            value: String(k.servicos_ativos),
+            meta: __("{0} clientes", [k.total_clientes]),
+        },
+    ];
+    var h =
+        '<section class="painel-section"><div class="painel-section-head">' +
+        "<div><h2 class='painel-section-title'>" +
+        __("Indicadores") +
+        "</h2>" +
+        '<p class="painel-section-sub">' +
+        __("Visão rápida do escritório") +
+        "</p></div></div>" +
+        '<div class="painel-kpi-grid">';
+    items.forEach(function (item) {
+        var cls = "painel-kpi";
+        if (item.urgent) cls += " urgent";
+        if (item.positive) cls += " positive";
+        if (item.warn) cls += " warn";
+        h +=
+            '<div class="' +
+            cls +
+            '" data-kpi="' +
+            item.key +
+            '">' +
+            '<div class="painel-kpi-label">' +
+            item.label +
+            "</div>" +
+            '<div class="painel-kpi-value">' +
+            item.value +
+            "</div>" +
+            '<div class="painel-kpi-meta">' +
+            (item.meta || "") +
+            "</div></div>";
+    });
+    h += "</div></section>";
+    return h;
+}
+
+function bind_kpi_routes($root, routes) {
+    $root.find(".painel-kpi").each(function (idx) {
+        $(this)
+            .off("click")
+            .on("click", function () {
+                if (routes[idx]) routes[idx]();
+            });
+    });
+}
+
+function render_operacao_dia(d) {
+    var timeline = build_timeline_items(d);
+    var criticas = build_parcelas_criticas(d.parcelas, 5);
+    var h =
+        '<section class="painel-section painel-section--primary"><div class="painel-section-head">' +
+        "<div><h2 class='painel-section-title'>" +
+        __("Operação do dia") +
+        "</h2>" +
+        '<p class="painel-section-sub">' +
+        __("Central de urgências, agenda e cobrança imediata") +
+        "</p></div></div>" +
+        '<div class="painel-operacao-grid">';
+    h +=
+        '<div class="painel-panel"><div class="painel-panel-head">' +
+        __("Agenda e urgências") +
+        "</div>" +
+        '<div class="painel-op-list">' +
+        (timeline ||
+            render_empty_state(
+                "calendar",
+                __("Agenda tranquila hoje"),
+                __("Sem prazos ou audiências críticos para as próximas horas.")
+            )) +
+        "</div></div>";
+    h +=
+        '<div class="painel-panel" id="painel-parcelas-criticas"><div class="painel-panel-head">' +
+        __("Parcelas críticas") +
+        "</div>" +
+        '<div class="painel-op-list">' +
+        (criticas ||
+            render_empty_state(
+                "money",
+                __("Nenhuma parcela vencida"),
+                __("Honorários em dia — excelente controle de recebíveis.")
+            )) +
+        "</div></div>";
+    h += "</div></section>";
+    return h;
+}
+
+function build_timeline_items(d) {
+    var items = [];
+    (d.alertas || []).forEach(function (a) {
+        items.push({
+            sort: a.tipo === "prazo" && a.dias <= 0 ? 0 : 1,
+            time: a.hora || (a.tipo === "prazo" ? __("Prazo") : __("Hoje")),
+            title: a.titulo,
+            sub:
+                (a.cliente ? a.cliente + " · " : "") +
+                (a.tipo === "prazo"
+                    ? a.dias === 0
+                        ? __("Vence hoje")
+                        : __("Amanhã")
+                    : __("Audiência")),
+            doctype: a.doctype,
+            docname: a.docname,
+            pill: a.nivel === "red" ? "red" : "orange",
+        });
+    });
+    (d.audiencias || []).forEach(function (a) {
+        if (a.dias_restantes !== 0) return;
+        items.push({
+            sort: 2,
+            time: a.hora || __("—"),
+            title: a.tipo || __("Audiência"),
+            sub: (a.cliente || "") + (a.vara_label ? " · " + a.vara_label : ""),
+            doctype: "Audiencia",
+            docname: a.name,
+            pill: "blue",
+        });
+    });
+    (d.prazos || []).forEach(function (p) {
+        if (p.dias_restantes > 1) return;
+        items.push({
+            sort: p.dias_restantes <= 0 ? 0 : 1,
+            time: fmt_date_iso(p.data_prazo),
+            title: p.descricao || p.name,
+            sub: p.cliente_nome || "",
+            doctype: "Controle de Prazos",
+            docname: p.name,
+            pill: p.dias_restantes <= 0 ? "red" : "orange",
+        });
+    });
+    items.sort(function (a, b) {
+        return a.sort - b.sort;
+    });
+    if (!items.length) return "";
+    return items
+        .map(function (it) {
+            var hot = it.sort <= 1 ? " painel-op-item--hot" : "";
+            return (
+                '<div class="painel-op-item' +
+                hot +
+                '" data-dt="' +
+                it.doctype +
+                '" data-dn="' +
+                frappe.utils.escape_html(it.docname) +
+                '">' +
+                '<div class="painel-op-time">' +
+                frappe.utils.escape_html(String(it.time)) +
+                "</div>" +
+                '<div class="painel-op-body"><div class="painel-op-title">' +
+                frappe.utils.escape_html(it.title) +
+                '</div><div class="painel-op-sub">' +
+                frappe.utils.escape_html(it.sub) +
+                "</div></div>" +
+                '<div class="painel-op-side">' +
+                status_pill(it.pill === "red" ? "Alta" : it.pill === "orange" ? "Média" : "Normal") +
+                "</div></div>"
+            );
+        })
+        .join("");
+}
+
+function build_parcelas_criticas(parcelas, limit) {
+    if (!parcelas || !parcelas.length) return "";
+    var sorted = parcelas.slice().sort(function (a, b) {
+        if (a.status === "Vencida" && b.status !== "Vencida") return -1;
+        if (b.status === "Vencida" && a.status !== "Vencida") return 1;
+        return (a.dias_atraso || 0) > (b.dias_atraso || 0) ? -1 : 1;
+    });
+    return sorted
+        .slice(0, limit)
+        .map(function (p) {
+            var btn = "";
+            if (p.status === "Vencida" || p.status === "Pendente") {
+                btn =
+                    '<button type="button" class="painel-btn-recebida" data-parcela="' +
+                    frappe.utils.escape_html(p.name || "") +
+                    '">✓ ' +
+                    __("Recebida") +
+                    "</button>";
+            }
+            return (
+                '<div class="painel-op-item painel-parcela-critica" data-acordo="' +
+                frappe.utils.escape_html(p.parent || "") +
+                '">' +
+                '<div class="painel-op-body"><div class="painel-op-title">' +
+                frappe.utils.escape_html(p.cliente_nome || "—") +
+                '</div><div class="painel-op-sub">' +
+                fmt_currency(p.valor_total) +
+                " · " +
+                fmt_date_iso(p.vencimento) +
+                "</div></div>" +
+                '<div class="painel-op-side">' +
+                status_pill(p.status) +
+                btn +
+                "</div></div>"
+            );
+        })
+        .join("");
+}
+
+function render_financeiro(fin) {
+    if (!fin) return "";
+    var max_val = 1;
+    (fin.grafico || []).forEach(function (g) {
+        if (flt(g.valor) > max_val) max_val = flt(g.valor);
+    });
+    var chart_rows = (fin.grafico || [])
+        .map(function (g) {
+            var pct = Math.max(4, Math.round((flt(g.valor) / max_val) * 100));
+            return (
+                '<div class="painel-chart-row">' +
+                '<span class="painel-chart-label">' +
+                frappe.utils.escape_html(g.label) +
+                "</span>" +
+                '<div class="painel-chart-track"><div class="painel-chart-fill ' +
+                (g.tone || "neutral") +
+                '" style="width:' +
+                pct +
+                '%"></div></div>' +
+                '<span class="painel-chart-amt">' +
+                fmt_currency(g.valor) +
+                "</span></div>"
+            );
+        })
+        .join("");
+    return (
+        '<section class="painel-section" id="painel-financeiro"><div class="painel-section-head">' +
+        "<div><h2 class='painel-section-title'>" +
+        __("Financeiro") +
+        "</h2>" +
+        '<p class="painel-section-sub">' +
+        __("Recebíveis, inadimplência e projeção do período") +
+        "</p></div></div>" +
+        '<div class="painel-finance-grid">' +
+        '<div class="painel-panel"><div class="painel-finance-stats">' +
+        '<div class="painel-stat"><div class="painel-stat-label">' +
+        __("Recebido no mês") +
+        '</div><div class="painel-stat-value success">' +
+        fmt_currency(fin.recebido_mes.valor) +
+        "</div></div>" +
+        '<div class="painel-stat"><div class="painel-stat-label">' +
+        __("Vencido") +
+        '</div><div class="painel-stat-value danger">' +
+        fmt_currency(fin.vencido.valor) +
+        "</div></div>" +
+        '<div class="painel-stat"><div class="painel-stat-label">' +
+        __("Previsto semana") +
+        '</div><div class="painel-stat-value">' +
+        fmt_currency(fin.previsto_semana.valor) +
+        "</div></div>" +
+        '<div class="painel-stat"><div class="painel-stat-label">' +
+        __("Inadimplência") +
+        '</div><div class="painel-stat-value danger">' +
+        (fin.taxa_inadimplencia || 0) +
+        "%</div></div>" +
+        "</div></div>" +
+        '<div class="painel-panel"><div class="painel-panel-head">' +
+        __("Distribuição") +
+        '</div><div class="painel-chart">' +
+        chart_rows +
+        "</div></div></div></section>"
+    );
+}
+
+function render_parcelas(parcelas) {
+    var h =
+        '<section class="painel-section" id="painel-parcelas"><div class="painel-section-head">' +
+        "<div><h2 class='painel-section-title'>" +
+        __("Honorários em aberto") +
+        "</h2>" +
+        '<p class="painel-section-sub">' +
+        __("Cobranças pendentes e vencidas") +
+        "</p></div>" +
+        '<span class="painel-section-link" data-scroll="painel-financeiro">' +
+        __("Ver financeiro") +
+        "</span></div>";
+    if (!parcelas || !parcelas.length) {
+        return (
+            h +
+            '<div class="painel-panel">' +
+            render_empty_state(
+                "tick",
+                __("Honorários em dia"),
+                __("Não há parcelas pendentes ou vencidas no momento.")
+            ) +
+            "</div></section>"
+        );
+    }
+    h += '<div class="painel-panel">';
+    parcelas.forEach(function (p) {
+        var prazo_txt = "";
+        if (p.status === "Vencida" && p.dias_atraso > 0) {
+            prazo_txt = __("Atraso {0}d", [p.dias_atraso]);
+        } else if (p.status === "Pendente") {
+            prazo_txt = p.dias_para_vencer === 0 ? __("Hoje") : __("Em {0}d", [p.dias_para_vencer]);
+        }
+        var btn = "";
+        if (p.status === "Vencida" || p.status === "Pendente") {
+            btn =
+                '<button type="button" class="painel-btn-recebida" data-parcela="' +
+                frappe.utils.escape_html(p.name || "") +
+                '">✓ ' +
+                __("Recebida") +
+                "</button>";
+        }
+        h +=
+            '<div class="painel-parcela-card painel-row-acordo" data-acordo="' +
+            frappe.utils.escape_html(p.parent || "") +
+            '">' +
+            '<div class="painel-parcela-main"><div class="painel-op-title">' +
+            frappe.utils.escape_html(p.cliente_nome || "—") +
+            '</div><div class="painel-op-sub">' +
+            frappe.utils.escape_html(p.servico_titulo || p.servico_tipo || "") +
+            (p.numero_processo ? " · " + frappe.utils.escape_html(p.numero_processo) : "") +
+            "</div></div>" +
+            '<div class="painel-parcela-valor">' +
+            fmt_currency(p.valor_total) +
+            "</div>" +
+            '<div class="painel-muted">' +
+            fmt_date_iso(p.vencimento) +
+            (prazo_txt ? " · " + prazo_txt : "") +
+            "</div>" +
+            status_pill(p.status) +
+            btn +
+            "</div>";
+    });
+    h += "</div></section>";
+    return h;
+}
+
+function render_secundario(title, icon, body, section_id, emptyTitle, emptyHint) {
+    return (
+        '<section class="painel-section painel-section--secondary" id="' +
+        section_id +
+        '"><div class="painel-section-head">' +
+        "<h2 class='painel-section-title'>" +
+        title +
+        "</h2></div>" +
+        '<div class="painel-panel"><div class="painel-op-list">' +
+        (body || render_empty_state(icon, emptyTitle, emptyHint)) +
+        "</div></div></section>"
+    );
+}
+
+function render_audiencia_items(audiencias) {
+    if (!audiencias || !audiencias.length) return "";
+    return audiencias
+        .map(function (a) {
+            var btn =
+                a.modalidade === "Virtual" && a.link_virtual
+                    ? '<a class="painel-btn-entrar" href="' +
+                      frappe.utils.escape_html(a.link_virtual) +
+                      '" target="_blank" rel="noopener" onclick="event.stopPropagation();">' +
+                      __("Entrar") +
+                      "</a>"
+                    : "";
+            return (
+                '<div class="painel-op-item" data-dt="Audiencia" data-dn="' +
+                frappe.utils.escape_html(a.name) +
+                '">' +
+                '<div class="painel-op-time">' +
+                fmt_datetime(a.data, a.hora) +
+                "</div>" +
+                '<div class="painel-op-body"><div class="painel-op-title">' +
+                frappe.utils.escape_html(a.cliente || "—") +
+                '</div><div class="painel-op-sub">' +
+                frappe.utils.escape_html(a.tipo || "") +
+                (a.vara_label ? " · " + frappe.utils.escape_html(a.vara_label) : "") +
+                "</div></div>" +
+                '<div class="painel-op-side">' +
+                status_pill(a.modalidade || "Presencial") +
+                btn +
+                "</div></div>"
+            );
+        })
+        .join("");
+}
+
+function render_prazo_items(prazos) {
+    if (!prazos || !prazos.length) return "";
+    return prazos
+        .map(function (p) {
+            var dias = p.dias_restantes;
+            var dias_txt =
+                dias < 0
+                    ? __("Vencido há {0}d", [Math.abs(dias)])
+                    : dias === 0
+                      ? __("Hoje")
+                      : dias === 1
+                        ? __("Amanhã")
+                        : __("Em {0}d", [dias]);
+            return (
+                '<div class="painel-op-item" data-dt="Controle de Prazos" data-dn="' +
+                frappe.utils.escape_html(p.name) +
+                '">' +
+                '<div class="painel-op-time">' +
+                dias_txt +
+                "</div>" +
+                '<div class="painel-op-body"><div class="painel-op-title">' +
+                frappe.utils.escape_html(p.descricao || p.name) +
+                '</div><div class="painel-op-sub">' +
+                frappe.utils.escape_html(p.cliente_nome || "—") +
+                "</div></div>" +
+                '<div class="painel-op-side">' +
+                status_pill(p.prioridade) +
+                "</div></div>"
+            );
+        })
+        .join("");
+}
+
+function render_tarefa_items(tarefas) {
+    if (!tarefas || !tarefas.length) return "";
+    return tarefas
+        .map(function (t) {
+            var prazo = t.data_limite ? fmt_date_iso(t.data_limite) : __("Sem prazo");
+            return (
+                '<div class="painel-op-item" data-dt="Tarefa" data-dn="' +
+                frappe.utils.escape_html(t.name) +
+                '">' +
+                '<div class="painel-op-time">' +
+                prazo +
+                "</div>" +
+                '<div class="painel-op-body"><div class="painel-op-title">' +
+                frappe.utils.escape_html(t.titulo || "") +
+                '</div><div class="painel-op-sub">' +
+                frappe.utils.escape_html(t.responsavel_nome || "—") +
+                "</div></div>" +
+                '<div class="painel-op-side">' +
+                status_pill(t.status) +
+                "</div></div>"
+            );
+        })
+        .join("");
 }
 
 function painel_icon(name) {
@@ -277,6 +1284,10 @@ function painel_icon(name) {
 
 function fmt_currency(val) {
     return frappe.format(val || 0, { fieldtype: "Currency", currency: "BRL" });
+}
+
+function flt(val) {
+    return parseFloat(val) || 0;
 }
 
 function fmt_date_iso(iso) {
@@ -299,13 +1310,13 @@ function status_pill(status) {
         Repassada: "blue",
         Cancelada: "gray",
         "Em Andamento": "blue",
-        Pendente: "orange",
         Concluída: "green",
-        Cancelada: "gray",
         Alta: "red",
         "Média": "orange",
         Media: "orange",
-        Urgente: "red",
+        Virtual: "blue",
+        Presencial: "gray",
+        Híbrida: "orange",
         Normal: "gray",
         Baixa: "gray",
     };
@@ -319,382 +1330,34 @@ function status_pill(status) {
     );
 }
 
-function get_kpi_routes() {
-    return [
-        function () {
-            frappe.set_route("List", "Cliente");
-        },
-        function () {
-            frappe.route_options = { status: "Em andamento" };
-            frappe.set_route("List", "Servico");
-        },
-        function () {
-            scroll_painel_section("painel-parcelas");
-        },
-        function () {
-            scroll_painel_section("painel-parcelas");
-        },
-        function () {
-            scroll_painel_section("painel-parcelas");
-        },
-        function () {
-            scroll_painel_section("painel-audiencias");
-        },
-        function () {
-            frappe.route_options = { status: "Pendente" };
-            frappe.set_route("List", "Controle de Prazos");
-        },
-    ];
-}
-
-function render_kpis(k) {
-    if (!k) return "";
-    var items = [
-        { key: "clientes", icon: "users", label: __("Clientes"), value: k.total_clientes },
-        { key: "servicos", icon: "folder", label: __("Serviços ativos"), value: k.servicos_ativos },
-        {
-            key: "vencidas",
-            icon: "warning",
-            label: __("Parcelas vencidas"),
-            value: fmt_currency(k.parcelas_vencidas.valor),
-            sub: __("{0} parcela(s)", [k.parcelas_vencidas.count]),
-        },
-        {
-            key: "avencer",
-            icon: "calendar",
-            label: __("A vencer (30 dias)"),
-            value: fmt_currency(k.parcelas_a_vencer_30d.valor),
-            sub: __("{0} parcela(s)", [k.parcelas_a_vencer_30d.count]),
-        },
-        {
-            key: "recebido",
-            icon: "money",
-            label: __("Recebido este mês"),
-            value: fmt_currency(k.recebido_mes.valor),
-            sub: __("{0} parcela(s)", [k.recebido_mes.count]),
-            green: true,
-        },
-        { key: "audiencias", icon: "milestone", label: __("Audiências (7 dias)"), value: k.audiencias_semana },
-        { key: "prazos", icon: "time", label: __("Prazos urgentes"), value: k.prazos_urgentes },
-    ];
-
-    var h = '<div class="painel-section"><div class="kpi-grid">';
-    items.forEach(function (item) {
-        h +=
-            '<div class="painel-kpi-card' +
-            (item.green ? " painel-kpi-green" : "") +
-            '" data-kpi="' +
-            item.key +
-            '">' +
-            '<div class="painel-kpi-icon">' +
-            painel_icon(item.icon) +
-            "</div>" +
-            '<div class="painel-kpi-value">' +
-            item.value +
-            "</div>" +
-            '<div class="painel-kpi-label">' +
-            item.label +
-            (item.sub ? '<br><span class="painel-muted">' + item.sub + "</span>" : "") +
-            "</div></div>";
-    });
-    h += "</div></div>";
-    return h;
-}
-
-function bind_kpi_routes($root, routes) {
-    $root.find(".painel-kpi-card").each(function (idx) {
-        $(this)
-            .off("click")
-            .on("click", function () {
-                if (routes[idx]) routes[idx]();
-            });
-    });
-}
-
-function render_alertas(alertas) {
-    if (!alertas || !alertas.length) return "";
-    var h =
-        '<div class="painel-section"><h3 class="painel-section-title">' +
-        painel_icon("alert-triangle") +
-        " " +
-        __("Alertas") +
-        '</h3><div class="painel-alertas">';
-    alertas.forEach(function (a) {
-        var nivel = a.nivel === "red" ? "red" : "yellow";
-        var texto = "";
-        if (a.tipo === "prazo") {
-            var quando =
-                a.dias === 0
-                    ? __("Vence hoje")
-                    : a.dias === 1
-                      ? __("Vence amanhã")
-                      : __("Vence em {0} dias", [a.dias]);
-            texto =
-                "<strong>" +
-                frappe.utils.escape_html(a.titulo) +
-                "</strong> — " +
-                quando +
-                (a.cliente ? " · " + frappe.utils.escape_html(a.cliente) : "");
-        } else {
-            texto =
-                "<strong>" +
-                __("Audiência hoje") +
-                "</strong> — " +
-                frappe.utils.escape_html(a.titulo) +
-                (a.hora ? " " + a.hora : "") +
-                (a.cliente ? " · " + frappe.utils.escape_html(a.cliente) : "") +
-                (a.vara ? " · " + frappe.utils.escape_html(a.vara) : "");
-        }
-        h +=
-            '<div class="painel-alerta ' +
-            nivel +
-            '" data-dt="' +
-            a.doctype +
-            '" data-dn="' +
-            frappe.utils.escape_html(a.docname) +
-            '">' +
-            painel_icon(a.tipo === "prazo" ? "time" : "milestone") +
-            '<div style="flex:1;font-size:var(--text-sm);color:var(--text-color);">' +
-            texto +
-            "</div></div>";
-    });
-    h += "</div></div>";
-    return h;
-}
-
-function render_parcelas(parcelas) {
-    var h =
-        '<div class="painel-section" id="painel-parcelas"><h3 class="painel-section-title">' +
-        painel_icon("money") +
-        " " +
-        __("Parcelas") +
-        "</h3>";
-    if (!parcelas || !parcelas.length) {
-        return h + '<div class="painel-card"><div class="painel-empty">' + __("Nenhuma parcela pendente.") + "</div></div></div>";
-    }
-    h += '<div class="painel-card painel-section-table"><table class="painel-table"><thead><tr>';
-    h +=
-        "<th>" +
-        __("Cliente") +
-        "</th><th>" +
-        __("Serviço") +
-        "</th><th>" +
-        __("Vencimento") +
-        "</th><th>" +
-        __("Valor") +
-        "</th><th>" +
-        __("Status") +
-        "</th><th>" +
-        __("Prazo") +
-        "</th><th>" +
-        __("Ações") +
-        "</th></tr></thead><tbody>";
-    parcelas.forEach(function (p) {
-        var servico =
-            frappe.utils.escape_html(p.servico_titulo || p.servico_tipo || p.servico_ref || "—");
-        if (p.numero_processo) {
-            servico += '<br><span class="painel-muted">' + frappe.utils.escape_html(p.numero_processo) + "</span>";
-        }
-        var prazo_txt = "";
-        if (p.status === "Vencida" && p.dias_atraso > 0) {
-            prazo_txt = __("Atraso {0}d", [p.dias_atraso]);
-        } else if (p.status === "Pendente") {
-            prazo_txt =
-                p.dias_para_vencer === 0
-                    ? __("Hoje")
-                    : __("Em {0}d", [p.dias_para_vencer]);
-        }
-        var btn_recebida = "";
-        if (p.status === "Vencida" || p.status === "Pendente") {
-            btn_recebida =
-                '<button type="button" class="btn btn-xs btn-success painel-btn-recebida" data-parcela="' +
-                frappe.utils.escape_html(p.name || "") +
-                '">✓ ' +
-                __("Recebida") +
-                "</button>";
-        }
-        h +=
-            '<tr class="painel-row-click" data-acordo="' +
-            frappe.utils.escape_html(p.parent || "") +
-            '">' +
-            "<td>" +
-            frappe.utils.escape_html(p.cliente_nome || "—") +
-            "</td>" +
-            "<td>" +
-            servico +
-            "</td>" +
-            "<td>" +
-            fmt_date_iso(p.vencimento) +
-            "</td>" +
-            "<td>" +
-            fmt_currency(p.valor_total) +
-            "</td>" +
-            "<td>" +
-            status_pill(p.status) +
-            "</td>" +
-            '<td class="painel-muted">' +
-            frappe.utils.escape_html(prazo_txt) +
-            '</td><td class="painel-parcelas-actions">' +
-            btn_recebida +
-            "</td></tr>";
-    });
-    h += "</tbody></table></div></div>";
-    return h;
-}
-
-function render_audiencias(audiencias) {
-    var h =
-        '<div class="painel-section" id="painel-audiencias"><h3 class="painel-section-title">' +
-        painel_icon("milestone") +
-        " " +
-        __("Audiências — próximos 7 dias") +
-        "</h3>";
-    if (!audiencias || !audiencias.length) {
-        return h + '<div class="painel-card"><div class="painel-empty">' + __("Nenhuma audiência nesta semana.") + "</div></div></div>";
-    }
-    h += '<div class="painel-card">';
-    audiencias.forEach(function (a) {
-        var mod = a.modalidade || "";
-        var mod_cls = mod === "Virtual" ? "blue" : mod === "Híbrida" ? "orange" : "gray";
-        var btn =
-            mod === "Virtual" && a.link_virtual
-                ? '<a class="painel-btn-entrar" href="' +
-                  frappe.utils.escape_html(a.link_virtual) +
-                  '" target="_blank" rel="noopener" onclick="event.stopPropagation();">' +
-                  __("Entrar") +
-                  "</a>"
-                : "";
-        h +=
-            '<div class="painel-list-item" data-dt="Audiencia" data-dn="' +
-            frappe.utils.escape_html(a.name) +
-            '">' +
-            '<div style="min-width:120px;"><strong>' +
-            fmt_datetime(a.data, a.hora) +
-            "</strong></div>" +
-            "<div style='flex:1;min-width:140px;'>" +
-            frappe.utils.escape_html(a.cliente || "—") +
-            '<br><span class="painel-muted">' +
-            frappe.utils.escape_html(a.tipo || "") +
-            "</span></div>" +
-            '<div class="painel-muted">' +
-            frappe.utils.escape_html(a.vara_label || "—") +
-            "</div>" +
-            '<span class="indicator-pill ' +
-            mod_cls +
-            ' filterable no-indicator-dot ellipsis">' +
-            frappe.utils.escape_html(mod || __("Presencial")) +
-            "</span>" +
-            btn +
-            "</div>";
-    });
-    h += "</div></div>";
-    return h;
-}
-
-function render_prazos(prazos) {
-    var h =
-        '<div class="painel-section" id="painel-prazos"><h3 class="painel-section-title">' +
-        painel_icon("time") +
-        " " +
-        __("Prazos") +
-        "</h3>";
-    if (!prazos || !prazos.length) {
-        return h + '<div class="painel-card"><div class="painel-empty">' + __("Nenhum prazo pendente.") + "</div></div></div>";
-    }
-    h += '<div class="painel-card">';
-    prazos.forEach(function (p) {
-        var dias = p.dias_restantes;
-        var dias_txt =
-            dias < 0
-                ? __("Vencido há {0}d", [Math.abs(dias)])
-                : dias === 0
-                  ? __("Hoje")
-                  : dias === 1
-                    ? __("Amanhã")
-                    : __("Em {0}d", [dias]);
-        h +=
-            '<div class="painel-list-item" data-dt="Controle de Prazos" data-dn="' +
-            frappe.utils.escape_html(p.name) +
-            '">' +
-            '<div style="flex:1;min-width:180px;"><strong>' +
-            frappe.utils.escape_html(p.descricao || p.name) +
-            "</strong><br><span class='painel-muted'>" +
-            frappe.utils.escape_html(p.cliente_nome || "—") +
-            "</span></div>" +
-            '<div class="painel-muted">' +
-            dias_txt +
-            " · " +
-            fmt_date_iso(p.data_prazo) +
-            "</div>" +
-            status_pill(p.prioridade) +
-            "</div>";
-    });
-    h += "</div></div>";
-    return h;
-}
-
-function render_tarefas(tarefas) {
-    var h =
-        '<div class="painel-section" id="painel-tarefas"><h3 class="painel-section-title">' +
-        painel_icon("checklist") +
-        " " +
-        __("Tarefas") +
-        "</h3>";
-    if (!tarefas || !tarefas.length) {
-        return h + '<div class="painel-card"><div class="painel-empty">' + __("Nenhuma tarefa aberta.") + "</div></div></div>";
-    }
-    h += '<div class="painel-card">';
-    tarefas.forEach(function (t) {
-        var prazo = "";
-        if (t.data_limite) {
-            var d = t.dias_restantes;
-            if (d !== null && d !== undefined) {
-                if (d < 0) prazo = __("Atrasada {0}d", [Math.abs(d)]);
-                else if (d === 0) prazo = __("Hoje");
-                else if (d === 1) prazo = __("Amanhã");
-                else prazo = __("Em {0}d", [d]);
-            }
-            prazo += " · " + fmt_date_iso(t.data_limite);
-        } else {
-            prazo = __("Sem prazo");
-        }
-        h +=
-            '<div class="painel-list-item" data-dt="Tarefa" data-dn="' +
-            frappe.utils.escape_html(t.name) +
-            '">' +
-            '<div style="flex:1;min-width:160px;"><strong>' +
-            frappe.utils.escape_html(t.titulo || "") +
-            "</strong></div>" +
-            status_pill(t.status) +
-            '<div class="painel-muted">' +
-            frappe.utils.escape_html(prazo) +
-            "</div>" +
-            '<div class="painel-muted">' +
-            frappe.utils.escape_html(t.responsavel_nome || "—") +
-            "</div></div>";
-    });
-    h += "</div></div>";
-    return h;
-}
-
 function scroll_painel_section(id) {
     var el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-$(document).on("click", ".painel-alerta", function () {
+$(document).on("click", ".painel-action-chip", function () {
+    var dt = $(this).attr("data-new-dt");
+    if (dt) frappe.new_doc(dt);
+});
+
+$(document).on("click", ".painel-section-link[data-scroll]", function () {
+    scroll_painel_section($(this).attr("data-scroll"));
+});
+
+$(document).on("click", ".painel-op-item[data-dt]", function (e) {
+    if ($(e.target).closest(".painel-btn-recebida, .painel-btn-entrar").length) return;
     var dt = $(this).attr("data-dt");
     var dn = $(this).attr("data-dn");
     if (dt && dn) frappe.set_route("Form", dt, dn);
 });
 
-$(document).on("click", ".painel-list-item", function () {
-    var dt = $(this).attr("data-dt");
-    var dn = $(this).attr("data-dn");
-    if (dt && dn) frappe.set_route("Form", dt, dn);
+$(document).on("click", ".painel-parcela-critica", function (e) {
+    if ($(e.target).closest(".painel-btn-recebida").length) return;
+    var acordo = $(this).attr("data-acordo");
+    if (acordo) frappe.set_route("Form", "Acordo de Honorarios Processuais", acordo);
 });
 
-$(document).on("click", "tr.painel-row-click", function (e) {
+$(document).on("click", ".painel-row-acordo", function (e) {
     if ($(e.target).closest(".painel-btn-recebida").length) return;
     var acordo = $(this).attr("data-acordo");
     if (acordo) frappe.set_route("Form", "Acordo de Honorarios Processuais", acordo);

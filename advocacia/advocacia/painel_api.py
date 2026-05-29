@@ -38,6 +38,8 @@ def get_painel_data(limit_start=0, limit_page_length=20):
     mes_fim = get_last_day(hoje)
 
     kpis = _build_kpis(hoje, sete_dias, trinta_dias, mes_inicio, mes_fim)
+    financeiro = _build_financeiro(hoje, sete_dias, mes_inicio, mes_fim, kpis)
+    resumo = _build_resumo(hoje, kpis, financeiro)
     alertas = _build_alertas(hoje, sete_dias)
     parcelas = _get_parcelas(hoje, limit_start, limit_page_length)
     audiencias = _get_audiencias(hoje, sete_dias)
@@ -46,6 +48,8 @@ def get_painel_data(limit_start=0, limit_page_length=20):
 
     return {
         "kpis": kpis,
+        "resumo": resumo,
+        "financeiro": financeiro,
         "alertas": alertas,
         "parcelas": parcelas,
         "audiencias": audiencias,
@@ -79,6 +83,15 @@ def _build_kpis(hoje, sete_dias, trinta_dias, mes_inicio, mes_fim):
         fields=["valor_total"],
         limit_page_length=500,
     )
+    previsto_mes = frappe.get_all(
+        "Parcela de Honorarios",
+        filters={
+            "status": "Pendente",
+            "vencimento": ["between", [mes_inicio, mes_fim]],
+        },
+        fields=["valor_total"],
+        limit_page_length=500,
+    )
 
     return {
         "total_clientes": frappe.db.count("Cliente"),
@@ -95,6 +108,14 @@ def _build_kpis(hoje, sete_dias, trinta_dias, mes_inicio, mes_fim):
             "count": len(recebidas_mes),
             "valor": sum(flt(p.valor_total) for p in recebidas_mes),
         },
+        "previsto_mes": {
+            "count": len(previsto_mes),
+            "valor": sum(flt(p.valor_total) for p in previsto_mes),
+        },
+        "audiencias_hoje": frappe.db.count(
+            "Audiencia",
+            {"data_hora": ["between", [f"{hoje} 00:00:00", f"{hoje} 23:59:59"]]},
+        ),
         "audiencias_semana": frappe.db.count(
             "Audiencia",
             {"data_hora": ["between", [f"{hoje} 00:00:00", f"{sete_dias} 23:59:59"]]},
@@ -106,6 +127,57 @@ def _build_kpis(hoje, sete_dias, trinta_dias, mes_inicio, mes_fim):
                 "data_prazo": ["<=", add_days(hoje, 3)],
             },
         ),
+    }
+
+
+def _build_financeiro(hoje, sete_dias, mes_inicio, mes_fim, kpis):
+    previsto_semana_rows = frappe.get_all(
+        "Parcela de Honorarios",
+        filters={
+            "status": "Pendente",
+            "vencimento": ["between", [hoje, sete_dias]],
+        },
+        fields=["valor_total"],
+        limit_page_length=500,
+    )
+    previsto_semana_valor = sum(flt(p.valor_total) for p in previsto_semana_rows)
+    vencido_valor = flt(kpis["parcelas_vencidas"]["valor"])
+    recebido_valor = flt(kpis["recebido_mes"]["valor"])
+    pendente_valor = flt(kpis["parcelas_a_vencer_30d"]["valor"])
+    base_inadimplencia = vencido_valor + recebido_valor + pendente_valor
+    taxa_inadimplencia = (
+        round((vencido_valor / base_inadimplencia) * 100, 1) if base_inadimplencia else 0
+    )
+
+    return {
+        "recebido_mes": kpis["recebido_mes"],
+        "vencido": kpis["parcelas_vencidas"],
+        "previsto_mes": kpis["previsto_mes"],
+        "previsto_semana": {
+            "count": len(previsto_semana_rows),
+            "valor": previsto_semana_valor,
+        },
+        "a_vencer_30d": kpis["parcelas_a_vencer_30d"],
+        "taxa_inadimplencia": taxa_inadimplencia,
+        "grafico": [
+            {"label": _("Vencido"), "valor": vencido_valor, "tone": "danger"},
+            {"label": _("Recebido"), "valor": recebido_valor, "tone": "success"},
+            {"label": _("A vencer"), "valor": pendente_valor, "tone": "warning"},
+            {"label": _("Previsto mês"), "valor": flt(kpis["previsto_mes"]["valor"]), "tone": "neutral"},
+        ],
+    }
+
+
+def _build_resumo(hoje, kpis, financeiro):
+    return {
+        "data_hoje": frappe.utils.formatdate(hoje, "EEEE, d 'de' MMMM"),
+        "audiencias_hoje": kpis.get("audiencias_hoje") or 0,
+        "parcelas_vencidas": kpis["parcelas_vencidas"]["count"],
+        "prazos_urgentes": kpis["prazos_urgentes"],
+        "previsto_semana_valor": financeiro["previsto_semana"]["valor"],
+        "urgencia": "alta"
+        if kpis["parcelas_vencidas"]["count"] or kpis["prazos_urgentes"]
+        else "normal",
     }
 
 
