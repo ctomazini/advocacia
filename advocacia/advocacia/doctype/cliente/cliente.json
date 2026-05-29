@@ -17,6 +17,7 @@
    "fieldtype": "Select",
    "options": "Pessoa Física\nPessoa Jurídica",
    "reqd": 1,
+   "allow_in_quick_entry": 1,
    "in_list_view": 1,
    "in_standard_filter": 1,
    "bold": 1
@@ -26,6 +27,7 @@
    "label": "Nome / Razão Social",
    "fieldtype": "Data",
    "reqd": 1,
+   "allow_in_quick_entry": 1,
    "in_list_view": 1,
    "in_global_search": 1,
    "bold": 1
@@ -45,6 +47,9 @@
    "label": "CPF",
    "fieldtype": "Data",
    "depends_on": "eval:doc.tipo_pessoa=='Pessoa Física'",
+   "mandatory_depends_on": "eval:doc.tipo_pessoa=='Pessoa Física'",
+   "allow_in_quick_entry": 1,
+   "unique": 1,
    "in_list_view": 1
   },
   {
@@ -58,6 +63,9 @@
    "label": "CNPJ",
    "fieldtype": "Data",
    "depends_on": "eval:doc.tipo_pessoa=='Pessoa Jurídica'",
+   "mandatory_depends_on": "eval:doc.tipo_pessoa=='Pessoa Jurídica'",
+   "allow_in_quick_entry": 1,
+   "unique": 1,
    "in_list_view": 1
   },
   {

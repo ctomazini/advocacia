@@ -1,14 +1,33 @@
 import frappe
+from frappe import _
 from frappe.model.document import Document
+from frappe.utils import cint
 
 from advocacia.advocacia.validators import limpar_numerico, validar_cnj
 
 
 class Servico(Document):
+	def before_save(self):
+		if self.tipo != "Processo Judicial":
+			self.numeracao_legada = 0
+
 	def validate(self):
-		if self.numero_processo:
-			self.numero_processo = validar_cnj(self.numero_processo)
+		if self.tipo != "Processo Judicial":
+			return
+
+		legado = cint(self.numeracao_legada)
+		numero = (self.numero_processo or "").strip()
+
+		if not legado:
+			if not numero:
+				frappe.throw(
+					_("Informe o número do processo no formato CNJ."),
+					title=_("Campo obrigatório"),
+				)
+			self.numero_processo = validar_cnj(numero)
 			self.numero_processo = limpar_numerico(self.numero_processo)
+		elif numero:
+			self.numero_processo = numero
 
 
 def format_servico_link_label(doc=None, servico_name=None):
@@ -29,14 +48,18 @@ def format_servico_link_label(doc=None, servico_name=None):
 
 	numero_processo = doc.get("numero_processo") or ""
 	if numero_processo:
-		digits = "".join(ch for ch in str(numero_processo) if ch.isdigit())
-		if len(digits) == 20:
-			numero_processo = (
-				f"{digits[:7]}-{digits[7:9]}.{digits[9:13]}."
-				f"{digits[13]}.{digits[14:16]}.{digits[16:]}"
-			)
-		if numero_processo not in parts:
-			parts.append(numero_processo)
+		if cint(doc.get("numeracao_legada")):
+			if numero_processo not in parts:
+				parts.append(numero_processo)
+		else:
+			digits = "".join(ch for ch in str(numero_processo) if ch.isdigit())
+			if len(digits) == 20:
+				numero_processo = (
+					f"{digits[:7]}-{digits[7:9]}.{digits[9:13]}."
+					f"{digits[13]}.{digits[14:16]}.{digits[16:]}"
+				)
+			if numero_processo not in parts:
+				parts.append(numero_processo)
 
 	status = doc.get("status")
 	if status and status not in parts:
@@ -73,7 +96,7 @@ def servico_query(doctype, txt, searchfield, start, page_len, filters):
 		"Servico",
 		filters=list_filters,
 		or_filters=or_filters if txt else None,
-		fields=["name", "title", "cliente", "numero_processo", "status"],
+		fields=["name", "title", "cliente", "numero_processo", "status", "numeracao_legada"],
 		limit_start=start,
 		limit_page_length=page_len,
 		order_by="modified desc",
