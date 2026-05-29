@@ -75,7 +75,7 @@ def _sincronizar_pagamentos_do_acordo_impl(acordo, commit=False):
 			if changed:
 				pagamento.save(ignore_permissions=True)
 				atualizados += 1
-		elif pagamento.status not in ("Recebido", "Repassado"):
+		elif pagamento.status not in ("Recebido", "Repassado", "Cancelado"):
 			_sync_status_from_parcela(pagamento, parcela)
 
 	cancelados += _cancelar_pagamentos_orfaos(acordo.name, active_origem_ids)
@@ -189,6 +189,8 @@ def _parcela_to_pagamento_payload(acordo, parcela, idx, cliente, servico):
 
 
 def _pode_atualizar_pagamento(pagamento):
+	if pagamento.status == "Cancelado":
+		return False
 	if pagamento.manual_override:
 		return False
 	if pagamento.status in ("Recebido", "Repassado"):
@@ -221,6 +223,8 @@ def _apply_pagamento_payload(pagamento, payload):
 
 
 def _sync_status_from_parcela(pagamento, parcela):
+	if pagamento.status == "Cancelado":
+		return
 	new_status = STATUS_PARCELA_TO_PAGAMENTO.get(parcela.status or "Pendente", "Pendente")
 	if pagamento.status != new_status and pagamento.status in ("Pendente", "Vencido"):
 		pagamento.status = new_status

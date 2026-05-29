@@ -441,6 +441,127 @@ function inject_painel_styles() {
             font-weight: 600;
             color: var(--text-muted);
         }
+        .painel-secondary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: var(--painel-gap);
+            align-items: start;
+        }
+        .painel-section--secondary {
+            margin-bottom: 0;
+        }
+        .painel-section--secondary .painel-panel {
+            min-height: 220px;
+        }
+        .painel-schedule-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 12px 14px 16px;
+        }
+        .painel-schedule-card {
+            display: grid;
+            grid-template-columns: 76px minmax(0, 1fr) auto;
+            gap: 14px;
+            align-items: start;
+            padding: 14px 16px;
+            border-radius: var(--painel-radius-sm);
+            border: 1px solid color-mix(in srgb, var(--border-color) 55%, transparent);
+            background: color-mix(in srgb, var(--subtle-fg) 35%, var(--card-bg));
+            cursor: pointer;
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.18s ease;
+        }
+        .painel-schedule-card:hover {
+            background: color-mix(in srgb, var(--subtle-fg) 70%, var(--card-bg));
+            border-color: color-mix(in srgb, var(--primary) 20%, var(--border-color));
+            transform: translateY(-1px);
+        }
+        .painel-schedule-card--urgent {
+            border-left: 3px solid color-mix(in srgb, var(--red-500) 60%, transparent);
+            background: color-mix(in srgb, var(--red-500) 5%, var(--card-bg));
+        }
+        .painel-schedule-card--today {
+            border-left: 3px solid color-mix(in srgb, var(--orange-500) 60%, transparent);
+        }
+        .painel-schedule-when {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 72px;
+            padding: 8px 6px;
+            border-radius: 10px;
+            background: var(--card-bg);
+            border: 1px solid color-mix(in srgb, var(--border-color) 50%, transparent);
+            text-align: center;
+            line-height: 1.2;
+        }
+        .painel-schedule-day {
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            color: var(--text-color);
+            font-variant-numeric: tabular-nums;
+        }
+        .painel-schedule-month {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-top: 2px;
+            letter-spacing: 0.04em;
+        }
+        .painel-schedule-hour,
+        .painel-schedule-countdown {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-top: 6px;
+            font-variant-numeric: tabular-nums;
+        }
+        .painel-schedule-countdown.danger { color: var(--red-600); }
+        .painel-schedule-countdown.warn { color: var(--orange-600); }
+        .painel-schedule-body { min-width: 0; }
+        .painel-schedule-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-color);
+            margin: 0 0 6px;
+            line-height: 1.35;
+            letter-spacing: -0.01em;
+            word-break: break-word;
+        }
+        .painel-schedule-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.45;
+            word-break: break-word;
+        }
+        .painel-schedule-meta {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+            flex-shrink: 0;
+            max-width: 120px;
+        }
+        .painel-schedule-meta .indicator-pill {
+            font-size: 10px;
+            padding: 3px 8px;
+            max-width: 110px;
+        }
+        .painel-section-foot {
+            padding: 0 18px 14px;
+            text-align: right;
+        }
+        .painel-section-foot-link {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--primary);
+            cursor: pointer;
+        }
+        .painel-section-foot-link:hover { opacity: 0.85; }
         .painel-parcela-card {
             display: flex;
             flex-wrap: wrap;
@@ -481,16 +602,27 @@ function inject_painel_styles() {
             transform: scale(1.02);
         }
         .painel-btn-entrar {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 36px;
             padding: 8px 14px;
             border-radius: var(--painel-radius-sm);
-            background: var(--primary);
-            color: var(--primary-color, #fff);
             font-size: 12px;
             font-weight: 600;
             text-decoration: none;
-            transition: opacity 0.15s ease;
+            white-space: nowrap;
+            border: 1px solid color-mix(in srgb, var(--primary) 28%, transparent);
+            background: color-mix(in srgb, var(--primary) 12%, var(--card-bg));
+            color: var(--primary);
+            transition: background 0.18s ease, border-color 0.18s ease, transform 0.15s ease;
         }
-        .painel-btn-entrar:hover { opacity: 0.92; }
+        .painel-btn-entrar:hover {
+            background: color-mix(in srgb, var(--primary) 20%, var(--card-bg));
+            border-color: color-mix(in srgb, var(--primary) 42%, transparent);
+            color: var(--primary);
+            transform: scale(1.02);
+        }
         .painel-empty {
             padding: 48px 28px 52px;
             text-align: center;
@@ -558,7 +690,7 @@ function inject_painel_styles() {
         @media (max-width: 1024px) {
             .painel-root { padding: 8px 20px 48px; }
             .painel-kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
-            .painel-operacao-grid, .painel-finance-grid { grid-template-columns: 1fr; }
+            .painel-operacao-grid, .painel-finance-grid, .painel-secondary-grid { grid-template-columns: 1fr; }
             .painel-parcela-main { min-width: 100%; }
         }
         @media (max-width: 640px) {
@@ -578,6 +710,17 @@ function inject_painel_styles() {
                 margin-right: 8px;
                 padding-left: 16px;
                 padding-right: 16px;
+            }
+            .painel-secondary-grid { grid-template-columns: 1fr; }
+            .painel-schedule-card {
+                grid-template-columns: 68px minmax(0, 1fr);
+                grid-template-rows: auto auto;
+            }
+            .painel-schedule-meta {
+                grid-column: 1 / -1;
+                flex-direction: row;
+                justify-content: flex-start;
+                max-width: none;
             }
             .painel-chart-label { width: 72px; font-size: 12px; }
             .painel-chart-amt { width: 88px; }
@@ -625,13 +768,15 @@ function render_painel($container, d) {
     html += render_operacao_dia(d);
     html += render_financeiro(d.financeiro);
     html += render_parcelas(d.parcelas);
+    html += '<div class="painel-secondary-grid">';
     html += render_secundario(
         __("Agenda — 7 dias"),
         "milestone",
         render_audiencia_items(d.audiencias),
         "painel-audiencias",
         __("Nenhuma audiência nesta semana"),
-        __("Quando houver compromissos agendados, eles aparecerão aqui.")
+        __("Quando houver compromissos agendados, eles aparecerão aqui."),
+        "Audiencia"
     );
     html += render_secundario(
         __("Prazos"),
@@ -639,7 +784,8 @@ function render_painel($container, d) {
         render_prazo_items(d.prazos),
         "painel-prazos",
         __("Nenhum prazo pendente"),
-        __("Sua fila processual está em dia neste período.")
+        __("Sua fila processual está em dia neste período."),
+        "Controle de Prazos"
     );
     html += render_secundario(
         __("Tarefas"),
@@ -647,8 +793,10 @@ function render_painel($container, d) {
         render_tarefa_items(d.tarefas),
         "painel-tarefas",
         __("Nenhuma tarefa aberta"),
-        __("Ótimo momento para planejar o próximo passo do escritório.")
+        __("Ótimo momento para planejar o próximo passo do escritório."),
+        "Tarefa"
     );
+    html += "</div>";
     html += "</div>";
     $container.html(html);
     bind_kpi_routes($container, kpi_routes);
@@ -1111,8 +1259,8 @@ function render_parcelas(parcelas) {
         '<p class="painel-section-sub">' +
         __("Cobranças pendentes e vencidas") +
         "</p></div>" +
-        '<span class="painel-section-link" data-scroll="painel-financeiro">' +
-        __("Ver financeiro") +
+        '<span class="painel-section-link" data-route-list="Pagamento">' +
+        __("Ver pagamentos") +
         "</span></div>";
     if (!parcelas || !parcelas.length) {
         return (
@@ -1168,7 +1316,17 @@ function render_parcelas(parcelas) {
     return h;
 }
 
-function render_secundario(title, icon, body, section_id, emptyTitle, emptyHint) {
+function render_secundario(title, icon, body, section_id, emptyTitle, emptyHint, list_doctype) {
+    var foot = "";
+    if (list_doctype && body) {
+        foot =
+            '<div class="painel-section-foot">' +
+            '<span class="painel-section-foot-link" data-route-list="' +
+            frappe.utils.escape_html(list_doctype) +
+            '">' +
+            __("Ver todos") +
+            "</span></div>";
+    }
     return (
         '<section class="painel-section painel-section--secondary" id="' +
         section_id +
@@ -1176,16 +1334,46 @@ function render_secundario(title, icon, body, section_id, emptyTitle, emptyHint)
         "<h2 class='painel-section-title'>" +
         title +
         "</h2></div>" +
-        '<div class="painel-panel"><div class="painel-op-list">' +
-        (body || render_empty_state(icon, emptyTitle, emptyHint)) +
-        "</div></div></section>"
+        '<div class="painel-panel">' +
+        (body
+            ? '<div class="painel-schedule-list">' + body + "</div>" + foot
+            : render_empty_state(icon, emptyTitle, emptyHint)) +
+        "</div></section>"
     );
+}
+
+function painel_date_parts(iso) {
+    if (!iso) {
+        return { day: "—", month: "" };
+    }
+    var months = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
+    var d = frappe.datetime.str_to_obj(iso);
+    return {
+        day: String(d.getDate()).padStart(2, "0"),
+        month: months[d.getMonth()] || "",
+    };
+}
+
+function prazo_countdown_label(dias) {
+    if (dias < 0) {
+        return { text: __("Vencido"), cls: "danger" };
+    }
+    if (dias === 0) {
+        return { text: __("Hoje"), cls: "warn" };
+    }
+    if (dias === 1) {
+        return { text: __("Amanhã"), cls: "warn" };
+    }
+    return { text: __("Em {0}d", [dias]), cls: "" };
 }
 
 function render_audiencia_items(audiencias) {
     if (!audiencias || !audiencias.length) return "";
     return audiencias
         .map(function (a) {
+            var parts = painel_date_parts(a.data);
+            var card_cls = "painel-schedule-card";
+            if (a.dias_restantes === 0) card_cls += " painel-schedule-card--today";
             var btn =
                 a.modalidade === "Virtual" && a.link_virtual
                     ? '<a class="painel-btn-entrar" href="' +
@@ -1195,19 +1383,31 @@ function render_audiencia_items(audiencias) {
                       "</a>"
                     : "";
             return (
-                '<div class="painel-op-item" data-dt="Audiencia" data-dn="' +
+                '<div class="' +
+                card_cls +
+                '" data-dt="Audiencia" data-dn="' +
                 frappe.utils.escape_html(a.name) +
                 '">' +
-                '<div class="painel-op-time">' +
-                fmt_datetime(a.data, a.hora) +
+                '<div class="painel-schedule-when">' +
+                '<span class="painel-schedule-day">' +
+                frappe.utils.escape_html(parts.day) +
+                "</span>" +
+                '<span class="painel-schedule-month">' +
+                frappe.utils.escape_html(parts.month) +
+                "</span>" +
+                (a.hora
+                    ? '<span class="painel-schedule-hour">' + frappe.utils.escape_html(a.hora) + "</span>"
+                    : "") +
                 "</div>" +
-                '<div class="painel-op-body"><div class="painel-op-title">' +
+                '<div class="painel-schedule-body">' +
+                '<div class="painel-schedule-title">' +
                 frappe.utils.escape_html(a.cliente || "—") +
-                '</div><div class="painel-op-sub">' +
-                frappe.utils.escape_html(a.tipo || "") +
+                "</div>" +
+                '<div class="painel-schedule-sub">' +
+                frappe.utils.escape_html(a.tipo || __("Audiência")) +
                 (a.vara_label ? " · " + frappe.utils.escape_html(a.vara_label) : "") +
                 "</div></div>" +
-                '<div class="painel-op-side">' +
+                '<div class="painel-schedule-meta">' +
                 status_pill(a.modalidade || "Presencial") +
                 btn +
                 "</div></div>"
@@ -1221,28 +1421,39 @@ function render_prazo_items(prazos) {
     return prazos
         .map(function (p) {
             var dias = p.dias_restantes;
-            var dias_txt =
-                dias < 0
-                    ? __("Vencido há {0}d", [Math.abs(dias)])
-                    : dias === 0
-                      ? __("Hoje")
-                      : dias === 1
-                        ? __("Amanhã")
-                        : __("Em {0}d", [dias]);
+            var cd = prazo_countdown_label(dias);
+            var parts = painel_date_parts(p.data_prazo);
+            var card_cls = "painel-schedule-card";
+            if (dias < 0) card_cls += " painel-schedule-card--urgent";
+            else if (dias <= 1) card_cls += " painel-schedule-card--today";
             return (
-                '<div class="painel-op-item" data-dt="Controle de Prazos" data-dn="' +
+                '<div class="' +
+                card_cls +
+                '" data-dt="Controle de Prazos" data-dn="' +
                 frappe.utils.escape_html(p.name) +
                 '">' +
-                '<div class="painel-op-time">' +
-                dias_txt +
-                "</div>" +
-                '<div class="painel-op-body"><div class="painel-op-title">' +
+                '<div class="painel-schedule-when">' +
+                '<span class="painel-schedule-day">' +
+                frappe.utils.escape_html(parts.day) +
+                "</span>" +
+                '<span class="painel-schedule-month">' +
+                frappe.utils.escape_html(parts.month) +
+                "</span>" +
+                '<span class="painel-schedule-countdown ' +
+                cd.cls +
+                '">' +
+                frappe.utils.escape_html(cd.text) +
+                "</span></div>" +
+                '<div class="painel-schedule-body">' +
+                '<div class="painel-schedule-title">' +
                 frappe.utils.escape_html(p.descricao || p.name) +
-                '</div><div class="painel-op-sub">' +
+                "</div>" +
+                '<div class="painel-schedule-sub">' +
                 frappe.utils.escape_html(p.cliente_nome || "—") +
+                (p.servico_titulo ? " · " + frappe.utils.escape_html(p.servico_titulo) : "") +
                 "</div></div>" +
-                '<div class="painel-op-side">' +
-                status_pill(p.prioridade) +
+                '<div class="painel-schedule-meta">' +
+                status_pill(p.prioridade || "Normal") +
                 "</div></div>"
             );
         })
@@ -1253,20 +1464,45 @@ function render_tarefa_items(tarefas) {
     if (!tarefas || !tarefas.length) return "";
     return tarefas
         .map(function (t) {
-            var prazo = t.data_limite ? fmt_date_iso(t.data_limite) : __("Sem prazo");
+            var parts = painel_date_parts(t.data_limite);
+            var cd = t.data_limite
+                ? prazo_countdown_label(t.dias_restantes != null ? t.dias_restantes : 99)
+                : { text: __("Sem prazo"), cls: "" };
+            var card_cls = "painel-schedule-card";
+            if (t.dias_restantes != null && t.dias_restantes < 0) {
+                card_cls += " painel-schedule-card--urgent";
+            } else if (t.dias_restantes === 0) {
+                card_cls += " painel-schedule-card--today";
+            }
             return (
-                '<div class="painel-op-item" data-dt="Tarefa" data-dn="' +
+                '<div class="' +
+                card_cls +
+                '" data-dt="Tarefa" data-dn="' +
                 frappe.utils.escape_html(t.name) +
                 '">' +
-                '<div class="painel-op-time">' +
-                prazo +
-                "</div>" +
-                '<div class="painel-op-body"><div class="painel-op-title">' +
+                '<div class="painel-schedule-when">' +
+                (t.data_limite
+                    ? '<span class="painel-schedule-day">' +
+                      frappe.utils.escape_html(parts.day) +
+                      "</span>" +
+                      '<span class="painel-schedule-month">' +
+                      frappe.utils.escape_html(parts.month) +
+                      "</span>"
+                    : '<span class="painel-schedule-day">—</span>') +
+                '<span class="painel-schedule-countdown ' +
+                cd.cls +
+                '">' +
+                frappe.utils.escape_html(cd.text) +
+                "</span></div>" +
+                '<div class="painel-schedule-body">' +
+                '<div class="painel-schedule-title">' +
                 frappe.utils.escape_html(t.titulo || "") +
-                '</div><div class="painel-op-sub">' +
+                "</div>" +
+                '<div class="painel-schedule-sub">' +
                 frappe.utils.escape_html(t.responsavel_nome || "—") +
+                (t.cliente_nome ? " · " + frappe.utils.escape_html(t.cliente_nome) : "") +
                 "</div></div>" +
-                '<div class="painel-op-side">' +
+                '<div class="painel-schedule-meta">' +
                 status_pill(t.status) +
                 "</div></div>"
             );
@@ -1354,6 +1590,19 @@ $(document).on("click", ".painel-action-chip", function () {
 
 $(document).on("click", ".painel-section-link[data-scroll]", function () {
     scroll_painel_section($(this).attr("data-scroll"));
+});
+
+$(document).on("click", "[data-route-list]", function (e) {
+    e.stopPropagation();
+    var dt = $(this).attr("data-route-list");
+    if (dt) frappe.set_route("List", dt);
+});
+
+$(document).on("click", ".painel-schedule-card[data-dt]", function (e) {
+    if ($(e.target).closest(".painel-btn-recebida, .painel-btn-entrar").length) return;
+    var dt = $(this).attr("data-dt");
+    var dn = $(this).attr("data-dn");
+    if (dt && dn) frappe.set_route("Form", dt, dn);
 });
 
 $(document).on("click", ".painel-op-item[data-dt]", function (e) {

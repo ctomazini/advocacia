@@ -1,10 +1,12 @@
 frappe.ui.form.on('Acordo de Honorarios Processuais', {
     refresh: function(frm) {
         controlar_campos(frm);
+        controlar_grid_parcelas(frm);
         somar_totais(frm);
     },
     modo_honorarios: function(frm) {
         controlar_campos(frm);
+        controlar_grid_parcelas(frm);
         if (eh_direto(frm)) {
             // Limpa campos de divisão quando muda para Direto
             frm.set_value('percentual_advogada', 0);
@@ -49,15 +51,30 @@ frappe.ui.form.on('Acordo de Honorarios Processuais', {
 });
 
 frappe.ui.form.on('Parcela de Honorarios', {
+    valor_total: function(frm, cdt, cdn) {
+        if (!eh_direto(frm)) {
+            return;
+        }
+        somar_totais(frm);
+    },
     valor_advogada: function(frm, cdt, cdn) {
+        if (eh_direto(frm)) {
+            return;
+        }
         recalcular_total_linha(cdt, cdn);
         somar_totais(frm);
     },
     valor_cliente: function(frm, cdt, cdn) {
+        if (eh_direto(frm)) {
+            return;
+        }
         recalcular_total_linha(cdt, cdn);
         somar_totais(frm);
     },
     valor_sucumbência: function(frm, cdt, cdn) {
+        if (eh_direto(frm)) {
+            return;
+        }
         recalcular_total_linha(cdt, cdn);
         somar_totais(frm);
     },
@@ -65,6 +82,7 @@ frappe.ui.form.on('Parcela de Honorarios', {
         somar_totais(frm);
     },
     table_ztjx_add: function(frm) {
+        controlar_grid_parcelas(frm);
         somar_totais(frm);
     }
 });
@@ -83,6 +101,12 @@ function recalcular_total_linha(cdt, cdn) {
 
 function controlar_campos(frm) {
     var direto = eh_direto(frm);
+
+    frm.set_df_property(
+        'valor_total_do_acordo',
+        'label',
+        direto ? 'Valor Total do Contrato' : 'Valor Total do Acordo'
+    );
 
     // --- Campos de divisão (ocultos no modo Direto) ---
     var campos_divisao = [
@@ -123,6 +147,25 @@ function controlar_campos(frm) {
             frm.set_df_property('honorários_de_sucumbência', 'read_only', 1);
         }
     }
+}
+
+function controlar_grid_parcelas(frm) {
+    var grid = frm.fields_dict.table_ztjx && frm.fields_dict.table_ztjx.grid;
+    if (!grid) {
+        return;
+    }
+    var direto = eh_direto(frm);
+
+    grid.update_docfield_property(
+        'valor_total',
+        'label',
+        direto ? 'Valor do Contrato' : 'Valor Total'
+    );
+    grid.update_docfield_property('valor_total', 'read_only', direto ? 0 : 1);
+    grid.update_docfield_property('valor_advogada', 'hidden', direto ? 1 : 0);
+    grid.update_docfield_property('valor_cliente', 'hidden', direto ? 1 : 0);
+    grid.update_docfield_property('valor_sucumbência', 'hidden', direto ? 1 : 0);
+    grid.refresh();
 }
 
 function calcular_valores(frm) {
@@ -212,7 +255,9 @@ function gerar_tabela_parcelas(frm) {
         return;
     }
     if (!total) {
-        frappe.msgprint('Preencha o valor total do acordo.');
+        frappe.msgprint(
+            direto ? 'Preencha o valor total do contrato.' : 'Preencha o valor total do acordo.'
+        );
         return;
     }
 

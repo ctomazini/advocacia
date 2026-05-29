@@ -445,6 +445,8 @@ def _marcar_pagamento_recebido(pagamento_name):
 	from advocacia.advocacia.financeiro import sync_parcela_from_pagamento
 
 	doc = frappe.get_doc("Pagamento", pagamento_name)
+	if doc.status == "Cancelado":
+		frappe.throw(_("Pagamento cancelado não pode ser alterado."))
 	if doc.status in ("Recebido", "Repassado"):
 		frappe.throw(_("Pagamento já está {0}").format(doc.status))
 

@@ -13,9 +13,10 @@ frappe.ui.form.on('Parcela de Honorarios', {
 
         // Botão Registrar Recebimento
         if (!frm.doc.data_recebimento && frm.doc.status !== 'Cancelada') {
+            var valor_receb = frm.doc.valor_total || frm.doc.valor_advogada || 0;
             frm.add_custom_button('✓ Registrar Recebimento', function() {
                 frappe.confirm(
-                    `Confirmar recebimento de <b>R$ ${frappe.format(frm.doc.valor_advogada, {fieldtype:'Currency'})}</b> hoje?`,
+                    `Confirmar recebimento de <b>R$ ${frappe.format(valor_receb, {fieldtype:'Currency'})}</b> hoje?`,
                     function() {
                         frappe.call({
                             method: 'registrar_recebimento',

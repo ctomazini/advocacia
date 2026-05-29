@@ -15,19 +15,19 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Servi\u00e7os",
+   "label": "Painel",
    "link_count": 0,
-   "link_to": "Servico",
-   "link_type": "DocType",
+   "link_to": "painel",
+   "link_type": "Page",
    "onboard": 1,
    "type": "Link"
   },
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Honor\u00e1rios",
+   "label": "Servi\u00e7os",
    "link_count": 0,
-   "link_to": "Acordo de Honorarios Processuais",
+   "link_to": "Servico",
    "link_type": "DocType",
    "onboard": 1,
    "type": "Link"
@@ -45,9 +45,19 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Registro de Atos",
+   "label": "Honor\u00e1rios",
    "link_count": 0,
-   "link_to": "Registro de Atos",
+   "link_to": "Acordo de Honorarios Processuais",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Prazos",
+   "link_count": 0,
+   "link_to": "Controle de Prazos",
    "link_type": "DocType",
    "onboard": 1,
    "type": "Link"
@@ -65,9 +75,19 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Prazos",
+   "label": "Tarefas",
    "link_count": 0,
-   "link_to": "Controle de Prazos",
+   "link_to": "Tarefa",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Registro de Atos",
+   "link_count": 0,
+   "link_to": "Registro de Atos",
    "link_type": "DocType",
    "onboard": 1,
    "type": "Link"
@@ -89,26 +109,6 @@
    "link_count": 0,
    "link_to": "Template Documento",
    "link_type": "DocType",
-   "onboard": 1,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Tarefas",
-   "link_count": 0,
-   "link_to": "Tarefa",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Painel",
-   "link_count": 0,
-   "link_to": "painel",
-   "link_type": "Page",
    "onboard": 1,
    "type": "Link"
   },
@@ -174,14 +174,6 @@
  "sequence_id": 0.0,
  "shortcuts": [
   {
-   "color": "Blue",
-   "format": "{} Ativos",
-   "label": "Servi\u00e7os",
-   "link_to": "Servico",
-   "stats_filter": "{\"status\": \"Em andamento\"}",
-   "type": "DocType"
-  },
-  {
    "color": "Grey",
    "doc_view": "List",
    "label": "Painel",
@@ -189,9 +181,11 @@
    "url": "/app/painel"
   },
   {
-   "color": "Purple",
-   "label": "Honorários",
-   "link_to": "Acordo de Honorarios Processuais",
+   "color": "Blue",
+   "format": "{} Ativos",
+   "label": "Servi\u00e7os",
+   "link_to": "Servico",
+   "stats_filter": "{\"status\": \"Em andamento\"}",
    "type": "DocType"
   },
   {
@@ -203,22 +197,9 @@
    "type": "DocType"
   },
   {
-   "color": "Grey",
-   "doc_view": "List",
-   "label": "Cadastro de documentos",
-   "type": "URL",
-   "url": "/app/template-documento"
-  },
-  {
-   "color": "Orange",
-   "label": "Registro de Atos",
-   "link_to": "Registro de Atos",
-   "type": "DocType"
-  },
-  {
-   "color": "Blue",
-   "label": "Audi\u00eancias",
-   "link_to": "Audiencia",
+   "color": "Purple",
+   "label": "Honorários",
+   "link_to": "Acordo de Honorarios Processuais",
    "type": "DocType"
   },
   {
@@ -230,14 +211,33 @@
    "type": "DocType"
   },
   {
-   "label": "Clientes",
-   "link_to": "Cliente",
+   "color": "Blue",
+   "label": "Audi\u00eancias",
+   "link_to": "Audiencia",
    "type": "DocType"
   },
   {
    "label": "Tarefas",
    "link_to": "Tarefa",
    "type": "DocType"
+  },
+  {
+   "color": "Orange",
+   "label": "Registro de Atos",
+   "link_to": "Registro de Atos",
+   "type": "DocType"
+  },
+  {
+   "label": "Clientes",
+   "link_to": "Cliente",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Documentos",
+   "type": "URL",
+   "url": "/app/template-documento"
   },
   {
    "color": "Grey",

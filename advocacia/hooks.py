@@ -66,4 +66,6 @@ after_install = "advocacia.advocacia.setup.install.after_install"
 after_migrate = [
     "advocacia.advocacia.setup.reinstalar_istable_doctypes",
     "advocacia.advocacia.setup.install.after_install",
+    "advocacia.advocacia.setup.translations.ensure_doctype_translations",
+    "advocacia.advocacia.setup.sidebar.ensure_advocacia_sidebar",
 ]

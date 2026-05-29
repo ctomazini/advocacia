@@ -1,0 +1,20 @@
+{
+ "app": "advocacia",
+ "creation": "2026-05-29 18:00:00.000000",
+ "docstatus": 0,
+ "doctype": "Desktop Icon",
+ "hidden": 0,
+ "icon": "briefcase",
+ "icon_type": "Link",
+ "idx": 2,
+ "label": "Advocacia",
+ "link_to": "Advocacia",
+ "link_type": "Workspace Sidebar",
+ "modified": "2026-05-29 18:00:00.000000",
+ "modified_by": "Administrator",
+ "name": "Advocacia",
+ "owner": "Administrator",
+ "restrict_removal": 0,
+ "roles": [],
+ "standard": 1
+}
