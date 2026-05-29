@@ -1,5 +1,6 @@
 import frappe
-from frappe.utils import flt, now_datetime, today
+from frappe import _
+from frappe.utils import add_days, flt, getdate, now_datetime, today
 
 STATUS_PARCELA_TO_PAGAMENTO = {
 	"Pendente": "Pendente",
@@ -17,6 +18,18 @@ STATUS_PAGAMENTO_TO_PARCELA = {
 	"Cancelado": "Cancelada",
 	"Renegociado": "Pendente",
 }
+
+TIPO_HONORARIOS = "Honorários (Parcela)"
+TIPO_ATOS = "Atos Advocatícios"
+
+
+def is_pagamento_atos(pagamento):
+	return (pagamento.get("tipo_origem") or "") == TIPO_ATOS
+
+
+def is_pagamento_honorarios(pagamento):
+	tipo = pagamento.get("tipo_origem") or TIPO_HONORARIOS
+	return tipo == TIPO_HONORARIOS
 
 
 def sincronizar_pagamentos_hook(doc, method=None):
@@ -70,6 +83,8 @@ def _sincronizar_pagamentos_do_acordo_impl(acordo, commit=False):
 			continue
 
 		pagamento = frappe.get_doc("Pagamento", pagamento_name)
+		if is_pagamento_atos(pagamento):
+			continue
 		if _pode_atualizar_pagamento(pagamento):
 			changed = _apply_pagamento_payload(pagamento, payload)
 			if changed:
@@ -110,8 +125,13 @@ def migrar_pagamentos_existentes():
 
 def sync_parcela_from_pagamento(pagamento):
 	"""Propaga recebimento do Pagamento para a parcela contratual."""
+	if is_pagamento_atos(pagamento):
+		return
 	if not pagamento.parcela_origem_id:
 		return
+	if str(pagamento.parcela_origem_id).startswith("ATOS-"):
+		return
+
 	parcela_name = frappe.db.get_value(
 		"Parcela de Honorarios",
 		{"parcela_origem_id": pagamento.parcela_origem_id},
@@ -136,6 +156,322 @@ def sync_parcela_from_pagamento(pagamento):
 
 	if updates:
 		frappe.db.set_value("Parcela de Honorarios", parcela_name, updates, update_modified=True)
+
+
+def on_pagamento_trash(doc, method=None):
+	"""Impede exclusão de Pagamento de honorários já recebido."""
+	if is_pagamento_atos(doc):
+		return
+
+	if doc.status in ("Recebido", "Repassado"):
+		frappe.throw(
+			_("Não é possível excluir Pagamento de honorários com status '{0}'. "
+			  "Cancele o pagamento primeiro.").format(doc.status),
+			title=_("Exclusão Bloqueada"),
+		)
+
+
+def on_pagamento_update_honorarios(doc, method=None):
+	"""Propaga cancelamento de pagamento de honorários para a parcela contratual."""
+	if getattr(frappe.flags, "in_pagamento_sync", False):
+		return
+	if is_pagamento_atos(doc):
+		return
+	if doc.status != "Cancelado":
+		return
+
+	sync_parcela_from_pagamento(doc)
+	if doc.acordo:
+		verificar_acordo_quitado(doc.acordo)
+
+
+def verificar_acordo_quitado(acordo_name):
+	"""Recalcula status Quitado do acordo após cancelamento ou reversão."""
+	if not acordo_name:
+		return
+
+	from advocacia.advocacia.tasks import _marcar_acordo_quitado_se_completo
+
+	acordo_status = frappe.db.get_value(
+		"Acordo de Honorarios Processuais", acordo_name, "status"
+	)
+	if acordo_status == "Quitado":
+		pagamentos = frappe.get_all(
+			"Pagamento",
+			filters={
+				"acordo": acordo_name,
+				"tipo_origem": ["in", [TIPO_HONORARIOS, ""]],
+				"status": ["not in", ["Cancelado"]],
+			},
+			fields=["status"],
+		)
+		if not pagamentos or not all(
+			p.status in ("Recebido", "Repassado") for p in pagamentos
+		):
+			frappe.db.set_value(
+				"Acordo de Honorarios Processuais",
+				acordo_name,
+				"status",
+				"Vigente",
+				update_modified=True,
+			)
+			frappe.logger().info(
+				"Acordo {0} revertido de Quitado para Vigente".format(acordo_name)
+			)
+			return
+
+	_marcar_acordo_quitado_se_completo(acordo_name, usar_pagamentos=True)
+
+
+@frappe.whitelist()
+def resync_pagamentos_acordo(acordo_name):
+	"""Re-sincroniza pagamentos do Acordo sem precisar editar campos."""
+	acordo = frappe.get_doc("Acordo de Honorarios Processuais", acordo_name)
+	frappe.has_permission(
+		"Acordo de Honorarios Processuais", "write", doc=acordo, throw=True
+	)
+	sincronizar_pagamentos_do_acordo(acordo, commit=True)
+	frappe.msgprint(
+		_("Pagamentos re-sincronizados com sucesso."),
+		title=_("Sincronização"),
+		indicator="green",
+	)
+	return {"status": "ok"}
+
+
+@frappe.whitelist()
+def gerar_pagamento_atos(registro_name, data_vencimento=None):
+	"""Sincroniza atos pendentes com o Pagamento aberto do registro (idempotente)."""
+	return sincronizar_pagamento_atos(registro_name, data_vencimento)
+
+
+@frappe.whitelist()
+def sincronizar_pagamento_atos(registro_name, data_vencimento=None):
+	"""Upsert: atualiza Pagamento Atos aberto ou cria um novo lote fechado."""
+	if not frappe.has_permission("Registro de Atos", "write"):
+		frappe.throw(_("Sem permissão"), frappe.PermissionError)
+
+	registro = frappe.get_doc("Registro de Atos", registro_name)
+	vencimento = getdate(data_vencimento or registro.data_vencimento_cobranca or add_days(today(), 30))
+
+	pagamento_aberto = _get_pagamento_atos_aberto(registro.name)
+	criado = False
+
+	if pagamento_aberto:
+		pagamento = frappe.get_doc("Pagamento", pagamento_aberto)
+		incluidos, novos = _classificar_atos_para_sync(registro, pagamento.name)
+		if not novos and not incluidos:
+			frappe.throw(_("Não há atos para sincronizar na cobrança."))
+		atos_faturados = incluidos + novos
+	else:
+		novos = [
+			ato
+			for ato in registro.atos or []
+			if ato.status == "Pendente" and flt(ato.valor) > 0
+		]
+		if not novos:
+			frappe.throw(_("Não há atos pendentes para cobrar."))
+		atos_faturados = novos
+		pagamento = None
+
+	total = sum(flt(ato.valor) for ato in atos_faturados)
+	observacoes = _montar_observacoes_atos(atos_faturados)
+
+	if pagamento:
+		if pagamento.status not in ("Pendente", "Vencido"):
+			frappe.throw(
+				_("Pagamento {0} não está aberto para sincronização.").format(pagamento.name)
+			)
+		pagamento.valor = total
+		pagamento.observacoes = observacoes
+		pagamento.data_vencimento = vencimento
+		pagamento.sincronizado_em = now_datetime()
+		pagamento.save(ignore_permissions=True)
+	else:
+		criado = True
+		origem_id = _gerar_parcela_origem_id_atos(registro.name)
+		pagamento = frappe.get_doc(
+			{
+				"doctype": "Pagamento",
+				"tipo_origem": TIPO_ATOS,
+				"registro_atos": registro.name,
+				"servico": registro.servico,
+				"cliente": registro.cliente,
+				"parcela_origem_id": origem_id,
+				"descricao": _("Atos — {0}").format(registro.name)[:140],
+				"valor": total,
+				"data_vencimento": vencimento,
+				"status": "Pendente",
+				"observacoes": observacoes,
+			}
+		)
+		pagamento.insert(ignore_permissions=True)
+
+	for ato in novos:
+		ato.status = "Cobrado"
+		ato.cobranca_id = pagamento.name
+
+	registro.ultimo_pagamento = pagamento.name
+	frappe.flags.in_atos_cobranca_sync = True
+	try:
+		registro.flags.ignore_validate = True
+		registro.save(ignore_permissions=True)
+	finally:
+		frappe.flags.in_atos_cobranca_sync = False
+
+	frappe.db.commit()
+
+	acao = "criado" if criado else "atualizado"
+	frappe.logger().info(
+		"Cobrança atos {0} {1}: pagamento {2}, {3} ato(s), R$ {4}".format(
+			registro.name, acao, pagamento.name, len(atos_faturados), total
+		)
+	)
+
+	return {
+		"success": True,
+		"criado": criado,
+		"pagamento": pagamento.name,
+		"total": total,
+		"qtd_atos": len(atos_faturados),
+		"qtd_novos": len(novos),
+	}
+
+
+def _get_pagamento_atos_aberto(registro_name):
+	return frappe.db.get_value(
+		"Pagamento",
+		{
+			"registro_atos": registro_name,
+			"tipo_origem": TIPO_ATOS,
+			"status": ["in", ["Pendente", "Vencido"]],
+		},
+		"name",
+		order_by="creation desc",
+	)
+
+
+def _classificar_atos_para_sync(registro, pagamento_name):
+	incluidos = []
+	novos = []
+	for ato in registro.atos or []:
+		if ato.status == "Cobrado" and ato.cobranca_id == pagamento_name:
+			incluidos.append(ato)
+		elif ato.status == "Pendente" and flt(ato.valor) > 0:
+			novos.append(ato)
+	return incluidos, novos
+
+
+def _montar_observacoes_atos(atos):
+	partes = []
+	for ato in atos:
+		desc = ato.get("descrição") or ato.get("descricao") or ""
+		partes.append(
+			"{0}: {1} (R$ {2:.2f})".format(ato.tipo or _("Ato"), desc, flt(ato.valor))
+		)
+	return "\n".join(partes)
+
+
+def _gerar_parcela_origem_id_atos(registro_name):
+	"""ID determinístico: ATOS-{registro}, sequência -02 se lote anterior existir."""
+	base = "ATOS-{0}".format(registro_name)
+	if not frappe.db.exists("Pagamento", {"parcela_origem_id": base}):
+		return base
+	seq = 2
+	while frappe.db.exists("Pagamento", {"parcela_origem_id": "{0}-{1:02d}".format(base, seq)}):
+		seq += 1
+	return "{0}-{1:02d}".format(base, seq)
+
+
+def reverter_atos_do_pagamento(pagamento):
+	"""Devolve atos para Pendente quando Pagamento de origem Atos é cancelado."""
+	liberar_vinculos_pagamento_atos(pagamento, revert_atos=True)
+
+
+def liberar_vinculos_pagamento_atos(pagamento, revert_atos=True):
+	"""Desvincula Pagamento Atos do Registro (atos + ultimo_pagamento). Usado no cancelamento e on_trash."""
+	if not is_pagamento_atos(pagamento):
+		return
+	if not pagamento.registro_atos:
+		return
+
+	registro_name = pagamento.registro_atos
+	changed = False
+
+	if revert_atos:
+		registro = frappe.get_doc("Registro de Atos", registro_name)
+		for ato in registro.atos or []:
+			if ato.cobranca_id == pagamento.name and ato.status == "Cobrado":
+				ato.status = "Pendente"
+				ato.cobranca_id = None
+				changed = True
+
+		if changed:
+			frappe.flags.in_atos_cobranca_sync = True
+			try:
+				registro.flags.ignore_validate = True
+				registro.save(ignore_permissions=True)
+			finally:
+				frappe.flags.in_atos_cobranca_sync = False
+			frappe.logger().info(
+				"Atos revertidos para Pendente — pagamento {0}".format(pagamento.name)
+			)
+
+	_limpar_ultimo_pagamento_se_apontar(registro_name, pagamento.name)
+
+
+def _limpar_ultimo_pagamento_se_apontar(registro_name, pagamento_name):
+	if frappe.db.get_value("Registro de Atos", registro_name, "ultimo_pagamento") != pagamento_name:
+		return
+
+	outro = frappe.db.get_value(
+		"Pagamento",
+		{
+			"registro_atos": registro_name,
+			"tipo_origem": TIPO_ATOS,
+			"name": ["!=", pagamento_name],
+			"status": ["not in", ["Cancelado"]],
+		},
+		"name",
+		order_by="modified desc",
+	)
+	frappe.db.set_value(
+		"Registro de Atos",
+		registro_name,
+		"ultimo_pagamento",
+		outro,
+		update_modified=False,
+	)
+
+
+@frappe.whitelist()
+def cancelar_cobranca_pagamento_atos(pagamento_name):
+	"""Cancela cobrança de atos e libera vínculos no Registro."""
+	if not frappe.has_permission("Pagamento", "write"):
+		frappe.throw(_("Sem permissão"), frappe.PermissionError)
+
+	pagamento = frappe.get_doc("Pagamento", pagamento_name)
+	if not is_pagamento_atos(pagamento):
+		frappe.throw(_("Este pagamento não é de origem Atos Advocatícios."))
+
+	if pagamento.status == "Cancelado":
+		frappe.throw(_("Pagamento já está cancelado."))
+
+	if pagamento.status in ("Recebido", "Repassado"):
+		frappe.throw(
+			_("Pagamento recebido não pode ser cancelado. Estorne manualmente se necessário."),
+			title=_("Operação não permitida"),
+		)
+
+	pagamento.status = "Cancelado"
+	pagamento.save(ignore_permissions=False)
+	frappe.db.commit()
+
+	return {
+		"success": True,
+		"pagamento": pagamento.name,
+		"registro_atos": pagamento.registro_atos,
+	}
 
 
 def _as_acordo_doc(acordo_doc):
@@ -172,6 +508,7 @@ def _parcela_to_pagamento_payload(acordo, parcela, idx, cliente, servico):
 	valor_recebido = flt(parcela.valor_total) if status in ("Recebido", "Repassado") else 0
 
 	return {
+		"tipo_origem": TIPO_HONORARIOS,
 		"acordo": acordo.name,
 		"servico": servico,
 		"cliente": cliente,
@@ -189,6 +526,8 @@ def _parcela_to_pagamento_payload(acordo, parcela, idx, cliente, servico):
 
 
 def _pode_atualizar_pagamento(pagamento):
+	if is_pagamento_atos(pagamento):
+		return False
 	if pagamento.status == "Cancelado":
 		return False
 	if pagamento.manual_override:
@@ -203,6 +542,7 @@ def _pode_atualizar_pagamento(pagamento):
 def _apply_pagamento_payload(pagamento, payload):
 	changed = False
 	for field in (
+		"tipo_origem",
 		"acordo",
 		"servico",
 		"cliente",
@@ -223,6 +563,8 @@ def _apply_pagamento_payload(pagamento, payload):
 
 
 def _sync_status_from_parcela(pagamento, parcela):
+	if is_pagamento_atos(pagamento):
+		return
 	if pagamento.status == "Cancelado":
 		return
 	new_status = STATUS_PARCELA_TO_PAGAMENTO.get(parcela.status or "Pendente", "Pendente")
@@ -234,7 +576,10 @@ def _sync_status_from_parcela(pagamento, parcela):
 
 def _cancelar_pagamentos_orfaos(acordo_name, active_origem_ids):
 	cancelados = 0
-	filters = {"acordo": acordo_name}
+	filters = {
+		"acordo": acordo_name,
+		"tipo_origem": ["in", [TIPO_HONORARIOS, ""]],
+	}
 	if active_origem_ids:
 		filters["parcela_origem_id"] = ["not in", list(active_origem_ids)]
 

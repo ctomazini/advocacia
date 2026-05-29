@@ -3,6 +3,27 @@ frappe.ui.form.on('Acordo de Honorarios Processuais', {
         controlar_campos(frm);
         controlar_grid_parcelas(frm);
         somar_totais(frm);
+
+        if (!frm.is_new()) {
+            frm.add_custom_button(__('Re-sincronizar Pagamentos'), function() {
+                frappe.confirm(
+                    __('Isso vai re-sincronizar todos os pagamentos com as parcelas atuais. Continuar?'),
+                    function() {
+                        frappe.call({
+                            method: 'advocacia.advocacia.financeiro.resync_pagamentos_acordo',
+                            args: { acordo_name: frm.doc.name },
+                            freeze: true,
+                            freeze_message: __('Sincronizando...'),
+                            callback: function(r) {
+                                if (r.message && r.message.status === 'ok') {
+                                    frm.reload_doc();
+                                }
+                            }
+                        });
+                    }
+                );
+            }, __('Ações'));
+        }
     },
     modo_honorarios: function(frm) {
         controlar_campos(frm);
