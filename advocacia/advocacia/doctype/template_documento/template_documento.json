@@ -52,7 +52,7 @@
    "fieldtype": "Attach",
    "label": "Arquivo Template (.docx)",
    "reqd": 1,
-   "description": "Upload do modelo .docx com placeholders: {{ nome }}, {{ cpf }}, {{ rg }}, {{ endereco }}, {{ cidade }}, {{ estado }}, {{ numero_processo }}, {{ vara }}, {{ comarca }}, {{ data_hoje }}, {{ data_hoje_extenso }}"
+   "description": "Upload do modelo .docx com placeholders no formato {{ nome_do_campo }}. Clique em 'Ver Placeholders' abaixo para ver a lista completa."
   },
   {
    "fieldname": "section_break_2",
@@ -60,10 +60,10 @@
    "label": "Placeholders Disponiveis"
   },
   {
-   "fieldname": "placeholders_info",
-   "fieldtype": "HTML",
-   "label": "Info Placeholders",
-   "options": "<div><b>PF:</b> {{ nome }}, {{ cpf }}, {{ rg }}, {{ nacionalidade }}, {{ estado_civil }}, {{ profissao }}, {{ telefone }}, {{ email }}<br><b>PJ:</b> {{ nome }}, {{ cnpj }}, {{ representante }}, {{ cpf_representante }}<br><b>Endereco:</b> {{ endereco }}, {{ numero }}, {{ complemento }}, {{ bairro }}, {{ cidade }}, {{ estado }}, {{ cep }}<br><b>Servico:</b> {{ servico }}, {{ tipo_servico }}, {{ numero_processo }}, {{ area }}, {{ vara }}, {{ comarca }}, {{ parte_contraria }}, {{ valor_causa }}, {{ data_abertura }}<br><b>Data:</b> {{ data_hoje }}, {{ data_hoje_extenso }}</div>"
+   "fieldname": "ver_placeholders",
+   "fieldtype": "Button",
+   "label": "Ver Placeholders Disponíveis",
+   "description": "Clique para ver todos os placeholders que podem ser usados nos templates .docx"
   }
  ],
  "permissions": [
