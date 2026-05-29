@@ -1,10 +1,8 @@
+node_modules/
 __pycache__/
 *.pyc
+.git/
 *.egg-info/
 dist/
 build/
 .eggs/
-node_modules/
-*.swp
-*.swo
-.DS_Store
