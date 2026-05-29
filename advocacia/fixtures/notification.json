@@ -1,0 +1,51 @@
+[
+ {
+  "attach_print": 0,
+  "channel": "System Notification",
+  "condition_type": "Filters",
+  "date_changed": "data_prazo",
+  "days_in_advance": 3,
+  "docstatus": 0,
+  "doctype": "Notification",
+  "document_type": "Controle de Prazos",
+  "enabled": 1,
+  "event": "Days Before",
+  "is_standard": 0,
+  "message": "<p>O prazo '{{ doc.descricao }}' do servico {{ doc.servico }} vence em {{ doc.dias_notificacao or 3 }} dias ({{ frappe.utils.formatdate(doc.data_prazo) }}).</p>",
+  "message_type": "Markdown",
+  "module": "Advocacia",
+  "name": "Advocacia - Prazo vencendo",
+  "recipients": [
+   {
+    "receiver_by_document_field": "responsavel"
+   },
+   {
+    "receiver_by_document_field": "owner"
+   }
+  ],
+  "subject": "Prazo vencendo: {{ doc.descricao }} - {{ doc.cliente }}"
+ },
+ {
+  "attach_print": 0,
+  "channel": "System Notification",
+  "condition_type": "Filters",
+  "date_changed": "data_hora",
+  "days_in_advance": 1,
+  "docstatus": 0,
+  "doctype": "Notification",
+  "document_type": "Audiencia",
+  "enabled": 1,
+  "event": "Days Before",
+  "is_standard": 0,
+  "message": "<p>Audiencia {{ doc.tipo }} ({{ doc.modalidade }}) agendada para {{ frappe.utils.format_datetime(doc.data_hora) }}. Vara: {{ doc.local_vara }}.</p>",
+  "message_type": "Markdown",
+  "module": "Advocacia",
+  "name": "Advocacia - Audiencia amanha",
+  "recipients": [
+   {
+    "receiver_by_document_field": "owner"
+   }
+  ],
+  "subject": "Audiencia amanha: {{ doc.cliente }} - {{ doc.tipo }}"
+ }
+]

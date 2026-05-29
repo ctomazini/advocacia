@@ -13,7 +13,20 @@ fixtures = [
     {
         "dt": "Client Script",
         "filters": [["name", "=", "Link Audiencia Virtual"]]
-    }
+    },
+    {
+        "dt": "Notification",
+        "filters": [
+            [
+                "name",
+                "in",
+                [
+                    "Advocacia - Prazo vencendo",
+                    "Advocacia - Audiencia amanha",
+                ],
+            ]
+        ],
+    },
 ]
 
 doctype_js = {
@@ -27,7 +40,16 @@ app_include_js = [
 scheduler_events = {
     "daily": [
         "advocacia.advocacia.notificacoes.notificar_prazos_diario",
-]
+        "advocacia.advocacia.tasks.verificar_parcelas_vencidas",
+        "advocacia.advocacia.tasks.notificar_parcelas_vencidas",
+        "advocacia.advocacia.tasks.notificar_audiencias_hoje",
+    ]
+}
+
+doc_events = {
+    "Parcela de Honorarios": {
+        "on_update": "advocacia.advocacia.tasks.on_parcela_update",
+    },
 }
 
 after_install = "advocacia.advocacia.setup.install.after_install"

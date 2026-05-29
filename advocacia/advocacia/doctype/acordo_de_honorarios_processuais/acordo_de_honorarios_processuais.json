@@ -431,7 +431,7 @@
    "oldfieldname": null,
    "fieldtype": "Select",
    "oldfieldtype": null,
-   "options": "Vigente\nEncerrado\nCancelado",
+   "options": "Vigente\nEncerrado\nCancelado\nQuitado",
    "search_index": 0,
    "show_dashboard": 0,
    "hidden": 0,

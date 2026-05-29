@@ -46,13 +46,4 @@
             }
         });
     });
-
-    frappe.views.calendar["Audiencia"] = {
-        field_map: { start:"data_hora", end:"data_hora", id:"name", title:"tipo", allDay:false },
-        get_css_class: function(d){ return d.modalidade==="Virtual"?"green":"blue"; }
-    };
-    frappe.views.calendar["Controle de Prazos"] = {
-        field_map: { start:"data_prazo", end:"data_prazo", id:"name", title:"descricao", allDay:true },
-        get_css_class: function(d){ return d.prioridade==="Alta"?"red":d.prioridade==="Media"?"orange":"blue"; }
-    };
 })();
