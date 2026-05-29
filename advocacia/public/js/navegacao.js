@@ -7,7 +7,7 @@
         var b = document.createElement("button");
         b.id = FAB_ID;
         b.innerHTML = "&#8592; Painel";
-        b.style.cssText = "position:fixed;bottom:28px;right:28px;background:var(--primary);color:#fff;border:none;border-radius:50px;padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;display:none;box-shadow:0 4px 12px rgba(0,0,0,.25);z-index:9999";
+        b.style.cssText = "position:fixed;bottom:calc(16px + env(safe-area-inset-bottom, 0px));right:16px;background:var(--primary);color:#fff;border:none;border-radius:50px;padding:10px 16px;font-size:12px;font-weight:600;cursor:pointer;display:none;box-shadow:0 4px 12px rgba(0,0,0,.25);z-index:9999;max-width:calc(100vw - 32px)";
         b.onclick = function(){ frappe.set_route("painel"); };
         document.body.appendChild(b);
     }
@@ -26,13 +26,15 @@
     frappe.after_ajax(function() {
         addFab();
         var route = frappe.get_route();
-        var inScope = route && (route[0]==="Form"||route[0]==="List") && DTS.indexOf(route[1])>-1;
+        var onPainel = route && route[0] === "painel";
+        var inScope = !onPainel && route && (route[0]==="Form"||route[0]==="List") && DTS.indexOf(route[1])>-1;
         showFab(!!inScope);
     });
 
     $(document).on("page-change", function() {
         var route = frappe.get_route();
-        var inScope = route && (route[0]==="Form"||route[0]==="List") && DTS.indexOf(route[1])>-1;
+        var onPainel = route && route[0] === "painel";
+        var inScope = !onPainel && route && (route[0]==="Form"||route[0]==="List") && DTS.indexOf(route[1])>-1;
         addFab();
         showFab(!!inScope);
     });

@@ -102,6 +102,12 @@ function inject_painel_styles() {
             color: var(--text-muted);
             line-height: 1.5;
         }
+        .painel-hero-pulse-stats {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px 20px;
+        }
         .painel-hero-pulse strong {
             color: var(--text-color);
             font-weight: 600;
@@ -132,11 +138,22 @@ function inject_painel_styles() {
             color: var(--green-700);
             border: 1px solid color-mix(in srgb, var(--green-500) 18%, transparent);
         }
+        .painel-actions-wrap {
+            margin-bottom: var(--painel-gap-md);
+        }
+        .painel-actions-label {
+            display: none;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin: 0 0 10px;
+        }
         .painel-actions {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
-            margin-bottom: var(--painel-gap-md);
         }
         .painel-action-chip {
             display: inline-flex;
@@ -153,6 +170,10 @@ function inject_painel_styles() {
             transition: border-color 0.22s ease, box-shadow 0.22s ease, transform 0.18s ease, background 0.22s ease;
             min-height: 44px;
             box-shadow: var(--painel-shadow);
+        }
+        .painel-action-chip .icon {
+            color: var(--primary);
+            flex-shrink: 0;
         }
         .painel-action-chip:hover {
             border-color: color-mix(in srgb, var(--primary) 35%, var(--border-color));
@@ -693,37 +714,167 @@ function inject_painel_styles() {
             .painel-operacao-grid, .painel-finance-grid, .painel-secondary-grid { grid-template-columns: 1fr; }
             .painel-parcela-main { min-width: 100%; }
         }
-        @media (max-width: 640px) {
-            .painel-root { padding: 4px 16px 40px; --painel-gap: 32px; }
-            .painel-hero { padding: 24px 0 20px; }
-            .painel-kpi-grid { grid-template-columns: 1fr; }
-            .painel-kpi { min-height: 100px; padding: 22px 20px; }
-            .painel-finance-stats { grid-template-columns: 1fr; }
-            .painel-actions { gap: 8px; }
-            .painel-action-chip {
-                flex: 1 1 calc(50% - 4px);
-                justify-content: center;
-                padding: 10px 12px;
+        @media (max-width: 768px) {
+            body.advocacia-painel-active .layout-main-section-wrapper {
+                padding-left: 0;
+                padding-right: 0;
             }
+            body.advocacia-painel-active .page-head {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+            body.advocacia-painel-active .page-head .page-actions .btn {
+                min-height: 36px;
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+            .painel-root {
+                padding: 0 12px 72px;
+                --painel-gap: 28px;
+                --painel-gap-md: 20px;
+                max-width: none;
+            }
+            .painel-hero {
+                padding: 16px 0 18px;
+                margin-bottom: var(--painel-gap-md);
+            }
+            .painel-hero-greeting {
+                font-size: 1.35rem;
+            }
+            .painel-hero-context {
+                font-size: 13px;
+                line-height: 1.5;
+            }
+            .painel-hero-pulse {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+            .painel-hero-pulse-stats {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px 12px;
+            }
+            .painel-hero-pulse-stats > span {
+                display: block;
+                padding: 10px 12px;
+                border-radius: var(--painel-radius-sm);
+                background: color-mix(in srgb, var(--subtle-fg) 55%, var(--card-bg));
+                border: 1px solid color-mix(in srgb, var(--border-color) 55%, transparent);
+                font-size: 12px;
+                line-height: 1.35;
+            }
+            .painel-hero-pulse .dot { display: none; }
+            .painel-urgency-badge {
+                align-self: stretch;
+                justify-content: center;
+                text-align: center;
+            }
+            .painel-actions-label { display: block; }
+            .painel-actions-wrap {
+                margin-left: -12px;
+                margin-right: -12px;
+                margin-bottom: var(--painel-gap-md);
+            }
+            .painel-actions-label {
+                padding: 0 12px;
+            }
+            .painel-actions {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scroll-snap-type: x proximity;
+                gap: 8px;
+                padding: 0 12px 6px;
+                scrollbar-width: none;
+            }
+            .painel-actions::-webkit-scrollbar { display: none; }
+            .painel-action-chip {
+                flex: 0 0 auto;
+                scroll-snap-align: start;
+                min-width: 96px;
+                max-width: 112px;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+                padding: 12px 8px;
+                text-align: center;
+                font-size: 11px;
+                line-height: 1.25;
+                min-height: 84px;
+            }
+            .painel-action-chip .icon {
+                width: 18px;
+                height: 18px;
+            }
+            .painel-action-chip span {
+                white-space: normal;
+                display: block;
+            }
+            .painel-section-head {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            .painel-section-link {
+                white-space: normal;
+            }
+            .painel-kpi-grid { grid-template-columns: 1fr; gap: 12px; }
+            .painel-kpi {
+                min-height: 92px;
+                padding: 18px 16px 16px;
+            }
+            .painel-kpi-value {
+                font-size: 1.45rem;
+            }
+            .painel-finance-stats { grid-template-columns: 1fr; }
             .painel-op-item, .painel-parcela-card {
                 margin-left: 8px;
                 margin-right: 8px;
-                padding-left: 16px;
-                padding-right: 16px;
+                padding-left: 14px;
+                padding-right: 14px;
+            }
+            .painel-op-item {
+                flex-wrap: wrap;
+            }
+            .painel-op-side {
+                width: 100%;
+                flex-direction: row;
+                align-items: center;
+                justify-content: flex-start;
+                margin-top: 4px;
+            }
+            .painel-parcela-card {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .painel-parcela-card .painel-btn-recebida,
+            .painel-parcela-card .painel-btn-entrar {
+                width: 100%;
+                justify-content: center;
             }
             .painel-secondary-grid { grid-template-columns: 1fr; }
             .painel-schedule-card {
-                grid-template-columns: 68px minmax(0, 1fr);
+                grid-template-columns: 56px minmax(0, 1fr);
                 grid-template-rows: auto auto;
+                padding: 14px 12px;
             }
             .painel-schedule-meta {
                 grid-column: 1 / -1;
                 flex-direction: row;
+                flex-wrap: wrap;
                 justify-content: flex-start;
                 max-width: none;
             }
-            .painel-chart-label { width: 72px; font-size: 12px; }
-            .painel-chart-amt { width: 88px; }
+            .painel-chart-label { width: 64px; font-size: 11px; }
+            .painel-chart-amt { width: 76px; font-size: 12px; }
+        }
+        @media (max-width: 640px) {
+            .painel-root { padding: 0 12px 64px; }
+            .painel-hero-pulse-stats {
+                grid-template-columns: 1fr;
+            }
         }
     `;
     $('<style id="painel-advocacia-styles">' + css + "</style>").appendTo("head");
@@ -838,7 +989,7 @@ function painel_context_line(resumo, kpis) {
     }
     if (kpis.previsto_mes && kpis.previsto_mes.valor) {
         parts.push(
-            __("Fluxo previsto no mês: {0}", [fmt_currency(kpis.previsto_mes.valor)])
+            __("Fluxo previsto no mês: {0}", [fmt_currency(kpis.previsto_mes.valor, true)])
         );
     }
     return parts.join(". ") + ".";
@@ -855,28 +1006,37 @@ function render_header(resumo, kpis) {
     resumo = resumo || {};
     kpis = kpis || {};
     var urg = resumo.urgencia === "alta" ? "alta" : "normal";
-    var pulse =
+    var pulse_stats =
+        '<div class="painel-hero-pulse-stats">' +
         '<span><strong>' +
         (resumo.audiencias_hoje || 0) +
         "</strong> " +
         __("audiência(s) hoje") +
-        '</span><span class="dot"></span><span><strong>' +
+        "</span><span><strong>" +
         (resumo.parcelas_vencidas || 0) +
         "</strong> " +
         __("parcela(s) vencida(s)") +
-        '</span><span class="dot"></span><span><strong>' +
-        fmt_currency(resumo.previsto_semana_valor || 0) +
+        "</span><span><strong>" +
+        fmt_currency(resumo.previsto_semana_valor || 0, true) +
         "</strong> " +
         __("previsto esta semana") +
         "</span>";
     if (resumo.prazos_urgentes) {
-        pulse +=
-            '<span class="dot"></span><span><strong>' +
+        pulse_stats +=
+            "<span><strong>" +
             resumo.prazos_urgentes +
             "</strong> " +
             __("prazo(s) crítico(s)") +
             "</span>";
     }
+    pulse_stats += "</div>";
+    var pulse =
+        pulse_stats +
+        '<span class="painel-urgency-badge ' +
+        urg +
+        '">' +
+        (urg === "alta" ? __("Atenção hoje") : __("Operação estável")) +
+        "</span>";
     return (
         '<header class="painel-hero">' +
         '<h1 class="painel-hero-greeting">' +
@@ -890,23 +1050,24 @@ function render_header(resumo, kpis) {
         "</p>" +
         '<div class="painel-hero-pulse">' +
         pulse +
-        '<span class="painel-urgency-badge ' +
-        urg +
-        '">' +
-        (urg === "alta" ? __("Atenção hoje") : __("Operação estável")) +
-        "</span></div></header>"
+        "</div></header>"
     );
 }
 
 function render_acoes_rapidas() {
     var actions = [
-        { label: __("Novo Serviço"), icon: "folder", dt: "Servico" },
-        { label: __("Nova Audiência"), icon: "milestone", dt: "Audiencia" },
-        { label: __("Novo Prazo"), icon: "time", dt: "Controle de Prazos" },
-        { label: __("Novo Honorário"), icon: "money", dt: "Acordo de Honorarios Processuais" },
-        { label: __("Novo Cliente"), icon: "users", dt: "Cliente" },
+        { label: __("Novo Cliente"), icon: "user-plus", dt: "Cliente" },
+        { label: __("Novo Serviço"), icon: "folder-plus", dt: "Servico" },
+        { label: __("Nova Audiência"), icon: "calendar-plus-2", dt: "Audiencia" },
+        { label: __("Novo Prazo"), icon: "clock-plus", dt: "Controle de Prazos" },
+        { label: __("Novo Honorário"), icon: "file-plus", dt: "Acordo de Honorarios Processuais" },
     ];
-    var h = '<div class="painel-actions">';
+    var h =
+        '<div class="painel-actions-wrap">' +
+        '<p class="painel-actions-label">' +
+        __("Ações rápidas") +
+        "</p>" +
+        '<div class="painel-actions">';
     actions.forEach(function (a) {
         h +=
             '<button type="button" class="painel-action-chip" data-new-dt="' +
@@ -917,26 +1078,47 @@ function render_acoes_rapidas() {
             a.label +
             "</span></button>";
     });
-    h += "</div>";
+    h += "</div></div>";
     return h;
 }
 
 function get_kpi_routes() {
+    var hoje = frappe.datetime.get_today();
+    var mes_inicio = frappe.datetime.month_start(hoje);
+    var mes_fim = frappe.datetime.month_end(hoje);
+    var tres_dias = frappe.datetime.add_days(hoje, 3);
+
     return [
         function () {
-            scroll_painel_section("painel-parcelas");
+            frappe.route_options = { status: "Vencido" };
+            frappe.set_route("List", "Pagamento");
         },
         function () {
-            scroll_painel_section("painel-parcelas");
+            frappe.route_options = {
+                status: ["in", ["Recebido", "Repassado"]],
+                data_recebimento: ["between", [mes_inicio, mes_fim]],
+            };
+            frappe.set_route("List", "Pagamento");
         },
         function () {
-            scroll_painel_section("painel-parcelas");
+            frappe.route_options = {
+                status: "Pendente",
+                data_vencimento: ["between", [mes_inicio, mes_fim]],
+            };
+            frappe.set_route("List", "Pagamento");
         },
         function () {
-            scroll_painel_section("painel-audiencias");
+            frappe.route_options = {
+                data_hora: ["between", [hoje + " 00:00:00", hoje + " 23:59:59"]],
+            };
+            frappe.set_route("List", "Audiencia");
         },
         function () {
-            scroll_painel_section("painel-prazos");
+            frappe.route_options = {
+                status: "Pendente",
+                data_prazo: ["<=", tres_dias],
+            };
+            frappe.set_route("List", "Controle de Prazos");
         },
         function () {
             frappe.route_options = { status: "Em andamento" };
@@ -1518,7 +1700,10 @@ function painel_icon(name) {
     }
 }
 
-function fmt_currency(val) {
+function fmt_currency(val, plain) {
+    if (plain) {
+        return format_currency(val || 0, "BRL");
+    }
     return frappe.format(val || 0, { fieldtype: "Currency", currency: "BRL" });
 }
 

@@ -13,8 +13,8 @@
    "indent": 0,
    "keep_closed": 0,
    "label": "Painel",
-   "link_to": "/app/painel",
-   "link_type": "URL",
+   "link_to": "painel",
+   "link_type": "Page",
    "show_arrow": 0,
    "type": "Link"
   },

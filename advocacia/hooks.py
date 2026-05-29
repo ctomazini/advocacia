@@ -34,8 +34,17 @@ doctype_js = {
 }
 
 app_include_js = [
-    "/assets/advocacia/js/navegacao.js"
+    "/assets/advocacia/js/navegacao.js",
+    "/assets/advocacia/js/servico_link.js",
 ]
+
+standard_queries = {
+    "Servico": "advocacia.advocacia.doctype.servico.servico.servico_query",
+}
+
+override_whitelisted_methods = {
+    "frappe.desk.search.get_link_title": "advocacia.advocacia.doctype.servico.servico.get_link_title",
+}
 
 scheduler_events = {
     "daily": [

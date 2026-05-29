@@ -177,8 +177,8 @@
    "color": "Grey",
    "doc_view": "List",
    "label": "Painel",
-   "type": "URL",
-   "url": "/app/painel"
+   "link_to": "painel",
+   "type": "Page"
   },
   {
    "color": "Blue",
