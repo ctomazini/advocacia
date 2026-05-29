@@ -1,267 +1,675 @@
-frappe.pages['painel'].on_page_load = function(wrapper) {
+frappe.pages.painel = frappe.pages.painel || {};
+
+frappe.pages.painel.on_page_load = function (wrapper) {
     var page = frappe.ui.make_app_page({
         parent: wrapper,
-        title: 'Painel Advocacia',
-        single_column: true
+        title: __("Painel do Escritório"),
+        single_column: true,
     });
 
-    page.add_button("+ Serviço",    function(){ frappe.new_doc("Servico"); },                          {btn_class:"btn-default"});
-    page.add_button("+ Cliente",    function(){ frappe.new_doc("Cliente"); },                          {btn_class:"btn-default"});
-    page.add_button("+ Honorários", function(){ frappe.new_doc("Acordo de Honorarios Processuais"); }, {btn_class:"btn-default"});
-    page.add_button("+ Audiência",  function(){ frappe.new_doc("Audiencia"); },                        {btn_class:"btn-default"});
-    page.add_button("+ Prazo",      function(){ frappe.new_doc("Controle de Prazos"); },               {btn_class:"btn-default"});
-    page.add_button("+ Tarefa",     function(){ frappe.new_doc("Tarefa"); },                           {btn_class:"btn-default"});
-    page.add_button("↺ Atualizar",  function(){ render_painel(page); },                                {btn_class:"btn-default"});
+    page.painel_container = $('<div class="painel-container"></div>').appendTo(page.main);
+    inject_painel_styles();
 
-    $(wrapper).find('.page-content').html('<div id="painel-root" style="padding:20px;max-width:1200px"></div>');
-    render_painel(page);
+    page.add_button(__("+ Serviço"), function () {
+        frappe.new_doc("Servico");
+    });
+    page.add_button(__("+ Honorários"), function () {
+        frappe.new_doc("Acordo de Honorarios Processuais");
+    });
+    page.add_button(__("+ Audiência"), function () {
+        frappe.new_doc("Audiencia");
+    });
+    page.add_button(__("+ Prazo"), function () {
+        frappe.new_doc("Controle de Prazos");
+    });
+    page.add_button(__("↺ Atualizar"), function () {
+        load_painel(page);
+    });
+
+    load_painel(page);
 };
 
-function fc(v) {
-    return 'R$ ' + parseFloat(v||0).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+function inject_painel_styles() {
+    if (document.getElementById("painel-advocacia-styles")) return;
+    var css = `
+        .painel-container {
+            padding: 16px;
+            max-width: 1280px;
+            background: var(--bg-default);
+        }
+        .painel-section {
+            margin-bottom: 32px;
+        }
+        .painel-section-title {
+            font-size: var(--text-base);
+            font-weight: 600;
+            color: var(--text-color);
+            margin: 0 0 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        .painel-kpi-card {
+            border-radius: var(--border-radius-lg);
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            padding: 16px;
+            min-height: 88px;
+            cursor: pointer;
+            transition: box-shadow 0.2s ease;
+            box-shadow: var(--shadow-sm);
+        }
+        .painel-kpi-card:hover {
+            box-shadow: var(--shadow-sm);
+        }
+        .painel-kpi-value {
+            font-size: var(--text-lg);
+            font-weight: 700;
+            color: var(--text-color);
+            line-height: 1.2;
+        }
+        .painel-kpi-label {
+            font-size: var(--text-sm);
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+        .painel-kpi-icon {
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+        .painel-alertas {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .painel-alerta {
+            border-radius: var(--border-radius-lg);
+            border: 1px solid var(--border-color);
+            padding: 12px 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            cursor: pointer;
+            min-height: 44px;
+        }
+        .painel-alerta.red {
+            background: color-mix(in srgb, var(--red-500) 12%, var(--card-bg));
+            border-color: var(--red-500);
+        }
+        .painel-alerta.yellow {
+            background: color-mix(in srgb, var(--yellow-500) 12%, var(--card-bg));
+            border-color: var(--yellow-500);
+        }
+        .painel-card {
+            border-radius: var(--border-radius-lg);
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+        .painel-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: var(--text-sm);
+        }
+        .painel-table th {
+            text-align: left;
+            padding: 12px 16px;
+            background: var(--subtle-fg);
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: var(--text-sm);
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+        .painel-table td {
+            padding: 12px 16px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-color);
+            vertical-align: middle;
+        }
+        .painel-table tr.painel-row-click {
+            cursor: pointer;
+        }
+        .painel-table tr.painel-row-click:hover td {
+            background: var(--subtle-fg);
+        }
+        .painel-section-table {
+            overflow-x: auto;
+        }
+        .painel-list-item {
+            padding: 12px 16px;
+            border-top: 1px solid var(--border-color);
+            cursor: pointer;
+            min-height: 44px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px 16px;
+        }
+        .painel-list-item:first-child {
+            border-top: none;
+        }
+        .painel-list-item:hover {
+            background: var(--subtle-fg);
+        }
+        .painel-muted {
+            color: var(--text-muted);
+            font-size: var(--text-sm);
+        }
+        .painel-btn-entrar {
+            min-height: 44px;
+            min-width: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 12px;
+            border-radius: var(--border-radius);
+            background: var(--btn-primary-bg);
+            color: var(--btn-primary-color);
+            text-decoration: none;
+            font-size: var(--text-sm);
+            font-weight: 600;
+        }
+        .painel-empty {
+            text-align: center;
+            padding: 32px 16px;
+            color: var(--text-muted);
+            font-size: var(--text-sm);
+        }
+        .painel-skeleton-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        .painel-skeleton-block {
+            height: 88px;
+            border-radius: var(--border-radius-lg);
+            background: var(--gray-100);
+            animation: painel-pulse 1.5s ease-in-out infinite;
+        }
+        .painel-skeleton-section {
+            height: 200px;
+            border-radius: var(--border-radius-lg);
+            background: var(--gray-100);
+            animation: painel-pulse 1.5s ease-in-out infinite;
+            margin-bottom: 24px;
+        }
+        @keyframes painel-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.45; }
+        }
+        @media (max-width: 768px) {
+            .kpi-grid { grid-template-columns: 1fr 1fr; }
+            .painel-section-table { overflow-x: auto; }
+        }
+        @media (max-width: 480px) {
+            .kpi-grid { grid-template-columns: 1fr; }
+        }
+    `;
+    $('<style id="painel-advocacia-styles">' + css + "</style>").appendTo("head");
 }
 
-function fmt_data(d) {
-    if (!d) return '';
-    var parts = String(d).split('-');
-    return parts.length === 3 ? parts[2]+'/'+parts[1]+'/'+parts[0] : d;
+function load_painel(page) {
+    mostrar_skeleton(page.painel_container);
+    frappe.xcall("advocacia.advocacia.painel_api.get_painel_data")
+        .then(function (data) {
+            render_painel(page.painel_container, data);
+        })
+        .catch(function (err) {
+            handle_error(page.painel_container, err);
+        });
 }
 
-function fmt_hora(h) {
-    if (!h) return '';
-    return String(h).substring(0, 5);
+function mostrar_skeleton($container) {
+    var html = '<div class="painel-skeleton-grid">';
+    for (var i = 0; i < 7; i++) html += '<div class="painel-skeleton-block"></div>';
+    html += "</div>";
+    html += '<div class="painel-skeleton-section"></div>';
+    html += '<div class="painel-skeleton-section"></div>';
+    $container.html(html);
 }
 
-function scroll_to(id) {
-    var el = document.getElementById(id);
-    if (el) el.scrollIntoView({behavior: 'smooth', block: 'start'});
+function handle_error($container, err) {
+    var msg = (err && err.message) || String(err);
+    $container.html(
+        '<div class="painel-card"><div class="painel-empty" style="color: var(--red-500);">' +
+            __("Erro ao carregar o painel: {0}", [msg]) +
+            "</div></div>"
+    );
 }
 
-function render_painel(page) {
-    var root = document.getElementById('painel-root');
-    root.innerHTML = '<p style="color:#888">Carregando...</p>';
-
-    frappe.xcall("advocacia.advocacia.painel_api.get_painel_data").then(function(d) {
-        var t = d.totais;
-        var h = '';
-
-        // KPIs
-        h += '<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:28px">';
-        h += kpi(fc(t.vencido),   'Vencido',            '#dc2626', 'sec-vencidas',  d.vencidas.length);
-        h += kpi(fc(t.proximos),  'Vence em 7 dias',    '#d97706', 'sec-proximas',  d.proximas.length);
-        h += kpi(fc(t.futuro),    'A receber (futuro)', '#2563eb', 'sec-futuro',    null);
-        h += kpi(fc(t.repasse),   'Repasse pendente',   '#7c3aed', 'sec-repasses',  d.repasses.length);
-        h += kpi(d.clientes,      'Clientes',           '#6b7280', null,            null, 'Cliente');
-        h += kpi(d.servicos,      'Serviços',           '#6b7280', null,            null, 'Servico');
-        h += '</div>';
-
-        // Vencidas
-        h += '<div id="sec-vencidas">';
-        if (d.vencidas.length) {
-            h += secao('⚠️ Honorários Vencidos (' + d.vencidas.length + ')', '#dc2626');
-            h += tabela_parcelas(d.vencidas, '#dc2626', true);
-        }
-        h += '</div>';
-
-        // Próximos 7 dias
-        h += '<div id="sec-proximas">';
-        if (d.proximas.length) {
-            h += secao('📅 Vence nos Próximos 7 Dias (' + d.proximas.length + ')', '#d97706');
-            h += tabela_parcelas(d.proximas, '#d97706', false);
-        }
-        h += '</div>';
-
-        h += '<div id="sec-futuro"></div>';
-
-        // Repasses
-        h += '<div id="sec-repasses">';
-        if (d.repasses.length) {
-            h += secao('↗ Repasses Pendentes (' + d.repasses.length + ')', '#7c3aed');
-            h += '<div style="background:#fff;border-radius:8px;overflow:hidden;margin-bottom:24px;box-shadow:0 1px 4px rgba(0,0,0,.08)">';
-            h += grid_header(['Cliente','Serviço','Parcela','Valor Cliente'], '1.2fr 1fr 1fr auto');
-            d.repasses.forEach(function(p) {
-                h += '<div style="display:grid;grid-template-columns:1.2fr 1fr 1fr auto;padding:12px 16px;border-bottom:1px solid #f3f4f6;cursor:pointer;align-items:center;gap:8px" onclick="frappe.set_route(\'Form\',\'Acordo de Honorarios Processuais\',\'' + p.parent + '\')">';
-                h += '<span style="font-weight:500">' + (p.cliente_nome || '-') + '</span>';
-                h += '<span style="color:#6b7280;font-size:12px">' + (p.servico_titulo || p.servico_ref || '') + '</span>';
-                h += '<span style="font-size:12px;color:#374151">' + (p['descrição'] || p.descricao || '') + '</span>';
-                h += '<span style="color:#7c3aed;font-weight:700;text-align:right">' + fc(p.valor_cliente) + '</span>';
-                h += '</div>';
-            });
-            h += '</div>';
-        }
-        h += '</div>';
-
-        // Audiências
-        if (d.audiencias && d.audiencias.length) {
-            h += secao('🏛️ Audiências Esta Semana (' + d.audiencias.length + ')', '#0891b2');
-            h += '<div style="background:#fff;border-radius:8px;overflow:hidden;margin-bottom:24px;box-shadow:0 1px 4px rgba(0,0,0,.08)">';
-            h += grid_header(['Data/Hora','Cliente','Processo','Modalidade','Tipo/Local',''], '140px 1fr 1fr 100px 1fr 80px');
-            d.audiencias.forEach(function(a) {
-                var dias = a.dias_restantes || 0;
-                var badge_dias = dias === 0 ? '<span style="background:#dc262622;color:#dc2626;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:600;margin-left:4px">HOJE</span>'
-                    : dias === 1 ? '<span style="background:#d9770622;color:#d97706;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:600;margin-left:4px">AMANHÃ</span>'
-                    : '<span style="color:#6b7280;font-size:11px;margin-left:4px">em ' + dias + 'd</span>';
-
-                var is_virtual = a.modalidade === 'Virtual';
-                var badge_mod = is_virtual
-                    ? '<span style="background:#7c3aed22;color:#7c3aed;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">🖥️ Virtual</span>'
-                    : '<span style="background:#0891b222;color:#0891b2;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">🏢 Presencial</span>';
-
-                var btn_entrar = '';
-                if (is_virtual && a.link_virtual) {
-                    btn_entrar = '<a href="' + a.link_virtual + '" target="_blank" onclick="event.stopPropagation()" style="background:#7c3aed;color:#fff;padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;text-decoration:none;white-space:nowrap;display:inline-block">Entrar ↗</a>';
-                }
-
-                var local_info = (a.tipo || '');
-                if (a.local_vara) local_info += ' — ' + a.local_vara;
-
-                h += '<div style="display:grid;grid-template-columns:140px 1fr 1fr 100px 1fr 80px;padding:12px 16px;border-bottom:1px solid #f3f4f6;cursor:pointer;align-items:center;gap:8px" onclick="frappe.set_route(\'Form\',\'Audiencia\',\'' + a.name + '\')">';
-                h += '<div><span style="font-weight:600;color:#0891b2">' + fmt_data((a.data_hora || '').substring(0,10)) + '</span><br><span style="font-size:12px;color:#6b7280">' + fmt_hora((a.data_hora || '').substring(11,16)) + badge_dias + '</span></div>';
-                h += '<span style="font-weight:500">' + (a.cliente_nome || a.cliente || '-') + '</span>';
-                h += '<span style="font-size:12px;color:#6b7280">' + (a.numero_processo || a.servico || '') + '</span>';
-                h += '<span>' + badge_mod + '</span>';
-                h += '<span style="font-size:12px;color:#374151">' + local_info + '</span>';
-                h += '<span style="text-align:center">' + btn_entrar + '</span>';
-                h += '</div>';
-            });
-            h += '</div>';
-        }
-
-        // Prazos
-        if (d.prazos.length) {
-            h += secao('⏰ Prazos Esta Semana (' + d.prazos.length + ')', '#7c3aed');
-            h += '<div style="background:#fff;border-radius:8px;overflow:hidden;margin-bottom:24px;box-shadow:0 1px 4px rgba(0,0,0,.08)">';
-            h += grid_header(['Prazo','Cliente','Serviço','Vence em','Prioridade'], '1.5fr 1fr 1fr 80px 90px');
-            d.prazos.forEach(function(p) {
-                var cor = p.prioridade === 'Alta' ? '#dc2626' : p.prioridade === 'Média' ? '#d97706' : '#6b7280';
-                var dias = p.dias_restantes || 0;
-                var badge_dias = dias === 0 ? '<span style="color:#dc2626;font-weight:700">HOJE</span>'
-                    : dias === 1 ? '<span style="color:#d97706;font-weight:600">Amanhã</span>'
-                    : dias < 0 ? '<span style="color:#dc2626;font-weight:700">VENCIDO ' + Math.abs(dias) + 'd</span>'
-                    : '<span style="color:#6b7280">' + dias + ' dias</span>';
-
-                h += '<div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 80px 90px;padding:12px 16px;border-bottom:1px solid #f3f4f6;cursor:pointer;align-items:center;gap:8px" onclick="frappe.set_route(\'Form\',\'Controle de Prazos\',\'' + p.name + '\')">';
-                h += '<div><span style="font-weight:500">' + (p.descricao || '') + '</span><br><span style="font-size:11px;color:#9ca3af">' + fmt_data(p.data_prazo) + '</span></div>';
-                h += '<span style="font-size:12px">' + (p.cliente_nome || '-') + '</span>';
-                h += '<span style="font-size:12px;color:#6b7280">' + (p.servico_tipo || '') + (p.numero_processo ? ' — ' + p.numero_processo : '') + '</span>';
-                h += '<span style="text-align:center">' + badge_dias + '</span>';
-                h += '<span style="text-align:center"><span style="background:' + cor + '22;color:' + cor + ';padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">' + p.prioridade + '</span></span>';
-                h += '</div>';
-            });
-            h += '</div>';
-        }
-
-        // Tarefas
-        if (d.tarefas.length) {
-            h += secao('📋 Tarefas (' + d.tarefas.length + ')', '#2563eb');
-            h += '<div style="background:#fff;border-radius:8px;overflow:hidden;margin-bottom:24px;box-shadow:0 1px 4px rgba(0,0,0,.08)">';
-            h += grid_header(['Tarefa','Serviço/Cliente','Status','Prazo','Prioridade'], '1.3fr 1fr 110px 110px 90px');
-            d.tarefas.forEach(function(t) {
-                var cor_p = t.prioridade === 'Urgente' ? '#dc2626' : t.prioridade === 'Alta' ? '#d97706' : '#6b7280';
-                var cor_s = t.status === 'Em Andamento' ? '#2563eb' : '#d97706';
-
-                var prazo_label = '';
-                if (t.data_limite) {
-                    var dias = t.dias_restantes;
-                    if (dias !== null && dias !== undefined) {
-                        if (dias < 0) prazo_label = '<span style="color:#dc2626;font-weight:600">Atrasada ' + Math.abs(dias) + 'd</span>';
-                        else if (dias === 0) prazo_label = '<span style="color:#dc2626;font-weight:600">HOJE</span>';
-                        else if (dias === 1) prazo_label = '<span style="color:#d97706">Amanhã</span>';
-                        else prazo_label = '<span style="color:#6b7280">' + dias + ' dias</span>';
-                    }
-                    prazo_label += '<br><span style="font-size:10px;color:#9ca3af">' + fmt_data(t.data_limite) + '</span>';
-                } else {
-                    prazo_label = '<span style="color:#9ca3af;font-size:11px">Sem prazo</span>';
-                }
-
-                // Serviço/Cliente
-                var ctx = '';
-                if (t.cliente_nome) ctx = '<span style="font-weight:500;font-size:12px">' + t.cliente_nome + '</span>';
-                if (t.servico_tipo) ctx += (ctx ? '<br>' : '') + '<span style="font-size:11px;color:#9ca3af">' + t.servico_tipo + '</span>';
-                if (!ctx) ctx = '<span style="color:#9ca3af;font-size:11px">—</span>';
-
-                h += '<div style="display:grid;grid-template-columns:1.3fr 1fr 110px 110px 90px;padding:12px 16px;border-bottom:1px solid #f3f4f6;cursor:pointer;align-items:center;gap:8px" onclick="frappe.set_route(\'Form\',\'Tarefa\',\'' + t.name + '\')">';
-                h += '<span style="font-weight:500">' + (t.titulo || '') + '</span>';
-                h += '<span>' + ctx + '</span>';
-                h += '<span><span style="background:' + cor_s + '22;color:' + cor_s + ';padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">' + t.status + '</span></span>';
-                h += '<span style="font-size:12px;text-align:center">' + prazo_label + '</span>';
-                h += '<span style="text-align:center"><span style="background:' + cor_p + '22;color:' + cor_p + ';padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">' + t.prioridade + '</span></span>';
-                h += '</div>';
-            });
-            h += '</div>';
-        }
-
-        if (!d.vencidas.length && !d.proximas.length && !d.repasses.length && !d.prazos.length && !d.tarefas.length && !(d.audiencias && d.audiencias.length)) {
-            h += '<div style="text-align:center;padding:48px;color:#6b7280;background:#fff;border-radius:8px">✅ Nenhuma pendência no momento</div>';
-        }
-
-        root.innerHTML = h;
-    }).catch(function(e) {
-        root.innerHTML = '<p style="color:red">Erro ao carregar: ' + e + '</p>';
-        console.error(e);
-    });
+function render_painel($container, d) {
+    var html = "";
+    var kpi_routes = get_kpi_routes();
+    html += render_kpis(d.kpis);
+    html += render_alertas(d.alertas);
+    html += render_parcelas(d.parcelas);
+    html += render_audiencias(d.audiencias);
+    html += render_prazos(d.prazos);
+    html += render_tarefas(d.tarefas);
+    $container.html(html);
+    bind_kpi_routes($container, kpi_routes);
 }
 
-function kpi(val, label, cor, scroll_id, count, list_dt) {
-    var onclick = '';
-    if (list_dt) {
-        onclick = 'frappe.set_route(\'List\',\'' + list_dt + '\')';
-    } else if (scroll_id) {
-        onclick = 'scroll_to(\'' + scroll_id + '\')';
+function painel_icon(name) {
+    try {
+        return frappe.utils.icon(name, "sm") || "";
+    } catch (e) {
+        return "";
     }
-    var badge = (count !== null && count !== undefined) ? '<span style="font-size:11px;color:#9ca3af;margin-left:4px">(' + count + ')</span>' : '';
-    return '<div style="flex:1;min-width:130px;background:#fff;border-radius:8px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.08);cursor:pointer;border-top:3px solid ' + cor + '" onclick="' + onclick + '">'
-        + '<div style="font-size:22px;font-weight:700;color:' + cor + '">' + val + '</div>'
-        + '<div style="font-size:12px;color:#6b7280;margin-top:4px">' + label + badge + '</div>'
-        + '</div>';
 }
 
-function secao(titulo, cor) {
-    return '<div style="font-size:14px;font-weight:600;color:' + cor + ';margin-bottom:8px;padding-left:4px">' + titulo + '</div>';
+function fmt_currency(val) {
+    return frappe.format(val || 0, { fieldtype: "Currency", currency: "BRL" });
 }
 
-function grid_header(cols, template) {
-    var h = '<div style="display:grid;grid-template-columns:' + template + ';padding:8px 16px;background:#f9fafb;font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;gap:8px">';
-    cols.forEach(function(c) {
-        h += '<span>' + c + '</span>';
+function fmt_date_iso(iso) {
+    if (!iso) return "";
+    return frappe.datetime.str_to_user(iso);
+}
+
+function fmt_datetime(iso, hora) {
+    if (!iso) return "";
+    var s = fmt_date_iso(iso);
+    if (hora) s += " " + hora;
+    return s;
+}
+
+function status_pill(status) {
+    var map = {
+        Vencida: "red",
+        Pendente: "orange",
+        Recebida: "green",
+        Repassada: "blue",
+        Cancelada: "gray",
+        "Em Andamento": "blue",
+        Pendente: "orange",
+        Concluída: "green",
+        Cancelada: "gray",
+        Alta: "red",
+        "Média": "orange",
+        Media: "orange",
+        Urgente: "red",
+        Normal: "gray",
+        Baixa: "gray",
+    };
+    var cls = map[status] || "gray";
+    return (
+        '<span class="indicator-pill ' +
+        cls +
+        ' filterable no-indicator-dot ellipsis">' +
+        frappe.utils.escape_html(status || "") +
+        "</span>"
+    );
+}
+
+function get_kpi_routes() {
+    return [
+        function () {
+            frappe.set_route("List", "Cliente");
+        },
+        function () {
+            frappe.route_options = { status: "Em andamento" };
+            frappe.set_route("List", "Servico");
+        },
+        function () {
+            scroll_painel_section("painel-parcelas");
+        },
+        function () {
+            scroll_painel_section("painel-parcelas");
+        },
+        function () {
+            frappe.route_options = { status: "Recebida" };
+            frappe.set_route("List", "Acordo de Honorarios Processuais");
+        },
+        function () {
+            scroll_painel_section("painel-audiencias");
+        },
+        function () {
+            frappe.route_options = { status: "Pendente" };
+            frappe.set_route("List", "Controle de Prazos");
+        },
+    ];
+}
+
+function render_kpis(k) {
+    if (!k) return "";
+    var items = [
+        { key: "clientes", icon: "users", label: __("Clientes"), value: k.total_clientes },
+        { key: "servicos", icon: "folder", label: __("Serviços ativos"), value: k.servicos_ativos },
+        {
+            key: "vencidas",
+            icon: "warning",
+            label: __("Parcelas vencidas"),
+            value: fmt_currency(k.parcelas_vencidas.valor),
+            sub: __("{0} parcela(s)", [k.parcelas_vencidas.count]),
+        },
+        {
+            key: "avencer",
+            icon: "calendar",
+            label: __("A vencer (30 dias)"),
+            value: fmt_currency(k.parcelas_a_vencer_30d.valor),
+            sub: __("{0} parcela(s)", [k.parcelas_a_vencer_30d.count]),
+        },
+        {
+            key: "recebido",
+            icon: "money",
+            label: __("Recebido no mês"),
+            value: fmt_currency(k.recebido_mes.valor),
+            sub: __("{0} parcela(s)", [k.recebido_mes.count]),
+        },
+        { key: "audiencias", icon: "milestone", label: __("Audiências (7 dias)"), value: k.audiencias_semana },
+        { key: "prazos", icon: "time", label: __("Prazos urgentes"), value: k.prazos_urgentes },
+    ];
+
+    var h = '<div class="painel-section"><div class="kpi-grid">';
+    items.forEach(function (item) {
+        h +=
+            '<div class="painel-kpi-card" data-kpi="' +
+            item.key +
+            '">' +
+            '<div class="painel-kpi-icon">' +
+            painel_icon(item.icon) +
+            "</div>" +
+            '<div class="painel-kpi-value">' +
+            item.value +
+            "</div>" +
+            '<div class="painel-kpi-label">' +
+            item.label +
+            (item.sub ? '<br><span class="painel-muted">' + item.sub + "</span>" : "") +
+            "</div></div>";
     });
-    h += '</div>';
+    h += "</div></div>";
     return h;
 }
 
-function tabela_parcelas(lista, cor, mostrar_atraso) {
-    var cols = mostrar_atraso ? '1.5fr 1.2fr 1fr auto 70px' : '1.5fr 1.2fr 1fr auto';
-    var h = '<div style="background:#fff;border-radius:8px;overflow:hidden;margin-bottom:24px;box-shadow:0 1px 4px rgba(0,0,0,.08)">';
+function bind_kpi_routes($root, routes) {
+    $root.find(".painel-kpi-card").each(function (idx) {
+        $(this)
+            .off("click")
+            .on("click", function () {
+                if (routes[idx]) routes[idx]();
+            });
+    });
+}
 
-    h += '<div style="display:grid;grid-template-columns:' + cols + ';padding:8px 16px;background:#f9fafb;font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;gap:8px">';
-    h += '<span>Cliente</span><span>Serviço</span><span>Parcela</span><span style="text-align:right">Valor</span>';
-    if (mostrar_atraso) h += '<span style="text-align:right">Atraso</span>';
-    h += '</div>';
+function render_alertas(alertas) {
+    if (!alertas || !alertas.length) return "";
+    var h =
+        '<div class="painel-section"><h3 class="painel-section-title">' +
+        painel_icon("alert-triangle") +
+        " " +
+        __("Alertas") +
+        "</h3><div class="painel-alertas">";
+    alertas.forEach(function (a) {
+        var nivel = a.nivel === "red" ? "red" : "yellow";
+        var texto = "";
+        if (a.tipo === "prazo") {
+            var quando =
+                a.dias === 0
+                    ? __("Vence hoje")
+                    : a.dias === 1
+                      ? __("Vence amanhã")
+                      : __("Vence em {0} dias", [a.dias]);
+            texto =
+                "<strong>" +
+                frappe.utils.escape_html(a.titulo) +
+                "</strong> — " +
+                quando +
+                (a.cliente ? " · " + frappe.utils.escape_html(a.cliente) : "");
+        } else {
+            texto =
+                "<strong>" +
+                __("Audiência hoje") +
+                "</strong> — " +
+                frappe.utils.escape_html(a.titulo) +
+                (a.hora ? " " + a.hora : "") +
+                (a.cliente ? " · " + frappe.utils.escape_html(a.cliente) : "") +
+                (a.vara ? " · " + frappe.utils.escape_html(a.vara) : "");
+        }
+        h +=
+            '<div class="painel-alerta ' +
+            nivel +
+            '" data-dt="' +
+            a.doctype +
+            '" data-dn="' +
+            frappe.utils.escape_html(a.docname) +
+            '">' +
+            painel_icon(a.tipo === "prazo" ? "time" : "milestone") +
+            '<div style="flex:1;font-size:var(--text-sm);color:var(--text-color);">' +
+            texto +
+            "</div></div>";
+    });
+    h += "</div></div>";
+    return h;
+}
 
-    lista.forEach(function(p) {
-        var servico_label = p.servico_titulo || p.servico_tipo || p.servico_ref || '';
+function render_parcelas(parcelas) {
+    var h =
+        '<div class="painel-section" id="painel-parcelas"><h3 class="painel-section-title">' +
+        painel_icon("money") +
+        " " +
+        __("Parcelas") +
+        "</h3>";
+    if (!parcelas || !parcelas.length) {
+        return h + '<div class="painel-card"><div class="painel-empty">' + __("Nenhuma parcela pendente.") + "</div></div></div>";
+    }
+    h += '<div class="painel-card painel-section-table"><table class="painel-table"><thead><tr>';
+    h +=
+        "<th>" +
+        __("Cliente") +
+        "</th><th>" +
+        __("Serviço") +
+        "</th><th>" +
+        __("Vencimento") +
+        "</th><th>" +
+        __("Valor") +
+        "</th><th>" +
+        __("Status") +
+        "</th><th>" +
+        __("Prazo") +
+        "</th></tr></thead><tbody>";
+    parcelas.forEach(function (p) {
+        var servico =
+            frappe.utils.escape_html(p.servico_titulo || p.servico_tipo || p.servico_ref || "—");
         if (p.numero_processo) {
-            servico_label += ' <span style="font-size:10px;color:#9ca3af">' + p.numero_processo + '</span>';
+            servico += '<br><span class="painel-muted">' + frappe.utils.escape_html(p.numero_processo) + "</span>";
         }
-
-        h += '<div style="display:grid;grid-template-columns:' + cols + ';padding:12px 16px;border-bottom:1px solid #f3f4f6;cursor:pointer;align-items:center;gap:8px" onclick="frappe.set_route(\'Form\',\'Acordo de Honorarios Processuais\',\'' + (p.parent || '') + '\')">';
-        h += '<span style="font-weight:500">' + (p.cliente_nome || '-') + '</span>';
-        h += '<span style="font-size:12px;color:#6b7280">' + servico_label + '</span>';
-
-        var descricao = p['descrição'] || p.descricao || '';
-        h += '<span style="font-size:12px"><span style="color:#374151">' + descricao + '</span><br>';
-        h += '<span style="color:#9ca3af;font-size:11px">' + fmt_data(p.vencimento) + '</span></span>';
-        h += '<span style="color:' + cor + ';font-weight:700;text-align:right;white-space:nowrap">' + fc(p.valor_total) + '</span>';
-
-        if (mostrar_atraso) {
-            var dias = p.dias_atraso || 0;
-            var cor_atraso = dias > 30 ? '#dc2626' : dias > 7 ? '#d97706' : '#6b7280';
-            h += '<span style="text-align:right;color:' + cor_atraso + ';font-size:12px;font-weight:600">' + dias + 'd</span>';
+        var prazo_txt = "";
+        if (p.status === "Vencida" && p.dias_atraso > 0) {
+            prazo_txt = __("Atraso {0}d", [p.dias_atraso]);
+        } else if (p.status === "Pendente") {
+            prazo_txt =
+                p.dias_para_vencer === 0
+                    ? __("Hoje")
+                    : __("Em {0}d", [p.dias_para_vencer]);
         }
-
-        h += '</div>';
+        h +=
+            '<tr class="painel-row-click" data-acordo="' +
+            frappe.utils.escape_html(p.parent || "") +
+            '">' +
+            "<td>" +
+            frappe.utils.escape_html(p.cliente_nome || "—") +
+            "</td>" +
+            "<td>" +
+            servico +
+            "</td>" +
+            "<td>" +
+            fmt_date_iso(p.vencimento) +
+            "</td>" +
+            "<td>" +
+            fmt_currency(p.valor_total) +
+            "</td>" +
+            "<td>" +
+            status_pill(p.status) +
+            "</td>" +
+            '<td class="painel-muted">' +
+            frappe.utils.escape_html(prazo_txt) +
+            "</td></tr>";
     });
-
-    h += '</div>';
+    h += "</tbody></table></div></div>";
     return h;
 }
+
+function render_audiencias(audiencias) {
+    var h =
+        '<div class="painel-section" id="painel-audiencias"><h3 class="painel-section-title">' +
+        painel_icon("milestone") +
+        " " +
+        __("Audiências — próximos 7 dias") +
+        "</h3>";
+    if (!audiencias || !audiencias.length) {
+        return h + '<div class="painel-card"><div class="painel-empty">' + __("Nenhuma audiência nesta semana.") + "</div></div></div>";
+    }
+    h += '<div class="painel-card">';
+    audiencias.forEach(function (a) {
+        var mod = a.modalidade || "";
+        var mod_cls = mod === "Virtual" ? "blue" : mod === "Híbrida" ? "orange" : "gray";
+        var btn =
+            mod === "Virtual" && a.link_virtual
+                ? '<a class="painel-btn-entrar" href="' +
+                  frappe.utils.escape_html(a.link_virtual) +
+                  '" target="_blank" rel="noopener" onclick="event.stopPropagation();">' +
+                  __("Entrar") +
+                  "</a>"
+                : "";
+        h +=
+            '<div class="painel-list-item" data-dt="Audiencia" data-dn="' +
+            frappe.utils.escape_html(a.name) +
+            '">' +
+            '<div style="min-width:120px;"><strong>' +
+            fmt_datetime(a.data, a.hora) +
+            "</strong></div>" +
+            "<div style='flex:1;min-width:140px;'>" +
+            frappe.utils.escape_html(a.cliente || "—") +
+            '<br><span class="painel-muted">' +
+            frappe.utils.escape_html(a.tipo || "") +
+            "</span></div>" +
+            '<div class="painel-muted">' +
+            frappe.utils.escape_html(a.vara_label || "—") +
+            "</div>" +
+            '<span class="indicator-pill ' +
+            mod_cls +
+            ' filterable no-indicator-dot ellipsis">' +
+            frappe.utils.escape_html(mod || __("Presencial")) +
+            "</span>" +
+            btn +
+            "</div>";
+    });
+    h += "</div></div>";
+    return h;
+}
+
+function render_prazos(prazos) {
+    var h =
+        '<div class="painel-section" id="painel-prazos"><h3 class="painel-section-title">' +
+        painel_icon("time") +
+        " " +
+        __("Prazos") +
+        "</h3>";
+    if (!prazos || !prazos.length) {
+        return h + '<div class="painel-card"><div class="painel-empty">' + __("Nenhum prazo pendente.") + "</div></div></div>";
+    }
+    h += '<div class="painel-card">';
+    prazos.forEach(function (p) {
+        var dias = p.dias_restantes;
+        var dias_txt =
+            dias < 0
+                ? __("Vencido há {0}d", [Math.abs(dias)])
+                : dias === 0
+                  ? __("Hoje")
+                  : dias === 1
+                    ? __("Amanhã")
+                    : __("Em {0}d", [dias]);
+        h +=
+            '<div class="painel-list-item" data-dt="Controle de Prazos" data-dn="' +
+            frappe.utils.escape_html(p.name) +
+            '">' +
+            '<div style="flex:1;min-width:180px;"><strong>' +
+            frappe.utils.escape_html(p.descricao || p.name) +
+            "</strong><br><span class='painel-muted'>" +
+            frappe.utils.escape_html(p.cliente_nome || "—") +
+            "</span></div>" +
+            '<div class="painel-muted">' +
+            dias_txt +
+            " · " +
+            fmt_date_iso(p.data_prazo) +
+            "</div>" +
+            status_pill(p.prioridade) +
+            "</div>";
+    });
+    h += "</div></div>";
+    return h;
+}
+
+function render_tarefas(tarefas) {
+    var h =
+        '<div class="painel-section" id="painel-tarefas"><h3 class="painel-section-title">' +
+        painel_icon("checklist") +
+        " " +
+        __("Tarefas") +
+        "</h3>";
+    if (!tarefas || !tarefas.length) {
+        return h + '<div class="painel-card"><div class="painel-empty">' + __("Nenhuma tarefa aberta.") + "</div></div></div>";
+    }
+    h += '<div class="painel-card">';
+    tarefas.forEach(function (t) {
+        var prazo = "";
+        if (t.data_limite) {
+            var d = t.dias_restantes;
+            if (d !== null && d !== undefined) {
+                if (d < 0) prazo = __("Atrasada {0}d", [Math.abs(d)]);
+                else if (d === 0) prazo = __("Hoje");
+                else if (d === 1) prazo = __("Amanhã");
+                else prazo = __("Em {0}d", [d]);
+            }
+            prazo += " · " + fmt_date_iso(t.data_limite);
+        } else {
+            prazo = __("Sem prazo");
+        }
+        h +=
+            '<div class="painel-list-item" data-dt="Tarefa" data-dn="' +
+            frappe.utils.escape_html(t.name) +
+            '">' +
+            '<div style="flex:1;min-width:160px;"><strong>' +
+            frappe.utils.escape_html(t.titulo || "") +
+            "</strong></div>" +
+            status_pill(t.status) +
+            '<div class="painel-muted">' +
+            frappe.utils.escape_html(prazo) +
+            "</div>" +
+            '<div class="painel-muted">' +
+            frappe.utils.escape_html(t.responsavel_nome || "—") +
+            "</div></div>";
+    });
+    h += "</div></div>";
+    return h;
+}
+
+function scroll_painel_section(id) {
+    var el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+$(document).on("click", ".painel-alerta", function () {
+    var dt = $(this).attr("data-dt");
+    var dn = $(this).attr("data-dn");
+    if (dt && dn) frappe.set_route("Form", dt, dn);
+});
+
+$(document).on("click", ".painel-list-item", function () {
+    var dt = $(this).attr("data-dt");
+    var dn = $(this).attr("data-dn");
+    if (dt && dn) frappe.set_route("Form", dt, dn);
+});
+
+$(document).on("click", "tr.painel-row-click", function () {
+    var acordo = $(this).attr("data-acordo");
+    if (acordo) frappe.set_route("Form", "Acordo de Honorarios Processuais", acordo);
+});

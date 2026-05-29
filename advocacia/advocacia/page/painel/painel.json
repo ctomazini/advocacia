@@ -1,0 +1,19 @@
+{
+ "doctype": "Page",
+ "name": "painel",
+ "page_name": "painel",
+ "title": "Painel do Escritório",
+ "module": "Advocacia",
+ "standard": "Yes",
+ "roles": [
+  {
+   "role": "Advocacia User"
+  },
+  {
+   "role": "Advocacia Manager"
+  },
+  {
+   "role": "System Manager"
+  }
+ ]
+}
