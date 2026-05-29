@@ -5,12 +5,45 @@
  "custom": 0,
  "istable": 1,
  "fields": [
-  {"fieldname": "nome", "label": "Nome", "fieldtype": "Data", "reqd": 1, "in_list_view": 1, "bold": 1},
-  {"fieldname": "tipo", "label": "Tipo", "fieldtype": "Select", "options": "Principal\nConjuge\nResponsável\nOutro", "in_list_view": 1},
-  {"fieldname": "telefone", "label": "Telefone", "fieldtype": "Data", "in_list_view": 1},
-  {"fieldname": "celular", "label": "Celular", "fieldtype": "Data", "in_list_view": 1},
-  {"fieldname": "email", "label": "E-mail", "fieldtype": "Data", "options": "Email", "in_list_view": 1},
-  {"fieldname": "observacao", "label": "Observação", "fieldtype": "Small Text"}
+  {
+   "fieldname": "nome",
+   "label": "Nome",
+   "fieldtype": "Data",
+   "reqd": 1,
+   "in_list_view": 1,
+   "bold": 1
+  },
+  {
+   "fieldname": "tipo",
+   "label": "Tipo",
+   "fieldtype": "Select",
+   "options": "Principal\nConjuge\nResponsável\nOutro",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "telefone",
+   "label": "Telefone",
+   "fieldtype": "Data",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "celular",
+   "label": "Celular",
+   "fieldtype": "Data",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "email",
+   "label": "E-mail",
+   "fieldtype": "Data",
+   "options": "Email",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "observacao",
+   "label": "Observação",
+   "fieldtype": "Small Text"
+  }
  ],
  "permissions": []
 }

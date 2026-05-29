@@ -6,6 +6,8 @@ import io
 
 @frappe.whitelist()
 def gerar_documento(servico_name, template_name):
+    if not frappe.has_permission("Servico", "read"):
+        frappe.throw("Sem permissão", frappe.PermissionError)
     try:
         from docxtpl import DocxTemplate
     except ImportError:
@@ -124,6 +126,8 @@ def _formatar_data_extenso(data_str):
 
 @frappe.whitelist()
 def get_templates_disponiveis():
+    if not frappe.has_permission("Template Documento", "read"):
+        frappe.throw("Sem permissão", frappe.PermissionError)
     return frappe.get_all(
         "Template Documento",
         fields=["name", "titulo", "tipo_documento", "descricao"],

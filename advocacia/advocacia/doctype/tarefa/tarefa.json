@@ -12,21 +12,113 @@
  "title_field": "titulo",
  "search_fields": "titulo,status,responsavel",
  "fields": [
-  {"fieldname": "naming_series", "label": "Série", "fieldtype": "Select", "options": "TAR-.YYYY.-", "default": "TAR-.YYYY.-"},
-  {"fieldname": "titulo", "label": "Título", "fieldtype": "Data", "reqd": 1, "in_list_view": 1, "in_global_search": 1, "bold": 1},
-  {"fieldname": "status", "label": "Status", "fieldtype": "Select", "options": "Pendente\nEm Andamento\nConcluída\nCancelada", "default": "Pendente", "in_list_view": 1, "in_standard_filter": 1, "bold": 1},
-  {"fieldname": "col_break_1", "fieldtype": "Column Break"},
-  {"fieldname": "prioridade", "label": "Prioridade", "fieldtype": "Select", "options": "Normal\nAlta\nUrgente", "default": "Normal", "in_list_view": 1, "in_standard_filter": 1},
-  {"fieldname": "data_limite", "label": "Data Limite", "fieldtype": "Date", "in_list_view": 1},
-  {"fieldname": "sec_detalhes", "label": "Detalhes", "fieldtype": "Section Break"},
-  {"fieldname": "descricao", "label": "Descrição", "fieldtype": "Text Editor"},
-  {"fieldname": "servico", "label": "Serviço Relacionado", "fieldtype": "Link", "options": "Servico"},
-  {"fieldname": "col_break_2", "fieldtype": "Column Break"},
-  {"fieldname": "responsavel", "label": "Responsável", "fieldtype": "Link", "options": "User"},
-  {"fieldname": "data_conclusao", "label": "Data de Conclusão", "fieldtype": "Date"}
+  {
+   "fieldname": "naming_series",
+   "label": "Série",
+   "fieldtype": "Select",
+   "options": "TAR-.YYYY.-",
+   "default": "TAR-.YYYY.-"
+  },
+  {
+   "fieldname": "titulo",
+   "label": "Título",
+   "fieldtype": "Data",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_global_search": 1,
+   "bold": 1
+  },
+  {
+   "fieldname": "status",
+   "label": "Status",
+   "fieldtype": "Select",
+   "options": "Pendente\nEm Andamento\nConcluída\nCancelada",
+   "default": "Pendente",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "bold": 1
+  },
+  {
+   "fieldname": "col_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "prioridade",
+   "label": "Prioridade",
+   "fieldtype": "Select",
+   "options": "Normal\nAlta\nUrgente",
+   "default": "Normal",
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "data_limite",
+   "label": "Data Limite",
+   "fieldtype": "Date",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "sec_detalhes",
+   "label": "Detalhes",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "descricao",
+   "label": "Descrição",
+   "fieldtype": "Text Editor"
+  },
+  {
+   "fieldname": "servico",
+   "label": "Serviço Relacionado",
+   "fieldtype": "Link",
+   "options": "Servico"
+  },
+  {
+   "fieldname": "col_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "responsavel",
+   "label": "Responsável",
+   "fieldtype": "Link",
+   "options": "User"
+  },
+  {
+   "fieldname": "data_conclusao",
+   "label": "Data de Conclusão",
+   "fieldtype": "Date"
+  }
  ],
  "permissions": [
-  {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1},
-  {"role": "All", "read": 1, "write": 1, "create": 1, "delete": 0}
+  {
+   "role": "Advocacia Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Advocacia User",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 0,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  }
  ]
 }

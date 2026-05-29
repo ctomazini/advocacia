@@ -11,32 +11,174 @@
  "title_field": "nome",
  "search_fields": "nome,cpf,cnpj",
  "fields": [
-  {"fieldname": "tipo_pessoa", "label": "Tipo de Pessoa", "fieldtype": "Select", "options": "Pessoa Física\nPessoa Jurídica", "reqd": 1, "in_list_view": 1, "in_standard_filter": 1, "bold": 1},
-  {"fieldname": "nome", "label": "Nome / Razão Social", "fieldtype": "Data", "reqd": 1, "in_list_view": 1, "in_global_search": 1, "bold": 1},
-  {"fieldname": "nome_fantasia", "label": "Nome Fantasia", "fieldtype": "Data", "depends_on": "eval:doc.tipo_pessoa=='Pessoa Jurídica'"},
-  {"fieldname": "col_break_1", "fieldtype": "Column Break"},
-  {"fieldname": "cpf", "label": "CPF", "fieldtype": "Data", "depends_on": "eval:doc.tipo_pessoa=='Pessoa Física'", "in_list_view": 1},
-  {"fieldname": "rg", "label": "RG", "fieldtype": "Data", "depends_on": "eval:doc.tipo_pessoa=='Pessoa Física'"},
-  {"fieldname": "cnpj", "label": "CNPJ", "fieldtype": "Data", "depends_on": "eval:doc.tipo_pessoa=='Pessoa Jurídica'", "in_list_view": 1},
-  {"fieldname": "sec_pf", "label": "Dados Pessoais", "fieldtype": "Section Break", "depends_on": "eval:doc.tipo_pessoa=='Pessoa Física'"},
-  {"fieldname": "nacionalidade", "label": "Nacionalidade", "fieldtype": "Data", "default": "Brasileira"},
-  {"fieldname": "estado_civil", "label": "Estado Civil", "fieldtype": "Select", "options": "\nSolteiro(a)\nCasado(a)\nDivorciado(a)\nViúvo(a)\nUnião Estável"},
-  {"fieldname": "profissao", "label": "Profissão", "fieldtype": "Data"},
-  {"fieldname": "sec_pj", "label": "Dados da Empresa", "fieldtype": "Section Break", "depends_on": "eval:doc.tipo_pessoa=='Pessoa Jurídica'"},
-  {"fieldname": "representante", "label": "Representante Legal", "fieldtype": "Data", "bold": 1},
-  {"fieldname": "cpf_representante", "label": "CPF do Representante", "fieldtype": "Data"},
-  {"fieldname": "col_break_pj", "fieldtype": "Column Break"},
-  {"fieldname": "cargo_representante", "label": "Cargo", "fieldtype": "Data"},
-  {"fieldname": "nacionalidade_pj", "label": "Nacionalidade do Representante", "fieldtype": "Data", "default": "Brasileira"},
-  {"fieldname": "sec_contatos", "label": "Contatos", "fieldtype": "Section Break"},
-  {"fieldname": "contatos", "label": "Contatos", "fieldtype": "Table", "options": "Contato Cliente"},
-  {"fieldname": "sec_enderecos", "label": "Endereços", "fieldtype": "Section Break"},
-  {"fieldname": "enderecos", "label": "Endereços", "fieldtype": "Table", "options": "Endereco Cliente"},
-  {"fieldname": "sec_obs", "label": "Observações", "fieldtype": "Section Break", "collapsible": 1},
-  {"fieldname": "observacoes", "label": "Observações", "fieldtype": "Text Editor"}
+  {
+   "fieldname": "tipo_pessoa",
+   "label": "Tipo de Pessoa",
+   "fieldtype": "Select",
+   "options": "Pessoa Física\nPessoa Jurídica",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "bold": 1
+  },
+  {
+   "fieldname": "nome",
+   "label": "Nome / Razão Social",
+   "fieldtype": "Data",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_global_search": 1,
+   "bold": 1
+  },
+  {
+   "fieldname": "nome_fantasia",
+   "label": "Nome Fantasia",
+   "fieldtype": "Data",
+   "depends_on": "eval:doc.tipo_pessoa=='Pessoa Jurídica'"
+  },
+  {
+   "fieldname": "col_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cpf",
+   "label": "CPF",
+   "fieldtype": "Data",
+   "depends_on": "eval:doc.tipo_pessoa=='Pessoa Física'",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "rg",
+   "label": "RG",
+   "fieldtype": "Data",
+   "depends_on": "eval:doc.tipo_pessoa=='Pessoa Física'"
+  },
+  {
+   "fieldname": "cnpj",
+   "label": "CNPJ",
+   "fieldtype": "Data",
+   "depends_on": "eval:doc.tipo_pessoa=='Pessoa Jurídica'",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "sec_pf",
+   "label": "Dados Pessoais",
+   "fieldtype": "Section Break",
+   "depends_on": "eval:doc.tipo_pessoa=='Pessoa Física'"
+  },
+  {
+   "fieldname": "nacionalidade",
+   "label": "Nacionalidade",
+   "fieldtype": "Data",
+   "default": "Brasileira"
+  },
+  {
+   "fieldname": "estado_civil",
+   "label": "Estado Civil",
+   "fieldtype": "Select",
+   "options": "\nSolteiro(a)\nCasado(a)\nDivorciado(a)\nViúvo(a)\nUnião Estável"
+  },
+  {
+   "fieldname": "profissao",
+   "label": "Profissão",
+   "fieldtype": "Data"
+  },
+  {
+   "fieldname": "sec_pj",
+   "label": "Dados da Empresa",
+   "fieldtype": "Section Break",
+   "depends_on": "eval:doc.tipo_pessoa=='Pessoa Jurídica'"
+  },
+  {
+   "fieldname": "representante",
+   "label": "Representante Legal",
+   "fieldtype": "Data",
+   "bold": 1
+  },
+  {
+   "fieldname": "cpf_representante",
+   "label": "CPF do Representante",
+   "fieldtype": "Data"
+  },
+  {
+   "fieldname": "col_break_pj",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cargo_representante",
+   "label": "Cargo",
+   "fieldtype": "Data"
+  },
+  {
+   "fieldname": "nacionalidade_pj",
+   "label": "Nacionalidade do Representante",
+   "fieldtype": "Data",
+   "default": "Brasileira"
+  },
+  {
+   "fieldname": "sec_contatos",
+   "label": "Contatos",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "contatos",
+   "label": "Contatos",
+   "fieldtype": "Table",
+   "options": "Contato Cliente"
+  },
+  {
+   "fieldname": "sec_enderecos",
+   "label": "Endereços",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "enderecos",
+   "label": "Endereços",
+   "fieldtype": "Table",
+   "options": "Endereco Cliente"
+  },
+  {
+   "fieldname": "sec_obs",
+   "label": "Observações",
+   "fieldtype": "Section Break",
+   "collapsible": 1
+  },
+  {
+   "fieldname": "observacoes",
+   "label": "Observações",
+   "fieldtype": "Text Editor"
+  }
  ],
  "permissions": [
-  {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1},
-  {"role": "All", "read": 1, "write": 1, "create": 1, "delete": 0}
+  {
+   "role": "Advocacia Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Advocacia User",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 0,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  }
  ]
 }

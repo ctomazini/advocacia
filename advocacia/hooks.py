@@ -30,6 +30,9 @@ scheduler_events = {
 ]
 }
 
+after_install = "advocacia.advocacia.setup.install.after_install"
+
 after_migrate = [
-    "advocacia.advocacia.setup.reinstalar_istable_doctypes"
+    "advocacia.advocacia.setup.reinstalar_istable_doctypes",
+    "advocacia.advocacia.setup.install.after_install",
 ]

@@ -3,6 +3,8 @@ from frappe.utils import today, add_days, date_diff
 
 @frappe.whitelist()
 def get_painel_data():
+    if not frappe.has_permission("Servico", "read"):
+        frappe.throw("Sem permissão", frappe.PermissionError)
     hoje = today()
     set7 = add_days(hoje, 7)
 
