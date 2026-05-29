@@ -5,8 +5,20 @@ from frappe.utils import add_days, getdate, today
 
 
 def verificar_parcelas_vencidas():
-	"""Marca parcelas pendentes com vencimento anterior a hoje como Vencida."""
+	"""Marca pagamentos/parcelas pendentes com vencimento anterior a hoje como vencidos."""
 	hoje = today()
+	from advocacia.advocacia.financeiro import sync_parcela_from_pagamento
+
+	pagamentos = frappe.get_all(
+		"Pagamento",
+		filters={"data_vencimento": ["<", hoje], "status": "Pendente", "manual_override": 0},
+		fields=["name", "parcela_origem_id"],
+	)
+	for row in pagamentos:
+		frappe.db.set_value("Pagamento", row.name, "status", "Vencido", update_modified=False)
+		pag = frappe.get_doc("Pagamento", row.name)
+		sync_parcela_from_pagamento(pag)
+
 	parcelas = frappe.get_all(
 		"Parcela de Honorarios",
 		filters={"vencimento": ["<", hoje], "status": "Pendente"},
@@ -15,41 +27,42 @@ def verificar_parcelas_vencidas():
 	for name in parcelas:
 		frappe.db.set_value("Parcela de Honorarios", name, "status", "Vencida", update_modified=False)
 
-	count = len(parcelas)
-	frappe.logger().info("Parcelas vencidas atualizadas: {0}".format(count))
+	frappe.logger().info(
+		"Vencidos atualizados: {0} pagamentos, {1} parcelas".format(len(pagamentos), len(parcelas))
+	)
 	frappe.db.commit()
 
 
 def notificar_parcelas_vencidas():
-	"""Notifica parcelas vencidas ha 3 dias (status Vencida, vencimento = hoje - 3)."""
+	"""Notifica pagamentos vencidos ha 3 dias (camada operacional)."""
 	data_alvo = add_days(today(), -3)
-	parcelas = frappe.get_all(
-		"Parcela de Honorarios",
-		filters={"status": "Vencida", "vencimento": data_alvo},
-		fields=["name", "parent", "parenttype", "vencimento", "owner"],
+	pagamentos = frappe.get_all(
+		"Pagamento",
+		filters={"status": "Vencido", "data_vencimento": data_alvo},
+		fields=["name", "acordo", "cliente", "data_vencimento", "owner"],
 	)
 	count = 0
-	for p in parcelas:
-		subject = _("Parcela vencida: {0}").format(p.name)
-		if _notification_already_sent("Parcela de Honorarios", p.name, subject):
+	for p in pagamentos:
+		subject = _("Pagamento vencido: {0}").format(p.name)
+		if _notification_already_sent("Pagamento", p.name, subject):
 			continue
 		message = _(
-			"A parcela {0} (vencimento {1}) esta vencida ha 3 dias. Acordo: {2}."
+			"O pagamento {0} (vencimento {1}) esta vencido ha 3 dias. Acordo: {2}."
 		).format(
 			p.name,
-			frappe.utils.formatdate(p.vencimento),
-			p.parent or _("N/A"),
+			frappe.utils.formatdate(p.data_vencimento),
+			p.acordo or _("N/A"),
 		)
 		_send_system_notification(
-			users=_parcela_recipients(p),
-			doctype="Parcela de Honorarios",
+			users=_pagamento_recipients(p),
+			doctype="Pagamento",
 			docname=p.name,
 			subject=subject,
 			message=message,
 		)
 		count += 1
 
-	frappe.logger().info("Notificacoes de parcelas vencidas enviadas: {0}".format(count))
+	frappe.logger().info("Notificacoes de pagamentos vencidos enviadas: {0}".format(count))
 	frappe.db.commit()
 
 
@@ -104,25 +117,53 @@ def on_parcela_update(doc, method=None):
 		return
 	if doc.parenttype != "Acordo de Honorarios Processuais" or not doc.parent:
 		return
+	_marcar_acordo_quitado_se_completo(doc.parent)
 
-	parcelas = frappe.get_all(
-		"Parcela de Honorarios",
-		filters={
-			"parent": doc.parent,
-			"parenttype": "Acordo de Honorarios Processuais",
-		},
-		fields=["status"],
+
+def on_pagamento_update(doc, method=None):
+	"""Quando todos os pagamentos do acordo estao Recebidos, marca o acordo como Quitado."""
+	if getattr(frappe.flags, "in_pagamento_sync", False):
+		return
+	if doc.status not in ("Recebido", "Repassado"):
+		return
+	if not doc.acordo:
+		return
+	_marcar_acordo_quitado_se_completo(doc.acordo, usar_pagamentos=True)
+
+
+def _marcar_acordo_quitado_se_completo(acordo_name, usar_pagamentos=False):
+	if usar_pagamentos:
+		pagamentos = frappe.get_all(
+			"Pagamento",
+			filters={"acordo": acordo_name, "status": ["not in", ["Cancelado"]]},
+			fields=["status"],
+		)
+		if not pagamentos or not all(p.status in ("Recebido", "Repassado") for p in pagamentos):
+			return
+	else:
+		parcelas = frappe.get_all(
+			"Parcela de Honorarios",
+			filters={
+				"parent": acordo_name,
+				"parenttype": "Acordo de Honorarios Processuais",
+			},
+			fields=["status"],
+		)
+		if not parcelas or not all(p.status == "Recebida" for p in parcelas):
+			return
+
+	acordo_status = frappe.db.get_value("Acordo de Honorarios Processuais", acordo_name, "status")
+	if acordo_status == "Quitado":
+		return
+
+	frappe.db.set_value(
+		"Acordo de Honorarios Processuais",
+		acordo_name,
+		"status",
+		"Quitado",
+		update_modified=True,
 	)
-	if not parcelas or not all(p.status == "Recebida" for p in parcelas):
-		return
-
-	acordo = frappe.get_doc("Acordo de Honorarios Processuais", doc.parent)
-	if acordo.status == "Quitado":
-		return
-
-	acordo.status = "Quitado"
-	acordo.save(ignore_permissions=True)
-	frappe.logger().info("Acordo {0} quitado".format(doc.parent))
+	frappe.logger().info("Acordo {0} quitado".format(acordo_name))
 
 
 def _parcela_recipients(parcela):
@@ -132,6 +173,19 @@ def _parcela_recipients(parcela):
 	if parcela.parenttype == "Acordo de Honorarios Processuais" and parcela.parent:
 		acordo_owner = frappe.db.get_value(
 			"Acordo de Honorarios Processuais", parcela.parent, "owner"
+		)
+		if acordo_owner and acordo_owner not in users:
+			users.append(acordo_owner)
+	return users or ["Administrator"]
+
+
+def _pagamento_recipients(pagamento):
+	users = []
+	if pagamento.owner:
+		users.append(pagamento.owner)
+	if pagamento.acordo:
+		acordo_owner = frappe.db.get_value(
+			"Acordo de Honorarios Processuais", pagamento.acordo, "owner"
 		)
 		if acordo_owner and acordo_owner not in users:
 			users.append(acordo_owner)
@@ -186,11 +240,15 @@ def verificar_status_servicos():
 		)
 		tem_parcela_aberta = False
 		for ac in acordos:
-			count = frappe.db.count(
+			count_parcela = frappe.db.count(
 				"Parcela de Honorarios",
 				{"parent": ac.name, "status": ["in", ["Pendente", "Vencida"]]},
 			)
-			if count > 0:
+			count_pag = frappe.db.count(
+				"Pagamento",
+				{"acordo": ac.name, "status": ["in", ["Pendente", "Vencido"]]},
+			)
+			if count_parcela > 0 or count_pag > 0:
 				tem_parcela_aberta = True
 				break
 

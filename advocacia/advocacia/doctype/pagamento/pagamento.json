@@ -1,0 +1,223 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2026-05-29 12:00:00.000000",
+ "custom": 0,
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "sec_relacionamentos",
+  "acordo",
+  "servico",
+  "cliente",
+  "col_rel_1",
+  "numero_parcela",
+  "descricao",
+  "sec_origem",
+  "parcela_origem_id",
+  "sincronizado_em",
+  "manual_override",
+  "sec_financeiro",
+  "valor",
+  "valor_recebido",
+  "col_fin_1",
+  "data_vencimento",
+  "data_recebimento",
+  "status",
+  "sec_controle",
+  "observacoes",
+  "comprovante"
+ ],
+ "fields": [
+  {
+   "default": "PAY-.YYYY.-",
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Série",
+   "options": "PAY-.YYYY.-"
+  },
+  {
+   "fieldname": "sec_relacionamentos",
+   "fieldtype": "Section Break",
+   "label": "Relacionamentos"
+  },
+  {
+   "fieldname": "acordo",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Acordo",
+   "options": "Acordo de Honorarios Processuais",
+   "reqd": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "servico",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Serviço",
+   "options": "Servico",
+   "reqd": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "cliente",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Cliente",
+   "options": "Cliente",
+   "reqd": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "col_rel_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "numero_parcela",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Nº Parcela"
+  },
+  {
+   "bold": 1,
+   "fieldname": "descricao",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Descrição"
+  },
+  {
+   "fieldname": "sec_origem",
+   "fieldtype": "Section Break",
+   "label": "Origem / Sincronização"
+  },
+  {
+   "fieldname": "parcela_origem_id",
+   "fieldtype": "Data",
+   "label": "ID Parcela Origem",
+   "read_only": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "sincronizado_em",
+   "fieldtype": "Datetime",
+   "label": "Sincronizado em",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "manual_override",
+   "fieldtype": "Check",
+   "label": "Edição manual (não sincronizar)"
+  },
+  {
+   "fieldname": "sec_financeiro",
+   "fieldtype": "Section Break",
+   "label": "Financeiro"
+  },
+  {
+   "fieldname": "valor",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Valor",
+   "reqd": 1
+  },
+  {
+   "fieldname": "valor_recebido",
+   "fieldtype": "Currency",
+   "label": "Valor Recebido"
+  },
+  {
+   "fieldname": "col_fin_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "data_vencimento",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Vencimento",
+   "reqd": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "data_recebimento",
+   "fieldtype": "Date",
+   "label": "Data de Recebimento"
+  },
+  {
+   "default": "Pendente",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Pendente\nVencido\nRecebido\nCancelado\nRenegociado\nRepassado",
+   "reqd": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "sec_controle",
+   "fieldtype": "Section Break",
+   "label": "Controle"
+  },
+  {
+   "fieldname": "observacoes",
+   "fieldtype": "Small Text",
+   "label": "Observações"
+  },
+  {
+   "fieldname": "comprovante",
+   "fieldtype": "Attach",
+   "label": "Comprovante"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-05-29 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Advocacia",
+ "name": "Pagamento",
+ "naming_series_options": "PAY-.YYYY.-",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "role": "Advocacia Manager",
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 0,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "role": "Advocacia User",
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "write": 1
+  }
+ ],
+ "sort_field": "data_vencimento",
+ "sort_order": "ASC",
+ "states": [],
+ "track_changes": 1
+}

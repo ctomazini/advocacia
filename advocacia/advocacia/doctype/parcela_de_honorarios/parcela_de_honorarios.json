@@ -518,6 +518,14 @@
    "doctype": "DocField"
   },
   {
+   "fieldname": "parcela_origem_id",
+   "fieldtype": "Data",
+   "label": "ID de Origem",
+   "read_only": 1,
+   "no_copy": 1,
+   "hidden": 1
+  },
+  {
    "name": "fnb1m361t0",
    "creation": "2026-05-24 21:08:55.542269",
    "modified": "2026-05-26 18:10:18.683204",

@@ -1002,17 +1002,17 @@ function build_timeline_items(d) {
 function build_parcelas_criticas(parcelas, limit) {
     if (!parcelas || !parcelas.length) return "";
     var sorted = parcelas.slice().sort(function (a, b) {
-        if (a.status === "Vencida" && b.status !== "Vencida") return -1;
-        if (b.status === "Vencida" && a.status !== "Vencida") return 1;
+        if (_is_vencido(a.status) && !_is_vencido(b.status)) return -1;
+        if (_is_vencido(b.status) && !_is_vencido(a.status)) return 1;
         return (a.dias_atraso || 0) > (b.dias_atraso || 0) ? -1 : 1;
     });
     return sorted
         .slice(0, limit)
         .map(function (p) {
             var btn = "";
-            if (p.status === "Vencida" || p.status === "Pendente") {
+            if (_pagamento_pode_receber(p.status)) {
                 btn =
-                    '<button type="button" class="painel-btn-recebida" data-parcela="' +
+                    '<button type="button" class="painel-btn-recebida" data-pagamento="' +
                     frappe.utils.escape_html(p.name || "") +
                     '">✓ ' +
                     __("Recebida") +
@@ -1129,15 +1129,15 @@ function render_parcelas(parcelas) {
     h += '<div class="painel-panel">';
     parcelas.forEach(function (p) {
         var prazo_txt = "";
-        if (p.status === "Vencida" && p.dias_atraso > 0) {
+        if (_is_vencido(p.status) && p.dias_atraso > 0) {
             prazo_txt = __("Atraso {0}d", [p.dias_atraso]);
         } else if (p.status === "Pendente") {
             prazo_txt = p.dias_para_vencer === 0 ? __("Hoje") : __("Em {0}d", [p.dias_para_vencer]);
         }
         var btn = "";
-        if (p.status === "Vencida" || p.status === "Pendente") {
+        if (_pagamento_pode_receber(p.status)) {
             btn =
-                '<button type="button" class="painel-btn-recebida" data-parcela="' +
+                '<button type="button" class="painel-btn-recebida" data-pagamento="' +
                 frappe.utils.escape_html(p.name || "") +
                 '">✓ ' +
                 __("Recebida") +
@@ -1302,13 +1302,25 @@ function fmt_datetime(iso, hora) {
     return s;
 }
 
+function _is_vencido(status) {
+    return status === "Vencida" || status === "Vencido";
+}
+
+function _pagamento_pode_receber(status) {
+    return status === "Pendente" || _is_vencido(status);
+}
+
 function status_pill(status) {
     var map = {
         Vencida: "red",
+        Vencido: "red",
         Pendente: "orange",
         Recebida: "green",
+        Recebido: "green",
         Repassada: "blue",
+        Repassado: "blue",
         Cancelada: "gray",
+        Cancelado: "gray",
         "Em Andamento": "blue",
         Concluída: "green",
         Alta: "red",
@@ -1366,20 +1378,20 @@ $(document).on("click", ".painel-row-acordo", function (e) {
 $(document).on("click", ".painel-btn-recebida", function (e) {
     e.stopPropagation();
     var btn = $(this);
-    var parcela = btn.attr("data-parcela");
-    if (!parcela) return;
+    var pagamento = btn.attr("data-pagamento") || btn.attr("data-parcela");
+    if (!pagamento) return;
 
     frappe.confirm(
-        __("Marcar parcela como recebida hoje?"),
+        __("Marcar pagamento como recebido hoje?"),
         function () {
             btn.prop("disabled", true).text("...");
             frappe
                 .xcall("advocacia.advocacia.painel_api.marcar_parcela_recebida", {
-                    parcela_name: parcela,
+                    parcela_name: pagamento,
                 })
                 .then(function () {
                     frappe.show_alert({
-                        message: __("Parcela marcada como Recebida"),
+                        message: __("Pagamento marcado como Recebido"),
                         indicator: "green",
                     });
                     var page =

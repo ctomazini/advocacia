@@ -50,8 +50,14 @@ scheduler_events = {
 }
 
 doc_events = {
+    "Acordo de Honorarios Processuais": {
+        "on_update": "advocacia.advocacia.financeiro.sincronizar_pagamentos_hook",
+    },
     "Parcela de Honorarios": {
         "on_update": "advocacia.advocacia.tasks.on_parcela_update",
+    },
+    "Pagamento": {
+        "on_update": "advocacia.advocacia.tasks.on_pagamento_update",
     },
 }
 
