@@ -1,0 +1,113 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "creation": "2026-05-31 12:00:00",
+ "custom": 0,
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "sec_identificacao",
+  "razao_social",
+  "cnpj",
+  "registro_sia",
+  "column_break_1",
+  "advogada",
+  "oab",
+  "sec_endereco",
+  "endereco"
+ ],
+ "fields": [
+  {
+   "fieldname": "sec_identificacao",
+   "fieldtype": "Section Break",
+   "label": "Identificação"
+  },
+  {
+   "fieldname": "razao_social",
+   "fieldtype": "Data",
+   "label": "Razão Social",
+   "reqd": 1
+  },
+  {
+   "fieldname": "cnpj",
+   "fieldtype": "Data",
+   "label": "CNPJ",
+   "description": "Armazenado apenas com dígitos. Usado nos placeholders de documentos."
+  },
+  {
+   "fieldname": "registro_sia",
+   "fieldtype": "Data",
+   "label": "Registro SIA"
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "advogada",
+   "fieldtype": "Data",
+   "label": "Advogada(o) Principal",
+   "reqd": 1
+  },
+  {
+   "fieldname": "oab",
+   "fieldtype": "Data",
+   "label": "OAB",
+   "reqd": 1
+  },
+  {
+   "fieldname": "sec_endereco",
+   "fieldtype": "Section Break",
+   "label": "Endereço Profissional"
+  },
+  {
+   "fieldname": "endereco",
+   "fieldtype": "Small Text",
+   "label": "Endereço Completo",
+   "reqd": 1
+  }
+ ],
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-05-31 12:00:00",
+ "modified_by": "Administrator",
+ "module": "Advocacia",
+ "name": "Configuracao do Escritorio",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "role": "Advocacia Manager",
+   "write": 1
+  },
+  {
+   "read": 1,
+   "role": "Advocacia User",
+   "write": 0,
+   "create": 0,
+   "delete": 0,
+   "export": 0,
+   "print": 1,
+   "email": 0
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

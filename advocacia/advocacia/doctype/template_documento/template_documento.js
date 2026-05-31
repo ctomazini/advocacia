@@ -1,62 +1,57 @@
 frappe.ui.form.on("Template Documento", {
-	ver_placeholders: function (frm) {
+	ver_placeholders(frm) {
 		frappe.call({
-			method: "advocacia.advocacia.documentos.get_placeholders_disponiveis",
+			method: "advocacia.advocacia.documentos.get_placeholders_referencia",
 			freeze: true,
 			freeze_message: __("Carregando placeholders..."),
-			callback: function (r) {
+			callback(r) {
 				if (!r.message) {
 					return;
 				}
-
-				var grupos = r.message;
-				var html = '<div style="max-height:500px;overflow-y:auto;">';
-
-				var ordem = [
-					"Aliases Legados",
-					"Data",
-					"Servico",
-					"Cliente",
-					"Endereco Cliente",
-					"Contato Cliente",
-					"Acordo de Honorarios Processuais",
-				];
-
-				ordem.forEach(function (grupo) {
-					if (!grupos[grupo]) {
-						return;
-					}
-					var campos = grupos[grupo];
-					html +=
-						'<h5 style="margin-top:12px;margin-bottom:4px;border-bottom:1px solid #d1d8dd;padding-bottom:4px;">' +
-						frappe.utils.escape_html(grupo) +
-						"</h5>";
-					html +=
-						'<table class="table table-condensed table-bordered" style="font-size:12px;">';
-					html +=
-						"<thead><tr><th>Placeholder</th><th>Label</th><th>Tipo</th></tr></thead><tbody>";
-					campos.forEach(function (c) {
-						html +=
-							"<tr><td><code>{{ " +
-							frappe.utils.escape_html(c.placeholder) +
-							" }}</code></td>";
-						html +=
-							"<td>" + frappe.utils.escape_html(c.label) + "</td>";
-						html +=
-							"<td>" + frappe.utils.escape_html(c.fieldtype) + "</td></tr>";
-					});
-					html += "</tbody></table>";
-				});
-
-				html += "</div>";
-
-				frappe.msgprint({
-					title: __("Placeholders Disponíveis"),
-					message: html,
-					wide: true,
-					indicator: "blue",
-				});
+				render_placeholders_referencia(r.message);
 			},
 		});
 	},
 });
+
+function render_placeholders_referencia(blocos) {
+	let html = '<div style="max-height:560px;overflow-y:auto;">';
+
+	blocos.forEach((bloco) => {
+		const badge = bloco.condicional
+			? ' <span class="indicator-pill orange">condicional</span>'
+			: "";
+		html +=
+			'<h5 style="margin-top:14px;margin-bottom:6px;border-bottom:1px solid var(--border-color);padding-bottom:4px;">' +
+			frappe.utils.escape_html(bloco.grupo) +
+			badge +
+			"</h5>";
+		html +=
+			'<table class="table table-condensed table-bordered" style="font-size:12px;">';
+		html += "<thead><tr><th>Placeholder</th><th>Label</th><th>Alias legado</th></tr></thead><tbody>";
+
+		(bloco.items || []).forEach((item) => {
+			html +=
+				"<tr><td><code>{{ " +
+				frappe.utils.escape_html(item.placeholder) +
+				" }}</code></td>";
+			html += "<td>" + frappe.utils.escape_html(item.label || "") + "</td>";
+			html +=
+				"<td>" +
+				(item.alias
+					? "<code>{{ " + frappe.utils.escape_html(item.alias) + " }}</code>"
+					: "—") +
+				"</td></tr>";
+		});
+		html += "</tbody></table>";
+	});
+
+	html += "</div>";
+
+	frappe.msgprint({
+		title: __("Placeholders Disponíveis"),
+		message: html,
+		wide: true,
+		indicator: "blue",
+	});
+}

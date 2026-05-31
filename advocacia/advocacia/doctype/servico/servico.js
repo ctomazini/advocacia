@@ -23,66 +23,8 @@ frappe.ui.form.on("Servico", {
 			});
 		}, "Criar");
 
-		frm.add_custom_button(__("Gerar Documento"), function () {
-			frappe.call({
-				method: "advocacia.advocacia.documentos.get_templates_disponiveis",
-				callback: function (r) {
-					if (!r.message || r.message.length === 0) {
-						frappe.msgprint(
-							__(
-								"Nenhum template cadastrado. Va em Template Documento para cadastrar."
-							)
-						);
-						return;
-					}
-					var d = new frappe.ui.Dialog({
-						title: __("Selecionar Template"),
-						fields: [
-							{
-								fieldname: "template",
-								fieldtype: "Link",
-								label: __("Template"),
-								options: "Template Documento",
-								reqd: 1,
-								get_query: function () {
-									return { filters: { habilitado: 1 } };
-								},
-							},
-						],
-						primary_action_label: __("Gerar"),
-						primary_action: function (values) {
-							d.hide();
-							frappe.call({
-								method: "advocacia.advocacia.documentos.gerar_documento",
-								args: {
-									servico_name: frm.doc.name,
-									template_name: values.template,
-								},
-								freeze: true,
-								freeze_message: __("Gerando documento..."),
-								callback: function (res) {
-									if (res.message) {
-										frappe.msgprint({
-											title: __("Documento Gerado"),
-											message:
-												__("Arquivo: ") +
-												res.message.file_name +
-												'<br><br><a href="' +
-												res.message.file_url +
-												'" target="_blank" class="btn btn-primary btn-sm">' +
-												__("Baixar Documento") +
-												"</a>",
-											indicator: "green",
-										});
-										frm.reload_doc();
-									}
-								},
-							});
-						},
-					});
-					d.show();
-				},
-			});
+		frm.add_custom_button(__("Gerar Documentos"), function () {
+			abrir_dialog_gerar_documentos(frm);
 		}, __("Documentos"));
 	},
 	tipo: function (frm) {
@@ -106,6 +48,205 @@ function aplicar_mascara_processo_servico(frm) {
 	if (window.AdvocaciaMasks) {
 		AdvocaciaMasks.setupServicoProcessoMask(frm);
 	}
+}
+
+function abrir_dialog_gerar_documentos(frm) {
+	frappe.call({
+		method: "advocacia.advocacia.documentos.get_templates_disponiveis",
+		callback(r_templates) {
+			const templates = r_templates.message || [];
+			if (!templates.length) {
+				frappe.msgprint(
+					__(
+						"Nenhum template cadastrado. Vá em Template Documento para cadastrar."
+					)
+				);
+				return;
+			}
+
+			frappe.call({
+				method: "advocacia.advocacia.documentos.get_kits_disponiveis",
+				callback(r_kits) {
+					montar_dialog_gerar_documentos(frm, templates, r_kits.message || []);
+				},
+			});
+		},
+	});
+}
+
+function montar_dialog_gerar_documentos(frm, templates, kits) {
+	const agrupados = {};
+	templates.forEach((tpl) => {
+		const tipo = tpl.tipo_documento || __("Outro");
+		if (!agrupados[tipo]) {
+			agrupados[tipo] = [];
+		}
+		agrupados[tipo].push(tpl);
+	});
+
+	let checklist_html = '<div class="adv-doc-bulk-list" style="max-height:320px;overflow-y:auto;">';
+	checklist_html +=
+		'<p class="text-muted small">' +
+		__("Selecione os templates ou use um kit para pré-marcar.") +
+		"</p>";
+	checklist_html +=
+		'<p><label class="checkbox"><input type="checkbox" class="adv-doc-select-all"> ' +
+		__("Selecionar todos") +
+		"</label></p>";
+
+	Object.keys(agrupados)
+		.sort()
+		.forEach((tipo) => {
+			checklist_html +=
+				'<div style="margin-top:10px;font-weight:600;">' +
+				frappe.utils.escape_html(tipo) +
+				"</div>";
+			agrupados[tipo].forEach((tpl) => {
+				checklist_html +=
+					'<p style="margin:4px 0 4px 12px;">' +
+					'<label class="checkbox">' +
+					'<input type="checkbox" class="adv-doc-template" data-template="' +
+					frappe.utils.escape_html(tpl.name) +
+					'"> ' +
+					frappe.utils.escape_html(tpl.titulo) +
+					"</label></p>";
+			});
+		});
+	checklist_html += "</div>";
+
+	const dialog = new frappe.ui.Dialog({
+		title: __("Gerar Documentos"),
+		fields: [
+			{
+				fieldname: "kit",
+				fieldtype: "Select",
+				label: __("Kit (opcional)"),
+				options: ["", ...kits.map((k) => k.name)],
+				description: __("Pré-seleciona os templates de um kit"),
+			},
+			{
+				fieldname: "templates_html",
+				fieldtype: "HTML",
+				options: checklist_html,
+			},
+		],
+		primary_action_label: __("Gerar documentos"),
+		primary_action() {
+			const selecionados = [];
+			dialog.$wrapper.find(".adv-doc-template:checked").each(function () {
+				selecionados.push($(this).attr("data-template"));
+			});
+			if (!selecionados.length) {
+				frappe.msgprint(__("Selecione ao menos um template."));
+				return;
+			}
+			dialog.hide();
+			gerar_documentos_em_lote(frm, selecionados);
+		},
+	});
+
+	dialog.show();
+
+	if (dialog.fields_dict.kit && kits.length) {
+		dialog.fields_dict.kit.df.options = ["", ...kits.map((k) => k.name)];
+		dialog.fields_dict.kit.refresh();
+		dialog.fields_dict.kit.$input.on("change", function () {
+			const kit_name = dialog.get_value("kit");
+			dialog.$wrapper.find(".adv-doc-template").prop("checked", false);
+			if (!kit_name) {
+				atualizar_label_botao_bulk(dialog);
+				return;
+			}
+			const kit = kits.find((k) => k.name === kit_name);
+			if (!kit || !kit.templates) {
+				return;
+			}
+			kit.templates.forEach((template_name) => {
+				dialog.$wrapper
+					.find('.adv-doc-template[data-template="' + template_name + '"]')
+					.prop("checked", true);
+			});
+			atualizar_label_botao_bulk(dialog);
+		});
+	} else if (dialog.fields_dict.kit) {
+		dialog.toggle_display("kit", false);
+	}
+
+	dialog.$wrapper.find(".adv-doc-select-all").on("change", function () {
+		const checked = $(this).is(":checked");
+		dialog.$wrapper.find(".adv-doc-template").prop("checked", checked);
+		atualizar_label_botao_bulk(dialog);
+	});
+
+	dialog.$wrapper.on("change", ".adv-doc-template", function () {
+		atualizar_label_botao_bulk(dialog);
+	});
+
+	atualizar_label_botao_bulk(dialog);
+}
+
+function atualizar_label_botao_bulk(dialog) {
+	const total = dialog.$wrapper.find(".adv-doc-template:checked").length;
+	dialog.set_primary_action(
+		total
+			? __("Gerar {0} documento(s)", [total])
+			: __("Gerar documentos")
+	);
+}
+
+function gerar_documentos_em_lote(frm, template_names) {
+	frappe.call({
+		method: "advocacia.advocacia.documentos.gerar_documentos_em_lote",
+		args: {
+			servico_name: frm.doc.name,
+			template_names: template_names,
+		},
+		freeze: true,
+		freeze_message: __("Gerando documentos..."),
+		callback(r) {
+			if (!r.message || !r.message.data) {
+				return;
+			}
+			const data = r.message.data;
+			let html = "";
+
+			if (data.gerados && data.gerados.length) {
+				html += "<p><strong>" + __("Documentos gerados:") + "</strong></p><ul>";
+				data.gerados.forEach((item) => {
+					html +=
+						"<li>" +
+						frappe.utils.escape_html(item.titulo || item.template) +
+						' — <a href="' +
+						item.file_url +
+						'" target="_blank">' +
+						frappe.utils.escape_html(item.file_name) +
+						"</a></li>";
+				});
+				html += "</ul>";
+			}
+
+			if (data.falhas && data.falhas.length) {
+				html += "<p><strong>" + __("Falhas:") + "</strong></p><ul>";
+				data.falhas.forEach((item) => {
+					html +=
+						"<li>" +
+						frappe.utils.escape_html(item.template) +
+						": " +
+						frappe.utils.escape_html(item.erro) +
+						"</li>";
+				});
+				html += "</ul>";
+			}
+
+			frappe.msgprint({
+				title: __("Geração em lote"),
+				message: html || __("Nenhum documento gerado."),
+				indicator: data.falhas && data.falhas.length ? "orange" : "green",
+				wide: true,
+			});
+			frm.reload_doc();
+		},
+	});
 }
 
 function servico_quick_entry_pseudo_form(dialog) {

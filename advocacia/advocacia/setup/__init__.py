@@ -6,6 +6,11 @@ ISTABLE_DOCTYPES = [
     "Ato Advocaticio",
     "Contato Cliente",
     "Endereco Cliente",
+    "Kit Documento Item",
+]
+
+PARENT_DOCTYPES_AFTER_ISTABLE = [
+    "Kit de Documentos",
 ]
 
 
@@ -17,7 +22,7 @@ def reinstalar_istable_doctypes():
     base = frappe.get_app_path("advocacia", "advocacia", "doctype")
     reinstalados = []
 
-    for dt in ISTABLE_DOCTYPES:
+    for dt in ISTABLE_DOCTYPES + PARENT_DOCTYPES_AFTER_ISTABLE:
         if not frappe.db.exists("DocType", dt):
             dt_path = os.path.join(base, frappe.scrub(dt), frappe.scrub(dt) + ".json")
             if os.path.exists(dt_path):
@@ -26,4 +31,4 @@ def reinstalar_istable_doctypes():
 
     if reinstalados:
         frappe.db.commit()
-        frappe.logger().info(f"Reinstalados DocTypes istable: {reinstalados}")
+        frappe.logger().info(f"Reinstalados DocTypes: {reinstalados}")

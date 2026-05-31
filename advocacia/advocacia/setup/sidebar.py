@@ -22,6 +22,7 @@ SIDEBAR_LINK_ORDER = (
 	("Honorários", "Acordo de Honorarios Processuais", "DocType"),
 	("Despesas", "Despesa do Escritorio", "DocType"),
 	("Documentos", "Template Documento", "DocType"),
+	("Kits de Documentos", "Kit de Documentos", "DocType"),
 	# Relatórios
 	("Produtividade", "produtividade", "Report"),
 	("Horas por Serviço", "horas_por_servico", "Report"),
@@ -34,6 +35,7 @@ SIDEBAR_LINK_ORDER = (
 	("Vara", "Vara", "DocType"),
 	("Tribunal", "Tribunal", "DocType"),
 	("Fase Processual", "Fase Processual", "DocType"),
+	("Escritório", "Configuracao do Escritorio", "DocType"),
 )
 
 SIDEBAR_SECTIONS = (

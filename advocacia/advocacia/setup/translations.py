@@ -4,6 +4,8 @@ DOCTYPE_LABELS = {
 	"Acordo de Honorarios Processuais": "Honorários",
 	"Controle de Prazos": "Prazos",
 	"Template Documento": "Documentos",
+	"Kit de Documentos": "Kits de Documentos",
+	"Configuracao do Escritorio": "Configuração do Escritório",
 	"Registro de Atos": "Registro de Atos",
 }
 
