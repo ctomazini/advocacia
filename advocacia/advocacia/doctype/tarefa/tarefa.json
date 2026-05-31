@@ -72,7 +72,8 @@
    "fieldname": "servico",
    "label": "Serviço Relacionado",
    "fieldtype": "Link",
-   "options": "Servico"
+   "options": "Servico",
+   "allow_in_quick_entry": 1
   },
   {
    "fieldname": "col_break_2",

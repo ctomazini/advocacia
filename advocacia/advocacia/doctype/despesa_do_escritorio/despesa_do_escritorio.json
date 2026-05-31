@@ -83,7 +83,8 @@
    "fieldname": "data_vencimento",
    "fieldtype": "Date",
    "in_list_view": 1,
-   "label": "Data de Vencimento"
+   "label": "Data de Vencimento",
+   "allow_in_quick_entry": 1
   },
   {
    "fieldname": "data_pagamento",
