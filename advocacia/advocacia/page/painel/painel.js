@@ -926,18 +926,433 @@ function inject_painel_styles() {
             justify-content: space-between;
             gap: 12px 20px;
             margin-bottom: var(--painel-gap-md);
-            padding: 14px 16px;
-            border-radius: var(--painel-radius-sm);
-            border: 1px solid color-mix(in srgb, var(--border-color) 65%, transparent);
+            padding: 16px 20px;
+            border-radius: var(--painel-radius);
+            border: 1px solid color-mix(in srgb, var(--primary) 18%, var(--border-color));
+            background: linear-gradient(
+                135deg,
+                color-mix(in srgb, var(--primary) 6%, var(--card-bg)) 0%,
+                var(--card-bg) 100%
+            );
+            box-shadow: var(--painel-shadow);
+        }
+        .painel-periodo-bar .painel-filtro-group {
+            width: 100%;
+            justify-content: space-between;
+        }
+        .painel-periodo-label {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            color: var(--text-color);
+        }
+        .painel-periodo-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 4px;
+            border-radius: 10px;
+            background: color-mix(in srgb, var(--subtle-fg) 55%, var(--card-bg));
+            border: 1px solid color-mix(in srgb, var(--border-color) 60%, transparent);
+        }
+        .painel-periodo-btn {
+            min-height: 36px;
+            padding: 8px 16px;
+            font-weight: 600;
+        }
+        .painel-zona-critica {
+            margin-bottom: calc(var(--painel-gap) + 4px);
+        }
+        .painel-destaques-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        @media (min-width: 900px) {
+            .painel-destaques-grid { grid-template-columns: 1.2fr 0.8fr; }
+        }
+        .painel-priority-max { margin-bottom: var(--painel-gap); }
+        .painel-priority-high { margin-bottom: var(--painel-gap); }
+        .painel-priority-medium { margin-bottom: var(--painel-gap-md); }
+        .painel-priority-low {
+            margin-bottom: var(--painel-gap-md);
+            opacity: 0.98;
+        }
+        .painel-priority-low .painel-section-title {
+            font-size: 0.98rem;
+            color: var(--text-muted);
+        }
+        .painel-zona-secundaria {
+            padding-top: 8px;
+            border-top: 1px solid color-mix(in srgb, var(--border-color) 45%, transparent);
+        }
+        .painel-centro-atencao {
+            margin-bottom: 0;
+        }
+        .painel-centro-shell {
+            padding: 28px 24px 24px;
+            border-radius: calc(var(--painel-radius) + 2px);
+            border: 1px solid color-mix(in srgb, var(--primary) 22%, var(--border-color));
+            background: linear-gradient(
+                165deg,
+                color-mix(in srgb, var(--primary) 7%, var(--card-bg)) 0%,
+                var(--card-bg) 42%,
+                color-mix(in srgb, var(--subtle-fg) 35%, var(--card-bg)) 100%
+            );
+            box-shadow: var(--painel-shadow-hover);
+        }
+        .painel-centro-head .painel-section-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+        }
+        .painel-centro-head .painel-section-sub {
+            font-size: 14px;
+            color: color-mix(in srgb, var(--text-muted) 85%, var(--text-color));
+        }
+        .painel-prox-audiencia,
+        .painel-saude-card {
+            border-radius: var(--painel-radius);
+            border: 1px solid color-mix(in srgb, var(--border-color) 70%, transparent);
+            background: var(--card-bg);
+            box-shadow: var(--painel-shadow);
+            overflow: hidden;
+            transition: box-shadow 0.25s ease, transform 0.2s ease;
+        }
+        .painel-prox-audiencia:hover,
+        .painel-saude-card:hover {
+            box-shadow: var(--painel-shadow-hover);
+        }
+        .painel-prox-audiencia-head,
+        .painel-saude-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 18px 22px 14px;
+            border-bottom: 1px solid color-mix(in srgb, var(--border-color) 45%, transparent);
+            background: color-mix(in srgb, var(--subtle-fg) 40%, var(--card-bg));
+        }
+        .painel-prox-badge,
+        .painel-saude-badge {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: color-mix(in srgb, var(--blue-500) 12%, var(--card-bg));
+            color: var(--blue-600);
+        }
+        .painel-saude-badge.tone-green { background: color-mix(in srgb, var(--green-500) 12%, var(--card-bg)); color: var(--green-700); }
+        .painel-saude-badge.tone-orange { background: color-mix(in srgb, var(--orange-500) 12%, var(--card-bg)); color: var(--orange-600); }
+        .painel-saude-badge.tone-red { background: color-mix(in srgb, var(--red-500) 12%, var(--card-bg)); color: var(--red-600); }
+        .painel-prox-title,
+        .painel-saude-title {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--text-color);
+        }
+        .painel-prox-body {
+            padding: 20px 22px 22px;
+            cursor: pointer;
+        }
+        .painel-prox-body:hover {
             background: color-mix(in srgb, var(--subtle-fg) 35%, var(--card-bg));
         }
+        .painel-prox-when {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            color: var(--text-color);
+            margin-bottom: 6px;
+        }
+        .painel-prox-tipo {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 12px;
+        }
+        .painel-prox-meta {
+            display: grid;
+            gap: 8px;
+        }
+        .painel-prox-row {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        .painel-prox-row-label {
+            min-width: 72px;
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .painel-prox-row-value {
+            color: var(--text-color);
+            font-weight: 500;
+        }
+        .painel-prox-empty {
+            padding: 28px 22px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        .painel-saude-body {
+            padding: 18px 22px 22px;
+        }
+        .painel-saude-score-wrap {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 18px;
+        }
+        .painel-saude-ring {
+            position: relative;
+            width: 88px;
+            height: 88px;
+            flex-shrink: 0;
+        }
+        .painel-saude-ring svg {
+            width: 88px;
+            height: 88px;
+            transform: rotate(-90deg);
+        }
+        .painel-saude-ring-bg {
+            fill: none;
+            stroke: color-mix(in srgb, var(--border-color) 80%, transparent);
+            stroke-width: 8;
+        }
+        .painel-saude-ring-fill {
+            fill: none;
+            stroke-width: 8;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.6s ease;
+        }
+        .painel-saude-ring-fill.tone-green { stroke: var(--green-600); }
+        .painel-saude-ring-fill.tone-blue { stroke: var(--blue-600); }
+        .painel-saude-ring-fill.tone-orange { stroke: var(--orange-600); }
+        .painel-saude-ring-fill.tone-red { stroke: var(--red-600); }
+        .painel-saude-score-text {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.1;
+        }
+        .painel-saude-score-num {
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+        }
+        .painel-saude-score-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .painel-saude-summary {
+            flex: 1;
+            min-width: 0;
+        }
+        .painel-saude-summary h4 {
+            margin: 0 0 4px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+        .painel-saude-summary p {
+            margin: 0;
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.45;
+        }
+        .painel-saude-rows {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .painel-saude-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            line-height: 1.35;
+        }
+        .painel-saude-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .painel-saude-dot.red { background: var(--red-500); }
+        .painel-saude-dot.orange { background: var(--orange-500); }
+        .painel-saude-dot.green { background: var(--green-500); }
+        .painel-saude-row strong {
+            font-weight: 700;
+            color: var(--text-color);
+        }
+        .painel-success-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 36px 24px;
+            border-radius: var(--painel-radius-sm);
+            background: color-mix(in srgb, var(--green-500) 8%, var(--card-bg));
+            border: 1px solid color-mix(in srgb, var(--green-500) 22%, transparent);
+        }
+        .painel-success-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: color-mix(in srgb, var(--green-500) 15%, var(--card-bg));
+            color: var(--green-700);
+            margin-bottom: 12px;
+        }
+        .painel-success-title {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--green-700);
+        }
+        .painel-success-hint {
+            margin: 8px 0 0;
+            font-size: 13px;
+            color: var(--text-muted);
+            max-width: 28rem;
+            line-height: 1.45;
+        }
+        .painel-com-item {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 12px 16px;
+            align-items: center;
+            padding: 16px 18px;
+            margin: 0 8px 10px;
+            border-radius: var(--painel-radius-sm);
+            border: 1px solid color-mix(in srgb, var(--border-color) 55%, transparent);
+            background: color-mix(in srgb, var(--subtle-fg) 25%, var(--card-bg));
+            cursor: pointer;
+            transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.18s ease;
+        }
+        .painel-com-item:last-child { margin-bottom: 4px; }
+        .painel-com-item:hover {
+            background: color-mix(in srgb, var(--subtle-fg) 55%, var(--card-bg));
+            border-color: color-mix(in srgb, var(--primary) 18%, var(--border-color));
+            box-shadow: var(--painel-shadow);
+            transform: translateY(-1px);
+        }
+        .painel-com-cliente {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+        .painel-com-assunto {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-color);
+            line-height: 1.35;
+            margin-bottom: 4px;
+        }
+        .painel-com-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .painel-com-side {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+        }
+        .painel-com-dias {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--orange-600);
+            font-variant-numeric: tabular-nums;
+        }
+        .painel-finance-donut-wrap {
+            padding: 16px 20px 24px;
+            min-height: 240px;
+        }
+        .painel-finance-donut-wrap .graph-svg-tip {
+            z-index: 10;
+        }
+        .painel-list-item {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 8px 16px;
+            align-items: center;
+            padding: 16px 18px;
+            margin: 0 10px 10px;
+            border-radius: var(--painel-radius-sm);
+            border: 1px solid color-mix(in srgb, var(--border-color) 50%, transparent);
+            background: var(--card-bg);
+            transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .painel-list-item:last-child { margin-bottom: 12px; }
+        .painel-list-item:hover {
+            background: color-mix(in srgb, var(--subtle-fg) 45%, var(--card-bg));
+            border-color: color-mix(in srgb, var(--primary) 15%, var(--border-color));
+            box-shadow: var(--painel-shadow);
+        }
+        .painel-list-valor {
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            text-align: right;
+        }
+        .painel-list-valor.danger { color: var(--red-600); }
+        .painel-list-valor.warn { color: var(--orange-600); }
+        .painel-schedule-item {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 12px 16px;
+            align-items: center;
+            padding: 16px 18px;
+            margin: 0 8px 10px;
+            border-radius: var(--painel-radius-sm);
+            border: 1px solid color-mix(in srgb, var(--border-color) 50%, transparent);
+            background: color-mix(in srgb, var(--subtle-fg) 20%, var(--card-bg));
+            cursor: pointer;
+            transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .painel-schedule-item:last-child { margin-bottom: 4px; }
+        .painel-list-side {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+        }
+        .painel-panel-head--sub {
+            border-top: 1px solid color-mix(in srgb, var(--border-color) 50%, transparent);
+            font-size: 13px;
+        }
+        .painel-chart--percent {
+            padding-top: 12px;
+        }
+        .painel-atencao-card.tone-gray { border-left: 5px solid var(--painel-tone-gray); }
         .painel-filtro-group {
             display: flex;
             flex-wrap: wrap;
             align-items: center;
             gap: 8px 12px;
         }
-        .painel-periodo-label,
         .painel-linhas-label {
             font-size: 12px;
             font-weight: 600;
@@ -992,31 +1407,31 @@ function inject_painel_styles() {
             gap: 10px;
         }
         .painel-centro-atencao {
-            margin-bottom: var(--painel-gap);
+            margin-bottom: 0;
         }
         .painel-centro-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+            gap: 12px;
         }
         @media (min-width: 640px) {
-            .painel-centro-grid { grid-template-columns: repeat(4, 1fr); }
+            .painel-centro-grid { grid-template-columns: repeat(3, 1fr); }
         }
         @media (min-width: 1024px) {
-            .painel-centro-grid { grid-template-columns: repeat(6, 1fr); }
+            .painel-centro-grid { grid-template-columns: repeat(3, 1fr); }
         }
         .painel-centro-groups {
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 20px;
         }
         .painel-centro-group-title {
             font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.05em;
+            font-weight: 700;
+            letter-spacing: 0.06em;
             text-transform: uppercase;
             color: var(--text-muted);
-            margin: 0 0 8px;
+            margin: 0 0 10px;
         }
         .painel-duo-grid {
             display: grid;
@@ -1045,30 +1460,32 @@ function inject_painel_styles() {
         .painel-atencao-card {
             display: flex;
             align-items: flex-start;
-            gap: 10px;
-            padding: 12px 14px;
+            gap: 12px;
+            padding: 16px 16px 14px;
             border-radius: var(--painel-radius-sm);
             border: 1px solid color-mix(in srgb, var(--border-color) 65%, transparent);
             background: var(--card-bg);
             box-shadow: var(--painel-shadow);
             cursor: pointer;
-            transition: transform 0.18s ease, box-shadow 0.2s ease;
-            min-height: 64px;
+            transition: transform 0.18s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+            min-height: 88px;
         }
         .painel-atencao-card:hover {
             transform: translateY(-2px);
             box-shadow: var(--painel-shadow-hover);
+            border-color: color-mix(in srgb, var(--primary) 20%, var(--border-color));
         }
-        .painel-atencao-card.tone-red { border-left: 4px solid var(--painel-tone-red); }
-        .painel-atencao-card.tone-orange { border-left: 4px solid var(--painel-tone-orange); }
-        .painel-atencao-card.tone-yellow { border-left: 4px solid var(--painel-tone-yellow); }
-        .painel-atencao-card.tone-green { border-left: 4px solid var(--painel-tone-green); }
-        .painel-atencao-card.tone-blue { border-left: 4px solid var(--painel-tone-blue); }
+        .painel-atencao-card.tone-red { border-left: 5px solid var(--painel-tone-red); }
+        .painel-atencao-card.tone-orange { border-left: 5px solid var(--painel-tone-orange); }
+        .painel-atencao-card.tone-yellow { border-left: 5px solid var(--painel-tone-yellow); }
+        .painel-atencao-card.tone-green { border-left: 5px solid var(--painel-tone-green); }
+        .painel-atencao-card.tone-blue { border-left: 5px solid var(--painel-tone-blue); }
+        .painel-atencao-card.tone-gray { border-left: 5px solid var(--painel-tone-gray); }
         .painel-atencao-icon {
             flex-shrink: 0;
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1076,77 +1493,118 @@ function inject_painel_styles() {
         }
         .painel-atencao-body { flex: 1; min-width: 0; }
         .painel-atencao-count {
-            font-size: 1.15rem;
-            font-weight: 700;
-            letter-spacing: -0.03em;
-            line-height: 1.1;
+            font-size: clamp(1.35rem, 2vw, 1.65rem);
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            line-height: 1.05;
             color: var(--text-color);
         }
         .painel-atencao-label {
-            font-size: 11px;
+            font-size: 12px;
+            font-weight: 500;
             color: var(--text-muted);
-            margin-top: 3px;
-            line-height: 1.3;
+            margin-top: 6px;
+            line-height: 1.35;
             white-space: normal;
             word-break: break-word;
         }
         .painel-atencao-meta {
-            font-size: 10px;
-            color: var(--text-muted);
-            margin-top: 2px;
-            line-height: 1.25;
-            opacity: 0.9;
-        }
-        .painel-timeline-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0;
-            padding: 8px 0;
-        }
-        .painel-timeline-item {
-            display: grid;
-            grid-template-columns: 72px minmax(0, 1fr) auto;
-            gap: 10px;
-            align-items: start;
-            padding: 10px 14px;
-            border-bottom: 1px solid color-mix(in srgb, var(--border-color) 45%, transparent);
-            cursor: pointer;
-            transition: background 0.18s ease;
-        }
-        .painel-timeline-item:last-child { border-bottom: none; }
-        .painel-timeline-item:hover {
-            background: color-mix(in srgb, var(--subtle-fg) 50%, var(--card-bg));
-        }
-        .painel-timeline-date {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             color: var(--text-muted);
-            font-variant-numeric: tabular-nums;
+            margin-top: 4px;
+            line-height: 1.25;
+            opacity: 0.95;
         }
-        .painel-timeline-type {
+        .painel-timeline-modern {
+            position: relative;
+            padding: 20px 24px 24px 56px;
+        }
+        .painel-tl-item {
+            position: relative;
+            padding: 0 0 28px 0;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 8px 12px;
+            align-items: start;
+            cursor: pointer;
+        }
+        .painel-tl-item:last-child { padding-bottom: 0; }
+        .painel-tl-item:not(:last-child)::before {
+            content: "";
+            position: absolute;
+            left: -29px;
+            top: 22px;
+            bottom: 4px;
+            width: 2px;
+            background: color-mix(in srgb, var(--border-color) 85%, transparent);
+        }
+        .painel-tl-marker {
+            position: absolute;
+            left: -36px;
+            top: 6px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 3px solid var(--card-bg);
+            box-shadow: 0 0 0 2px currentColor;
+            z-index: 1;
+        }
+        .painel-tl-item.tone-red .painel-tl-marker { color: var(--red-500); background: var(--red-500); }
+        .painel-tl-item.tone-orange .painel-tl-marker { color: var(--orange-500); background: var(--orange-500); }
+        .painel-tl-item.tone-yellow .painel-tl-marker { color: var(--yellow-500); background: var(--yellow-500); }
+        .painel-tl-item.tone-blue .painel-tl-marker { color: var(--blue-500); background: var(--blue-500); }
+        .painel-tl-item.tone-gray .painel-tl-marker { color: var(--gray-500); background: var(--gray-500); }
+        .painel-tl-item:hover .painel-tl-content {
+            background: color-mix(in srgb, var(--subtle-fg) 50%, var(--card-bg));
+        }
+        .painel-tl-content {
+            padding: 12px 14px;
+            border-radius: var(--painel-radius-sm);
+            border: 1px solid transparent;
+            transition: background 0.18s ease, border-color 0.18s ease;
+        }
+        .painel-tl-item:hover .painel-tl-content {
+            border-color: color-mix(in srgb, var(--border-color) 60%, transparent);
+        }
+        .painel-tl-when {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 6px;
+            letter-spacing: -0.01em;
+        }
+        .painel-tl-type {
             display: inline-flex;
             align-items: center;
             gap: 6px;
             font-size: 11px;
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.04em;
-            color: var(--text-muted);
+            letter-spacing: 0.05em;
             margin-bottom: 4px;
         }
-        .painel-timeline-title {
-            font-size: 13px;
+        .painel-tl-item.tone-red .painel-tl-type { color: var(--red-600); }
+        .painel-tl-item.tone-orange .painel-tl-type { color: var(--orange-600); }
+        .painel-tl-item.tone-yellow .painel-tl-type { color: var(--yellow-700); }
+        .painel-tl-item.tone-blue .painel-tl-type { color: var(--blue-600); }
+        .painel-tl-item.tone-gray .painel-tl-type { color: var(--gray-600); }
+        .painel-tl-title {
+            font-size: 14px;
             font-weight: 600;
             color: var(--text-color);
-            line-height: 1.3;
-            word-break: break-word;
-        }
-        .painel-timeline-sub {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-top: 2px;
             line-height: 1.35;
             word-break: break-word;
+        }
+        .painel-tl-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+        .painel-timeline-list {
+            display: none;
         }
         .painel-kpi-row {
             display: grid;
@@ -1161,11 +1619,10 @@ function inject_painel_styles() {
         @media (max-width: 640px) {
             .painel-kpi-row { grid-template-columns: 1fr; }
             .painel-centro-grid { grid-template-columns: 1fr; }
-            .painel-timeline-item {
-                grid-template-columns: 72px minmax(0, 1fr);
-                grid-template-rows: auto auto;
-            }
-            .painel-timeline-item .indicator-pill { grid-column: 1 / -1; justify-self: start; }
+            .painel-centro-shell { padding: 20px 16px 18px; }
+            .painel-timeline-modern { padding-left: 48px; }
+            .painel-tl-item { grid-template-columns: 1fr; }
+            .painel-tl-item .indicator-pill { justify-self: start; }
         }
     `;
     $('<style id="painel-advocacia-styles">' + css + "</style>").appendTo("head");
@@ -1340,19 +1797,25 @@ function render_painel($container, d, page) {
     var periodo = d.periodo_dias || page.painel_periodo || 7;
     var limits = d.list_limits || painel_merge_list_limits(page);
     var meta = d.list_meta || {};
+    var horas = d.horas_periodo != null ? d.horas_periodo : d.horas_semana;
     page.painel_list_limits = limits;
     var html = '<div class="painel-content">';
     html += render_header(d.resumo, d.kpis, periodo, d.financeiro);
     html += render_filtros_painel(periodo);
     html += render_acoes_rapidas();
+    html += '<div class="painel-zona-critica">';
     html += render_centro_atencao(
         d.centro_atencao,
         d.kpis,
         d.financeiro,
-        d.horas_periodo != null ? d.horas_periodo : d.horas_semana,
+        horas,
         d.total_despesas_mes,
         periodo
     );
+    html += '<div class="painel-destaques-grid">';
+    html += render_proxima_audiencia(d.audiencias, d.timeline);
+    html += render_saude_operacional(d.centro_atencao, d.kpis, d.financeiro);
+    html += "</div></div>";
     html += render_timeline(d.timeline, periodo, meta.timeline, limits.timeline);
     html += render_comunicacoes_pendentes(
         d.comunicacoes_pendentes || d.ultimas_comunicacoes,
@@ -1360,6 +1823,15 @@ function render_painel($container, d, page) {
         meta.comunicacoes,
         limits.comunicacoes
     );
+    html += render_indicadores_painel(
+        d.centro_atencao,
+        d.kpis,
+        d.financeiro,
+        horas,
+        d.total_despesas_mes,
+        periodo
+    );
+    html += '<div class="painel-zona-secundaria">';
     html += render_financeiro(d.financeiro, periodo);
     html += render_duo_honorarios_despesas(
         d.parcelas,
@@ -1373,15 +1845,33 @@ function render_painel($container, d, page) {
     html += render_duo_custas_horas(
         d.custas_pendentes_repasse,
         d.total_custas_mes,
-        d.horas_periodo != null ? d.horas_periodo : d.horas_semana,
+        horas,
         meta.custas,
         periodo,
         limits.custas
     );
     html += "</div>";
+    html += "</div>";
     $container.html(html);
     bind_painel_filters($container, page);
     bind_atencao_routes($container, page);
+    painel_init_finance_chart($container, d.financeiro, page);
+}
+
+function render_success_state(title, hint) {
+    return (
+        '<div class="painel-success-state">' +
+        '<div class="painel-success-icon">' +
+        painel_icon("check-circle") +
+        "</div>" +
+        '<p class="painel-success-title">' +
+        frappe.utils.escape_html(title) +
+        "</p>" +
+        (hint
+            ? '<p class="painel-success-hint">' + frappe.utils.escape_html(hint) + "</p>"
+            : "") +
+        "</div>"
+    );
 }
 
 function render_empty_state(icon, title, hint) {
@@ -1463,14 +1953,6 @@ function render_header(resumo, kpis, periodo_dias, financeiro) {
         (resumo.audiencias_hoje || 0) +
         "</strong> " +
         __("audiência(s) hoje") +
-        "</span><span><strong>" +
-        (resumo.parcelas_vencidas || 0) +
-        "</strong> " +
-        __("parcela(s) vencida(s)") +
-        "</span><span><strong>" +
-        fmt_currency(previsto_val, true) +
-        "</strong> " +
-        painel_periodo_previsto_label(periodo_dias) +
         "</span>";
     if (resumo.prazos_urgentes) {
         pulse_stats +=
@@ -1480,6 +1962,20 @@ function render_header(resumo, kpis, periodo_dias, financeiro) {
             __("prazo(s) crítico(s)") +
             "</span>";
     }
+    pulse_stats +=
+        "<span><strong>" +
+        (kpis.tarefas_pendentes || 0) +
+        "</strong> " +
+        __("tarefa(s) aberta(s)") +
+        "</span><span><strong>" +
+        (resumo.parcelas_vencidas || 0) +
+        "</strong> " +
+        __("parcela(s) vencida(s)") +
+        "</span><span><strong>" +
+        fmt_currency(previsto_val, true) +
+        "</strong> " +
+        painel_periodo_previsto_label(periodo_dias) +
+        "</span>";
     pulse_stats += "</div>";
     var pulse =
         pulse_stats +
@@ -1678,7 +2174,28 @@ function render_centro_atencao(centro, kpis, fin, horas, total_despesas, periodo
         },
     ];
 
-    var indicadores = [
+    return (
+        '<section class="painel-section painel-centro-atencao painel-priority-max" id="painel-centro-atencao">' +
+        '<div class="painel-centro-shell">' +
+        '<div class="painel-section-head painel-centro-head"><div><h2 class="painel-section-title">' +
+        __("Centro de Atenção") +
+        "</h2>" +
+        '<p class="painel-section-sub">' +
+        __("O que exige sua atenção agora — {0}", [painel_periodo_enunciado(periodo_dias)]) +
+        "</p></div></div>" +
+        '<div class="painel-centro-groups">' +
+        group(__("Urgente"), urgentes) +
+        group(__("No período ({0})", [painel_periodo_label(periodo_dias)]), no_periodo) +
+        "</div></div></section>"
+    );
+}
+
+function painel_build_indicadores_items(centro, kpis, fin, horas, total_despesas, periodo_dias) {
+    centro = centro || {};
+    kpis = kpis || {};
+    fin = fin || {};
+    periodo_dias = cint(periodo_dias) || 7;
+    return [
         {
             tone: "blue",
             icon: "calendar",
@@ -1757,21 +2274,296 @@ function render_centro_atencao(centro, kpis, fin, horas, total_despesas, periodo
             route: "despesas_mes",
         },
     ];
+}
+
+function render_indicadores_painel(centro, kpis, fin, horas, total_despesas, periodo_dias) {
+    var items = painel_build_indicadores_items(
+        centro,
+        kpis,
+        fin,
+        horas,
+        total_despesas,
+        periodo_dias
+    );
+
+    function card(it) {
+        return (
+            '<div class="painel-atencao-card tone-' +
+            it.tone +
+            '" data-atencao-route="' +
+            it.route +
+            '">' +
+            '<div class="painel-atencao-icon">' +
+            painel_icon(it.icon) +
+            "</div>" +
+            '<div class="painel-atencao-body">' +
+            '<div class="painel-atencao-count">' +
+            frappe.utils.escape_html(String(it.count)) +
+            "</div>" +
+            '<div class="painel-atencao-label">' +
+            frappe.utils.escape_html(it.label) +
+            "</div></div></div>"
+        );
+    }
 
     return (
-        '<section class="painel-section painel-centro-atencao" id="painel-centro-atencao">' +
+        '<section class="painel-section painel-priority-medium" id="painel-indicadores">' +
         '<div class="painel-section-head"><div><h2 class="painel-section-title">' +
-        __("Centro de Atenção") +
+        __("Indicadores") +
         "</h2>" +
         '<p class="painel-section-sub">' +
-        __("Urgências e indicadores {0}", [painel_periodo_enunciado(periodo_dias)]) +
+        __("Visão consolidada {0}", [painel_periodo_enunciado(periodo_dias)]) +
         "</p></div></div>" +
-        '<div class="painel-centro-groups">' +
-        group(__("Urgente"), urgentes) +
-        group(__("No período ({0})", [painel_periodo_label(periodo_dias)]), no_periodo) +
-        group(__("Indicadores"), indicadores) +
+        '<div class="painel-centro-grid">' +
+        items.map(card).join("") +
         "</div></section>"
     );
+}
+
+function painel_day_diff(date_str) {
+    if (!date_str) return null;
+    return frappe.datetime.get_day_diff(date_str, frappe.datetime.get_today());
+}
+
+function painel_timeline_when_label(data, hora, dias_restantes) {
+    if (dias_restantes == null && data) {
+        dias_restantes = painel_day_diff(data);
+    }
+    if (dias_restantes === 0) {
+        return hora ? __("Hoje {0}", [hora]) : __("Hoje");
+    }
+    if (dias_restantes === 1) {
+        return hora ? __("Amanhã {0}", [hora]) : __("Amanhã");
+    }
+    var base = fmt_date_iso(data);
+    return hora ? base + " · " + hora : base;
+}
+
+function painel_find_proxima_audiencia(audiencias, timeline) {
+    if (audiencias && audiencias.length) {
+        return audiencias[0];
+    }
+    if (timeline && timeline.length) {
+        for (var i = 0; i < timeline.length; i++) {
+            if (timeline[i].tipo === "audiencia") {
+                return {
+                    name: timeline[i].docname,
+                    tipo: timeline[i].titulo,
+                    cliente: timeline[i].subtitulo,
+                    servico: timeline[i].detalhe,
+                    data: timeline[i].data,
+                    hora: timeline[i].hora,
+                    dias_restantes: painel_day_diff(timeline[i].data),
+                    vara_label: timeline[i].detalhe,
+                };
+            }
+        }
+    }
+    return null;
+}
+
+function render_proxima_audiencia(audiencias, timeline) {
+    var a = painel_find_proxima_audiencia(audiencias, timeline);
+    var h =
+        '<div class="painel-prox-audiencia painel-priority-max" id="painel-prox-audiencia">' +
+        '<div class="painel-prox-audiencia-head">' +
+        '<span class="painel-prox-badge">' +
+        painel_icon("calendar-days") +
+        "</span>" +
+        '<h3 class="painel-prox-title">' +
+        __("Próxima Audiência") +
+        "</h3></div>";
+
+    if (!a) {
+        return (
+            h +
+            '<div class="painel-prox-empty">' +
+            __("Nenhuma audiência agendada.") +
+            "</div></div>"
+        );
+    }
+
+    var when = painel_timeline_when_label(a.data, a.hora, a.dias_restantes);
+    h +=
+        '<div class="painel-prox-body" data-dt="Audiencia" data-dn="' +
+        frappe.utils.escape_html(a.name || "") +
+        '">' +
+        '<div class="painel-prox-when">' +
+        frappe.utils.escape_html(when) +
+        "</div>" +
+        '<div class="painel-prox-tipo">' +
+        frappe.utils.escape_html(a.tipo || __("Audiência")) +
+        "</div>" +
+        '<div class="painel-prox-meta">' +
+        '<div class="painel-prox-row"><span class="painel-prox-row-label">' +
+        __("Cliente") +
+        '</span><span class="painel-prox-row-value">' +
+        frappe.utils.escape_html(a.cliente || "—") +
+        "</span></div>" +
+        '<div class="painel-prox-row"><span class="painel-prox-row-label">' +
+        __("Serviço") +
+        '</span><span class="painel-prox-row-value">' +
+        frappe.utils.escape_html(a.servico || "—") +
+        "</span></div>" +
+        (a.vara_label
+            ? '<div class="painel-prox-row"><span class="painel-prox-row-label">' +
+              __("Local") +
+              '</span><span class="painel-prox-row-value">' +
+              frappe.utils.escape_html(a.vara_label) +
+              "</span></div>"
+            : "") +
+        "</div></div></div>";
+    return h;
+}
+
+function painel_calc_saude_operacional(centro, kpis, fin) {
+    centro = centro || {};
+    kpis = kpis || {};
+    fin = fin || {};
+    var vencidos =
+        (centro.prazos_vencidos || 0) +
+        ((centro.parcelas_vencidas && centro.parcelas_vencidas.count) || 0) +
+        (centro.tarefas_atrasadas || 0);
+    var pendentes = centro.tarefas_pendentes || kpis.tarefas_pendentes || 0;
+    var previstos =
+        (centro.pagamentos_periodo && centro.pagamentos_periodo.count) ||
+        (fin.previsto_periodo && fin.previsto_periodo.count) ||
+        0;
+    var honorarios = centro.honorarios_ativos || kpis.honorarios_ativos || 0;
+    var atencao =
+        (centro.prazos_proximos_3d || 0) + (centro.prazos_urgentes || kpis.prazos_urgentes || 0);
+    var penal = Math.min(
+        85,
+        vencidos * 4 + atencao * 1.5 + (centro.tarefas_atrasadas || 0) * 2
+    );
+    var score = Math.round(Math.max(0, Math.min(100, 100 - penal)));
+    var label =
+        score >= 85
+            ? __("Excelente")
+            : score >= 70
+              ? __("Boa")
+              : score >= 50
+                ? __("Atenção")
+                : __("Crítica");
+    var tone = score >= 85 ? "green" : score >= 70 ? "blue" : score >= 50 ? "orange" : "red";
+    return {
+        score: score,
+        label: label,
+        tone: tone,
+        vencidos: vencidos,
+        pendentes: pendentes,
+        previstos: previstos,
+        honorarios: honorarios,
+    };
+}
+
+function render_saude_operacional(centro, kpis, fin) {
+    var s = painel_calc_saude_operacional(centro, kpis, fin);
+    var circumference = 2 * Math.PI * 36;
+    var offset = circumference - (circumference * s.score) / 100;
+    return (
+        '<div class="painel-saude-card painel-priority-max" id="painel-saude-operacional">' +
+        '<div class="painel-saude-head">' +
+        '<span class="painel-saude-badge tone-' +
+        s.tone +
+        '">' +
+        painel_icon("activity") +
+        "</span>" +
+        '<h3 class="painel-saude-title">' +
+        __("Saúde Operacional") +
+        "</h3></div>" +
+        '<div class="painel-saude-body">' +
+        '<div class="painel-saude-score-wrap">' +
+        '<div class="painel-saude-ring">' +
+        '<svg viewBox="0 0 88 88" aria-hidden="true">' +
+        '<circle class="painel-saude-ring-bg" cx="44" cy="44" r="36"></circle>' +
+        '<circle class="painel-saude-ring-fill tone-' +
+        s.tone +
+        '" cx="44" cy="44" r="36" stroke-dasharray="' +
+        circumference +
+        '" stroke-dashoffset="' +
+        offset +
+        '"></circle></svg>' +
+        '<div class="painel-saude-score-text">' +
+        '<span class="painel-saude-score-num">' +
+        s.score +
+        "%</span>" +
+        '<span class="painel-saude-score-label">' +
+        frappe.utils.escape_html(s.label) +
+        "</span></div></div>" +
+        '<div class="painel-saude-summary">' +
+        "<h4>" +
+        frappe.utils.escape_html(s.label) +
+        "</h4>" +
+        "<p>" +
+        __("Consolidado a partir dos indicadores operacionais já exibidos no painel.") +
+        "</p></div></div>" +
+        '<div class="painel-saude-rows">' +
+        '<div class="painel-saude-row"><span class="painel-saude-dot red"></span><span><strong>' +
+        s.vencidos +
+        "</strong> " +
+        __("itens vencidos ou críticos") +
+        "</span></div>" +
+        '<div class="painel-saude-row"><span class="painel-saude-dot orange"></span><span><strong>' +
+        s.pendentes +
+        "</strong> " +
+        __("tarefas pendentes") +
+        "</span></div>" +
+        '<div class="painel-saude-row"><span class="painel-saude-dot green"></span><span><strong>' +
+        s.previstos +
+        "</strong> " +
+        __("recebimentos previstos") +
+        "</span></div>" +
+        '<div class="painel-saude-row"><span class="painel-saude-dot green"></span><span><strong>' +
+        s.honorarios +
+        "</strong> " +
+        __("honorários ativos") +
+        "</span></div></div></div></div>"
+    );
+}
+
+function painel_init_finance_chart($root, fin, page) {
+    if (!fin || !fin.grafico || typeof frappe.Chart === "undefined") return;
+    var $el = $root.find("#painel-finance-donut");
+    if (!$el.length) return;
+    if (page && page.painel_finance_chart) {
+        try {
+            page.painel_finance_chart.destroy();
+        } catch (e) {
+            /* ignore */
+        }
+        page.painel_finance_chart = null;
+    }
+    var labels = [];
+    var values = [];
+    var colors = [];
+    var tone_colors = {
+        danger: "#e03636",
+        success: "#28a745",
+        warning: "#f59e0b",
+        neutral: "#6c757d",
+    };
+    (fin.grafico || []).forEach(function (g) {
+        if (flt(g.valor) <= 0) return;
+        labels.push(g.label);
+        values.push(flt(g.valor));
+        colors.push(tone_colors[g.tone] || tone_colors.neutral);
+    });
+    if (!values.length) return;
+    page.painel_finance_chart = new frappe.Chart($el[0], {
+        type: "donut",
+        height: 220,
+        data: {
+            labels: labels,
+            datasets: [{ values: values }],
+        },
+        colors: colors,
+        tooltipOptions: {
+            formatTooltipY: function (d) {
+                return format_currency(d, "BRL");
+            },
+        },
+    });
 }
 
 function render_timeline(timeline, periodo_dias, list_meta, list_limit) {
@@ -1786,7 +2578,7 @@ function render_timeline(timeline, periodo_dias, list_meta, list_limit) {
             : __("Audiências, prazos e tarefas {0}", [painel_periodo_enunciado(periodo_dias)]);
     var meta_html = painel_list_meta_html(list_meta, list_limit);
     var h =
-        '<section class="painel-section painel-section--timeline" id="painel-timeline"><div class="painel-section-head">' +
+        '<section class="painel-section painel-section--timeline painel-priority-high" id="painel-timeline"><div class="painel-section-head">' +
         "<div><h2 class='painel-section-title'>" +
         titulo +
         "</h2>" +
@@ -1815,7 +2607,7 @@ function render_timeline(timeline, periodo_dias, list_meta, list_limit) {
         );
     }
 
-    h += '<div class="painel-panel"><div class="painel-timeline-list">';
+    h += '<div class="painel-panel"><div class="painel-timeline-modern">';
     timeline.forEach(function (it) {
         var tipo_label =
             it.tipo === "audiencia"
@@ -1823,30 +2615,44 @@ function render_timeline(timeline, periodo_dias, list_meta, list_limit) {
                 : it.tipo === "prazo"
                   ? __("Prazo")
                   : __("Tarefa");
-        var pill_map = { red: "Alta", orange: "Média", yellow: "Normal", blue: "Normal", gray: "Baixa" };
+        var tipo_icon =
+            it.tipo === "audiencia" ? "milestone" : it.tipo === "prazo" ? "time" : "checklist";
+        var pill_map = {
+            red: "Alta",
+            orange: "Média",
+            yellow: "Normal",
+            blue: "Normal",
+            gray: "Baixa",
+        };
+        var tone = it.urgencia || "blue";
+        var dias =
+            it.dias_restantes != null ? it.dias_restantes : painel_day_diff(it.data);
+        var when = painel_timeline_when_label(it.data, it.hora, dias);
         h +=
-            '<div class="painel-timeline-item" data-dt="' +
+            '<div class="painel-tl-item tone-' +
+            tone +
+            '" data-dt="' +
             frappe.utils.escape_html(it.doctype || "") +
             '" data-dn="' +
             frappe.utils.escape_html(it.docname || "") +
             '">' +
-            '<div class="painel-timeline-date">' +
-            frappe.utils.escape_html(fmt_date_iso(it.data)) +
-            (it.hora ? " · " + frappe.utils.escape_html(it.hora) : "") +
+            '<span class="painel-tl-marker" aria-hidden="true"></span>' +
+            '<div class="painel-tl-content">' +
+            '<div class="painel-tl-when">' +
+            frappe.utils.escape_html(when) +
             "</div>" +
-            '<div class="painel-timeline-body">' +
-            '<div class="painel-timeline-type">' +
-            painel_icon(it.tipo === "audiencia" ? "milestone" : it.tipo === "prazo" ? "time" : "checklist") +
+            '<div class="painel-tl-type">' +
+            painel_icon(tipo_icon) +
             frappe.utils.escape_html(tipo_label) +
             "</div>" +
-            '<div class="painel-timeline-title">' +
+            '<div class="painel-tl-title">' +
             frappe.utils.escape_html(it.titulo || "") +
             "</div>" +
-            '<div class="painel-timeline-sub">' +
+            '<div class="painel-tl-sub">' +
             frappe.utils.escape_html(it.subtitulo || "") +
             (it.detalhe ? " · " + frappe.utils.escape_html(it.detalhe) : "") +
             "</div></div>" +
-            status_pill(pill_map[it.urgencia] || "Normal") +
+            status_pill(pill_map[tone] || "Normal") +
             "</div>";
     });
     h += "</div></div></section>";
@@ -1924,7 +2730,7 @@ function render_comunicacoes_pendentes(comunicacoes, periodo_dias, list_meta, li
     periodo_dias = cint(periodo_dias) || 7;
     var meta_html = painel_list_meta_html(list_meta, list_limit);
     var h =
-        '<section class="painel-section" id="painel-comunicacoes"><div class="painel-section-head">' +
+        '<section class="painel-section painel-priority-high" id="painel-comunicacoes"><div class="painel-section-head">' +
         "<div><h2 class='painel-section-title'>" +
         __("Comunicações") +
         "</h2>" +
@@ -1942,8 +2748,7 @@ function render_comunicacoes_pendentes(comunicacoes, periodo_dias, list_meta, li
         return (
             h +
             '<div class="painel-panel">' +
-            render_empty_state(
-                "message",
+            render_success_state(
                 __("Nenhuma comunicação pendente"),
                 __("Retornos e follow-ups aparecerão aqui quando precisarem de ação.")
             ) +
@@ -1954,23 +2759,29 @@ function render_comunicacoes_pendentes(comunicacoes, periodo_dias, list_meta, li
     h += '<div class="painel-panel"><div class="painel-schedule-list">';
     comunicacoes.forEach(function (c) {
         var urg = c.urgencia_ordem === 0 ? "red" : c.urgencia_ordem === 1 ? "orange" : "yellow";
+        var status_label = urg === "red" ? __("Alta") : urg === "orange" ? __("Média") : __("Normal");
         h +=
-            '<div class="painel-schedule-item" data-comunicacao="' +
+            '<div class="painel-com-item" data-comunicacao="' +
             frappe.utils.escape_html(c.name || "") +
             '" data-dt="Comunicacao" data-dn="' +
             frappe.utils.escape_html(c.name || "") +
             '">' +
-            '<div class="painel-schedule-main">' +
-            '<div class="painel-op-title">' +
+            '<div class="painel-com-main">' +
+            '<div class="painel-com-cliente">' +
+            frappe.utils.escape_html(c.cliente || __("Sem cliente")) +
+            "</div>" +
+            '<div class="painel-com-assunto">' +
             frappe.utils.escape_html(c.assunto || c.name) +
             "</div>" +
-            '<div class="painel-op-sub">' +
-            frappe.utils.escape_html(c.cliente || "") +
-            (c.motivo_pendencia ? " · " + frappe.utils.escape_html(c.motivo_pendencia) : "") +
-            "</div></div>" +
-            '<div class="painel-schedule-side">' +
-            status_pill(urg === "red" ? "Alta" : urg === "orange" ? "Média" : "Normal") +
-            '<span class="painel-op-sub">' +
+            (c.motivo_pendencia
+                ? '<div class="painel-com-meta">' +
+                  frappe.utils.escape_html(c.motivo_pendencia) +
+                  "</div>"
+                : "") +
+            "</div>" +
+            '<div class="painel-com-side">' +
+            status_pill(status_label) +
+            '<span class="painel-com-dias">' +
             __("{0}d sem retorno", [c.dias_sem_retorno || 0]) +
             "</span></div></div>";
     });
@@ -2399,8 +3210,9 @@ function render_financeiro(fin, periodo_dias) {
             );
         })
         .join("");
+    var taxa = fin.taxa_recebimento || 0;
     return (
-        '<section class="painel-section" id="painel-financeiro"><div class="painel-section-head">' +
+        '<section class="painel-section painel-priority-low" id="painel-financeiro"><div class="painel-section-head">' +
         "<div><h2 class='painel-section-title'>" +
         __("Financeiro") +
         "</h2>" +
@@ -2432,7 +3244,20 @@ function render_financeiro(fin, periodo_dias) {
         "</div></div>" +
         '<div class="painel-panel"><div class="painel-panel-head">' +
         __("Distribuição") +
-        '</div><div class="painel-chart">' +
+        '</div><div id="painel-finance-donut" class="painel-finance-donut-wrap"></div>' +
+        '<div class="painel-panel-head painel-panel-head--sub">' +
+        __("Taxa de recebimento") +
+        '</div><div class="painel-chart painel-chart--percent">' +
+        '<div class="painel-chart-row">' +
+        '<span class="painel-chart-label">' +
+        __("Recebido") +
+        "</span>" +
+        '<div class="painel-chart-track"><div class="painel-chart-fill success" style="width:' +
+        Math.max(4, Math.min(100, taxa)) +
+        '%"></div></div>' +
+        '<span class="painel-chart-amt">' +
+        taxa +
+        "%</span></div>" +
         chart_rows +
         "</div></div></div></section>"
     );
@@ -2442,7 +3267,7 @@ function render_parcelas(parcelas, compact, list_meta, list_limit) {
     var meta_html = painel_list_meta_html(list_meta, list_limit);
     var h =
         '<section class="painel-section' +
-        (compact ? " painel-section--nested" : "") +
+        (compact ? " painel-section--nested painel-priority-low" : " painel-priority-low") +
         '" id="painel-parcelas"><div class="painel-section-head">' +
         "<div><h2 class='painel-section-title'>" +
         __("Honorários em aberto") +
@@ -2486,7 +3311,7 @@ function render_parcelas(parcelas, compact, list_meta, list_limit) {
                 "</button>";
         }
         h +=
-            '<div class="painel-parcela-card painel-row-acordo" data-acordo="' +
+            '<div class="painel-list-item painel-parcela-card painel-row-acordo" data-acordo="' +
             frappe.utils.escape_html(p.parent || "") +
             '">' +
             '<div class="painel-parcela-main"><div class="painel-op-title">' +
@@ -2494,17 +3319,21 @@ function render_parcelas(parcelas, compact, list_meta, list_limit) {
             '</div><div class="painel-op-sub">' +
             frappe.utils.escape_html(p.servico_titulo || p.servico_tipo || "") +
             (p.numero_processo ? " · " + frappe.utils.escape_html(p.numero_processo) : "") +
-            "</div></div>" +
-            '<div class="painel-parcela-valor">' +
-            fmt_currency(p.valor_total) +
             "</div>" +
             '<div class="painel-muted">' +
             fmt_date_iso(p.vencimento) +
             (prazo_txt ? " · " + prazo_txt : "") +
             "</div>" +
             status_pill(p.status) +
+            "</div>" +
+            '<div class="painel-list-side">' +
+            '<div class="painel-list-valor ' +
+            (_is_vencido(p.status) ? "danger" : "warn") +
+            '">' +
+            fmt_currency(p.valor_total) +
+            "</div>" +
             btn +
-            "</div>";
+            "</div></div>";
     });
     h += "</div></section>";
     return h;
@@ -2514,7 +3343,7 @@ function render_despesas(despesas, total_mes, compact, list_meta, list_limit) {
     var meta_html = painel_list_meta_html(list_meta, list_limit);
     var h =
         '<section class="painel-section' +
-        (compact ? " painel-section--nested" : "") +
+        (compact ? " painel-section--nested painel-priority-low" : " painel-priority-low") +
         '" id="painel-despesas"><div class="painel-section-head">' +
         "<div><h2 class='painel-section-title'>" +
         __("Despesas") +
@@ -2550,7 +3379,7 @@ function render_despesas(despesas, total_mes, compact, list_meta, list_limit) {
                 ? '<span class="indicator-pill red">' + __("Atrasado") + "</span>"
                 : '<span class="indicator-pill orange">' + __("Pendente") + "</span>";
         h +=
-            '<div class="painel-schedule-item painel-row-despesa" data-despesa="' +
+            '<div class="painel-list-item painel-schedule-item painel-row-despesa" data-despesa="' +
             frappe.utils.escape_html(d.name || "") +
             '">' +
             '<div class="painel-schedule-main">' +
@@ -2562,10 +3391,11 @@ function render_despesas(despesas, total_mes, compact, list_meta, list_limit) {
             (d.data_vencimento
                 ? " · " + frappe.utils.escape_html(frappe.datetime.str_to_user(d.data_vencimento))
                 : "") +
-            "</div></div>" +
-            '<div class="painel-schedule-side">' +
+            "</div>" +
             badge +
-            '<div class="painel-op-valor ' +
+            "</div>" +
+            '<div class="painel-list-side">' +
+            '<div class="painel-list-valor ' +
             tone +
             '">' +
             fmt_currency(d.valor) +
@@ -2579,7 +3409,7 @@ function render_custas(custas, total_mes, compact, list_meta, list_limit) {
     var meta_html = painel_list_meta_html(list_meta, list_limit);
     var h =
         '<section class="painel-section' +
-        (compact ? " painel-section--nested" : "") +
+        (compact ? " painel-section--nested painel-priority-low" : " painel-priority-low") +
         '" id="painel-custas"><div class="painel-section-head">' +
         "<div><h2 class='painel-section-title'>" +
         __("Custas") +
@@ -2610,7 +3440,7 @@ function render_custas(custas, total_mes, compact, list_meta, list_limit) {
     h += '<div class="painel-panel"><div class="painel-schedule-list">';
     custas.forEach(function (c) {
         h +=
-            '<div class="painel-schedule-item" data-custa="' +
+            '<div class="painel-list-item painel-schedule-item" data-custa="' +
             frappe.utils.escape_html(c.name || "") +
             '">' +
             '<div class="painel-schedule-main">' +
@@ -2620,10 +3450,11 @@ function render_custas(custas, total_mes, compact, list_meta, list_limit) {
             '<div class="painel-op-sub">' +
             frappe.utils.escape_html(c.tipo || "") +
             (c.servico ? " · " + frappe.utils.escape_html(c.servico) : "") +
-            "</div></div>" +
-            '<div class="painel-schedule-side">' +
+            "</div>" +
             '<span class="indicator-pill blue">' + __("Aguardando repasse") + "</span>" +
-            '<div class="painel-op-valor warn">' +
+            "</div>" +
+            '<div class="painel-list-side">' +
+            '<div class="painel-list-valor warn">' +
             fmt_currency(c.valor) +
             "</div></div></div>";
     });
@@ -2635,7 +3466,7 @@ function render_horas_semana(horas, compact, periodo_dias) {
     periodo_dias = cint(periodo_dias) || 7;
     return (
         '<section class="painel-section' +
-        (compact ? " painel-section--nested" : " painel-section--inline") +
+        (compact ? " painel-section--nested painel-priority-low" : " painel-section--inline painel-priority-low") +
         '" id="painel-horas">' +
         '<div class="painel-section-head"><div><h2 class="painel-section-title">' +
         __("Horas") +
@@ -2985,8 +3816,14 @@ function scroll_painel_section(id) {
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-$(document).on("click", ".painel-timeline-item[data-dt]", function (e) {
+$(document).on("click", ".painel-timeline-item[data-dt], .painel-tl-item[data-dt]", function (e) {
     if ($(e.target).closest(".painel-btn-recebida, .painel-btn-entrar").length) return;
+    var dt = $(this).attr("data-dt");
+    var dn = $(this).attr("data-dn");
+    if (dt && dn) frappe.set_route("Form", dt, dn);
+});
+
+$(document).on("click", ".painel-prox-body[data-dt]", function (e) {
     var dt = $(this).attr("data-dt");
     var dn = $(this).attr("data-dn");
     if (dt && dn) frappe.set_route("Form", dt, dn);
@@ -2997,7 +3834,7 @@ $(document).on("click", "[data-route-calendar]", function (e) {
     frappe.set_route("List", "Audiencia", "Calendar");
 });
 
-$(document).on("click", ".painel-schedule-item[data-dt]", function (e) {
+$(document).on("click", ".painel-schedule-item[data-dt], .painel-com-item[data-dt]", function (e) {
     if ($(e.target).closest(".painel-btn-recebida, .painel-btn-entrar").length) return;
     var dt = $(this).attr("data-dt");
     var dn = $(this).attr("data-dn");
