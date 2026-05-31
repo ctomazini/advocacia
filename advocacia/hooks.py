@@ -11,10 +11,6 @@ fixtures = [
         "filters": [["name", "=", "Advocacia"]]
     },
     {
-        "dt": "Client Script",
-        "filters": [["name", "=", "Link Audiencia Virtual"]]
-    },
-    {
         "dt": "Notification",
         "filters": [
             [
@@ -28,10 +24,6 @@ fixtures = [
         ],
     },
 ]
-
-doctype_js = {
-    "Servico": "public/js/servico.js"
-}
 
 app_include_js = [
     "/assets/advocacia/js/navegacao.js",
@@ -49,6 +41,7 @@ override_whitelisted_methods = {
 scheduler_events = {
     "daily": [
         "advocacia.advocacia.tasks.verificar_parcelas_vencidas",
+        "advocacia.advocacia.tasks.verificar_despesas_vencidas",
         "advocacia.advocacia.tasks.notificar_parcelas_vencidas",
         "advocacia.advocacia.tasks.notificar_audiencias_hoje",
         "advocacia.advocacia.notificacoes.notificar_prazos_diario",
