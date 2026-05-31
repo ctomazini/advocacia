@@ -1,0 +1,180 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-05-31 12:00:00",
+ "custom": 0,
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "informacoes_section",
+  "servico",
+  "cliente",
+  "column_break_info",
+  "data",
+  "responsavel",
+  "tempo_section",
+  "hora_inicio",
+  "hora_fim",
+  "column_break_tempo",
+  "duracao_minutos",
+  "duracao_horas",
+  "atividade_section",
+  "atividade",
+  "categoria",
+  "descricao",
+  "cobravel"
+ ],
+ "fields": [
+  {
+   "fieldname": "informacoes_section",
+   "fieldtype": "Section Break",
+   "label": "Informações"
+  },
+  {
+   "fieldname": "servico",
+   "fieldtype": "Link",
+   "options": "Servico",
+   "label": "Serviço",
+   "reqd": 1,
+   "allow_in_quick_entry": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "cliente",
+   "fieldtype": "Link",
+   "options": "Cliente",
+   "label": "Cliente",
+   "read_only": 1,
+   "fetch_from": "servico.cliente"
+  },
+  {
+   "fieldname": "column_break_info",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "data",
+   "fieldtype": "Date",
+   "label": "Data",
+   "reqd": 1,
+   "default": "Today",
+   "allow_in_quick_entry": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "responsavel",
+   "fieldtype": "Link",
+   "options": "User",
+   "label": "Responsável"
+  },
+  {
+   "fieldname": "tempo_section",
+   "fieldtype": "Section Break",
+   "label": "Tempo"
+  },
+  {
+   "fieldname": "hora_inicio",
+   "fieldtype": "Time",
+   "label": "Hora Início"
+  },
+  {
+   "fieldname": "hora_fim",
+   "fieldtype": "Time",
+   "label": "Hora Fim"
+  },
+  {
+   "fieldname": "column_break_tempo",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "duracao_minutos",
+   "fieldtype": "Int",
+   "label": "Duração (min)",
+   "reqd": 1,
+   "allow_in_quick_entry": 1
+  },
+  {
+   "fieldname": "duracao_horas",
+   "fieldtype": "Float",
+   "label": "Duração (horas)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "atividade_section",
+   "fieldtype": "Section Break",
+   "label": "Atividade"
+  },
+  {
+   "fieldname": "atividade",
+   "fieldtype": "Data",
+   "label": "Atividade",
+   "reqd": 1,
+   "allow_in_quick_entry": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "categoria",
+   "fieldtype": "Select",
+   "label": "Categoria",
+   "options": "Estudo/Pesquisa\nRedação\nAudiência\nReunião\nDeslocamento\nAtendimento\nAdministrativo\nOutro"
+  },
+  {
+   "fieldname": "descricao",
+   "fieldtype": "Small Text",
+   "label": "Detalhes"
+  },
+  {
+   "fieldname": "cobravel",
+   "fieldtype": "Check",
+   "label": "Cobrável",
+   "default": "1"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 0,
+ "is_tree": 0,
+ "issingle": 0,
+ "istable": 0,
+ "links": [],
+ "modified": "2026-05-31 12:00:00",
+ "modified_by": "Administrator",
+ "module": "Advocacia",
+ "name": "Registro de Horas",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "Advocacia Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1
+  },
+  {
+   "role": "Advocacia User",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 0,
+   "report": 1,
+   "export": 1
+  },
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1
+  }
+ ],
+ "states": [],
+ "autoname": "format:HRS-{YYYY}-{####}",
+ "title_field": "atividade",
+ "search_fields": "servico,cliente,atividade,data",
+ "sort_field": "data",
+ "sort_order": "DESC",
+ "quick_entry": 1,
+ "track_changes": 1
+}
