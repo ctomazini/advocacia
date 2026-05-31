@@ -116,3 +116,62 @@ class TestAcordoHonorarios(FrappeTestCase):
 
 		status = frappe.db.get_value("Acordo de Honorarios Processuais", acordo.name, "status")
 		self.assertEqual(status, "Quitado")
+
+	def test_acordo_divisao_com_sucumbencia_soma_parcelas(self):
+		"""Acordo 30k + 10% sucumbência: parcelas somam 33k, base adv+cli = 30k."""
+		servico = create_test_servico().name
+		cliente = frappe.db.get_value("Servico", servico, "cliente")
+		valor_acordo = 30000
+		valor_adv = 9000
+		valor_cli = 21000
+		sucumbencia = 3000
+		doc = frappe.get_doc(
+			{
+				"doctype": "Acordo de Honorarios Processuais",
+				"servico": servico,
+				"cliente": cliente,
+				"modo_honorarios": "Acordo com Divisão",
+				"tipo_de_cobrança": "Percentual do acordo",
+				"percentual_advogada": 30,
+				"percentual_cliente": 70,
+				"valor_total_do_acordo": valor_acordo,
+				"valor_advogada": valor_adv,
+				"valor_cliente": valor_cli,
+				"honorários_de_sucumbência": sucumbencia,
+				"número_de_parcelas": 3,
+				"data_primeira_parcela": today(),
+				"table_ztjx": [
+					{
+						"vencimento": today(),
+						"valor_advogada": 3000,
+						"valor_cliente": 7000,
+						"valor_sucumbência": 3000,
+						"valor_total": 13000,
+						"status": "Pendente",
+						"descrição": "Parcela 1 + Sucumbência",
+					},
+					{
+						"vencimento": add_months(today(), 1),
+						"valor_advogada": 3000,
+						"valor_cliente": 7000,
+						"valor_sucumbência": 0,
+						"valor_total": 10000,
+						"status": "Pendente",
+						"descrição": "Parcela 2",
+					},
+					{
+						"vencimento": add_months(today(), 2),
+						"valor_advogada": 3000,
+						"valor_cliente": 7000,
+						"valor_sucumbência": 0,
+						"valor_total": 10000,
+						"status": "Pendente",
+						"descrição": "Parcela 3",
+					},
+				],
+			}
+		)
+		doc.insert(ignore_permissions=True)
+		soma = sum(flt(p.valor_total) for p in doc.table_ztjx)
+		self.assertAlmostEqual(soma, valor_acordo + sucumbencia, places=2)
+		self.assertAlmostEqual(flt(doc.valor_advogada) + flt(doc.valor_cliente), valor_acordo, places=2)

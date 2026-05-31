@@ -56,11 +56,13 @@ class AcordodeHonorariosProcessuais(Document):
             sucumbencia = flt(self.get("honorários_de_sucumbência"))
             if valor_cli < 0:
                 frappe.throw(_("Valor do cliente não pode ser negativo."))
-            soma_form = valor_adv + valor_cli + sucumbencia
-            if parcelas and abs(soma_form - total_acordo) > 0.05:
+            if sucumbencia < 0:
+                frappe.throw(_("Honorários de sucumbência não podem ser negativos."))
+            soma_base = valor_adv + valor_cli
+            if abs(soma_base - total_acordo) > 0.05:
                 frappe.throw(
-                    _("Soma advogada + cliente + sucumbência (R$ {0}) difere do valor total do acordo (R$ {1}).").format(
-                        soma_form, total_acordo
+                    _("Soma advogada + cliente (R$ {0}) difere do valor total do acordo (R$ {1}).").format(
+                        soma_base, total_acordo
                     )
                 )
 
