@@ -98,11 +98,29 @@ function inject_painel_styles() {
             font-weight: 400;
         }
         .painel-hero-context {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 6px 0;
             font-size: var(--text-sm);
             color: var(--text-muted);
             line-height: 1.55;
             max-width: 52rem;
             margin: 0 0 20px;
+        }
+        .painel-hero-context-part {
+            display: inline;
+        }
+        .painel-hero-context-part + .painel-hero-context-part::before {
+            content: " · ";
+            white-space: pre;
+            opacity: 0.55;
+        }
+        .painel-hero-money {
+            white-space: nowrap;
+            font-variant-numeric: tabular-nums;
+            color: var(--text-color);
+            font-weight: 600;
         }
         .painel-hero-pulse {
             display: flex;
@@ -118,6 +136,16 @@ function inject_painel_styles() {
             flex-wrap: wrap;
             align-items: center;
             gap: 12px 20px;
+        }
+        .painel-hero-stat {
+            display: inline-flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 0.25em;
+            max-width: 100%;
+        }
+        .painel-hero-stat--money {
+            white-space: nowrap;
         }
         .painel-hero-pulse strong {
             color: var(--text-color);
@@ -637,6 +665,7 @@ function inject_painel_styles() {
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            gap: 6px;
             min-height: 36px;
             padding: 8px 14px;
             border-radius: var(--painel-radius-sm);
@@ -779,7 +808,8 @@ function inject_painel_styles() {
                 grid-template-columns: 1fr 1fr;
                 gap: 8px 12px;
             }
-            .painel-hero-pulse-stats > span {
+            .painel-hero-pulse-stats > span,
+            .painel-hero-pulse-stats > .painel-hero-stat {
                 display: block;
                 padding: 10px 12px;
                 border-radius: var(--painel-radius-sm);
@@ -787,6 +817,14 @@ function inject_painel_styles() {
                 border: 1px solid color-mix(in srgb, var(--border-color) 55%, transparent);
                 font-size: 12px;
                 line-height: 1.35;
+                white-space: normal;
+            }
+            .painel-hero-stat--money {
+                white-space: normal;
+                grid-column: 1 / -1;
+            }
+            .painel-hero-stat--money .painel-hero-money {
+                white-space: nowrap;
             }
             .painel-hero-pulse .dot { display: none; }
             .painel-urgency-badge {
@@ -1062,12 +1100,87 @@ function inject_painel_styles() {
         .painel-prox-body:hover {
             background: color-mix(in srgb, var(--subtle-fg) 35%, var(--card-bg));
         }
+        .painel-prox-list {
+            display: flex;
+            flex-direction: column;
+        }
+        .painel-prox-card {
+            padding: 18px 22px 20px;
+            cursor: pointer;
+            transition: background 0.18s ease;
+        }
+        .painel-prox-card + .painel-prox-card {
+            border-top: 1px solid color-mix(in srgb, var(--border-color) 50%, transparent);
+        }
+        .painel-prox-card:hover {
+            background: color-mix(in srgb, var(--subtle-fg) 35%, var(--card-bg));
+        }
+        .painel-prox-card-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+        .painel-prox-mod {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            white-space: nowrap;
+            border: 1px solid transparent;
+        }
+        .painel-prox-mod--presencial {
+            color: var(--gray-700);
+            background: color-mix(in srgb, var(--gray-500) 12%, var(--card-bg));
+            border-color: color-mix(in srgb, var(--gray-500) 22%, transparent);
+        }
+        .painel-prox-mod--virtual {
+            color: var(--blue-700);
+            background: color-mix(in srgb, var(--blue-500) 14%, var(--card-bg));
+            border-color: color-mix(in srgb, var(--blue-500) 28%, transparent);
+        }
+        .painel-prox-mod--hibrida {
+            color: var(--orange-700);
+            background: color-mix(in srgb, var(--orange-500) 14%, var(--card-bg));
+            border-color: color-mix(in srgb, var(--orange-500) 28%, transparent);
+        }
+        .painel-prox-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid color-mix(in srgb, var(--border-color) 45%, transparent);
+        }
+        .painel-prox-ordem {
+            font-size: 0.85em;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+        .painel-prox-local-hint {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.35;
+        }
         .painel-prox-when {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             font-weight: 700;
             letter-spacing: -0.03em;
             color: var(--text-color);
-            margin-bottom: 6px;
+            line-height: 1.2;
+            flex: 1;
+            min-width: 0;
         }
         .painel-prox-tipo {
             font-size: 15px;
@@ -1890,41 +2003,64 @@ function render_empty_state(icon, title, hint) {
     );
 }
 
-function painel_context_line(resumo, kpis, periodo_dias, financeiro) {
+function painel_context_html(resumo, kpis, periodo_dias, financeiro) {
     resumo = resumo || {};
     kpis = kpis || {};
     financeiro = financeiro || {};
     periodo_dias = cint(periodo_dias) || 7;
-    if (resumo.urgencia !== "alta") {
-        return __("Visão operacional {0} — nenhuma urgência crítica no radar.", [
-            painel_periodo_enunciado(periodo_dias),
-        ]);
+
+    function part(text) {
+        return (
+            '<span class="painel-hero-context-part">' +
+            frappe.utils.escape_html(text) +
+            "</span>"
+        );
     }
-    var parts = [];
+
+    function money_part(label, value) {
+        return (
+            '<span class="painel-hero-context-part">' +
+            frappe.utils.escape_html(label + ": ") +
+            '<span class="painel-hero-money">' +
+            frappe.utils.escape_html(fmt_currency(value, true)) +
+            "</span></span>"
+        );
+    }
+
+    if (resumo.urgencia !== "alta") {
+        return part(
+            __("Visão operacional {0} — nenhuma urgência crítica no radar.", [
+                painel_periodo_enunciado(periodo_dias),
+            ])
+        );
+    }
+
+    var chunks = [];
     if (resumo.audiencias_hoje) {
-        parts.push(
-            __("{0} audiência(s) hoje exigem presença ou preparo", [resumo.audiencias_hoje])
+        chunks.push(
+            part(
+                __("{0} audiência(s) hoje exigem presença ou preparo", [resumo.audiencias_hoje])
+            )
         );
     }
     if (resumo.parcelas_vencidas) {
-        parts.push(__("{0} parcela(s) vencida(s) aguardam recebimento", [resumo.parcelas_vencidas]));
+        chunks.push(
+            part(__("{0} parcela(s) vencida(s) aguardam recebimento", [resumo.parcelas_vencidas]))
+        );
     }
     if (resumo.prazos_urgentes) {
-        parts.push(__("{0} prazo(s) com vencimento iminente", [resumo.prazos_urgentes]));
+        chunks.push(
+            part(__("{0} prazo(s) com vencimento iminente", [resumo.prazos_urgentes]))
+        );
     }
     var previsto =
         (financeiro.previsto_periodo && financeiro.previsto_periodo.valor) ||
         resumo.previsto_periodo_valor ||
         0;
     if (previsto) {
-        parts.push(
-            __("{0}: {1}", [
-                painel_periodo_previsto_label(periodo_dias),
-                fmt_currency(previsto, true),
-            ])
-        );
+        chunks.push(money_part(painel_periodo_previsto_label(periodo_dias), previsto));
     }
-    return parts.join(". ") + ".";
+    return chunks.join("");
 }
 
 function painel_greeting() {
@@ -1949,29 +2085,31 @@ function render_header(resumo, kpis, periodo_dias, financeiro) {
               0;
     var pulse_stats =
         '<div class="painel-hero-pulse-stats">' +
-        '<span><strong>' +
+        '<span class="painel-hero-stat"><strong>' +
         (resumo.audiencias_hoje || 0) +
         "</strong> " +
         __("audiência(s) hoje") +
         "</span>";
     if (resumo.prazos_urgentes) {
         pulse_stats +=
-            "<span><strong>" +
+            '<span class="painel-hero-stat"><strong>' +
             resumo.prazos_urgentes +
             "</strong> " +
             __("prazo(s) crítico(s)") +
             "</span>";
     }
     pulse_stats +=
-        "<span><strong>" +
+        '<span class="painel-hero-stat"><strong>' +
         (kpis.tarefas_pendentes || 0) +
         "</strong> " +
         __("tarefa(s) aberta(s)") +
-        "</span><span><strong>" +
+        "</span>" +
+        '<span class="painel-hero-stat"><strong>' +
         (resumo.parcelas_vencidas || 0) +
         "</strong> " +
         __("parcela(s) vencida(s)") +
-        "</span><span><strong>" +
+        "</span>" +
+        '<span class="painel-hero-stat painel-hero-stat--money"><strong class="painel-hero-money">' +
         fmt_currency(previsto_val, true) +
         "</strong> " +
         painel_periodo_previsto_label(periodo_dias) +
@@ -1993,7 +2131,7 @@ function render_header(resumo, kpis, periodo_dias, financeiro) {
         frappe.utils.escape_html(resumo.data_hoje || "") +
         "</p>" +
         '<p class="painel-hero-context">' +
-        frappe.utils.escape_html(painel_context_line(resumo, kpis, periodo_dias, financeiro)) +
+        painel_context_html(resumo, kpis, periodo_dias, financeiro) +
         "</p>" +
         '<div class="painel-hero-pulse">' +
         pulse +
@@ -2339,57 +2477,94 @@ function painel_timeline_when_label(data, hora, dias_restantes) {
     return hora ? base + " · " + hora : base;
 }
 
-function painel_find_proxima_audiencia(audiencias, timeline) {
+function painel_find_proximas_audiencias(audiencias, timeline, limit) {
+    limit = cint(limit) || 2;
     if (audiencias && audiencias.length) {
-        return audiencias[0];
+        return audiencias.slice(0, limit);
     }
+    var found = [];
     if (timeline && timeline.length) {
-        for (var i = 0; i < timeline.length; i++) {
-            if (timeline[i].tipo === "audiencia") {
-                return {
-                    name: timeline[i].docname,
-                    tipo: timeline[i].titulo,
-                    cliente: timeline[i].subtitulo,
-                    servico: timeline[i].detalhe,
-                    data: timeline[i].data,
-                    hora: timeline[i].hora,
-                    dias_restantes: painel_day_diff(timeline[i].data),
-                    vara_label: timeline[i].detalhe,
-                };
-            }
+        for (var i = 0; i < timeline.length && found.length < limit; i++) {
+            if (timeline[i].tipo !== "audiencia") continue;
+            found.push({
+                name: timeline[i].docname,
+                tipo: timeline[i].titulo,
+                cliente: timeline[i].subtitulo,
+                servico: timeline[i].detalhe,
+                data: timeline[i].data,
+                hora: timeline[i].hora,
+                dias_restantes: painel_day_diff(timeline[i].data),
+                vara_label: timeline[i].detalhe,
+                modalidade: "Presencial",
+                link_virtual: "",
+            });
         }
     }
-    return null;
+    return found;
 }
 
-function render_proxima_audiencia(audiencias, timeline) {
-    var a = painel_find_proxima_audiencia(audiencias, timeline);
-    var h =
-        '<div class="painel-prox-audiencia painel-priority-max" id="painel-prox-audiencia">' +
-        '<div class="painel-prox-audiencia-head">' +
-        '<span class="painel-prox-badge">' +
-        painel_icon("calendar-days") +
-        "</span>" +
-        '<h3 class="painel-prox-title">' +
-        __("Próxima Audiência") +
-        "</h3></div>";
+function painel_audiencia_modalidade_html(a) {
+    var mod = a.modalidade || "Presencial";
+    var icon = mod === "Virtual" ? "video" : mod === "Híbrida" ? "monitor" : "map-pin";
+    var cls =
+        mod === "Virtual" ? "virtual" : mod === "Híbrida" ? "hibrida" : "presencial";
+    return (
+        '<span class="painel-prox-mod painel-prox-mod--' +
+        cls +
+        '">' +
+        painel_icon(icon) +
+        frappe.utils.escape_html(mod) +
+        "</span>"
+    );
+}
 
-    if (!a) {
+function painel_audiencia_entrar_html(a) {
+    var mod = a.modalidade || "Presencial";
+    if (mod !== "Virtual" && mod !== "Híbrida") {
+        return "";
+    }
+    if (a.link_virtual) {
         return (
-            h +
-            '<div class="painel-prox-empty">' +
-            __("Nenhuma audiência agendada.") +
-            "</div></div>"
+            '<a class="painel-btn-entrar" href="' +
+            frappe.utils.escape_html(a.link_virtual) +
+            '" target="_blank" rel="noopener" onclick="event.stopPropagation();">' +
+            painel_icon("external-link") +
+            "<span>" +
+            __("Entrar na audiência") +
+            "</span></a>"
         );
     }
+    return (
+        '<span class="painel-btn-entrar painel-btn-entrar--muted" title="' +
+        frappe.utils.escape_html(__("Link ainda não cadastrado")) +
+        '">' +
+        __("Sem link") +
+        "</span>"
+    );
+}
 
+function render_proxima_audiencia_card(a, ordem) {
     var when = painel_timeline_when_label(a.data, a.hora, a.dias_restantes);
-    h +=
-        '<div class="painel-prox-body" data-dt="Audiencia" data-dn="' +
+    var mod = a.modalidade || "Presencial";
+    var local =
+        a.vara_label ||
+        (mod === "Presencial" || mod === "Híbrida" ? a.local_vara || "" : "");
+    var entrar = painel_audiencia_entrar_html(a);
+    var h =
+        '<div class="painel-prox-card" data-dt="Audiencia" data-dn="' +
         frappe.utils.escape_html(a.name || "") +
         '">' +
+        '<div class="painel-prox-card-head">' +
         '<div class="painel-prox-when">' +
+        (ordem
+            ? '<span class="painel-prox-ordem">' +
+              frappe.utils.escape_html(__("#{0}", [ordem])) +
+              " · " +
+              "</span>"
+            : "") +
         frappe.utils.escape_html(when) +
+        "</div>" +
+        painel_audiencia_modalidade_html(a) +
         "</div>" +
         '<div class="painel-prox-tipo">' +
         frappe.utils.escape_html(a.tipo || __("Audiência")) +
@@ -2404,15 +2579,49 @@ function render_proxima_audiencia(audiencias, timeline) {
         __("Serviço") +
         '</span><span class="painel-prox-row-value">' +
         frappe.utils.escape_html(a.servico || "—") +
-        "</span></div>" +
-        (a.vara_label
-            ? '<div class="painel-prox-row"><span class="painel-prox-row-label">' +
-              __("Local") +
-              '</span><span class="painel-prox-row-value">' +
-              frappe.utils.escape_html(a.vara_label) +
-              "</span></div>"
-            : "") +
-        "</div></div></div>";
+        "</span></div>";
+    if (local && mod !== "Virtual") {
+        h +=
+            '<div class="painel-prox-row"><span class="painel-prox-row-label">' +
+            __("Local") +
+            '</span><span class="painel-prox-row-value">' +
+            frappe.utils.escape_html(local) +
+            "</span></div>";
+    }
+    h += "</div>";
+    if (entrar) {
+        h += '<div class="painel-prox-actions">' + entrar + "</div>";
+    }
+    h += "</div>";
+    return h;
+}
+
+function render_proxima_audiencia(audiencias, timeline) {
+    var items = painel_find_proximas_audiencias(audiencias, timeline, 2);
+    var h =
+        '<div class="painel-prox-audiencia painel-priority-max" id="painel-prox-audiencia">' +
+        '<div class="painel-prox-audiencia-head">' +
+        '<span class="painel-prox-badge">' +
+        painel_icon("calendar-days") +
+        "</span>" +
+        '<h3 class="painel-prox-title">' +
+        __("Próximas Audiências") +
+        "</h3></div>";
+
+    if (!items.length) {
+        return (
+            h +
+            '<div class="painel-prox-empty">' +
+            __("Nenhuma audiência agendada.") +
+            "</div></div>"
+        );
+    }
+
+    h += '<div class="painel-prox-list">';
+    items.forEach(function (a, idx) {
+        h += render_proxima_audiencia_card(a, idx + 1);
+    });
+    h += "</div></div>";
     return h;
 }
 
@@ -3823,7 +4032,8 @@ $(document).on("click", ".painel-timeline-item[data-dt], .painel-tl-item[data-dt
     if (dt && dn) frappe.set_route("Form", dt, dn);
 });
 
-$(document).on("click", ".painel-prox-body[data-dt]", function (e) {
+$(document).on("click", ".painel-prox-card[data-dt], .painel-prox-body[data-dt]", function (e) {
+    if ($(e.target).closest(".painel-btn-entrar").length) return;
     var dt = $(this).attr("data-dt");
     var dn = $(this).attr("data-dn");
     if (dt && dn) frappe.set_route("Form", dt, dn);
