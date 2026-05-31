@@ -22,7 +22,11 @@
   "atividade",
   "categoria",
   "descricao",
-  "cobravel"
+  "cobravel",
+  "timer_section",
+  "timer_display",
+  "timer_inicio",
+  "timer_ativo"
  ],
  "fields": [
   {
@@ -127,6 +131,34 @@
    "fieldtype": "Check",
    "label": "Cobrável",
    "default": "1"
+  },
+  {
+   "fieldname": "timer_section",
+   "fieldtype": "Section Break",
+   "label": "Timer"
+  },
+  {
+   "fieldname": "timer_display",
+   "fieldtype": "HTML",
+   "label": "Tempo Decorrido",
+   "description": "Widget visual do contador (client-side)"
+  },
+  {
+   "fieldname": "timer_inicio",
+   "fieldtype": "Datetime",
+   "hidden": 1,
+   "label": "Início do Timer",
+   "read_only": 1,
+   "description": "Timestamp server-side do início"
+  },
+  {
+   "fieldname": "timer_ativo",
+   "fieldtype": "Check",
+   "default": "0",
+   "hidden": 1,
+   "label": "Timer Ativo",
+   "read_only": 1,
+   "description": "Flag: 1=correndo, 0=parado"
   }
  ],
  "index_web_pages_for_search": 1,

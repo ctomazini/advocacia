@@ -1,6 +1,7 @@
 import frappe
+from frappe import _
 from frappe.model.document import Document
-from frappe.utils import time_diff_in_seconds
+from frappe.utils import now_datetime, time_diff_in_seconds
 
 
 class RegistrodeHoras(Document):
@@ -14,3 +15,45 @@ class RegistrodeHoras(Document):
 
 		if self.duracao_minutos:
 			self.duracao_horas = round(self.duracao_minutos / 60, 2)
+
+		if self.timer_ativo and self.has_value_changed("duracao_minutos"):
+			frappe.throw(
+				_(
+					"Não é possível editar a duração manualmente enquanto o timer está ativo. Pare o timer primeiro."
+				)
+			)
+
+	@frappe.whitelist()
+	def iniciar_timer(self):
+		if self.timer_ativo:
+			frappe.throw(_("Timer já está em execução para este registro."))
+
+		self.timer_inicio = now_datetime()
+		self.timer_ativo = 1
+		self.save(ignore_permissions=True)
+		frappe.db.commit()
+
+		return {"timer_inicio": str(self.timer_inicio)}
+
+	@frappe.whitelist()
+	def parar_timer(self):
+		if not self.timer_ativo:
+			frappe.throw(_("Nenhum timer ativo para este registro."))
+
+		elapsed_seconds = time_diff_in_seconds(now_datetime(), self.timer_inicio)
+		elapsed_minutes = max(0, int(round(elapsed_seconds / 60)))
+
+		current = self.duracao_minutos or 0
+		self.duracao_minutos = current + elapsed_minutes
+		self.duracao_horas = round(self.duracao_minutos / 60, 2)
+
+		self.timer_inicio = None
+		self.timer_ativo = 0
+		self.save(ignore_permissions=True)
+		frappe.db.commit()
+
+		return {
+			"duracao_minutos": self.duracao_minutos,
+			"duracao_horas": self.duracao_horas,
+			"elapsed_seconds": elapsed_seconds,
+		}
