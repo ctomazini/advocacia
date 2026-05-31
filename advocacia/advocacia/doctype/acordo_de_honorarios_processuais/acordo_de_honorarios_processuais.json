@@ -58,7 +58,7 @@
  "migration_hash": null,
  "translated_doctype": 0,
  "is_calendar_and_gantt": 0,
- "quick_entry": 1,
+ "quick_entry": 0,
  "grid_page_length": 50,
  "rows_threshold_for_grid_search": 20,
  "track_views": 0,
