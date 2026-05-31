@@ -23,6 +23,10 @@ fixtures = [
             ]
         ],
     },
+    {
+        "dt": "Custom Field",
+        "filters": [["dt", "=", "Event"], ["fieldname", "like", "custom_source%"]],
+    },
 ]
 
 app_include_js = [
@@ -66,6 +70,14 @@ doc_events = {
         ],
         "on_trash": "advocacia.advocacia.financeiro.on_pagamento_trash",
     },
+    "Audiencia": {
+        "after_insert": "advocacia.advocacia.calendar_sync.sync_audiencia_to_event",
+        "on_update": "advocacia.advocacia.calendar_sync.sync_audiencia_to_event",
+    },
+    "Controle de Prazos": {
+        "after_insert": "advocacia.advocacia.calendar_sync.sync_prazo_to_event",
+        "on_update": "advocacia.advocacia.calendar_sync.sync_prazo_to_event",
+    },
 }
 
 after_install = "advocacia.advocacia.setup.install.after_install"
@@ -73,6 +85,7 @@ after_install = "advocacia.advocacia.setup.install.after_install"
 after_migrate = [
     "advocacia.advocacia.setup.reinstalar_istable_doctypes",
     "advocacia.advocacia.setup.install.after_install",
+    "advocacia.advocacia.setup.install.ensure_event_custom_fields",
     "advocacia.advocacia.setup.translations.ensure_doctype_translations",
     "advocacia.advocacia.setup.sidebar.ensure_advocacia_sidebar",
     "advocacia.advocacia.setup.reports.ensure_advocacia_reports",
