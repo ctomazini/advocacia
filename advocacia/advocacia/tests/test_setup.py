@@ -94,7 +94,10 @@ def create_test_servico(cliente=None, tipo="Consultoria", numero_processo=None, 
 	if numero_processo is None and tipo == "Processo Judicial":
 		data["numero_processo"] = _gerar_cnj_valido()
 	elif numero_processo is not None:
-		data["numero_processo"] = numero_processo
+		if numero_processo == "":
+			data["numero_processo"] = ""
+		else:
+			data["numero_processo"] = numero_processo
 	data.update(kwargs)
 	doc = frappe.get_doc(data)
 	doc.insert(ignore_permissions=True)

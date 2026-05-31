@@ -28,6 +28,13 @@ class TestServico(FrappeTestCase):
 		)
 		self.assertEqual(servico.numero_processo, VALID_CNJ_DIGITS)
 
+	def test_processo_judicial_sem_cnj_salva(self):
+		servico = create_test_servico(
+			tipo="Processo Judicial",
+			numero_processo="",
+		)
+		self.assertIsNone(servico.numero_processo)
+
 	def test_processo_legado_aceita_texto_livre(self):
 		servico = create_test_servico(
 			tipo="Processo Judicial",

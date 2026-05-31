@@ -18,15 +18,11 @@ class Servico(Document):
 		legado = cint(self.numeracao_legada)
 		numero = (self.numero_processo or "").strip()
 
-		if not legado:
-			if not numero:
-				frappe.throw(
-					_("Informe o número do processo no formato CNJ."),
-					title=_("Campo obrigatório"),
-				)
-			self.numero_processo = validar_cnj(numero)
-			self.numero_processo = limpar_numerico(self.numero_processo)
-		elif numero:
+		if not numero:
+			self.numero_processo = None
+		elif not legado:
+			self.numero_processo = limpar_numerico(validar_cnj(numero))
+		else:
 			self.numero_processo = numero
 
 
