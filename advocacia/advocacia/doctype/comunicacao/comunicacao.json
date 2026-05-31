@@ -93,7 +93,8 @@
    "fieldname": "gerar_tarefa",
    "fieldtype": "Check",
    "label": "Gerar Tarefa",
-   "default": "0"
+   "default": "0",
+   "description": "Cria uma Tarefa de follow-up (vencimento em 3 dias) com o texto de Próximos Passos. Só gera uma vez por comunicação."
   },
   {
    "fieldname": "tarefa",

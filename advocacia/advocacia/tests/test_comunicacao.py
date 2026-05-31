@@ -71,3 +71,16 @@ class TestComunicacao(FrappeTestCase):
 		com = create_test_comunicacao(gerar_tarefa=1, proximos_passos=None)
 		com.reload()
 		self.assertFalse(com.tarefa)
+
+	def test_gerar_tarefa_apos_primeiro_save(self):
+		com = create_test_comunicacao(proximos_passos="Ligar na segunda-feira")
+		self.assertFalse(com.tarefa)
+		com.gerar_tarefa = 1
+		com.save(ignore_permissions=True)
+		com.reload()
+		self.assertTrue(com.tarefa)
+		tarefa = frappe.get_doc("Tarefa", com.tarefa)
+		self.assertEqual(
+			frappe.utils.getdate(tarefa.data_limite),
+			frappe.utils.getdate(frappe.utils.add_days(frappe.utils.today(), 3)),
+		)
