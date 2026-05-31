@@ -84,8 +84,16 @@ frappe.listview_settings["Pagamento"] = {
 			});
 		}
 
-		listview.bulk_operations.delete = function (docnames, done) {
+		function confirmar_bulk_delete(docnames) {
 			const names = docnames.map((name) => name.toString());
+			if (!names.length) {
+				return;
+			}
+
+			const done = () => {
+				listview.disable_list_update = false;
+				listview.clear_checked_items();
+			};
 
 			if (names.length >= 5) {
 				const d = new frappe.ui.Dialog({
@@ -120,6 +128,7 @@ frappe.listview_settings["Pagamento"] = {
 							return;
 						}
 						d.hide();
+						listview.disable_list_update = true;
 						executar_bulk_delete(names, done);
 					},
 				});
@@ -139,9 +148,18 @@ frappe.listview_settings["Pagamento"] = {
 					[names.length]
 				),
 				function () {
+					listview.disable_list_update = true;
 					executar_bulk_delete(names, done);
 				}
 			);
-		};
+		}
+
+		const delete_label = __("Delete", null, "Button in list view actions menu");
+		const delete_item = listview.actions_menu_items.find((item) => item.label === delete_label);
+		if (delete_item) {
+			delete_item.action = () => confirmar_bulk_delete(listview.get_checked_items(true));
+			listview.page.clear_actions_menu();
+			listview.set_actions_menu_items();
+		}
 	},
 };

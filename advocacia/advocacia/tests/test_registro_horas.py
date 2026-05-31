@@ -106,3 +106,30 @@ class TestRegistroHoras(FrappeTestCase):
 		reg.duracao_minutos = 60
 		with self.assertRaises(ValidationError):
 			reg.save()
+
+	def test_get_timer_ativo_usuario(self):
+		from advocacia.advocacia.doctype.registro_de_horas.registro_de_horas import (
+			get_timer_ativo_usuario,
+		)
+
+		frappe.db.sql(
+			"""
+			UPDATE `tabRegistro de Horas`
+			SET timer_ativo = 0, timer_inicio = NULL
+			WHERE timer_ativo = 1 AND owner = %s
+			""",
+			frappe.session.user,
+		)
+
+		reg = create_test_registro_horas(duracao_minutos=30)
+		self.assertIsNone(get_timer_ativo_usuario())
+
+		reg.iniciar_timer()
+		reg.reload()
+		active = get_timer_ativo_usuario()
+		self.assertIsNotNone(active)
+		self.assertEqual(active["name"], reg.name)
+		self.assertTrue(active["timer_inicio"])
+
+		reg.parar_timer()
+		self.assertIsNone(get_timer_ativo_usuario())

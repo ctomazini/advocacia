@@ -57,3 +57,39 @@ class RegistrodeHoras(Document):
 			"duracao_horas": self.duracao_horas,
 			"elapsed_seconds": elapsed_seconds,
 		}
+
+
+@frappe.whitelist()
+def get_timer_ativo_usuario():
+	"""Retorna o registro com timer ativo do usuário logado, se existir."""
+	if frappe.session.user == "Guest":
+		return None
+
+	if not frappe.has_permission("Registro de Horas", "read"):
+		return None
+
+	if not frappe.db.table_exists("Registro de Horas"):
+		return None
+
+	user = frappe.session.user
+	rows = frappe.get_all(
+		"Registro de Horas",
+		filters={"timer_ativo": 1},
+		fields=["name", "timer_inicio", "atividade", "servico", "responsavel", "owner"],
+		order_by="modified desc",
+		limit_page_length=20,
+	)
+
+	for row in rows:
+		if row.responsavel and row.responsavel != user:
+			continue
+		if not row.responsavel and row.owner != user:
+			continue
+		return {
+			"name": row.name,
+			"timer_inicio": str(row.timer_inicio),
+			"atividade": row.atividade or row.name,
+			"servico": row.servico or "",
+		}
+
+	return None

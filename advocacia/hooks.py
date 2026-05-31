@@ -31,8 +31,10 @@ fixtures = [
 
 app_include_js = [
     "/assets/advocacia/js/masks.js",
+    "/assets/advocacia/js/list_nav.js",
     "/assets/advocacia/js/navegacao.js",
     "/assets/advocacia/js/servico_link.js",
+    "/assets/advocacia/js/timer_global.js",
 ]
 
 standard_queries = {

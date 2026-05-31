@@ -2,11 +2,13 @@ frappe.ui.form.on("Registro de Horas", {
 	refresh(frm) {
 		if (!frm.is_new()) {
 			if (frm.doc.timer_ativo) {
-				frm.add_custom_button(__("⏹ Parar Timer"), () => frm.events.parar_timer(frm), __("Timer"));
+				frm.add_custom_button(__("⏹ Parar Timer"), () => frm.events.parar_timer(frm));
+				frm.change_custom_button_type(__("⏹ Parar Timer"), null, "danger");
 				frm.events._start_visual_timer(frm);
 				frm.events._enable_beforeunload(frm);
 			} else {
-				frm.add_custom_button(__("▶ Iniciar Timer"), () => frm.events.iniciar_timer(frm), __("Timer"));
+				frm.add_custom_button(__("▶ Iniciar Timer"), () => frm.events.iniciar_timer(frm));
+				frm.change_custom_button_type(__("▶ Iniciar Timer"), null, "primary");
 				frm.events._stop_visual_timer(frm);
 				frm.events._disable_beforeunload(frm);
 			}
@@ -23,7 +25,11 @@ frappe.ui.form.on("Registro de Horas", {
 			freeze: true,
 			freeze_message: __("Iniciando timer..."),
 			callback() {
-				frm.reload_doc();
+				frm.reload_doc().then(function () {
+					if (advocacia.timer_global) {
+						advocacia.timer_global.refresh();
+					}
+				});
 			},
 		});
 	},
@@ -48,7 +54,11 @@ frappe.ui.form.on("Registro de Horas", {
 						5
 					);
 				}
-				frm.reload_doc();
+				frm.reload_doc().then(function () {
+					if (advocacia.timer_global) {
+						advocacia.timer_global.refresh();
+					}
+				});
 			},
 		});
 	},

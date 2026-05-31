@@ -1268,40 +1268,7 @@ function painel_list_meta_html(meta, list_limit) {
 }
 
 function painel_goto_list(doctype, filters) {
-    filters = filters || [];
-    frappe.route_options = null;
-    var list_key = "List/" + doctype + "/List";
-
-    var apply_filters = function () {
-        var lv = frappe.views.list_view && frappe.views.list_view[list_key];
-        if (!lv || !lv.filter_area) return false;
-        var tuples = filters.map(function (f) {
-            return [doctype, f[0], f[1], f[2]];
-        });
-        lv.filter_area.clear(false).then(function () {
-            if (tuples.length) {
-                return lv.filter_area.set(tuples);
-            }
-        }).then(function () {
-            lv.refresh();
-        });
-        frappe.route_options = null;
-        return true;
-    };
-
-    var cur = frappe.get_route();
-    if (cur[0] === "List" && cur[1] === doctype && apply_filters()) {
-        return;
-    }
-
-    var attempts = 0;
-    var timer = setInterval(function () {
-        attempts += 1;
-        if (apply_filters() || attempts > 30) {
-            clearInterval(timer);
-        }
-    }, 100);
-    frappe.set_route("List", doctype);
+    advocacia.list_nav.goto(doctype, filters || []);
 }
 
 function render_painel($container, d, page) {
@@ -2094,51 +2061,6 @@ function cint(val) {
     return parseInt(val, 10) || 0;
 }
 
-function get_kpi_routes() {
-    var hoje = frappe.datetime.get_today();
-    var mes_inicio = frappe.datetime.month_start(hoje);
-    var mes_fim = frappe.datetime.month_end(hoje);
-    var tres_dias = frappe.datetime.add_days(hoje, 3);
-
-    return [
-        function () {
-            frappe.route_options = { status: "Vencido" };
-            frappe.set_route("List", "Pagamento");
-        },
-        function () {
-            frappe.route_options = {
-                status: ["in", ["Recebido", "Repassado"]],
-                data_recebimento: ["between", [mes_inicio, mes_fim]],
-            };
-            frappe.set_route("List", "Pagamento");
-        },
-        function () {
-            frappe.route_options = {
-                status: "Pendente",
-                data_vencimento: ["between", [mes_inicio, mes_fim]],
-            };
-            frappe.set_route("List", "Pagamento");
-        },
-        function () {
-            frappe.route_options = {
-                data_hora: ["between", [hoje + " 00:00:00", hoje + " 23:59:59"]],
-            };
-            frappe.set_route("List", "Audiencia");
-        },
-        function () {
-            frappe.route_options = {
-                status: "Pendente",
-                data_prazo: ["<=", tres_dias],
-            };
-            frappe.set_route("List", "Controle de Prazos");
-        },
-        function () {
-            frappe.route_options = { status: "Em andamento" };
-            frappe.set_route("List", "Servico");
-        },
-    ];
-}
-
 function render_kpis(k) {
     if (!k) return "";
     var items = [
@@ -2215,16 +2137,6 @@ function render_kpis(k) {
     });
     h += "</div></section>";
     return h;
-}
-
-function bind_kpi_routes($root, routes) {
-    $root.find(".painel-kpi").each(function (idx) {
-        $(this)
-            .off("click")
-            .on("click", function () {
-                if (routes[idx]) routes[idx]();
-            });
-    });
 }
 
 function render_operacao_dia(d) {
