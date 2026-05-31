@@ -1,0 +1,49 @@
+import frappe
+from frappe.tests.utils import FrappeTestCase
+
+from advocacia.advocacia.report.horas_por_servico.horas_por_servico import execute as horas_execute
+from advocacia.advocacia.report.produtividade.produtividade import execute as prod_execute
+from advocacia.advocacia.tests.test_setup import (
+	create_test_acordo,
+	create_test_custa_processual,
+	create_test_registro_horas,
+	create_test_servico,
+)
+
+
+class TestReportProdutividade(FrappeTestCase):
+	def tearDown(self):
+		frappe.db.rollback()
+
+	def test_produtividade_executa_sem_erro_vazio(self):
+		columns, data, _msg, _chart = prod_execute({"periodo": "Tudo"})
+		self.assertTrue(columns)
+		self.assertIsInstance(data, list)
+
+	def test_produtividade_com_dados(self):
+		servico = create_test_servico(area="Cível", status="Encerrado")
+		create_test_acordo(servico=servico.name, valor_total=10000)
+		create_test_custa_processual(servico=servico.name, valor=500, status="Pago", data_pagamento=frappe.utils.today())
+		create_test_registro_horas(servico=servico.name, duracao_minutos=120)
+
+		columns, data, _msg, _chart = prod_execute({"periodo": "Tudo", "incluir_horas": 1})
+		civil = next((r for r in data if r.get("area") == "Cível"), None)
+		self.assertIsNotNone(civil)
+		self.assertGreaterEqual(civil.get("total_honorarios", 0), 10000)
+		self.assertGreaterEqual(civil.get("total_custas", 0), 500)
+		self.assertGreaterEqual(civil.get("horas_registradas", 0), 2)
+
+	def test_horas_por_servico_executa(self):
+		servico = create_test_servico()
+		create_test_registro_horas(servico=servico.name, duracao_minutos=60, cobravel=1)
+		create_test_registro_horas(servico=servico.name, duracao_minutos=30, cobravel=0)
+
+		columns, data = horas_execute({"servico": servico.name})
+		self.assertEqual(len(data), 1)
+		self.assertEqual(data[0]["total_horas"], 1.5)
+		self.assertEqual(data[0]["horas_cobraveis"], 1.0)
+		self.assertEqual(data[0]["horas_nao_cobraveis"], 0.5)
+
+	def test_horas_por_servico_vazio(self):
+		columns, data = horas_execute({})
+		self.assertIsInstance(data, list)

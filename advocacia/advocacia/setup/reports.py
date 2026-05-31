@@ -15,6 +15,8 @@ REPORT_JSON_PATHS = (
 	"fluxo_de_caixa/fluxo_de_caixa.json",
 	"honorarios_por_cliente/honorarios_por_cliente.json",
 	"carteira_ativa/carteira_ativa.json",
+	"produtividade/produtividade.json",
+	"horas_por_servico/horas_por_servico.json",
 )
 
 _REPORT_SYNC_FIELDS = (
