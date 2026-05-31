@@ -379,7 +379,7 @@ def _get_tarefas(hoje, limit_start, limit_page_length):
 
 
 def _get_despesas_pendentes():
-	if not frappe.has_permission("Despesa do Escritorio", "read", raise_exception=False):
+	if not frappe.has_permission("Despesa do Escritorio", "read"):
 		return []
 	return frappe.get_all(
 		"Despesa do Escritorio",
@@ -391,7 +391,7 @@ def _get_despesas_pendentes():
 
 
 def _get_total_despesas_mes(mes_inicio, mes_fim):
-	if not frappe.has_permission("Despesa do Escritorio", "read", raise_exception=False):
+	if not frappe.has_permission("Despesa do Escritorio", "read"):
 		return 0
 	result = frappe.db.sql(
 		"""
