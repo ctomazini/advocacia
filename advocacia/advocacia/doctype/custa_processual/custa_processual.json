@@ -1,0 +1,192 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-05-31 12:00:00",
+ "custom": 0,
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "informacoes_section",
+  "servico",
+  "cliente",
+  "tipo",
+  "column_break_info",
+  "descricao",
+  "status",
+  "valores_section",
+  "valor",
+  "data_pagamento",
+  "column_break_val",
+  "repassar_cliente",
+  "data_repasse",
+  "forma_pagamento",
+  "anexos_section",
+  "comprovante",
+  "observacoes_section",
+  "observacoes"
+ ],
+ "fields": [
+  {
+   "fieldname": "informacoes_section",
+   "fieldtype": "Section Break",
+   "label": "Informações"
+  },
+  {
+   "fieldname": "servico",
+   "fieldtype": "Link",
+   "options": "Servico",
+   "label": "Serviço",
+   "reqd": 1,
+   "allow_in_quick_entry": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "cliente",
+   "fieldtype": "Link",
+   "options": "Cliente",
+   "label": "Cliente",
+   "read_only": 1,
+   "fetch_from": "servico.cliente",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "tipo",
+   "fieldtype": "Select",
+   "label": "Tipo",
+   "reqd": 1,
+   "allow_in_quick_entry": 1,
+   "in_list_view": 1,
+   "options": "Taxa Judicial\nPerícia\nCertidão\nDeslocamento\nCópia/Impressão\nCorreios\nCartório\nDiligência\nOutros"
+  },
+  {
+   "fieldname": "column_break_info",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "descricao",
+   "fieldtype": "Data",
+   "label": "Descrição",
+   "reqd": 1,
+   "allow_in_quick_entry": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "default": "Pendente",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "options": "Pendente\nPago\nRepassado\nCancelado"
+  },
+  {
+   "fieldname": "valores_section",
+   "fieldtype": "Section Break",
+   "label": "Valores"
+  },
+  {
+   "fieldname": "valor",
+   "fieldtype": "Currency",
+   "label": "Valor",
+   "reqd": 1,
+   "allow_in_quick_entry": 1
+  },
+  {
+   "fieldname": "data_pagamento",
+   "fieldtype": "Date",
+   "label": "Data de Pagamento"
+  },
+  {
+   "fieldname": "column_break_val",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "repassar_cliente",
+   "fieldtype": "Check",
+   "label": "Repassar ao Cliente",
+   "default": "1"
+  },
+  {
+   "fieldname": "data_repasse",
+   "fieldtype": "Date",
+   "label": "Data de Repasse",
+   "depends_on": "eval:doc.repassar_cliente==1"
+  },
+  {
+   "fieldname": "forma_pagamento",
+   "fieldtype": "Select",
+   "label": "Forma de Pagamento",
+   "options": "PIX\nTED\nBoleto\nDinheiro\nCartão"
+  },
+  {
+   "fieldname": "anexos_section",
+   "fieldtype": "Section Break",
+   "label": "Comprovante",
+   "collapsible": 1
+  },
+  {
+   "fieldname": "comprovante",
+   "fieldtype": "Attach",
+   "label": "Comprovante"
+  },
+  {
+   "fieldname": "observacoes_section",
+   "fieldtype": "Section Break",
+   "label": "Observações",
+   "collapsible": 1
+  },
+  {
+   "fieldname": "observacoes",
+   "fieldtype": "Small Text",
+   "label": "Observações"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 0,
+ "is_tree": 0,
+ "issingle": 0,
+ "istable": 0,
+ "links": [],
+ "modified": "2026-05-31 12:00:00",
+ "modified_by": "Administrator",
+ "module": "Advocacia",
+ "name": "Custa Processual",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "Advocacia Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1
+  },
+  {
+   "role": "Advocacia User",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 0,
+   "report": 1,
+   "export": 1
+  },
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1
+  }
+ ],
+ "states": [],
+ "autoname": "format:CUST-{YYYY}-{####}",
+ "title_field": "descricao",
+ "search_fields": "servico,cliente,tipo,status,descricao",
+ "sort_field": "data_pagamento",
+ "sort_order": "DESC",
+ "quick_entry": 1,
+ "track_changes": 1
+}

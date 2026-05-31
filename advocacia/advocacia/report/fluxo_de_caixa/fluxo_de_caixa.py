@@ -97,6 +97,26 @@ def _get_despesas(filters, period_start, period_end):
 	)
 
 
+def _get_custas(filters, period_start, period_end):
+	if not frappe.db.table_exists("Custa Processual"):
+		return []
+
+	custa_filters = {
+		"status": "Pago",
+		"data_pagamento": ["between", [period_start, period_end]],
+	}
+	if filters.get("cliente"):
+		custa_filters["cliente"] = filters.cliente
+
+	return frappe.get_all(
+		"Custa Processual",
+		filters=custa_filters,
+		fields=["name", "descricao", "tipo", "servico", "data_pagamento", "valor"],
+		order_by="data_pagamento asc",
+		limit_page_length=0,
+	)
+
+
 def _build_chart(transactions, period_start, meses):
 	month_totals = {}
 	for i in range(meses):
@@ -158,6 +178,25 @@ def _get_data(filters):
 				"documento": desp.name,
 				"valor_entrada": 0,
 				"valor_saida": flt(desp.valor),
+			}
+		)
+
+	for custa in _get_custas(filters, period_start, period_end):
+		descricao = custa.descricao or custa.name
+		if custa.tipo:
+			descricao = f"{descricao} ({custa.tipo})"
+		if custa.servico:
+			descricao = f"{descricao} - {custa.servico}"
+		transactions.append(
+			{
+				"data": custa.data_pagamento,
+				"tipo": _("Saída"),
+				"descricao": descricao,
+				"origem": "Custa Processual",
+				"origem_doctype": "Custa Processual",
+				"documento": custa.name,
+				"valor_entrada": 0,
+				"valor_saida": flt(custa.valor),
 			}
 		)
 
