@@ -16,6 +16,8 @@ frappe.pages.painel.on_page_load = function (wrapper) {
     });
 
     frappe.pages.painel.page = page;
+    page.painel_periodo = 7;
+    page.painel_list_limit = 5;
     load_painel(page);
 };
 
@@ -47,18 +49,27 @@ function inject_painel_styles() {
         .painel-root {
             --painel-radius: 16px;
             --painel-radius-sm: 12px;
-            --painel-gap: 40px;
-            --painel-gap-md: 28px;
+            --painel-gap: 32px;
+            --painel-gap-md: 24px;
             --painel-gap-sm: 16px;
+            --painel-tone-red: var(--red-600);
+            --painel-tone-orange: var(--orange-600);
+            --painel-tone-yellow: var(--yellow-600);
+            --painel-tone-green: var(--green-700);
+            --painel-tone-blue: var(--blue-600);
+            --painel-tone-gray: var(--gray-600);
             --painel-shadow: 0 1px 2px color-mix(in srgb, var(--gray-900) 4%, transparent),
                 0 8px 24px color-mix(in srgb, var(--gray-900) 5%, transparent);
             --painel-shadow-hover: 0 2px 4px color-mix(in srgb, var(--gray-900) 5%, transparent),
                 0 12px 32px color-mix(in srgb, var(--gray-900) 8%, transparent);
-            max-width: 1180px;
+            max-width: 1280px;
             margin: 0 auto;
-            padding: 12px 28px 64px;
+            padding: 12px 16px 64px;
             color: var(--text-color);
             -webkit-font-smoothing: antialiased;
+        }
+        @media (min-width: 1024px) {
+            .painel-root { padding: 12px 28px 64px; }
         }
         .painel-content {
             animation: painel-fade-in 0.45s ease-out;
@@ -833,6 +844,25 @@ function inject_painel_styles() {
             .painel-section-link {
                 white-space: normal;
             }
+            .painel-periodo-bar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 14px;
+            }
+            .painel-filtro-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .painel-periodo-filters,
+            .painel-linhas-filters {
+                width: 100%;
+            }
+            .painel-periodo-btn,
+            .painel-linhas-btn {
+                flex: 1;
+                min-width: 0;
+                text-align: center;
+            }
             .painel-kpi-grid { grid-template-columns: 1fr; gap: 12px; }
             .painel-kpi {
                 min-height: 92px;
@@ -889,15 +919,260 @@ function inject_painel_styles() {
                 grid-template-columns: 1fr;
             }
         }
+        .painel-periodo-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px 20px;
+            margin-bottom: var(--painel-gap-md);
+            padding: 14px 16px;
+            border-radius: var(--painel-radius-sm);
+            border: 1px solid color-mix(in srgb, var(--border-color) 65%, transparent);
+            background: color-mix(in srgb, var(--subtle-fg) 35%, var(--card-bg));
+        }
+        .painel-filtro-group {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px 12px;
+        }
+        .painel-periodo-label,
+        .painel-linhas-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+        .painel-periodo-filters,
+        .painel-linhas-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .painel-periodo-btn,
+        .painel-linhas-btn {
+            min-height: 36px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            border: 1px solid color-mix(in srgb, var(--border-color) 80%, transparent);
+            background: var(--card-bg);
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .painel-periodo-btn.active,
+        .painel-linhas-btn.active {
+            background: color-mix(in srgb, var(--primary) 12%, var(--card-bg));
+            border-color: color-mix(in srgb, var(--primary) 35%, var(--border-color));
+            color: var(--primary);
+            font-weight: 600;
+        }
+        .painel-list-meta {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+        .painel-section-head-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+        }
+        .painel-centro-atencao {
+            margin-bottom: var(--painel-gap);
+        }
+        .painel-centro-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        @media (min-width: 640px) {
+            .painel-centro-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+        @media (min-width: 1024px) {
+            .painel-centro-grid { grid-template-columns: repeat(6, 1fr); }
+        }
+        .painel-centro-groups {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .painel-centro-group-title {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin: 0 0 8px;
+        }
+        .painel-duo-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--painel-gap-sm);
+            margin-bottom: var(--painel-gap);
+        }
+        @media (min-width: 768px) {
+            .painel-duo-grid { grid-template-columns: 1fr 1fr; }
+        }
+        .painel-duo-grid .painel-section {
+            margin-bottom: 0;
+        }
+        .painel-section--nested {
+            margin-bottom: var(--painel-gap-sm);
+        }
+        .painel-section--nested .painel-section-head {
+            margin-bottom: 12px;
+        }
+        .painel-section--nested .painel-section-title {
+            font-size: 0.95rem;
+        }
+        .painel-horas-panel {
+            padding: 18px 20px;
+        }
+        .painel-atencao-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 12px 14px;
+            border-radius: var(--painel-radius-sm);
+            border: 1px solid color-mix(in srgb, var(--border-color) 65%, transparent);
+            background: var(--card-bg);
+            box-shadow: var(--painel-shadow);
+            cursor: pointer;
+            transition: transform 0.18s ease, box-shadow 0.2s ease;
+            min-height: 64px;
+        }
+        .painel-atencao-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--painel-shadow-hover);
+        }
+        .painel-atencao-card.tone-red { border-left: 4px solid var(--painel-tone-red); }
+        .painel-atencao-card.tone-orange { border-left: 4px solid var(--painel-tone-orange); }
+        .painel-atencao-card.tone-yellow { border-left: 4px solid var(--painel-tone-yellow); }
+        .painel-atencao-card.tone-green { border-left: 4px solid var(--painel-tone-green); }
+        .painel-atencao-card.tone-blue { border-left: 4px solid var(--painel-tone-blue); }
+        .painel-atencao-icon {
+            flex-shrink: 0;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: color-mix(in srgb, var(--subtle-fg) 60%, var(--card-bg));
+        }
+        .painel-atencao-body { flex: 1; min-width: 0; }
+        .painel-atencao-count {
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            color: var(--text-color);
+        }
+        .painel-atencao-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 3px;
+            line-height: 1.3;
+            white-space: normal;
+            word-break: break-word;
+        }
+        .painel-atencao-meta {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 2px;
+            line-height: 1.25;
+            opacity: 0.9;
+        }
+        .painel-timeline-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            padding: 8px 0;
+        }
+        .painel-timeline-item {
+            display: grid;
+            grid-template-columns: 72px minmax(0, 1fr) auto;
+            gap: 10px;
+            align-items: start;
+            padding: 10px 14px;
+            border-bottom: 1px solid color-mix(in srgb, var(--border-color) 45%, transparent);
+            cursor: pointer;
+            transition: background 0.18s ease;
+        }
+        .painel-timeline-item:last-child { border-bottom: none; }
+        .painel-timeline-item:hover {
+            background: color-mix(in srgb, var(--subtle-fg) 50%, var(--card-bg));
+        }
+        .painel-timeline-date {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            font-variant-numeric: tabular-nums;
+        }
+        .painel-timeline-type {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+        .painel-timeline-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-color);
+            line-height: 1.3;
+            word-break: break-word;
+        }
+        .painel-timeline-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+            line-height: 1.35;
+            word-break: break-word;
+        }
+        .painel-kpi-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .painel-kpi-row:last-child { margin-bottom: 0; }
+        @media (max-width: 1024px) {
+            .painel-kpi-row { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 640px) {
+            .painel-kpi-row { grid-template-columns: 1fr; }
+            .painel-centro-grid { grid-template-columns: 1fr; }
+            .painel-timeline-item {
+                grid-template-columns: 72px minmax(0, 1fr);
+                grid-template-rows: auto auto;
+            }
+            .painel-timeline-item .indicator-pill { grid-column: 1 / -1; justify-self: start; }
+        }
     `;
     $('<style id="painel-advocacia-styles">' + css + "</style>").appendTo("head");
 }
 
 function load_painel(page) {
     mostrar_skeleton(page.painel_container);
-    frappe.xcall("advocacia.advocacia.painel_api.get_painel_data")
+    var periodo = page.painel_periodo || 7;
+    var list_limit = page.painel_list_limit != null ? page.painel_list_limit : 5;
+    frappe.xcall("advocacia.advocacia.painel_api.get_painel_data", {
+        periodo_dias: periodo,
+        list_limit: list_limit,
+    })
         .then(function (data) {
-            render_painel(page.painel_container, data);
+            page.painel_data = data;
+            render_painel(page.painel_container, data, page);
         })
         .catch(function (err) {
             handle_error(page.painel_container, err);
@@ -923,51 +1198,157 @@ function handle_error($container, err) {
     );
 }
 
-function render_painel($container, d) {
-    var kpi_routes = get_kpi_routes();
+function painel_periodo_fim(page) {
+    var dias = (page && page.painel_periodo) || 7;
+    return frappe.datetime.add_days(frappe.datetime.get_today(), dias);
+}
+
+function painel_periodo_label(dias) {
+    dias = cint(dias) || 7;
+    if (dias === 1) return __("hoje");
+    if (dias === 7) return __("7 dias");
+    if (dias === 15) return __("15 dias");
+    if (dias === 30) return __("30 dias");
+    return __("{0} dias", [dias]);
+}
+
+function painel_periodo_previsto_label(dias) {
+    dias = cint(dias) || 7;
+    if (dias === 1) return __("previsto hoje");
+    if (dias === 7) return __("previsto em 7 dias");
+    if (dias === 15) return __("previsto em 15 dias");
+    if (dias === 30) return __("previsto em 30 dias");
+    return __("previsto em {0} dias", [dias]);
+}
+
+function painel_periodo_a_receber_label(dias) {
+    dias = cint(dias) || 7;
+    if (dias === 1) return __("A receber hoje");
+    return __("A receber ({0})", [painel_periodo_label(dias)]);
+}
+
+function painel_periodo_recebidos_label(dias) {
+    dias = cint(dias) || 7;
+    if (dias === 1) return __("Recebidos hoje");
+    return __("Recebidos ({0})", [painel_periodo_label(dias)]);
+}
+
+function painel_periodo_enunciado(dias) {
+    dias = cint(dias) || 7;
+    if (dias === 1) return __("hoje");
+    return __("nos próximos {0} dias", [dias]);
+}
+
+function painel_periodo_scope_label(dias) {
+    dias = cint(dias) || 7;
+    if (dias === 1) return __("Período: hoje");
+    return __("Período: {0} dias", [dias]);
+}
+
+function painel_horas_label(dias) {
+    dias = cint(dias) || 7;
+    if (dias === 1) return __("Horas hoje");
+    return __("Horas ({0})", [painel_periodo_label(dias)]);
+}
+
+function painel_list_meta_html(meta, list_limit) {
+    if (!meta || !meta.total) return "";
+    if (!list_limit || list_limit === 0 || meta.showing >= meta.total) {
+        return (
+            '<span class="painel-list-meta">' +
+            __("Todos ({0})", [meta.total]) +
+            "</span>"
+        );
+    }
+    return (
+        '<span class="painel-list-meta">' +
+        __("{0} de {1}", [meta.showing, meta.total]) +
+        "</span>"
+    );
+}
+
+function painel_goto_list(doctype, filters) {
+    filters = filters || [];
+    frappe.route_options = null;
+    var list_key = "List/" + doctype + "/List";
+
+    var apply_filters = function () {
+        var lv = frappe.views.list_view && frappe.views.list_view[list_key];
+        if (!lv || !lv.filter_area) return false;
+        var tuples = filters.map(function (f) {
+            return [doctype, f[0], f[1], f[2]];
+        });
+        lv.filter_area.clear(false).then(function () {
+            if (tuples.length) {
+                return lv.filter_area.set(tuples);
+            }
+        }).then(function () {
+            lv.refresh();
+        });
+        frappe.route_options = null;
+        return true;
+    };
+
+    var cur = frappe.get_route();
+    if (cur[0] === "List" && cur[1] === doctype && apply_filters()) {
+        return;
+    }
+
+    var attempts = 0;
+    var timer = setInterval(function () {
+        attempts += 1;
+        if (apply_filters() || attempts > 30) {
+            clearInterval(timer);
+        }
+    }, 100);
+    frappe.set_route("List", doctype);
+}
+
+function render_painel($container, d, page) {
+    var periodo = d.periodo_dias || page.painel_periodo || 7;
+    var list_limit = d.list_limit != null ? d.list_limit : page.painel_list_limit || 5;
+    var meta = d.list_meta || {};
+    page.painel_list_limit = list_limit;
     var html = '<div class="painel-content">';
-    html += render_header(d.resumo, d.kpis);
+    html += render_header(d.resumo, d.kpis, periodo, d.financeiro);
+    html += render_filtros_painel(periodo, list_limit);
     html += render_acoes_rapidas();
-    html += render_kpis(d.kpis);
-    html += render_operacao_dia(d);
-    html += render_financeiro(d.financeiro);
-    html += render_parcelas(d.parcelas);
-    html += render_despesas(d.despesas_pendentes, d.total_despesas_mes);
-    html += render_custas(d.custas_pendentes_repasse, d.total_custas_mes);
-    html += render_horas_semana(d.horas_semana);
-    html += render_comunicacoes(d.ultimas_comunicacoes);
-    html += '<div class="painel-secondary-grid">';
-    html += render_secundario(
-        __("Agenda — 7 dias"),
-        "milestone",
-        render_audiencia_items(d.audiencias),
-        "painel-audiencias",
-        __("Nenhuma audiência nesta semana"),
-        __("Quando houver compromissos agendados, eles aparecerão aqui."),
-        "Audiencia"
+    html += render_centro_atencao(
+        d.centro_atencao,
+        d.kpis,
+        d.financeiro,
+        d.horas_periodo != null ? d.horas_periodo : d.horas_semana,
+        d.total_despesas_mes,
+        periodo
     );
-    html += render_secundario(
-        __("Prazos"),
-        "time",
-        render_prazo_items(d.prazos),
-        "painel-prazos",
-        __("Nenhum prazo pendente"),
-        __("Sua fila processual está em dia neste período."),
-        "Controle de Prazos"
+    html += render_timeline(d.timeline, periodo, meta.timeline, list_limit);
+    html += render_comunicacoes_pendentes(
+        d.comunicacoes_pendentes || d.ultimas_comunicacoes,
+        periodo,
+        meta.comunicacoes,
+        list_limit
     );
-    html += render_secundario(
-        __("Tarefas"),
-        "checklist",
-        render_tarefa_items(d.tarefas),
-        "painel-tarefas",
-        __("Nenhuma tarefa aberta"),
-        __("Ótimo momento para planejar o próximo passo do escritório."),
-        "Tarefa"
+    html += render_financeiro(d.financeiro, periodo);
+    html += render_duo_honorarios_despesas(
+        d.parcelas,
+        d.despesas_pendentes,
+        d.total_despesas_mes,
+        meta.parcelas,
+        meta.despesas,
+        list_limit
     );
-    html += "</div>";
+    html += render_duo_custas_horas(
+        d.custas_pendentes_repasse,
+        d.total_custas_mes,
+        d.horas_periodo != null ? d.horas_periodo : d.horas_semana,
+        meta.custas,
+        periodo,
+        list_limit
+    );
     html += "</div>";
     $container.html(html);
-    bind_kpi_routes($container, kpi_routes);
+    bind_painel_filters($container, page);
+    bind_atencao_routes($container, page);
 }
 
 function render_empty_state(icon, title, hint) {
@@ -986,11 +1367,15 @@ function render_empty_state(icon, title, hint) {
     );
 }
 
-function painel_context_line(resumo, kpis) {
+function painel_context_line(resumo, kpis, periodo_dias, financeiro) {
     resumo = resumo || {};
     kpis = kpis || {};
+    financeiro = financeiro || {};
+    periodo_dias = cint(periodo_dias) || 7;
     if (resumo.urgencia !== "alta") {
-        return __("Nenhuma urgência crítica no radar — bom dia para execução focada.");
+        return __("Visão operacional {0} — nenhuma urgência crítica no radar.", [
+            painel_periodo_enunciado(periodo_dias),
+        ]);
     }
     var parts = [];
     if (resumo.audiencias_hoje) {
@@ -1004,9 +1389,16 @@ function painel_context_line(resumo, kpis) {
     if (resumo.prazos_urgentes) {
         parts.push(__("{0} prazo(s) com vencimento iminente", [resumo.prazos_urgentes]));
     }
-    if (kpis.previsto_mes && kpis.previsto_mes.valor) {
+    var previsto =
+        (financeiro.previsto_periodo && financeiro.previsto_periodo.valor) ||
+        resumo.previsto_periodo_valor ||
+        0;
+    if (previsto) {
         parts.push(
-            __("Fluxo previsto no mês: {0}", [fmt_currency(kpis.previsto_mes.valor, true)])
+            __("{0}: {1}", [
+                painel_periodo_previsto_label(periodo_dias),
+                fmt_currency(previsto, true),
+            ])
         );
     }
     return parts.join(". ") + ".";
@@ -1019,10 +1411,19 @@ function painel_greeting() {
     return __("Boa noite");
 }
 
-function render_header(resumo, kpis) {
+function render_header(resumo, kpis, periodo_dias, financeiro) {
     resumo = resumo || {};
     kpis = kpis || {};
+    financeiro = financeiro || {};
+    periodo_dias = cint(periodo_dias) || 7;
     var urg = resumo.urgencia === "alta" ? "alta" : "normal";
+    var previsto_val =
+        resumo.previsto_periodo_valor != null
+            ? resumo.previsto_periodo_valor
+            : resumo.previsto_semana_valor ||
+              (financeiro.previsto_periodo && financeiro.previsto_periodo.valor) ||
+              (financeiro.previsto_semana && financeiro.previsto_semana.valor) ||
+              0;
     var pulse_stats =
         '<div class="painel-hero-pulse-stats">' +
         '<span><strong>' +
@@ -1034,9 +1435,9 @@ function render_header(resumo, kpis) {
         "</strong> " +
         __("parcela(s) vencida(s)") +
         "</span><span><strong>" +
-        fmt_currency(resumo.previsto_semana_valor || 0, true) +
+        fmt_currency(previsto_val, true) +
         "</strong> " +
-        __("previsto esta semana") +
+        painel_periodo_previsto_label(periodo_dias) +
         "</span>";
     if (resumo.prazos_urgentes) {
         pulse_stats +=
@@ -1063,7 +1464,7 @@ function render_header(resumo, kpis) {
         frappe.utils.escape_html(resumo.data_hoje || "") +
         "</p>" +
         '<p class="painel-hero-context">' +
-        frappe.utils.escape_html(painel_context_line(resumo, kpis)) +
+        frappe.utils.escape_html(painel_context_line(resumo, kpis, periodo_dias, financeiro)) +
         "</p>" +
         '<div class="painel-hero-pulse">' +
         pulse +
@@ -1073,11 +1474,17 @@ function render_header(resumo, kpis) {
 
 function render_acoes_rapidas() {
     var actions = [
-        { label: __("Novo Cliente"), icon: "user-plus", dt: "Cliente" },
-        { label: __("Novo Serviço"), icon: "folder-plus", dt: "Servico" },
-        { label: __("Nova Audiência"), icon: "calendar-plus-2", dt: "Audiencia" },
-        { label: __("Novo Prazo"), icon: "clock-plus", dt: "Controle de Prazos" },
-        { label: __("Novo Honorário"), icon: "file-plus", dt: "Acordo de Honorarios Processuais" },
+        { label: __("Cliente"), icon: "user-plus", dt: "Cliente" },
+        { label: __("Serviço"), icon: "folder-plus", dt: "Servico" },
+        { label: __("Audiência"), icon: "calendar-plus-2", dt: "Audiencia" },
+        { label: __("Prazo"), icon: "clock-plus", dt: "Controle de Prazos" },
+        { label: __("Comunicação"), icon: "message-square-plus", dt: "Comunicacao" },
+        { label: __("Tarefa"), icon: "list-plus", dt: "Tarefa" },
+        { label: __("Honorário"), icon: "file-plus", dt: "Acordo de Honorarios Processuais" },
+        { label: __("Pagamento"), icon: "circle-dollar-sign", dt: "Pagamento" },
+        { label: __("Custa"), icon: "receipt", dt: "Custa Processual" },
+        { label: __("Horas"), icon: "clock", dt: "Registro de Horas" },
+        { label: __("Despesa"), icon: "wallet", dt: "Despesa do Escritorio" },
     ];
     var h =
         '<div class="painel-actions-wrap">' +
@@ -1097,6 +1504,594 @@ function render_acoes_rapidas() {
     });
     h += "</div></div>";
     return h;
+}
+
+function render_filtros_painel(periodo_atual, list_limit) {
+    var opcoes_periodo = [
+        { dias: 1, label: __("Hoje") },
+        { dias: 7, label: __("7 dias") },
+        { dias: 15, label: __("15 dias") },
+        { dias: 30, label: __("30 dias") },
+    ];
+    var opcoes_linhas = [
+        { val: 5, label: "5" },
+        { val: 10, label: "10" },
+        { val: 15, label: "15" },
+        { val: 0, label: __("Todos") },
+    ];
+    list_limit = list_limit != null ? cint(list_limit) : 5;
+    var h =
+        '<div class="painel-periodo-bar">' +
+        '<div class="painel-filtro-group">' +
+        '<span class="painel-periodo-label">' +
+        painel_periodo_scope_label(periodo_atual) +
+        "</span>" +
+        '<div class="painel-periodo-filters">';
+    opcoes_periodo.forEach(function (op) {
+        h +=
+            '<button type="button" class="painel-periodo-btn' +
+            (periodo_atual === op.dias ? " active" : "") +
+            '" data-periodo="' +
+            op.dias +
+            '">' +
+            op.label +
+            "</button>";
+    });
+    h +=
+        "</div></div>" +
+        '<div class="painel-filtro-group">' +
+        '<span class="painel-linhas-label">' +
+        __("Itens por lista") +
+        "</span>" +
+        '<div class="painel-linhas-filters">';
+    opcoes_linhas.forEach(function (op) {
+        h +=
+            '<button type="button" class="painel-linhas-btn' +
+            (list_limit === op.val ? " active" : "") +
+            '" data-linhas="' +
+            op.val +
+            '">' +
+            op.label +
+            "</button>";
+    });
+    h += "</div></div></div>";
+    return h;
+}
+
+function render_centro_atencao(centro, kpis, fin, horas, total_despesas, periodo_dias) {
+    centro = centro || {};
+    kpis = kpis || {};
+    fin = fin || {};
+    periodo_dias = cint(periodo_dias) || 7;
+
+    function card(it) {
+        return (
+            '<div class="painel-atencao-card tone-' +
+            it.tone +
+            '" data-atencao-route="' +
+            it.route +
+            '">' +
+            '<div class="painel-atencao-icon">' +
+            painel_icon(it.icon) +
+            "</div>" +
+            '<div class="painel-atencao-body">' +
+            '<div class="painel-atencao-count">' +
+            frappe.utils.escape_html(String(it.count)) +
+            "</div>" +
+            '<div class="painel-atencao-label">' +
+            frappe.utils.escape_html(it.label) +
+            "</div>" +
+            (it.meta
+                ? '<div class="painel-atencao-meta">' +
+                  frappe.utils.escape_html(String(it.meta)) +
+                  "</div>"
+                : "") +
+            "</div></div>"
+        );
+    }
+
+    function group(title, items) {
+        var cards = items.map(card).join("");
+        if (!cards) return "";
+        return (
+            '<div class="painel-centro-group">' +
+            '<h3 class="painel-centro-group-title">' +
+            frappe.utils.escape_html(title) +
+            "</h3>" +
+            '<div class="painel-centro-grid">' +
+            cards +
+            "</div></div>"
+        );
+    }
+
+    var urgentes = [
+        {
+            tone: "red",
+            icon: "calendar-days",
+            count: centro.audiencias_hoje || 0,
+            label: __("Audiências hoje"),
+            route: "audiencias_hoje",
+        },
+        {
+            tone: "orange",
+            icon: "calendar-clock",
+            count: centro.audiencias_amanha || 0,
+            label: __("Amanhã"),
+            route: "audiencias_amanha",
+        },
+        {
+            tone: "red",
+            icon: "alarm-clock",
+            count: centro.prazos_vencidos || 0,
+            label: __("Prazos vencidos"),
+            route: "prazos_vencidos",
+        },
+        {
+            tone: "orange",
+            icon: "timer",
+            count: centro.prazos_proximos_3d || 0,
+            label: __("Prazos 3 dias"),
+            route: "prazos_proximos",
+        },
+        {
+            tone: "yellow",
+            icon: "list-todo",
+            count: centro.tarefas_atrasadas || 0,
+            label: __("Tarefas atrasadas"),
+            route: "tarefas_atrasadas",
+        },
+        {
+            tone: "red",
+            icon: "circle-dollar-sign",
+            count: (centro.parcelas_vencidas && centro.parcelas_vencidas.count) || 0,
+            label: __("Parcelas vencidas"),
+            meta: fmt_currency((centro.parcelas_vencidas && centro.parcelas_vencidas.valor) || 0, true),
+            route: "parcelas_vencidas",
+        },
+    ];
+
+    var no_periodo = [
+        {
+            tone: "orange",
+            icon: "wallet",
+            count: (centro.pagamentos_periodo && centro.pagamentos_periodo.count) || 0,
+            label: painel_periodo_a_receber_label(periodo_dias),
+            meta: fmt_currency((centro.pagamentos_periodo && centro.pagamentos_periodo.valor) || 0, true),
+            route: "pagamentos_periodo",
+        },
+        {
+            tone: "green",
+            icon: "trending-up",
+            count: (centro.recebimentos_periodo && centro.recebimentos_periodo.count) || 0,
+            label: painel_periodo_recebidos_label(periodo_dias),
+            meta: fmt_currency((centro.recebimentos_periodo && centro.recebimentos_periodo.valor) || 0, true),
+            route: "recebimentos_periodo",
+        },
+    ];
+
+    var indicadores = [
+        {
+            tone: "blue",
+            icon: "calendar",
+            count: centro.audiencias_periodo || kpis.audiencias_semana || 0,
+            label: __("Audiências ({0})", [painel_periodo_label(periodo_dias)]),
+            route: "audiencias_periodo",
+        },
+        {
+            tone: "orange",
+            icon: "time",
+            count: centro.prazos_urgentes || kpis.prazos_urgentes || 0,
+            label: __("Prazos críticos"),
+            route: "prazos_criticos",
+        },
+        {
+            tone: "yellow",
+            icon: "checklist",
+            count: centro.tarefas_pendentes || kpis.tarefas_pendentes || 0,
+            label: __("Tarefas abertas"),
+            route: "tarefas_pendentes",
+        },
+        {
+            tone: "green",
+            icon: "banknote",
+            count: fmt_currency((kpis.recebido_mes && kpis.recebido_mes.valor) || 0, true),
+            label: __("Receita mês"),
+            route: "receita_mes",
+        },
+        {
+            tone: "blue",
+            icon: "file-text",
+            count: centro.honorarios_ativos || kpis.honorarios_ativos || 0,
+            label: __("Honorários ativos"),
+            route: "honorarios_ativos",
+        },
+        {
+            tone: "blue",
+            icon: "clock",
+            count: (horas || 0).toFixed(1) + " h",
+            label: painel_horas_label(periodo_dias),
+            route: "horas",
+        },
+        {
+            tone: "gray",
+            icon: "users",
+            count: centro.total_clientes || kpis.total_clientes || 0,
+            label: __("Clientes"),
+            route: "clientes",
+        },
+        {
+            tone: "green",
+            icon: "percent",
+            count: (fin.taxa_recebimento || kpis.taxa_recebimento || 0) + "%",
+            label: __("Taxa receb."),
+            route: "taxa_recebimento",
+        },
+        {
+            tone: "blue",
+            icon: "briefcase",
+            count: centro.servicos_ativos || kpis.servicos_ativos || 0,
+            label: __("Processos"),
+            route: "processos_ativos",
+        },
+        {
+            tone: "orange",
+            icon: "receipt",
+            count: centro.custas_abertas || kpis.custas_abertas || 0,
+            label: __("Custas abertas"),
+            route: "custas_abertas",
+        },
+        {
+            tone: "orange",
+            icon: "wallet",
+            count: fmt_currency(total_despesas || 0, true),
+            label: __("Despesas mês"),
+            route: "despesas_mes",
+        },
+    ];
+
+    return (
+        '<section class="painel-section painel-centro-atencao" id="painel-centro-atencao">' +
+        '<div class="painel-section-head"><div><h2 class="painel-section-title">' +
+        __("Centro de Atenção") +
+        "</h2>" +
+        '<p class="painel-section-sub">' +
+        __("Urgências e indicadores {0}", [painel_periodo_enunciado(periodo_dias)]) +
+        "</p></div></div>" +
+        '<div class="painel-centro-groups">' +
+        group(__("Urgente"), urgentes) +
+        group(__("No período ({0})", [painel_periodo_label(periodo_dias)]), no_periodo) +
+        group(__("Indicadores"), indicadores) +
+        "</div></section>"
+    );
+}
+
+function render_timeline(timeline, periodo_dias, list_meta, list_limit) {
+    periodo_dias = cint(periodo_dias) || 7;
+    var titulo =
+        periodo_dias === 1
+            ? __("Agenda de hoje")
+            : __("Agenda — próximos {0} dias", [periodo_dias]);
+    var subtitulo =
+        periodo_dias === 1
+            ? __("Audiências, prazos e tarefas de hoje")
+            : __("Audiências, prazos e tarefas {0}", [painel_periodo_enunciado(periodo_dias)]);
+    var meta_html = painel_list_meta_html(list_meta, list_limit);
+    var h =
+        '<section class="painel-section painel-section--timeline" id="painel-timeline"><div class="painel-section-head">' +
+        "<div><h2 class='painel-section-title'>" +
+        titulo +
+        "</h2>" +
+        '<p class="painel-section-sub">' +
+        subtitulo +
+        "</p></div>" +
+        '<div class="painel-section-head-actions">' +
+        meta_html +
+        '<span class="painel-section-link" data-route-calendar="1">' +
+        __("Ver agenda") +
+        "</span></div></div>";
+
+    if (!timeline || !timeline.length) {
+        return (
+            h +
+            '<div class="painel-panel">' +
+            render_empty_state(
+                "calendar",
+                __("Agenda tranquila"),
+                periodo_dias === 1
+                    ? __("Nada agendado para hoje.")
+                    : __("Nenhum compromisso no período selecionado.")
+            ) +
+            "</div></section>"
+        );
+    }
+
+    h += '<div class="painel-panel"><div class="painel-timeline-list">';
+    timeline.forEach(function (it) {
+        var tipo_label =
+            it.tipo === "audiencia"
+                ? __("Audiência")
+                : it.tipo === "prazo"
+                  ? __("Prazo")
+                  : __("Tarefa");
+        var pill_map = { red: "Alta", orange: "Média", yellow: "Normal", blue: "Normal", gray: "Baixa" };
+        h +=
+            '<div class="painel-timeline-item" data-dt="' +
+            frappe.utils.escape_html(it.doctype || "") +
+            '" data-dn="' +
+            frappe.utils.escape_html(it.docname || "") +
+            '">' +
+            '<div class="painel-timeline-date">' +
+            frappe.utils.escape_html(fmt_date_iso(it.data)) +
+            (it.hora ? " · " + frappe.utils.escape_html(it.hora) : "") +
+            "</div>" +
+            '<div class="painel-timeline-body">' +
+            '<div class="painel-timeline-type">' +
+            painel_icon(it.tipo === "audiencia" ? "milestone" : it.tipo === "prazo" ? "time" : "checklist") +
+            frappe.utils.escape_html(tipo_label) +
+            "</div>" +
+            '<div class="painel-timeline-title">' +
+            frappe.utils.escape_html(it.titulo || "") +
+            "</div>" +
+            '<div class="painel-timeline-sub">' +
+            frappe.utils.escape_html(it.subtitulo || "") +
+            (it.detalhe ? " · " + frappe.utils.escape_html(it.detalhe) : "") +
+            "</div></div>" +
+            status_pill(pill_map[it.urgencia] || "Normal") +
+            "</div>";
+    });
+    h += "</div></div></section>";
+    return h;
+}
+
+function render_kpis_operacionais(k, fin, horas, total_despesas, total_custas, custas_list) {
+    if (!k) return "";
+    fin = fin || {};
+    var row1 = [
+        { label: __("Audiências da semana"), value: String(k.audiencias_semana || 0), route: "audiencias_semana" },
+        { label: __("Prazos críticos"), value: String(k.prazos_urgentes || 0), urgent: k.prazos_urgentes > 0, route: "prazos_criticos" },
+        { label: __("Tarefas pendentes"), value: String(k.tarefas_pendentes || 0), route: "tarefas_pendentes" },
+        {
+            label: __("Recebimentos do período"),
+            value: fmt_currency((k.recebido_periodo && k.recebido_periodo.valor) || 0),
+            positive: true,
+            route: "recebimentos_periodo",
+        },
+    ];
+    var row2 = [
+        { label: __("Receita do mês"), value: fmt_currency((k.recebido_mes && k.recebido_mes.valor) || 0), positive: true, route: "receita_mes" },
+        { label: __("Honorários ativos"), value: String(k.honorarios_ativos || 0), route: "honorarios_ativos" },
+        { label: __("Horas registradas"), value: (horas || 0).toFixed(1) + " h", route: "horas" },
+        { label: __("Clientes ativos"), value: String(k.total_clientes || 0), route: "clientes" },
+    ];
+    var row3 = [
+        { label: __("Taxa de recebimento"), value: (fin.taxa_recebimento || k.taxa_recebimento || 0) + "%", route: "taxa_recebimento" },
+        { label: __("Processos ativos"), value: String(k.servicos_ativos || 0), route: "processos_ativos" },
+        {
+            label: __("Custas abertas"),
+            value: String(k.custas_abertas || (custas_list && custas_list.length) || 0),
+            warn: (k.custas_abertas || 0) > 0,
+            route: "custas_abertas",
+        },
+        { label: __("Despesas do mês"), value: fmt_currency(total_despesas || 0), route: "despesas_mes" },
+    ];
+
+    var h =
+        '<section class="painel-section" id="painel-kpis"><div class="painel-section-head">' +
+        "<div><h2 class='painel-section-title'>" +
+        __("KPIs Operacionais") +
+        "</h2>" +
+        '<p class="painel-section-sub">' +
+        __("Indicadores do período selecionado") +
+        "</p></div></div>";
+
+    [row1, row2, row3].forEach(function (row) {
+        h += '<div class="painel-kpi-row">';
+        row.forEach(function (item) {
+            var cls = "painel-kpi";
+            if (item.urgent) cls += " urgent";
+            if (item.positive) cls += " positive";
+            if (item.warn) cls += " warn";
+            h +=
+                '<div class="' +
+                cls +
+                '" data-kpi-route="' +
+                (item.route || "") +
+                '">' +
+                '<div class="painel-kpi-label">' +
+                item.label +
+                "</div>" +
+                '<div class="painel-kpi-value">' +
+                item.value +
+                "</div></div>";
+        });
+        h += "</div>";
+    });
+    h += "</section>";
+    return h;
+}
+
+function render_comunicacoes_pendentes(comunicacoes, periodo_dias, list_meta, list_limit) {
+    periodo_dias = cint(periodo_dias) || 7;
+    var meta_html = painel_list_meta_html(list_meta, list_limit);
+    var h =
+        '<section class="painel-section" id="painel-comunicacoes"><div class="painel-section-head">' +
+        "<div><h2 class='painel-section-title'>" +
+        __("Comunicações") +
+        "</h2>" +
+        '<p class="painel-section-sub">' +
+        __("Follow-ups pendentes — visão {0}", [painel_periodo_enunciado(periodo_dias)]) +
+        "</p></div>" +
+        '<div class="painel-section-head-actions">' +
+        meta_html +
+        '<span class="painel-section-link" data-route-list="Comunicacao">' +
+        __("Ver todas") +
+        "</span></div></div>";
+
+    if (!comunicacoes || !comunicacoes.length) {
+        return (
+            h +
+            '<div class="painel-panel">' +
+            render_empty_state(
+                "message",
+                __("Nenhuma comunicação pendente"),
+                __("Retornos e follow-ups aparecerão aqui quando precisarem de ação.")
+            ) +
+            "</div></section>"
+        );
+    }
+
+    h += '<div class="painel-panel"><div class="painel-schedule-list">';
+    comunicacoes.forEach(function (c) {
+        var urg = c.urgencia_ordem === 0 ? "red" : c.urgencia_ordem === 1 ? "orange" : "yellow";
+        h +=
+            '<div class="painel-schedule-item" data-comunicacao="' +
+            frappe.utils.escape_html(c.name || "") +
+            '" data-dt="Comunicacao" data-dn="' +
+            frappe.utils.escape_html(c.name || "") +
+            '">' +
+            '<div class="painel-schedule-main">' +
+            '<div class="painel-op-title">' +
+            frappe.utils.escape_html(c.assunto || c.name) +
+            "</div>" +
+            '<div class="painel-op-sub">' +
+            frappe.utils.escape_html(c.cliente || "") +
+            (c.motivo_pendencia ? " · " + frappe.utils.escape_html(c.motivo_pendencia) : "") +
+            "</div></div>" +
+            '<div class="painel-schedule-side">' +
+            status_pill(urg === "red" ? "Alta" : urg === "orange" ? "Média" : "Normal") +
+            '<span class="painel-op-sub">' +
+            __("{0}d sem retorno", [c.dias_sem_retorno || 0]) +
+            "</span></div></div>";
+    });
+    h += "</div></div></section>";
+    return h;
+}
+
+function bind_painel_filters($root, page) {
+    $root.find(".painel-periodo-btn").on("click", function () {
+        var dias = cint($(this).attr("data-periodo"));
+        if (!page || dias === page.painel_periodo) return;
+        page.painel_periodo = dias;
+        load_painel(page);
+    });
+    $root.find(".painel-linhas-btn").on("click", function () {
+        var linhas = cint($(this).attr("data-linhas"));
+        if (!page || linhas === page.painel_list_limit) return;
+        page.painel_list_limit = linhas;
+        load_painel(page);
+    });
+}
+
+function bind_atencao_routes($root, page) {
+    var hoje = frappe.datetime.get_today();
+    var amanha = frappe.datetime.add_days(hoje, 1);
+    var tres_dias = frappe.datetime.add_days(hoje, 3);
+    var periodo_fim = painel_periodo_fim(page);
+    var mes_inicio = frappe.datetime.month_start(hoje);
+    var mes_fim = frappe.datetime.month_end(hoje);
+
+    var routes = {
+        audiencias_hoje: function () {
+            painel_goto_list("Audiencia", [
+                ["data_hora", "between", [hoje + " 00:00:00", hoje + " 23:59:59"]],
+            ]);
+        },
+        audiencias_amanha: function () {
+            painel_goto_list("Audiencia", [
+                ["data_hora", "between", [amanha + " 00:00:00", amanha + " 23:59:59"]],
+            ]);
+        },
+        audiencias_periodo: function () {
+            painel_goto_list("Audiencia", [
+                ["data_hora", "between", [hoje + " 00:00:00", periodo_fim + " 23:59:59"]],
+            ]);
+        },
+        prazos_vencidos: function () {
+            painel_goto_list("Controle de Prazos", [
+                ["status", "=", "Pendente"],
+                ["data_prazo", "<", hoje],
+            ]);
+        },
+        prazos_proximos: function () {
+            painel_goto_list("Controle de Prazos", [
+                ["status", "=", "Pendente"],
+                ["data_prazo", "between", [hoje, tres_dias]],
+            ]);
+        },
+        prazos_criticos: function () {
+            painel_goto_list("Controle de Prazos", [
+                ["status", "=", "Pendente"],
+                ["data_prazo", "<=", tres_dias],
+            ]);
+        },
+        tarefas_atrasadas: function () {
+            painel_goto_list("Tarefa", [
+                ["status", "in", ["Pendente", "Em Andamento"]],
+                ["data_limite", "<", hoje],
+            ]);
+        },
+        tarefas_pendentes: function () {
+            painel_goto_list("Tarefa", [["status", "in", ["Pendente", "Em Andamento"]]]);
+        },
+        parcelas_vencidas: function () {
+            painel_goto_list("Pagamento", [["status", "=", "Vencido"]]);
+        },
+        pagamentos_periodo: function () {
+            painel_goto_list("Pagamento", [
+                ["status", "=", "Pendente"],
+                ["data_vencimento", "between", [hoje, periodo_fim]],
+            ]);
+        },
+        recebimentos_periodo: function () {
+            painel_goto_list("Pagamento", [
+                ["status", "in", ["Recebido", "Repassado"]],
+                ["data_recebimento", "between", [hoje, periodo_fim]],
+            ]);
+        },
+        receita_mes: function () {
+            painel_goto_list("Pagamento", [
+                ["status", "in", ["Recebido", "Repassado"]],
+                ["data_recebimento", "between", [mes_inicio, mes_fim]],
+            ]);
+        },
+        honorarios_ativos: function () {
+            painel_goto_list("Acordo de Honorarios Processuais", [["status", "=", "Vigente"]]);
+        },
+        horas: function () {
+            painel_goto_list("Registro de Horas", [
+                ["data", "between", [hoje, periodo_fim]],
+            ]);
+        },
+        clientes: function () {
+            painel_goto_list("Cliente", []);
+        },
+        taxa_recebimento: function () {
+            frappe.set_route("query-report", "inadimplencia");
+        },
+        processos_ativos: function () {
+            painel_goto_list("Servico", [["status", "=", "Em andamento"]]);
+        },
+        custas_abertas: function () {
+            painel_goto_list("Custa Processual", [
+                ["status", "in", ["Pendente", "Pago"]],
+                ["repassar_cliente", "=", 1],
+            ]);
+        },
+        despesas_mes: function () {
+            painel_goto_list("Despesa do Escritorio", [
+                ["data_vencimento", "between", [mes_inicio, mes_fim]],
+            ]);
+        },
+    };
+
+    $root.find(".painel-atencao-card[data-atencao-route]").on("click", function () {
+        var key = $(this).attr("data-atencao-route");
+        if (routes[key]) routes[key]();
+    });
+}
+
+function cint(val) {
+    return parseInt(val, 10) || 0;
 }
 
 function get_kpi_routes() {
@@ -1385,8 +2380,33 @@ function build_parcelas_criticas(parcelas, limit) {
         .join("");
 }
 
-function render_financeiro(fin) {
+function render_duo_honorarios_despesas(parcelas, despesas, total_mes, meta_parcelas, meta_despesas, list_limit) {
+    return (
+        '<div class="painel-duo-grid" id="painel-duo-financeiro">' +
+        render_parcelas(parcelas, true, meta_parcelas, list_limit) +
+        render_despesas(despesas, total_mes, true, meta_despesas, list_limit) +
+        "</div>"
+    );
+}
+
+function render_duo_custas_horas(custas, total_mes, horas, meta_custas, periodo_dias, list_limit) {
+    return (
+        '<div class="painel-duo-grid" id="painel-duo-secundario">' +
+        render_custas(custas, total_mes, true, meta_custas, list_limit) +
+        render_horas_semana(horas, true, periodo_dias) +
+        "</div>"
+    );
+}
+
+function render_financeiro(fin, periodo_dias) {
     if (!fin) return "";
+    periodo_dias = cint(periodo_dias) || 7;
+    var previsto =
+        fin.previsto_periodo || fin.previsto_semana || { count: 0, valor: 0 };
+    var previsto_label =
+        periodo_dias === 1
+            ? __("Previsto hoje")
+            : __("Previsto ({0})", [painel_periodo_label(periodo_dias)]);
     var max_val = 1;
     (fin.grafico || []).forEach(function (g) {
         if (flt(g.valor) > max_val) max_val = flt(g.valor);
@@ -1416,7 +2436,7 @@ function render_financeiro(fin) {
         __("Financeiro") +
         "</h2>" +
         '<p class="painel-section-sub">' +
-        __("Recebíveis, inadimplência e projeção do período") +
+        __("Recebíveis e projeção {0}", [painel_periodo_enunciado(periodo_dias)]) +
         "</p></div></div>" +
         '<div class="painel-finance-grid">' +
         '<div class="painel-panel"><div class="painel-finance-stats">' +
@@ -1431,9 +2451,9 @@ function render_financeiro(fin) {
         fmt_currency(fin.vencido.valor) +
         "</div></div>" +
         '<div class="painel-stat"><div class="painel-stat-label">' +
-        __("Previsto semana") +
+        previsto_label +
         '</div><div class="painel-stat-value">' +
-        fmt_currency(fin.previsto_semana.valor) +
+        fmt_currency(previsto.valor) +
         "</div></div>" +
         '<div class="painel-stat"><div class="painel-stat-label">' +
         __("Inadimplência") +
@@ -1449,18 +2469,23 @@ function render_financeiro(fin) {
     );
 }
 
-function render_parcelas(parcelas) {
+function render_parcelas(parcelas, compact, list_meta, list_limit) {
+    var meta_html = painel_list_meta_html(list_meta, list_limit);
     var h =
-        '<section class="painel-section" id="painel-parcelas"><div class="painel-section-head">' +
+        '<section class="painel-section' +
+        (compact ? " painel-section--nested" : "") +
+        '" id="painel-parcelas"><div class="painel-section-head">' +
         "<div><h2 class='painel-section-title'>" +
         __("Honorários em aberto") +
         "</h2>" +
         '<p class="painel-section-sub">' +
-        __("Cobranças pendentes e vencidas") +
+        __("Pendentes e vencidos") +
         "</p></div>" +
+        '<div class="painel-section-head-actions">' +
+        meta_html +
         '<span class="painel-section-link" data-route-list="Pagamento">' +
-        __("Ver pagamentos") +
-        "</span></div>";
+        __("Ver todos") +
+        "</span></div></div>";
     if (!parcelas || !parcelas.length) {
         return (
             h +
@@ -1515,26 +2540,23 @@ function render_parcelas(parcelas) {
     return h;
 }
 
-function render_despesas(despesas, total_mes) {
+function render_despesas(despesas, total_mes, compact, list_meta, list_limit) {
+    var meta_html = painel_list_meta_html(list_meta, list_limit);
     var h =
-        '<section class="painel-section" id="painel-despesas"><div class="painel-section-head">' +
+        '<section class="painel-section' +
+        (compact ? " painel-section--nested" : "") +
+        '" id="painel-despesas"><div class="painel-section-head">' +
         "<div><h2 class='painel-section-title'>" +
-        __("Despesas do Escritório") +
+        __("Despesas") +
         "</h2>" +
         '<p class="painel-section-sub">' +
-        __("Overhead operacional — pendentes e atrasadas") +
+        __("Pendentes · mês calendário: {0}", [fmt_currency(total_mes || 0, true)]) +
         "</p></div>" +
+        '<div class="painel-section-head-actions">' +
+        meta_html +
         '<span class="painel-section-link" data-route-list="Despesa do Escritorio">' +
         __("Ver todas") +
-        "</span></div>";
-
-    h +=
-        '<div class="painel-kpi-grid painel-kpi-grid--inline" style="margin-bottom:12px">' +
-        '<div class="painel-kpi-card"><div class="painel-kpi-label">' +
-        __("Despesas do Mês") +
-        '</div><div class="painel-kpi-value">' +
-        fmt_currency(total_mes || 0) +
-        "</div></div></div>";
+        "</span></div></div>";
 
     if (!despesas || !despesas.length) {
         return (
@@ -1582,26 +2604,23 @@ function render_despesas(despesas, total_mes) {
     return h;
 }
 
-function render_custas(custas, total_mes) {
+function render_custas(custas, total_mes, compact, list_meta, list_limit) {
+    var meta_html = painel_list_meta_html(list_meta, list_limit);
     var h =
-        '<section class="painel-section" id="painel-custas"><div class="painel-section-head">' +
+        '<section class="painel-section' +
+        (compact ? " painel-section--nested" : "") +
+        '" id="painel-custas"><div class="painel-section-head">' +
         "<div><h2 class='painel-section-title'>" +
-        __("Custas Processuais") +
+        __("Custas") +
         "</h2>" +
         '<p class="painel-section-sub">' +
-        __("Gastos repassáveis — pagas aguardando repasse ao cliente") +
+        __("Repasse · mês calendário: {0}", [fmt_currency(total_mes || 0, true)]) +
         "</p></div>" +
+        '<div class="painel-section-head-actions">' +
+        meta_html +
         '<span class="painel-section-link" data-route-list="Custa Processual">' +
         __("Ver todas") +
-        "</span></div>";
-
-    h +=
-        '<div class="painel-kpi-grid painel-kpi-grid--inline" style="margin-bottom:12px">' +
-        '<div class="painel-kpi-card"><div class="painel-kpi-label">' +
-        __("Custas Pagas no Mês") +
-        '</div><div class="painel-kpi-value">' +
-        fmt_currency(total_mes || 0) +
-        "</div></div></div>";
+        "</span></div></div>";
 
     if (!custas || !custas.length) {
         return (
@@ -1640,17 +2659,25 @@ function render_custas(custas, total_mes) {
     return h;
 }
 
-function render_horas_semana(horas) {
+function render_horas_semana(horas, compact, periodo_dias) {
+    periodo_dias = cint(periodo_dias) || 7;
     return (
-        '<section class="painel-section painel-section--inline" id="painel-horas">' +
-        '<div class="painel-kpi-grid painel-kpi-grid--inline">' +
-        '<div class="painel-kpi-card painel-kpi-card--clickable" data-route-list="Registro de Horas">' +
-        '<div class="painel-kpi-label">' +
-        __("Horas Registradas (semana)") +
-        "</div>" +
-        '<div class="painel-kpi-value">' +
+        '<section class="painel-section' +
+        (compact ? " painel-section--nested" : " painel-section--inline") +
+        '" id="painel-horas">' +
+        '<div class="painel-section-head"><div><h2 class="painel-section-title">' +
+        __("Horas") +
+        "</h2>" +
+        '<p class="painel-section-sub">' +
+        __("Registradas {0}", [painel_periodo_enunciado(periodo_dias)]) +
+        "</p></div>" +
+        '<span class="painel-section-link" data-route-list="Registro de Horas">' +
+        __("Ver todas") +
+        "</span></div>" +
+        '<div class="painel-panel painel-horas-panel">' +
+        '<div class="painel-atencao-count">' +
         (horas || 0).toFixed(1) +
-        " h</div></div></div></section>"
+        " h</div></div></section>"
     );
 }
 
@@ -1986,6 +3013,25 @@ function scroll_painel_section(id) {
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
+$(document).on("click", ".painel-timeline-item[data-dt]", function (e) {
+    if ($(e.target).closest(".painel-btn-recebida, .painel-btn-entrar").length) return;
+    var dt = $(this).attr("data-dt");
+    var dn = $(this).attr("data-dn");
+    if (dt && dn) frappe.set_route("Form", dt, dn);
+});
+
+$(document).on("click", "[data-route-calendar]", function (e) {
+    e.stopPropagation();
+    frappe.set_route("List", "Audiencia", "Calendar");
+});
+
+$(document).on("click", ".painel-schedule-item[data-dt]", function (e) {
+    if ($(e.target).closest(".painel-btn-recebida, .painel-btn-entrar").length) return;
+    var dt = $(this).attr("data-dt");
+    var dn = $(this).attr("data-dn");
+    if (dt && dn) frappe.set_route("Form", dt, dn);
+});
+
 $(document).on("click", ".painel-action-chip", function () {
     var dt = $(this).attr("data-new-dt");
     if (dt) frappe.new_doc(dt);
@@ -1998,7 +3044,7 @@ $(document).on("click", ".painel-section-link[data-scroll]", function () {
 $(document).on("click", "[data-route-list]", function (e) {
     e.stopPropagation();
     var dt = $(this).attr("data-route-list");
-    if (dt) frappe.set_route("List", dt);
+    if (dt) painel_goto_list(dt, []);
 });
 
 $(document).on("click", ".painel-schedule-card[data-dt]", function (e) {
