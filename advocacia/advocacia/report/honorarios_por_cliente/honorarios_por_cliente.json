@@ -7,7 +7,7 @@
  "module": "Advocacia",
  "name": "honorarios_por_cliente",
  "owner": "Administrator",
- "ref_doctype": "Pagamento",
+ "ref_doctype": "Acordo de Honorarios Processuais",
  "report_name": "honorarios_por_cliente",
  "report_type": "Script Report",
  "roles": [
