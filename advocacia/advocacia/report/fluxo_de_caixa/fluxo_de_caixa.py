@@ -3,7 +3,7 @@
 
 import frappe
 from frappe import _
-from frappe.utils import add_months, flt, get_first_day, get_last_day, getdate, today
+from frappe.utils import add_months, cint, flt, get_first_day, get_last_day, getdate, today
 
 
 MESES_PT = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"]
@@ -18,156 +18,227 @@ def execute(filters=None):
 
 def _get_columns():
 	return [
-		{"fieldname": "periodo", "label": _("Período"), "fieldtype": "Data", "width": 120},
-		{"fieldname": "previsto", "label": _("Previsto (R$)"), "fieldtype": "Currency", "width": 140},
-		{"fieldname": "recebido", "label": _("Recebido (R$)"), "fieldtype": "Currency", "width": 140},
-		{"fieldname": "vencido", "label": _("Vencido (R$)"), "fieldtype": "Currency", "width": 140},
-		{"fieldname": "acumulado", "label": _("Acumulado (R$)"), "fieldtype": "Currency", "width": 140},
-		{"fieldname": "parcelas", "label": _("Parcelas"), "fieldtype": "Int", "width": 80},
+		{"fieldname": "data", "label": _("Data"), "fieldtype": "Date", "width": 110},
+		{"fieldname": "tipo", "label": _("Tipo"), "fieldtype": "Data", "width": 90},
+		{"fieldname": "descricao", "label": _("Descrição"), "fieldtype": "Data", "width": 220},
+		{"fieldname": "origem", "label": _("Origem"), "fieldtype": "Data", "width": 160},
+		{"fieldname": "origem_doctype", "label": _("Origem DocType"), "fieldtype": "Data", "hidden": 1},
+		{
+			"fieldname": "documento",
+			"label": _("Documento"),
+			"fieldtype": "Dynamic Link",
+			"options": "origem_doctype",
+			"width": 140,
+		},
+		{
+			"fieldname": "valor_entrada",
+			"label": _("Valor Entrada"),
+			"fieldtype": "Currency",
+			"width": 130,
+		},
+		{
+			"fieldname": "valor_saida",
+			"label": _("Valor Saída"),
+			"fieldtype": "Currency",
+			"width": 130,
+		},
+		{
+			"fieldname": "saldo_acumulado",
+			"label": _("Saldo Acumulado"),
+			"fieldtype": "Currency",
+			"width": 140,
+		},
 	]
 
 
-def _format_period_label(dt):
+def _format_month_label(dt):
 	dt = getdate(dt)
 	return f"{MESES_PT[dt.month - 1]}/{dt.year}"
 
 
-def _get_data(filters):
+def _get_period_bounds(filters):
 	hoje = getdate(today())
 	meses = int(filters.get("meses") or 6)
-	mes_inicio = get_first_day(hoje)
+	period_start = get_first_day(hoje)
+	period_end = get_last_day(add_months(period_start, meses - 1))
+	return period_start, period_end, meses
 
-	query_filters = {"status": ["!=", "Cancelado"]}
+
+def _get_pagamentos(filters, period_start, period_end):
+	query_filters = {
+		"status": "Recebido",
+		"data_recebimento": ["between", [period_start, period_end]],
+	}
 	if filters.get("cliente"):
 		query_filters["cliente"] = filters.cliente
 
-	pagamentos = frappe.get_all(
+	return frappe.get_all(
 		"Pagamento",
 		filters=query_filters,
-		fields=[
-			"valor",
-			"valor_recebido",
-			"data_vencimento",
-			"data_recebimento",
-			"status",
-		],
+		fields=["name", "descricao", "data_recebimento", "valor", "valor_recebido"],
+		order_by="data_recebimento asc",
 		limit_page_length=0,
 	)
 
-	rows = []
-	total_previsto = 0.0
-	total_recebido = 0.0
-	total_vencido_acum = 0.0
-	acumulado = 0.0
 
-	chart_labels = []
-	chart_previsto = []
-	chart_recebido = []
+def _get_despesas(filters, period_start, period_end):
+	if not cint(filters.get("incluir_despesas", 1)):
+		return []
 
-	if filters.get("incluir_vencidos"):
-		vencido_valor = 0.0
-		vencido_count = 0
-		for p in pagamentos:
-			if p.status != "Vencido":
-				continue
-			if not p.data_vencimento or getdate(p.data_vencimento) >= mes_inicio:
-				continue
-			vencido_valor += flt(p.valor)
-			vencido_count += 1
-		if vencido_valor or vencido_count:
-			rows.append(
-				{
-					"periodo": _("Vencidos"),
-					"previsto": 0,
-					"recebido": 0,
-					"vencido": vencido_valor,
-					"acumulado": 0,
-					"parcelas": vencido_count,
-				}
-			)
-			total_vencido_acum = vencido_valor
+	return frappe.get_all(
+		"Despesa do Escritorio",
+		filters={
+			"status": "Pago",
+			"data_pagamento": ["between", [period_start, period_end]],
+		},
+		fields=["name", "descricao", "categoria", "data_pagamento", "valor"],
+		order_by="data_pagamento asc",
+		limit_page_length=0,
+	)
 
+
+def _build_chart(transactions, period_start, meses):
+	month_totals = {}
 	for i in range(meses):
-		period_start = get_first_day(add_months(mes_inicio, i))
-		period_end = get_last_day(period_start)
-		label = _format_period_label(period_start)
+		month_start = get_first_day(add_months(period_start, i))
+		label = _format_month_label(month_start)
+		month_totals[label] = {"entrada": 0.0, "saida": 0.0}
 
-		previsto = recebido = vencido = 0.0
-		parcelas = 0
+	for row in transactions:
+		label = _format_month_label(row["data"])
+		if label not in month_totals:
+			month_totals[label] = {"entrada": 0.0, "saida": 0.0}
+		month_totals[label]["entrada"] += flt(row.get("valor_entrada"))
+		month_totals[label]["saida"] += flt(row.get("valor_saida"))
 
-		for p in pagamentos:
-			dv = getdate(p.data_vencimento) if p.data_vencimento else None
-			dr = getdate(p.data_recebimento) if p.data_recebimento else None
-
-			in_month_venc = dv and period_start <= dv <= period_end
-			in_month_rec = dr and period_start <= dr <= period_end
-
-			if in_month_venc or in_month_rec:
-				parcelas += 1
-
-			if p.status == "Pendente" and in_month_venc:
-				previsto += flt(p.valor)
-			if p.status in ("Recebido", "Repassado") and in_month_rec:
-				recebido += flt(p.valor_recebido or p.valor)
-			if p.status == "Vencido" and in_month_venc:
-				vencido += flt(p.valor)
-
-		acumulado += recebido
-		total_previsto += previsto
-		total_recebido += recebido
-
-		rows.append(
-			{
-				"periodo": label,
-				"previsto": previsto,
-				"recebido": recebido,
-				"vencido": vencido,
-				"acumulado": acumulado,
-				"parcelas": parcelas,
-			}
-		)
-		chart_labels.append(label)
-		chart_previsto.append(previsto)
-		chart_recebido.append(recebido)
-
-	pct_realizacao = (total_recebido / total_previsto * 100) if total_previsto else 0
-
-	chart = {
+	labels = list(month_totals.keys())
+	return {
 		"data": {
-			"labels": chart_labels,
+			"labels": labels,
 			"datasets": [
-				{"name": _("Previsto"), "values": chart_previsto},
-				{"name": _("Recebido"), "values": chart_recebido},
+				{"name": _("Entradas"), "values": [month_totals[l]["entrada"] for l in labels]},
+				{"name": _("Saídas"), "values": [month_totals[l]["saida"] for l in labels]},
 			],
 		},
-		"type": "line",
-		"colors": ["#3b82f6", "#22c55e"],
+		"type": "bar",
+		"colors": ["#28a745", "#dc3545"],
 	}
+
+
+def _get_data(filters):
+	period_start, period_end, meses = _get_period_bounds(filters)
+	transactions = []
+
+	for pag in _get_pagamentos(filters, period_start, period_end):
+		valor = flt(pag.valor_recebido or pag.valor)
+		transactions.append(
+			{
+				"data": pag.data_recebimento,
+				"tipo": _("Entrada"),
+				"descricao": pag.descricao or pag.name,
+				"origem": "Pagamento",
+				"origem_doctype": "Pagamento",
+				"documento": pag.name,
+				"valor_entrada": valor,
+				"valor_saida": 0,
+			}
+		)
+
+	for desp in _get_despesas(filters, period_start, period_end):
+		descricao = desp.descricao or desp.name
+		if desp.categoria:
+			descricao = f"{descricao} ({desp.categoria})"
+		transactions.append(
+			{
+				"data": desp.data_pagamento,
+				"tipo": _("Saída"),
+				"descricao": descricao,
+				"origem": "Despesa do Escritorio",
+				"origem_doctype": "Despesa do Escritorio",
+				"documento": desp.name,
+				"valor_entrada": 0,
+				"valor_saida": flt(desp.valor),
+			}
+		)
+
+	transactions.sort(key=lambda row: getdate(row["data"]))
+
+	saldo = 0.0
+	total_entradas = 0.0
+	total_saidas = 0.0
+	rows = []
+
+	for row in transactions:
+		total_entradas += flt(row["valor_entrada"])
+		total_saidas += flt(row["valor_saida"])
+		saldo += flt(row["valor_entrada"]) - flt(row["valor_saida"])
+		row["saldo_acumulado"] = saldo
+		rows.append(row)
+
+	saldo_liquido = total_entradas - total_saidas
+
+	if rows:
+		rows.append({})
+		rows.append(
+			{
+				"data": None,
+				"tipo": "",
+				"descricao": _("Total Entradas"),
+				"origem": "",
+				"origem_doctype": "",
+				"documento": "",
+				"valor_entrada": total_entradas,
+				"valor_saida": 0,
+				"saldo_acumulado": None,
+			}
+		)
+		rows.append(
+			{
+				"data": None,
+				"tipo": "",
+				"descricao": _("Total Saídas"),
+				"origem": "",
+				"origem_doctype": "",
+				"documento": "",
+				"valor_entrada": 0,
+				"valor_saida": total_saidas,
+				"saldo_acumulado": None,
+			}
+		)
+		rows.append(
+			{
+				"data": None,
+				"tipo": "",
+				"descricao": _("Saldo Líquido do Período"),
+				"origem": "",
+				"origem_doctype": "",
+				"documento": "",
+				"valor_entrada": 0,
+				"valor_saida": 0,
+				"saldo_acumulado": saldo_liquido,
+			}
+		)
+
+	chart = _build_chart(transactions, period_start, meses) if transactions else None
 
 	report_summary = [
 		{
-			"value": total_previsto,
-			"label": _("Total Previsto"),
-			"datatype": "Currency",
-			"indicator": "Blue",
-		},
-		{
-			"value": total_recebido,
-			"label": _("Total Recebido"),
+			"value": total_entradas,
+			"label": _("Total Entradas"),
 			"datatype": "Currency",
 			"indicator": "Green",
 		},
 		{
-			"value": total_vencido_acum,
-			"label": _("Vencido Acumulado"),
+			"value": total_saidas,
+			"label": _("Total Saídas"),
 			"datatype": "Currency",
 			"indicator": "Red",
 		},
 		{
-			"value": pct_realizacao,
-			"label": _("% Realização"),
-			"datatype": "Percent",
-			"indicator": "Green" if pct_realizacao >= 70 else "Orange",
+			"value": saldo_liquido,
+			"label": _("Saldo Líquido"),
+			"datatype": "Currency",
+			"indicator": "Green" if saldo_liquido >= 0 else "Red",
 		},
 	]
 
