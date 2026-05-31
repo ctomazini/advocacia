@@ -1,33 +1,45 @@
-### Advocacia
+# Advocacia
 
-Gestao juridica para escritorios de advocacia
+Aplicativo Frappe v16 para gestão jurídica de escritórios de advocacia no Brasil: clientes, serviços/processos, honorários, pagamentos, atos, prazos, audiências, despesas operacionais, painel operacional e geração de documentos (.docx).
 
-### Installation
+**Versão:** 0.5.0 · **Branch:** `frappe-v16`
 
-You can install this app using the [bench](https://github.com/frappe/bench) CLI:
+Documentação técnica completa: [CODEBASE_FINAL.md](./CODEBASE_FINAL.md)
+
+## Requisitos
+
+- [Frappe Bench](https://github.com/frappe/bench) com Frappe v16.x
+- Python 3.12+
+- Node.js **20+** (Frappe v16.19 recomenda **Node ≥24** para `bench build`)
+- MariaDB 10.6+
+- Dependência Python: `docxtpl>=0.18.0` (instalada via `pyproject.toml`)
+
+## Instalação
 
 ```bash
 cd $PATH_TO_YOUR_BENCH
-bench get-app $URL_OF_THIS_REPO --branch develop
-bench install-app advocacia
+bench get-app https://github.com/ctomazini/advocacia.git --branch frappe-v16
+bench --site seu-site.local install-app advocacia
+bench --site seu-site.local migrate
+bench build --app advocacia
+bench restart
 ```
 
-### Contributing
-
-This app uses `pre-commit` for code formatting and linting. Please [install pre-commit](https://pre-commit.com/#installation) and enable it for this repository:
+## Testes
 
 ```bash
-cd apps/advocacia
-pre-commit install
+bench --site seu-site.local set-config allow_tests true
+bench --site seu-site.local run-tests --app advocacia
 ```
 
-Pre-commit is configured to use the following tools for checking and formatting your code:
+Suíte atual: **120 testes** (`FrappeTestCase`).
 
-- ruff
-- eslint
-- prettier
-- pyupgrade
+## Desenvolvimento
 
-### License
+Após alterar DocType JSON: `bench --site seu-site.local migrate`  
+Após alterar JS de DocType: `bench --site seu-site.local clear-cache`  
+Após alterar `public/js/`: `bench build --app advocacia`
 
-mit
+## Licença
+
+MIT
