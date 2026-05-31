@@ -13,17 +13,24 @@ class TestPainelApi(FrappeTestCase):
 	def test_get_painel_data_estrutura(self):
 		data = get_painel_data()
 		for key in (
+			"periodo_dias",
+			"list_limit",
+			"list_meta",
 			"kpis",
 			"resumo",
 			"financeiro",
 			"alertas",
+			"centro_atencao",
+			"timeline",
 			"parcelas",
 			"despesas_pendentes",
 			"total_despesas_mes",
 			"custas_pendentes_repasse",
 			"total_custas_mes",
+			"comunicacoes_pendentes",
 			"ultimas_comunicacoes",
 			"horas_semana",
+			"horas_periodo",
 			"audiencias",
 			"prazos",
 			"tarefas",
@@ -52,7 +59,21 @@ class TestPainelApi(FrappeTestCase):
 			marcar_parcela_recebida(pag_name)
 
 	def test_paginacao(self):
-		data_small = get_painel_data(limit_start=0, limit_page_length=1)
-		data_large = get_painel_data(limit_start=0, limit_page_length=100)
-		self.assertLessEqual(len(data_small["tarefas"]), 1)
+		data_small = get_painel_data(limit_start=0, limit_page_length=1, list_limit=5)
+		data_large = get_painel_data(limit_start=0, limit_page_length=100, list_limit=0)
+		self.assertLessEqual(len(data_small["tarefas"]), 5)
 		self.assertLessEqual(len(data_small["tarefas"]), len(data_large["tarefas"]))
+
+	def test_periodo_dias(self):
+		data = get_painel_data(periodo_dias=30)
+		self.assertEqual(data["periodo_dias"], 30)
+		self.assertIsInstance(data["timeline"], list)
+		self.assertIn("audiencias_amanha", data["kpis"])
+
+	def test_list_limit(self):
+		data = get_painel_data(list_limit=5)
+		self.assertEqual(data["list_limit"], 5)
+		self.assertIn("timeline", data["list_meta"])
+		self.assertLessEqual(data["list_meta"]["timeline"]["showing"], 5)
+		data_all = get_painel_data(list_limit=0)
+		self.assertEqual(data_all["list_limit"], 0)
