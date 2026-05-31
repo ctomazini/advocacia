@@ -91,27 +91,19 @@ frappe.ui.form.on("Servico", {
 	numeracao_legada: function (frm) {
 		aplicar_mascara_processo_servico(frm);
 	},
+	numero_processo: function (frm) {
+		if (window.AdvocaciaMasks) {
+			AdvocaciaMasks.formatFormField(
+				frm,
+				"numero_processo",
+				AdvocaciaMasks.applyCNJ
+			);
+		}
+	},
 });
 
 function aplicar_mascara_processo_servico(frm) {
-	var field = frm.fields_dict.numero_processo;
-	if (!field || !field.$input) return;
-
-	field.$input.off(".advocacia_mask");
-	if ($.fn.inputmask && field.$input.inputmask) {
-		field.$input.inputmask("remove");
-	}
-
-	if (frm.doc.tipo !== "Processo Judicial" || frm.doc.numeracao_legada) {
-		return;
-	}
-
-	if (typeof advocacia_aplicar_mascara_input === "function") {
-		advocacia_aplicar_mascara_input(field.$input, "cnj");
-		return;
-	}
-
-	if ($.fn.inputmask) {
-		field.$input.inputmask("9999999-99.9999.9.99.9999");
+	if (window.AdvocaciaMasks) {
+		AdvocaciaMasks.setupServicoProcessoMask(frm);
 	}
 }
