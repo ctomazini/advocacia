@@ -1,15 +1,24 @@
-frappe.ui.form.on('Audiencia', {
-    refresh(frm) {
-        // Botão "Entrar" para audiências virtuais com link
-        if (frm.doc.modalidade === 'Virtual' && frm.doc.link_virtual) {
-            frm.add_custom_button(__('🖥️ Entrar na Audiência'), function() {
-                window.open(frm.doc.link_virtual, '_blank');
-            }).addClass('btn-primary');
-        }
-    },
-    modalidade(frm) {
-        if (frm.doc.modalidade !== 'Virtual') {
-            frm.set_value('link_virtual', '');
-        }
-    }
+frappe.ui.form.on("Audiencia", {
+	refresh(frm) {
+		if (frm.doc.modalidade === "Virtual") {
+			frm.add_custom_button(__("🖥️ Entrar na Audiência"), function () {
+				if (frm.doc.link_virtual) {
+					window.open(frm.doc.link_virtual, "_blank");
+					return;
+				}
+				frappe.msgprint({
+					title: __("Link não cadastrado"),
+					message: __(
+						"Esta audiência virtual ainda não possui link. Cadastre o link no campo acima quando estiver disponível."
+					),
+					indicator: "orange",
+				});
+			}).addClass("btn-primary");
+		}
+	},
+	modalidade(frm) {
+		if (frm.doc.modalidade !== "Virtual") {
+			frm.set_value("link_virtual", "");
+		}
+	},
 });

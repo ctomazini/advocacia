@@ -22,7 +22,7 @@ frappe.ui.form.on('Acordo de Honorarios Processuais', {
                         });
                     }
                 );
-            }, __('Ações'));
+            }).addClass('btn-primary-dark');
         }
     },
     modo_honorarios: function(frm) {
@@ -186,7 +186,60 @@ function controlar_grid_parcelas(frm) {
     grid.update_docfield_property('valor_advogada', 'hidden', direto ? 1 : 0);
     grid.update_docfield_property('valor_cliente', 'hidden', direto ? 1 : 0);
     grid.update_docfield_property('valor_sucumbência', 'hidden', direto ? 1 : 0);
+    grid.update_docfield_property('pagamento', 'formatter', function(value) {
+        if (!value) {
+            return '';
+        }
+        return frappe.form.formatters.Link(value, {
+            fieldtype: 'Link',
+            options: 'Pagamento',
+            parent: 'Parcela de Honorarios'
+        });
+    });
+    configurar_clique_pagamento_grid(frm);
     grid.refresh();
+}
+
+function configurar_clique_pagamento_grid(frm) {
+    var grid = frm.fields_dict.table_ztjx && frm.fields_dict.table_ztjx.grid;
+    if (!grid) {
+        return;
+    }
+
+    if (!frm._pagamento_link_style) {
+        frm._pagamento_link_style = true;
+        frappe.dom.set_style(
+            '.form-grid .grid-row [data-fieldname="pagamento"] .static-area, ' +
+            '.form-grid .grid-row [data-fieldname="pagamento"] .link-field input[readonly] ' +
+            '{ cursor: pointer; }'
+        );
+    }
+
+    grid.wrapper.off('.advocacia-pagamento');
+
+    grid.wrapper.on('mousedown.advocacia-pagamento', '[data-fieldname="pagamento"]', function(e) {
+        if ($(e.target).closest('.btn-open, .btn-clear, .link-btn').length) {
+            return;
+        }
+
+        var $row = $(this).closest('.grid-row');
+        var idx = $row.attr('data-idx');
+        if (!idx) {
+            return;
+        }
+
+        var parcela = (frm.doc.table_ztjx || []).find(function(r) {
+            return String(r.idx) === String(idx);
+        });
+        if (!parcela || !parcela.pagamento) {
+            return;
+        }
+
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        frappe.set_route('Form', 'Pagamento', parcela.pagamento);
+    });
 }
 
 function calcular_valores(frm) {
