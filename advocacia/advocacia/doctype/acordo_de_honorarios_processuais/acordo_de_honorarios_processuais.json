@@ -2,7 +2,7 @@
  "name": "Acordo de Honorarios Processuais",
  "docstatus": 0,
  "idx": 0,
- "search_fields": null,
+ "search_fields": "servico,cliente,status,tipo_de_cobrança",
  "issingle": 0,
  "is_virtual": 0,
  "is_tree": 0,

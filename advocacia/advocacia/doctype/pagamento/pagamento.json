@@ -9,7 +9,9 @@
  "field_order": [
   "naming_series",
   "sec_relacionamentos",
+  "tipo_origem",
   "acordo",
+  "registro_atos",
   "servico",
   "cliente",
   "col_rel_1",
@@ -44,14 +46,32 @@
    "label": "Relacionamentos"
   },
   {
+   "default": "Honorários (Parcela)",
+   "fieldname": "tipo_origem",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Origem",
+   "options": "Honorários (Parcela)\nAtos Advocatícios"
+  },
+  {
    "fieldname": "acordo",
    "fieldtype": "Link",
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Acordo",
+   "mandatory_depends_on": "eval:doc.tipo_origem=='Honorários (Parcela)'",
    "options": "Acordo de Honorarios Processuais",
-   "reqd": 1,
    "search_index": 1
+  },
+  {
+   "depends_on": "eval:doc.tipo_origem=='Atos Advocatícios'",
+   "fieldname": "registro_atos",
+   "fieldtype": "Link",
+   "label": "Registro de Atos",
+   "mandatory_depends_on": "eval:doc.tipo_origem=='Atos Advocatícios'",
+   "options": "Registro de Atos",
+   "read_only": 1
   },
   {
    "fieldname": "servico",
@@ -86,7 +106,7 @@
   {
    "bold": 1,
    "fieldname": "descricao",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "in_list_view": 1,
    "label": "Descrição"
   },
@@ -98,7 +118,7 @@
   {
    "fieldname": "parcela_origem_id",
    "fieldtype": "Data",
-   "label": "ID Parcela Origem",
+   "label": "ID Origem",
    "read_only": 1,
    "unique": 1
   },
@@ -111,6 +131,7 @@
   {
    "default": "0",
    "fieldname": "manual_override",
+   "depends_on": "eval:doc.tipo_origem=='Honorários (Parcela)'",
    "fieldtype": "Check",
    "label": "Edição manual (não sincronizar)"
   },
@@ -182,6 +203,7 @@
  "modified_by": "Administrator",
  "module": "Advocacia",
  "name": "Pagamento",
+ "search_fields": "servico,cliente,status,data_vencimento",
  "naming_series_options": "PAY-.YYYY.-",
  "owner": "Administrator",
  "permissions": [
@@ -219,5 +241,6 @@
  "sort_field": "data_vencimento",
  "sort_order": "ASC",
  "states": [],
+ "title_field": "descricao",
  "track_changes": 1
 }
