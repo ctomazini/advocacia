@@ -3,9 +3,25 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.utils import flt
 
+from advocacia.advocacia.financeiro import TIPO_ATOS, TIPO_HONORARIOS, is_pagamento_atos
+
 
 class Pagamento(Document):
 	def validate(self):
+		if not self.tipo_origem:
+			self.tipo_origem = TIPO_HONORARIOS
+
+		if self.tipo_origem == TIPO_HONORARIOS and not self.acordo:
+			frappe.throw(
+				_("Acordo é obrigatório para pagamentos de honorários."),
+				title=_("Campo obrigatório"),
+			)
+		if self.tipo_origem == TIPO_ATOS and not self.registro_atos:
+			frappe.throw(
+				_("Registro de Atos é obrigatório para pagamentos de atos."),
+				title=_("Campo obrigatório"),
+			)
+
 		if flt(self.valor) < 0:
 			frappe.throw(_("Valor não pode ser negativo."))
 
@@ -25,11 +41,16 @@ class Pagamento(Document):
 			)
 			if existing:
 				frappe.throw(
-					_("Já existe pagamento para a parcela de origem {0}.").format(
-						self.parcela_origem_id
-					)
+					_("Já existe pagamento para a origem {0}.").format(self.parcela_origem_id)
 				)
 
 	def before_save(self):
 		if self.is_new() and self.status == "Cancelado":
 			frappe.throw(_("Não é permitido criar pagamento já cancelado."))
+		if is_pagamento_atos(self):
+			self.manual_override = 0
+
+	def on_trash(self):
+		from advocacia.advocacia.financeiro import liberar_vinculos_pagamento_atos
+
+		liberar_vinculos_pagamento_atos(self, revert_atos=True)
