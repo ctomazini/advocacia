@@ -14,12 +14,6 @@ frappe.query_reports["fluxo_de_caixa"] = {
 			options: "Cliente",
 		},
 		{
-			fieldname: "incluir_vencidos",
-			label: __("Incluir vencidos acumulados"),
-			fieldtype: "Check",
-			default: 1,
-		},
-		{
 			fieldname: "incluir_despesas",
 			label: __("Incluir despesas do escritório"),
 			fieldtype: "Check",
