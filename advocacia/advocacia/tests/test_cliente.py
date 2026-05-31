@@ -118,3 +118,11 @@ class TestCliente(FrappeTestCase):
 				nome=f"Cliente Dup B {frappe.generate_hash(length=6)}",
 				cpf=cpf_fixo,
 			)
+
+	def test_nome_duplicado_com_cpf_diferente_ok(self):
+		nome = f"Maria Silva {frappe.generate_hash(length=6)}"
+		cliente_a = create_test_cliente(nome=nome, cpf=_gerar_cpf_valido())
+		cliente_b = create_test_cliente(nome=nome, cpf=_gerar_cpf_valido())
+		self.assertEqual(cliente_a.nome, cliente_b.nome)
+		self.assertNotEqual(cliente_a.name, cliente_b.name)
+		self.assertNotEqual(cliente_a.cpf, cliente_b.cpf)

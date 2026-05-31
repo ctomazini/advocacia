@@ -7,7 +7,7 @@
  "istable": 0,
  "quick_entry": 1,
  "track_changes": 1,
- "autoname": "field:nome",
+ "autoname": "format:CLI-{####}",
  "title_field": "nome",
  "search_fields": "nome,cpf,cnpj",
  "fields": [
