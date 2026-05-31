@@ -483,6 +483,8 @@ def sincronizar_pagamento_atos(registro_name, data_vencimento=None):
 		ato.cobranca_id = pagamento.name
 
 	registro.ultimo_pagamento = pagamento.name
+	registro._calcular_totais()
+	registro._atualizar_status()
 	frappe.flags.in_atos_cobranca_sync = True
 	try:
 		registro.flags.ignore_validate = True
@@ -642,6 +644,30 @@ def cancelar_cobranca_pagamento_atos(pagamento_name):
 		"success": True,
 		"pagamento": pagamento.name,
 		"registro_atos": pagamento.registro_atos,
+	}
+
+
+@frappe.whitelist()
+def cancelar_pagamento_honorarios(pagamento_name):
+	"""Cancela pagamento de honorários e propaga status para a parcela do acordo."""
+	if not frappe.has_permission("Pagamento", "write"):
+		frappe.throw(_("Sem permissão"), frappe.PermissionError)
+
+	pagamento = frappe.get_doc("Pagamento", pagamento_name)
+	if is_pagamento_atos(pagamento):
+		frappe.throw(_("Este pagamento é de Atos Advocatícios. Use o botão Cancelar Pagamento no form de Atos."))
+
+	if pagamento.status == "Cancelado":
+		frappe.throw(_("Pagamento já está cancelado."))
+
+	pagamento.status = "Cancelado"
+	pagamento.save(ignore_permissions=False)
+	frappe.db.commit()
+
+	return {
+		"success": True,
+		"pagamento": pagamento.name,
+		"acordo": pagamento.acordo,
 	}
 
 
