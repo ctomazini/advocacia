@@ -6,6 +6,10 @@ from frappe.utils import flt, getdate
 
 class AcordodeHonorariosProcessuais(Document):
     def validate(self):
+        if not self.cliente and self.servico:
+            self.cliente = frappe.db.get_value("Servico", self.servico, "cliente")
+        if not self.cliente:
+            frappe.throw(_("Cliente é obrigatório. Selecione um Serviço válido."))
         self._validar_financeiro()
         self._validar_parcelas()
 

@@ -4,7 +4,11 @@ from frappe.model.document import Document
 
 
 class ControledePrazos(Document):
-	pass
+	def validate(self):
+		if not self.cliente and self.servico:
+			self.cliente = frappe.db.get_value("Servico", self.servico, "cliente")
+		if not self.cliente:
+			frappe.throw(_("Cliente é obrigatório. Selecione um Serviço válido."))
 
 
 @frappe.whitelist()
