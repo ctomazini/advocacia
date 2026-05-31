@@ -39,6 +39,8 @@
    "options": "Cliente",
    "label": "Cliente",
    "reqd": 1,
+   "read_only": 1,
+   "fetch_from": "servico.cliente",
    "in_list_view": 1
   },
   {

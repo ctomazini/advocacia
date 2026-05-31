@@ -4,6 +4,10 @@ from frappe.utils import today
 
 
 class Tarefa(Document):
+    def validate(self):
+        if self.servico and not self.cliente:
+            self.cliente = frappe.db.get_value("Servico", self.servico, "cliente")
+
     def before_save(self):
         if self.status == "Concluída" and not self.data_conclusao:
             self.data_conclusao = today()

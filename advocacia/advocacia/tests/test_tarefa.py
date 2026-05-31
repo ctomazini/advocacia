@@ -19,6 +19,20 @@ class TestTarefa(FrappeTestCase):
 		servico = create_test_servico()
 		tarefa = create_test_tarefa(servico=servico.name)
 		self.assertEqual(tarefa.servico, servico.name)
+		self.assertEqual(tarefa.cliente, servico.cliente)
+
+	def test_cliente_via_servico(self):
+		servico = create_test_servico()
+		tarefa = frappe.get_doc(
+			{
+				"doctype": "Tarefa",
+				"titulo": "Tarefa com serviço",
+				"servico": servico.name,
+				"status": "Pendente",
+			}
+		)
+		tarefa.insert(ignore_permissions=True)
+		self.assertEqual(tarefa.cliente, servico.cliente)
 
 	def test_concluir(self):
 		tarefa = create_test_tarefa()

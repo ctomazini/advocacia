@@ -11,6 +11,9 @@ class Pagamento(Document):
 		if not self.tipo_origem:
 			self.tipo_origem = TIPO_HONORARIOS
 
+		if self.servico and not self.cliente:
+			self.cliente = frappe.db.get_value("Servico", self.servico, "cliente")
+
 		if self.tipo_origem == TIPO_HONORARIOS and not self.acordo:
 			frappe.throw(
 				_("Acordo é obrigatório para pagamentos de honorários."),

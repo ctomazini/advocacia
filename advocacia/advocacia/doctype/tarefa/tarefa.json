@@ -10,14 +10,51 @@
  "autoname": "naming_series:",
  "naming_series_options": "TAR-.YYYY.-",
  "title_field": "titulo",
- "search_fields": "titulo,status,responsavel",
+ "search_fields": "titulo,status,responsavel,servico,cliente",
+ "field_order": [
+  "informacoes_section",
+  "servico",
+  "cliente",
+  "col_break_1",
+  "titulo",
+  "status",
+  "prioridade",
+  "data_limite",
+  "sec_detalhes",
+  "descricao",
+  "col_break_2",
+  "responsavel",
+  "data_conclusao",
+  "naming_series"
+ ],
  "fields": [
   {
-   "fieldname": "naming_series",
-   "label": "Série",
-   "fieldtype": "Select",
-   "options": "TAR-.YYYY.-",
-   "default": "TAR-.YYYY.-"
+   "fieldname": "informacoes_section",
+   "fieldtype": "Section Break",
+   "label": "Informações"
+  },
+  {
+   "fieldname": "servico",
+   "label": "Serviço",
+   "fieldtype": "Link",
+   "options": "Servico",
+   "allow_in_quick_entry": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "cliente",
+   "label": "Cliente",
+   "fieldtype": "Link",
+   "options": "Cliente",
+   "read_only": 1,
+   "fetch_from": "servico.cliente",
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "col_break_1",
+   "fieldtype": "Column Break"
   },
   {
    "fieldname": "titulo",
@@ -38,10 +75,6 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "bold": 1
-  },
-  {
-   "fieldname": "col_break_1",
-   "fieldtype": "Column Break"
   },
   {
    "fieldname": "prioridade",
@@ -69,13 +102,6 @@
    "fieldtype": "Text Editor"
   },
   {
-   "fieldname": "servico",
-   "label": "Serviço Relacionado",
-   "fieldtype": "Link",
-   "options": "Servico",
-   "allow_in_quick_entry": 1
-  },
-  {
    "fieldname": "col_break_2",
    "fieldtype": "Column Break"
   },
@@ -89,6 +115,14 @@
    "fieldname": "data_conclusao",
    "label": "Data de Conclusão",
    "fieldtype": "Date"
+  },
+  {
+   "fieldname": "naming_series",
+   "label": "Série",
+   "fieldtype": "Select",
+   "options": "TAR-.YYYY.-",
+   "default": "TAR-.YYYY.-",
+   "hidden": 1
   }
  ],
  "permissions": [

@@ -28,6 +28,7 @@ class Comunicacao(Document):
 				"titulo": f"Follow-up: {self.assunto}",
 				"descricao": self.proximos_passos,
 				"servico": self.servico,
+				"cliente": self.cliente,
 				"status": "Pendente",
 				"data_limite": add_days(today(), 3),
 			}
