@@ -198,27 +198,6 @@
    "is_child_table": 0,
    "custom": 0,
    "doctype": "DocType Link"
-  },
-  {
-   "name": "ik1avd4rr5",
-   "creation": "2026-05-24 21:09:42.247173",
-   "modified": "2026-05-26 18:10:19.622224",
-   "modified_by": "Administrator",
-   "owner": "Administrator",
-   "docstatus": 0,
-   "parent": "Servico",
-   "parentfield": "links",
-   "parenttype": "DocType",
-   "idx": 5,
-   "group": "Financeiro",
-   "link_doctype": "Sales Invoice",
-   "link_fieldname": "custom_servico",
-   "parent_doctype": null,
-   "table_fieldname": null,
-   "hidden": 0,
-   "is_child_table": 0,
-   "custom": 0,
-   "doctype": "DocType Link"
   }
  ],
  "fields": [
