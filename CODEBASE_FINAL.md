@@ -1,8 +1,8 @@
-# CODEBASE_FINAL.md — App Advocacia v0.5.0
+# CODEBASE_FINAL.md — App Advocacia v0.6.0
 
 **Documento definitivo pré-deploy**  
 **Repositório:** `git@github.com:ctomazini/advocacia.git` · branch `frappe-v16`  
-**Versão:** `0.5.0`  
+**Versão:** `0.6.0`  
 **Data:** 2026-05-31  
 **Escopo:** auditoria completa pós-cleanup (tarefas 1–9), testes, Quick Entry, máscaras, patches, reports, Despesa do Escritorio
 
@@ -48,7 +48,7 @@
 
 ```
 advocacia/                              # raiz Git
-├── pyproject.toml                      # version 0.5.0, docxtpl
+├── pyproject.toml                      # version 0.6.0, docxtpl
 ├── README.md
 ├── CODEBASE_FINAL.md                   # este arquivo
 ├── advocacia/
@@ -61,11 +61,12 @@ advocacia/                              # raiz Git
 │   ├── patches/v16_0/                  # 3 patches pós-migrate
 │   ├── public/js/                      # masks.js, navegacao.js, servico_link.js
 │   └── advocacia/                      # módulo Advocacia
-│       ├── doctype/                    # 18 DocTypes
+│       ├── doctype/                    # 21 DocTypes
 │       ├── page/painel/
-│       ├── report/                     # 4 reports
-│       ├── tests/                      # 16 módulos de teste
+│       ├── report/                     # 6 reports
+│       ├── tests/                      # 21 módulos de teste
 │       ├── financeiro.py, painel_api.py, documentos.py
+│       ├── calendar_sync.py
 │       ├── tasks.py, notificacoes.py, validators.py
 │       └── setup/                      # install, workspace, sidebar, reports, translations
 ```
@@ -82,12 +83,25 @@ advocacia/                              # raiz Git
 | Testes | Suíte 120 testes em `advocacia/advocacia/tests/` |
 | Patches | Backfill `tipo_origem`, vínculo parcela↔pagamento |
 
+### Entregas v0.6.0
+
+| Área | Entrega |
+|------|---------|
+| Custa Processual | DocType repassável ao cliente + fluxo de caixa + painel |
+| Google Calendar | `calendar_sync.py` — Audiência/Prazo → Event Frappe + Custom Fields |
+| Comunicacao | Timeline de interações + geração automática de Tarefa |
+| Registro de Horas | Timesheet por serviço com cálculo de duração |
+| Reports | `produtividade` (estratégico) + `horas_por_servico` (detalhe) |
+| Painel | Custas pendentes, comunicações, horas da semana |
+| Servico sidebar | Links para Custa, Comunicacao, Registro de Horas |
+| Testes | **149 testes** (+29 novos) |
+
 ---
 
 ## 2. Árvore de DocTypes
 
 **Localização:** `advocacia/advocacia/doctype/`  
-**Total:** 18 DocTypes · todos `module=Advocacia`, `custom=0`
+**Total:** 21 DocTypes · todos `module=Advocacia`, `custom=0`
 
 ### Relações parent → child
 
