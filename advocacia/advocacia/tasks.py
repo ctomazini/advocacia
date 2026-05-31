@@ -33,13 +33,28 @@ def verificar_parcelas_vencidas():
 	frappe.db.commit()
 
 
+def verificar_despesas_vencidas():
+	"""Marca despesas pendentes como atrasadas se vencimento passou."""
+	despesas = frappe.get_all(
+		"Despesa do Escritorio",
+		filters={"status": "Pendente", "data_vencimento": ("<", today())},
+		pluck="name",
+	)
+	for name in despesas:
+		frappe.db.set_value("Despesa do Escritorio", name, "status", "Atrasado", update_modified=False)
+
+	if despesas:
+		frappe.logger().info("Despesas marcadas como atrasadas: {0}".format(len(despesas)))
+		frappe.db.commit()
+
+
 def notificar_parcelas_vencidas():
 	"""Notifica pagamentos vencidos ha 3 dias (camada operacional)."""
 	data_alvo = add_days(today(), -3)
 	pagamentos = frappe.get_all(
 		"Pagamento",
 		filters={"status": "Vencido", "data_vencimento": data_alvo},
-		fields=["name", "acordo", "cliente", "data_vencimento", "owner"],
+		fields=["name", "acordo", "cliente", "data_vencimento", "owner", "tipo_origem", "registro_atos"],
 	)
 	count = 0
 	for p in pagamentos:
@@ -47,11 +62,11 @@ def notificar_parcelas_vencidas():
 		if _notification_already_sent("Pagamento", p.name, subject):
 			continue
 		message = _(
-			"O pagamento {0} (vencimento {1}) esta vencido ha 3 dias. Acordo: {2}."
+			"O pagamento {0} (vencimento {1}) esta vencido ha 3 dias. Origem: {2}."
 		).format(
 			p.name,
 			frappe.utils.formatdate(p.data_vencimento),
-			p.acordo or _("N/A"),
+			_pagamento_origem_label(p),
 		)
 		_send_system_notification(
 			users=_pagamento_recipients(p),
@@ -112,7 +127,11 @@ def notificar_audiencias_hoje():
 
 
 def on_parcela_update(doc, method=None):
-	"""Quando todas as parcelas do acordo estao Recebida, marca o acordo como Quitado."""
+	"""Propaga parcela → pagamento e marca acordo quitado quando aplicável."""
+	from advocacia.advocacia.financeiro import sync_pagamento_from_parcela
+
+	sync_pagamento_from_parcela(doc)
+
 	if doc.status != "Recebida":
 		return
 	if doc.parenttype != "Acordo de Honorarios Processuais" or not doc.parent:
@@ -121,9 +140,16 @@ def on_parcela_update(doc, method=None):
 
 
 def on_pagamento_update(doc, method=None):
-	"""Quando todos os pagamentos do acordo estao Recebidos, marca o acordo como Quitado."""
+	"""Propaga status do pagamento para acordo (honorários) ou atos (reversão)."""
 	if getattr(frappe.flags, "in_pagamento_sync", False):
 		return
+
+	if doc.status == "Cancelado":
+		from advocacia.advocacia.financeiro import reverter_atos_do_pagamento
+
+		reverter_atos_do_pagamento(doc)
+		return
+
 	if doc.status not in ("Recebido", "Repassado"):
 		return
 	if not doc.acordo:
@@ -189,7 +215,21 @@ def _pagamento_recipients(pagamento):
 		)
 		if acordo_owner and acordo_owner not in users:
 			users.append(acordo_owner)
+	elif getattr(pagamento, "registro_atos", None):
+		registro_owner = frappe.db.get_value(
+			"Registro de Atos", pagamento.registro_atos, "owner"
+		)
+		if registro_owner and registro_owner not in users:
+			users.append(registro_owner)
 	return users or ["Administrator"]
+
+
+def _pagamento_origem_label(pagamento):
+	if pagamento.acordo:
+		return pagamento.acordo
+	if getattr(pagamento, "registro_atos", None):
+		return _("Atos: {0}").format(pagamento.registro_atos)
+	return _("N/A")
 
 
 def _notification_already_sent(document_type, document_name, subject):

@@ -1,0 +1,199 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:DESP-{YYYY}-{####}",
+ "creation": "2026-05-29 12:00:00.000000",
+ "custom": 0,
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "informacoes_section",
+  "descricao",
+  "categoria",
+  "column_break_info",
+  "valor",
+  "status",
+  "vencimento_section",
+  "data_vencimento",
+  "data_pagamento",
+  "column_break_venc",
+  "forma_pagamento",
+  "recorrencia_section",
+  "recorrente",
+  "frequencia",
+  "column_break_rec",
+  "proximo_vencimento",
+  "anexos_section",
+  "comprovante",
+  "observacoes_section",
+  "observacoes"
+ ],
+ "fields": [
+  {
+   "fieldname": "informacoes_section",
+   "fieldtype": "Section Break",
+   "label": "Informações"
+  },
+  {
+   "fieldname": "descricao",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Descrição",
+   "reqd": 1
+  },
+  {
+   "fieldname": "categoria",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Categoria",
+   "options": "Aluguel\nEnergia\nÁgua\nInternet\nTelefone\nSoftware/Assinatura\nMaterial de Escritório\nImpostos\nContabilidade\nManutenção\nOutros",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_info",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "valor",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Valor",
+   "reqd": 1
+  },
+  {
+   "default": "Pendente",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Pendente\nPago\nAtrasado\nCancelado"
+  },
+  {
+   "fieldname": "vencimento_section",
+   "fieldtype": "Section Break",
+   "label": "Vencimento e Pagamento"
+  },
+  {
+   "fieldname": "data_vencimento",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Data de Vencimento"
+  },
+  {
+   "fieldname": "data_pagamento",
+   "fieldtype": "Date",
+   "label": "Data de Pagamento"
+  },
+  {
+   "fieldname": "column_break_venc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "forma_pagamento",
+   "fieldtype": "Select",
+   "label": "Forma de Pagamento",
+   "options": "PIX\nTED\nBoleto\nDinheiro\nCartão\nDébito Automático"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "recorrencia_section",
+   "fieldtype": "Section Break",
+   "label": "Recorrência"
+  },
+  {
+   "default": "0",
+   "fieldname": "recorrente",
+   "fieldtype": "Check",
+   "label": "Despesa Recorrente"
+  },
+  {
+   "depends_on": "eval:doc.recorrente==1",
+   "fieldname": "frequencia",
+   "fieldtype": "Select",
+   "label": "Frequência",
+   "options": "Mensal\nBimestral\nTrimestral\nSemestral\nAnual"
+  },
+  {
+   "fieldname": "column_break_rec",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.recorrente==1",
+   "fieldname": "proximo_vencimento",
+   "fieldtype": "Date",
+   "label": "Próximo Vencimento",
+   "read_only": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "anexos_section",
+   "fieldtype": "Section Break",
+   "label": "Comprovante"
+  },
+  {
+   "fieldname": "comprovante",
+   "fieldtype": "Attach",
+   "label": "Comprovante"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "observacoes_section",
+   "fieldtype": "Section Break",
+   "label": "Observações"
+  },
+  {
+   "fieldname": "observacoes",
+   "fieldtype": "Small Text",
+   "label": "Observações"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 0,
+ "is_tree": 0,
+ "issingle": 0,
+ "istable": 0,
+ "links": [],
+ "modified": "2026-05-29 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Advocacia",
+ "name": "Despesa do Escritorio",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "export": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Advocacia Manager",
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 0,
+   "export": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Advocacia User",
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "export": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "write": 1
+  }
+ ],
+ "search_fields": "descricao,categoria,status,data_vencimento",
+ "sort_field": "data_vencimento",
+ "sort_order": "ASC",
+ "states": [],
+ "title_field": "descricao",
+ "track_changes": 1
+}

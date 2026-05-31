@@ -12,7 +12,9 @@ from frappe.utils import (
 
 PAGAMENTO_FIELDS = [
 	"name",
+	"tipo_origem",
 	"acordo",
+	"registro_atos",
 	"cliente",
 	"servico",
 	"valor",
@@ -44,6 +46,8 @@ def get_painel_data(limit_start=0, limit_page_length=20):
 	audiencias = _get_audiencias(hoje, sete_dias)
 	prazos = _get_prazos(hoje, sete_dias)
 	tarefas = _get_tarefas(hoje, limit_start, limit_page_length)
+	despesas_pendentes = _get_despesas_pendentes()
+	total_despesas_mes = _get_total_despesas_mes(mes_inicio, mes_fim)
 
 	return {
 		"kpis": kpis,
@@ -51,6 +55,8 @@ def get_painel_data(limit_start=0, limit_page_length=20):
 		"financeiro": financeiro,
 		"alertas": alertas,
 		"parcelas": parcelas,
+		"despesas_pendentes": despesas_pendentes,
+		"total_despesas_mes": total_despesas_mes,
 		"audiencias": audiencias,
 		"prazos": prazos,
 		"tarefas": tarefas,
@@ -372,12 +378,41 @@ def _get_tarefas(hoje, limit_start, limit_page_length):
 	return rows
 
 
+def _get_despesas_pendentes():
+	if not frappe.has_permission("Despesa do Escritorio", "read", raise_exception=False):
+		return []
+	return frappe.get_all(
+		"Despesa do Escritorio",
+		filters={"status": ["in", ["Pendente", "Atrasado"]]},
+		fields=["name", "descricao", "categoria", "valor", "data_vencimento", "status"],
+		order_by="data_vencimento ASC",
+		limit=10,
+	)
+
+
+def _get_total_despesas_mes(mes_inicio, mes_fim):
+	if not frappe.has_permission("Despesa do Escritorio", "read", raise_exception=False):
+		return 0
+	result = frappe.db.sql(
+		"""
+		SELECT COALESCE(SUM(valor), 0) as total
+		FROM `tabDespesa do Escritorio`
+		WHERE data_vencimento BETWEEN %s AND %s
+		AND status != 'Cancelado'
+		""",
+		(mes_inicio, mes_fim),
+		as_dict=True,
+	)
+	return flt(result[0].total if result else 0)
+
+
 def _enriquecer_pagamentos(pagamentos, hoje):
 	cache_servico = {}
 	for p in pagamentos:
-		p["parent"] = p.get("acordo")
+		p["parent"] = p.get("acordo") or p.get("registro_atos")
 		p["valor_total"] = p.get("valor")
 		p["vencimento"] = p.get("data_vencimento")
+		p["origem_label"] = _pagamento_origem_label(p)
 
 		cliente_link = p.get("cliente")
 		p["cliente_nome"] = cliente_link or ""
@@ -424,6 +459,14 @@ def _vara_label(vara_link):
 		return frappe.db.get_value("Vara", vara_link, "vara_name") or vara_link
 	except Exception:
 		return vara_link
+
+
+def _pagamento_origem_label(pagamento):
+	if pagamento.get("acordo"):
+		return pagamento.acordo
+	if pagamento.get("registro_atos"):
+		return _("Atos: {0}").format(pagamento.registro_atos)
+	return pagamento.get("tipo_origem") or ""
 
 
 @frappe.whitelist()

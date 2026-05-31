@@ -644,6 +644,19 @@ function inject_painel_styles() {
             color: var(--primary);
             transform: scale(1.02);
         }
+        .painel-btn-entrar--muted {
+            cursor: default;
+            opacity: 0.72;
+            border-color: var(--border-color);
+            background: var(--bg-subtle);
+            color: var(--text-muted);
+        }
+        .painel-btn-entrar--muted:hover {
+            transform: none;
+            background: var(--bg-subtle);
+            border-color: var(--border-color);
+            color: var(--text-muted);
+        }
         .painel-empty {
             padding: 48px 28px 52px;
             text-align: center;
@@ -919,6 +932,7 @@ function render_painel($container, d) {
     html += render_operacao_dia(d);
     html += render_financeiro(d.financeiro);
     html += render_parcelas(d.parcelas);
+    html += render_despesas(d.despesas_pendentes, d.total_despesas_mes);
     html += '<div class="painel-secondary-grid">';
     html += render_secundario(
         __("Agenda — 7 dias"),
@@ -1498,6 +1512,73 @@ function render_parcelas(parcelas) {
     return h;
 }
 
+function render_despesas(despesas, total_mes) {
+    var h =
+        '<section class="painel-section" id="painel-despesas"><div class="painel-section-head">' +
+        "<div><h2 class='painel-section-title'>" +
+        __("Despesas do Escritório") +
+        "</h2>" +
+        '<p class="painel-section-sub">' +
+        __("Overhead operacional — pendentes e atrasadas") +
+        "</p></div>" +
+        '<span class="painel-section-link" data-route-list="Despesa do Escritorio">' +
+        __("Ver todas") +
+        "</span></div>";
+
+    h +=
+        '<div class="painel-kpi-grid painel-kpi-grid--inline" style="margin-bottom:12px">' +
+        '<div class="painel-kpi-card"><div class="painel-kpi-label">' +
+        __("Despesas do Mês") +
+        '</div><div class="painel-kpi-value">' +
+        fmt_currency(total_mes || 0) +
+        "</div></div></div>";
+
+    if (!despesas || !despesas.length) {
+        return (
+            h +
+            '<div class="painel-panel">' +
+            render_empty_state(
+                "wallet",
+                __("Nenhuma despesa pendente"),
+                __("Despesas operacionais aparecerão aqui quando cadastradas.")
+            ) +
+            "</div></section>"
+        );
+    }
+
+    h += '<div class="painel-panel"><div class="painel-schedule-list">';
+    despesas.forEach(function (d) {
+        var tone = d.status === "Atrasado" ? "danger" : "warn";
+        var badge =
+            d.status === "Atrasado"
+                ? '<span class="indicator-pill red">' + __("Atrasado") + "</span>"
+                : '<span class="indicator-pill orange">' + __("Pendente") + "</span>";
+        h +=
+            '<div class="painel-schedule-item painel-row-despesa" data-despesa="' +
+            frappe.utils.escape_html(d.name || "") +
+            '">' +
+            '<div class="painel-schedule-main">' +
+            '<div class="painel-op-title">' +
+            frappe.utils.escape_html(d.descricao || d.name) +
+            "</div>" +
+            '<div class="painel-op-sub">' +
+            frappe.utils.escape_html(d.categoria || "") +
+            (d.data_vencimento
+                ? " · " + frappe.utils.escape_html(frappe.datetime.str_to_user(d.data_vencimento))
+                : "") +
+            "</div></div>" +
+            '<div class="painel-schedule-side">' +
+            badge +
+            '<div class="painel-op-valor ' +
+            tone +
+            '">' +
+            fmt_currency(d.valor) +
+            "</div></div></div>";
+    });
+    h += "</div></div></section>";
+    return h;
+}
+
 function render_secundario(title, icon, body, section_id, emptyTitle, emptyHint, list_doctype) {
     var foot = "";
     if (list_doctype && body) {
@@ -1556,14 +1637,24 @@ function render_audiencia_items(audiencias) {
             var parts = painel_date_parts(a.data);
             var card_cls = "painel-schedule-card";
             if (a.dias_restantes === 0) card_cls += " painel-schedule-card--today";
-            var btn =
-                a.modalidade === "Virtual" && a.link_virtual
-                    ? '<a class="painel-btn-entrar" href="' +
-                      frappe.utils.escape_html(a.link_virtual) +
-                      '" target="_blank" rel="noopener" onclick="event.stopPropagation();">' +
-                      __("Entrar") +
-                      "</a>"
-                    : "";
+            var btn = "";
+            if (a.modalidade === "Virtual") {
+                if (a.link_virtual) {
+                    btn =
+                        '<a class="painel-btn-entrar" href="' +
+                        frappe.utils.escape_html(a.link_virtual) +
+                        '" target="_blank" rel="noopener" onclick="event.stopPropagation();">' +
+                        __("Entrar") +
+                        "</a>";
+                } else {
+                    btn =
+                        '<span class="painel-btn-entrar painel-btn-entrar--muted" title="' +
+                        frappe.utils.escape_html(__("Link ainda não cadastrado")) +
+                        '">' +
+                        __("Sem link") +
+                        "</span>";
+                }
+            }
             return (
                 '<div class="' +
                 card_cls +
