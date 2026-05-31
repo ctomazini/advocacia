@@ -35,6 +35,14 @@ LIMITS = {
 
 LIST_LIMIT_MAX = 100
 
+DEFAULT_LIST_LIMIT_KEYS = (
+	"timeline",
+	"comunicacoes",
+	"parcelas",
+	"despesas",
+	"custas",
+)
+
 
 def _normalize_periodo_dias(periodo_dias):
 	dias = cint(periodo_dias or 7)
@@ -58,16 +66,52 @@ def _effective_list_cap(list_limit):
 	return list_limit
 
 
+def _normalize_list_limits(list_limits=None, list_limit=None):
+	defaults = {key: 5 for key in DEFAULT_LIST_LIMIT_KEYS}
+	parsed = {}
+
+	if list_limits:
+		if isinstance(list_limits, str):
+			parsed = frappe.parse_json(list_limits) or {}
+		elif isinstance(list_limits, dict):
+			parsed = list_limits
+
+	legacy_limit = None
+	if list_limit is not None:
+		legacy_limit = _normalize_list_limit(list_limit)
+
+	normalized = {}
+	for key in DEFAULT_LIST_LIMIT_KEYS:
+		if key in parsed:
+			normalized[key] = _normalize_list_limit(parsed[key])
+		elif legacy_limit is not None:
+			normalized[key] = legacy_limit
+		else:
+			normalized[key] = defaults[key]
+
+	return normalized
+
+
+def _list_cap(list_limits, key):
+	return _effective_list_cap(list_limits.get(key, 5))
+
+
 @frappe.whitelist()
-def get_painel_data(limit_start=0, limit_page_length=20, periodo_dias=7, list_limit=5):
+def get_painel_data(
+	limit_start=0,
+	limit_page_length=20,
+	periodo_dias=7,
+	list_limit=5,
+	list_limits=None,
+):
 	if not frappe.has_permission("Servico", "read"):
 		frappe.throw(_("Sem permissão"), frappe.PermissionError)
 
 	limit_start = cint(limit_start)
 	limit_page_length = min(cint(limit_page_length or 20), 100)
 	periodo_dias = _normalize_periodo_dias(periodo_dias)
-	list_limit = _normalize_list_limit(list_limit)
-	list_cap = _effective_list_cap(list_limit)
+	list_limits = _normalize_list_limits(list_limits, list_limit)
+	list_limit = list_limits["timeline"]
 
 	hoje = today()
 	periodo_fim = add_days(hoje, periodo_dias)
@@ -79,28 +123,37 @@ def get_painel_data(limit_start=0, limit_page_length=20, periodo_dias=7, list_li
 	financeiro = _build_financeiro(hoje, periodo_fim, mes_inicio, mes_fim, kpis, periodo_dias)
 	resumo = _build_resumo(hoje, kpis, financeiro, periodo_dias)
 	alertas = _build_alertas(hoje, periodo_fim)
+	parcelas_cap = _list_cap(list_limits, "parcelas")
+	despesas_cap = _list_cap(list_limits, "despesas")
+	custas_cap = _list_cap(list_limits, "custas")
+	comunicacoes_cap = _list_cap(list_limits, "comunicacoes")
+	timeline_cap = _list_cap(list_limits, "timeline")
+	tarefas_cap = timeline_cap
+
 	parcelas_all = _get_pagamentos_operacao(
 		hoje, periodo_fim, limit_start, LIST_LIMIT_MAX
 	)
-	parcelas = parcelas_all[:list_cap]
+	parcelas = parcelas_all[:parcelas_cap]
 	audiencias = _get_audiencias(hoje, periodo_fim, LIST_LIMIT_MAX)
 	prazos = _get_prazos(hoje, periodo_fim, LIST_LIMIT_MAX)
 	tarefas_all = _get_tarefas(hoje, limit_start, LIST_LIMIT_MAX)
-	tarefas = tarefas_all[:list_cap]
+	tarefas = tarefas_all[:tarefas_cap]
 	despesas_all = _get_despesas_pendentes(LIST_LIMIT_MAX)
-	despesas_pendentes = despesas_all[:list_cap]
+	despesas_pendentes = despesas_all[:despesas_cap]
 	total_despesas_mes = _get_total_despesas_mes(mes_inicio, mes_fim)
 	custas_all = _get_custas_pendentes_repasse(LIST_LIMIT_MAX)
-	custas_pendentes_repasse = custas_all[:list_cap]
+	custas_pendentes_repasse = custas_all[:custas_cap]
 	total_custas_mes = _get_total_custas_mes(mes_inicio, mes_fim)
 	comunicacoes_all = _get_comunicacoes_pendentes(LIST_LIMIT_MAX)
-	comunicacoes_pendentes = comunicacoes_all[:list_cap]
-	ultimas_comunicacoes = comunicacoes_pendentes or _get_ultimas_comunicacoes(list_cap)
+	comunicacoes_pendentes = comunicacoes_all[:comunicacoes_cap]
+	ultimas_comunicacoes = comunicacoes_pendentes or _get_ultimas_comunicacoes(
+		comunicacoes_cap
+	)
 	horas_semana = _get_horas_semana(hoje)
 	horas_periodo = _get_horas_periodo(hoje, periodo_fim)
 	centro_atencao = _build_centro_atencao(hoje, amanha, kpis, financeiro, tarefas)
 	timeline_full = _build_timeline(hoje, periodo_fim, audiencias, prazos, tarefas_all)
-	timeline = timeline_full[:list_cap]
+	timeline = timeline_full[:timeline_cap]
 
 	list_meta = {
 		"timeline": {"showing": len(timeline), "total": len(timeline_full)},
@@ -113,6 +166,7 @@ def get_painel_data(limit_start=0, limit_page_length=20, periodo_dias=7, list_li
 	return {
 		"periodo_dias": periodo_dias,
 		"list_limit": list_limit,
+		"list_limits": list_limits,
 		"list_meta": list_meta,
 		"kpis": kpis,
 		"resumo": resumo,
@@ -129,8 +183,8 @@ def get_painel_data(limit_start=0, limit_page_length=20, periodo_dias=7, list_li
 		"ultimas_comunicacoes": ultimas_comunicacoes,
 		"horas_semana": horas_semana,
 		"horas_periodo": horas_periodo,
-		"audiencias": audiencias[:list_cap],
-		"prazos": prazos[:list_cap],
+		"audiencias": audiencias[:timeline_cap],
+		"prazos": prazos[:timeline_cap],
 		"tarefas": tarefas,
 	}
 

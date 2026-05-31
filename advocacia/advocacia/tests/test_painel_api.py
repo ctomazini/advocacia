@@ -15,6 +15,7 @@ class TestPainelApi(FrappeTestCase):
 		for key in (
 			"periodo_dias",
 			"list_limit",
+			"list_limits",
 			"list_meta",
 			"kpis",
 			"resumo",
@@ -60,7 +61,11 @@ class TestPainelApi(FrappeTestCase):
 
 	def test_paginacao(self):
 		data_small = get_painel_data(limit_start=0, limit_page_length=1, list_limit=5)
-		data_large = get_painel_data(limit_start=0, limit_page_length=100, list_limit=0)
+		data_large = get_painel_data(
+			limit_start=0,
+			limit_page_length=100,
+			list_limits={"timeline": 0, "parcelas": 0, "despesas": 0, "custas": 0, "comunicacoes": 0},
+		)
 		self.assertLessEqual(len(data_small["tarefas"]), 5)
 		self.assertLessEqual(len(data_small["tarefas"]), len(data_large["tarefas"]))
 
@@ -73,7 +78,31 @@ class TestPainelApi(FrappeTestCase):
 	def test_list_limit(self):
 		data = get_painel_data(list_limit=5)
 		self.assertEqual(data["list_limit"], 5)
+		self.assertEqual(data["list_limits"]["timeline"], 5)
 		self.assertIn("timeline", data["list_meta"])
 		self.assertLessEqual(data["list_meta"]["timeline"]["showing"], 5)
 		data_all = get_painel_data(list_limit=0)
 		self.assertEqual(data_all["list_limit"], 0)
+
+	def test_list_limits_independentes(self):
+		data = get_painel_data(
+			list_limits={
+				"timeline": 5,
+				"comunicacoes": 10,
+				"parcelas": 15,
+				"despesas": 0,
+				"custas": 5,
+			}
+		)
+		self.assertEqual(data["list_limits"]["timeline"], 5)
+		self.assertEqual(data["list_limits"]["comunicacoes"], 10)
+		self.assertEqual(data["list_limits"]["parcelas"], 15)
+		self.assertEqual(data["list_limits"]["despesas"], 0)
+		self.assertLessEqual(data["list_meta"]["timeline"]["showing"], 5)
+		self.assertLessEqual(data["list_meta"]["comunicacoes"]["showing"], 10)
+		self.assertLessEqual(data["list_meta"]["parcelas"]["showing"], 15)
+		if data["list_meta"]["despesas"]["total"]:
+			self.assertEqual(
+				data["list_meta"]["despesas"]["showing"],
+				data["list_meta"]["despesas"]["total"],
+			)

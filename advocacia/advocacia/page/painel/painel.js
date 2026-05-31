@@ -17,7 +17,7 @@ frappe.pages.painel.on_page_load = function (wrapper) {
 
     frappe.pages.painel.page = page;
     page.painel_periodo = 7;
-    page.painel_list_limit = 5;
+    page.painel_list_limits = painel_default_list_limits();
     load_painel(page);
 };
 
@@ -970,6 +970,15 @@ function inject_painel_styles() {
             color: var(--primary);
             font-weight: 600;
         }
+        .painel-linhas-filters--inline {
+            gap: 4px;
+        }
+        .painel-linhas-filters--inline .painel-linhas-btn {
+            min-width: 32px;
+            min-height: 28px;
+            padding: 2px 8px;
+            font-size: 11px;
+        }
         .painel-list-meta {
             font-size: 11px;
             font-weight: 500;
@@ -1162,13 +1171,69 @@ function inject_painel_styles() {
     $('<style id="painel-advocacia-styles">' + css + "</style>").appendTo("head");
 }
 
+var PAINEL_LIST_LIMIT_KEYS = [
+    "timeline",
+    "comunicacoes",
+    "parcelas",
+    "despesas",
+    "custas",
+];
+
+function painel_default_list_limits() {
+    return {
+        timeline: 5,
+        comunicacoes: 5,
+        parcelas: 5,
+        despesas: 5,
+        custas: 5,
+    };
+}
+
+function painel_merge_list_limits(page) {
+    var defaults = painel_default_list_limits();
+    var current = (page && page.painel_list_limits) || {};
+    var merged = {};
+    PAINEL_LIST_LIMIT_KEYS.forEach(function (key) {
+        merged[key] = current[key] != null ? cint(current[key]) : defaults[key];
+    });
+    return merged;
+}
+
+function render_list_limit_controls(list_key, current_limit) {
+    var opcoes = [
+        { val: 5, label: "5" },
+        { val: 10, label: "10" },
+        { val: 15, label: "15" },
+        { val: 0, label: __("Todos") },
+    ];
+    current_limit = current_limit != null ? cint(current_limit) : 5;
+    var h =
+        '<div class="painel-linhas-filters painel-linhas-filters--inline" title="' +
+        __("Itens nesta lista") +
+        '">';
+    opcoes.forEach(function (op) {
+        h +=
+            '<button type="button" class="painel-linhas-btn' +
+            (current_limit === op.val ? " active" : "") +
+            '" data-list="' +
+            list_key +
+            '" data-linhas="' +
+            op.val +
+            '">' +
+            op.label +
+            "</button>";
+    });
+    h += "</div>";
+    return h;
+}
+
 function load_painel(page) {
     mostrar_skeleton(page.painel_container);
     var periodo = page.painel_periodo || 7;
-    var list_limit = page.painel_list_limit != null ? page.painel_list_limit : 5;
+    var list_limits = painel_merge_list_limits(page);
     frappe.xcall("advocacia.advocacia.painel_api.get_painel_data", {
         periodo_dias: periodo,
-        list_limit: list_limit,
+        list_limits: list_limits,
     })
         .then(function (data) {
             page.painel_data = data;
@@ -1273,12 +1338,12 @@ function painel_goto_list(doctype, filters) {
 
 function render_painel($container, d, page) {
     var periodo = d.periodo_dias || page.painel_periodo || 7;
-    var list_limit = d.list_limit != null ? d.list_limit : page.painel_list_limit || 5;
+    var limits = d.list_limits || painel_merge_list_limits(page);
     var meta = d.list_meta || {};
-    page.painel_list_limit = list_limit;
+    page.painel_list_limits = limits;
     var html = '<div class="painel-content">';
     html += render_header(d.resumo, d.kpis, periodo, d.financeiro);
-    html += render_filtros_painel(periodo, list_limit);
+    html += render_filtros_painel(periodo);
     html += render_acoes_rapidas();
     html += render_centro_atencao(
         d.centro_atencao,
@@ -1288,12 +1353,12 @@ function render_painel($container, d, page) {
         d.total_despesas_mes,
         periodo
     );
-    html += render_timeline(d.timeline, periodo, meta.timeline, list_limit);
+    html += render_timeline(d.timeline, periodo, meta.timeline, limits.timeline);
     html += render_comunicacoes_pendentes(
         d.comunicacoes_pendentes || d.ultimas_comunicacoes,
         periodo,
         meta.comunicacoes,
-        list_limit
+        limits.comunicacoes
     );
     html += render_financeiro(d.financeiro, periodo);
     html += render_duo_honorarios_despesas(
@@ -1302,7 +1367,8 @@ function render_painel($container, d, page) {
         d.total_despesas_mes,
         meta.parcelas,
         meta.despesas,
-        list_limit
+        limits.parcelas,
+        limits.despesas
     );
     html += render_duo_custas_horas(
         d.custas_pendentes_repasse,
@@ -1310,7 +1376,7 @@ function render_painel($container, d, page) {
         d.horas_periodo != null ? d.horas_periodo : d.horas_semana,
         meta.custas,
         periodo,
-        list_limit
+        limits.custas
     );
     html += "</div>";
     $container.html(html);
@@ -1473,20 +1539,13 @@ function render_acoes_rapidas() {
     return h;
 }
 
-function render_filtros_painel(periodo_atual, list_limit) {
+function render_filtros_painel(periodo_atual) {
     var opcoes_periodo = [
         { dias: 1, label: __("Hoje") },
         { dias: 7, label: __("7 dias") },
         { dias: 15, label: __("15 dias") },
         { dias: 30, label: __("30 dias") },
     ];
-    var opcoes_linhas = [
-        { val: 5, label: "5" },
-        { val: 10, label: "10" },
-        { val: 15, label: "15" },
-        { val: 0, label: __("Todos") },
-    ];
-    list_limit = list_limit != null ? cint(list_limit) : 5;
     var h =
         '<div class="painel-periodo-bar">' +
         '<div class="painel-filtro-group">' +
@@ -1500,23 +1559,6 @@ function render_filtros_painel(periodo_atual, list_limit) {
             (periodo_atual === op.dias ? " active" : "") +
             '" data-periodo="' +
             op.dias +
-            '">' +
-            op.label +
-            "</button>";
-    });
-    h +=
-        "</div></div>" +
-        '<div class="painel-filtro-group">' +
-        '<span class="painel-linhas-label">' +
-        __("Itens por lista") +
-        "</span>" +
-        '<div class="painel-linhas-filters">';
-    opcoes_linhas.forEach(function (op) {
-        h +=
-            '<button type="button" class="painel-linhas-btn' +
-            (list_limit === op.val ? " active" : "") +
-            '" data-linhas="' +
-            op.val +
             '">' +
             op.label +
             "</button>";
@@ -1752,6 +1794,7 @@ function render_timeline(timeline, periodo_dias, list_meta, list_limit) {
         subtitulo +
         "</p></div>" +
         '<div class="painel-section-head-actions">' +
+        render_list_limit_controls("timeline", list_limit) +
         meta_html +
         '<span class="painel-section-link" data-route-calendar="1">' +
         __("Ver agenda") +
@@ -1889,6 +1932,7 @@ function render_comunicacoes_pendentes(comunicacoes, periodo_dias, list_meta, li
         __("Follow-ups pendentes — visão {0}", [painel_periodo_enunciado(periodo_dias)]) +
         "</p></div>" +
         '<div class="painel-section-head-actions">' +
+        render_list_limit_controls("comunicacoes", list_limit) +
         meta_html +
         '<span class="painel-section-link" data-route-list="Comunicacao">' +
         __("Ver todas") +
@@ -1942,9 +1986,14 @@ function bind_painel_filters($root, page) {
         load_painel(page);
     });
     $root.find(".painel-linhas-btn").on("click", function () {
+        var list_key = $(this).attr("data-list");
         var linhas = cint($(this).attr("data-linhas"));
-        if (!page || linhas === page.painel_list_limit) return;
-        page.painel_list_limit = linhas;
+        if (!page || !list_key) return;
+        if (!page.painel_list_limits) {
+            page.painel_list_limits = painel_default_list_limits();
+        }
+        if (linhas === page.painel_list_limits[list_key]) return;
+        page.painel_list_limits[list_key] = linhas;
         load_painel(page);
     });
 }
@@ -2292,19 +2341,27 @@ function build_parcelas_criticas(parcelas, limit) {
         .join("");
 }
 
-function render_duo_honorarios_despesas(parcelas, despesas, total_mes, meta_parcelas, meta_despesas, list_limit) {
+function render_duo_honorarios_despesas(
+    parcelas,
+    despesas,
+    total_mes,
+    meta_parcelas,
+    meta_despesas,
+    limit_parcelas,
+    limit_despesas
+) {
     return (
         '<div class="painel-duo-grid" id="painel-duo-financeiro">' +
-        render_parcelas(parcelas, true, meta_parcelas, list_limit) +
-        render_despesas(despesas, total_mes, true, meta_despesas, list_limit) +
+        render_parcelas(parcelas, true, meta_parcelas, limit_parcelas) +
+        render_despesas(despesas, total_mes, true, meta_despesas, limit_despesas) +
         "</div>"
     );
 }
 
-function render_duo_custas_horas(custas, total_mes, horas, meta_custas, periodo_dias, list_limit) {
+function render_duo_custas_horas(custas, total_mes, horas, meta_custas, periodo_dias, limit_custas) {
     return (
         '<div class="painel-duo-grid" id="painel-duo-secundario">' +
-        render_custas(custas, total_mes, true, meta_custas, list_limit) +
+        render_custas(custas, total_mes, true, meta_custas, limit_custas) +
         render_horas_semana(horas, true, periodo_dias) +
         "</div>"
     );
@@ -2394,6 +2451,7 @@ function render_parcelas(parcelas, compact, list_meta, list_limit) {
         __("Pendentes e vencidos") +
         "</p></div>" +
         '<div class="painel-section-head-actions">' +
+        render_list_limit_controls("parcelas", list_limit) +
         meta_html +
         '<span class="painel-section-link" data-route-list="Pagamento">' +
         __("Ver todos") +
@@ -2465,6 +2523,7 @@ function render_despesas(despesas, total_mes, compact, list_meta, list_limit) {
         __("Pendentes · mês calendário: {0}", [fmt_currency(total_mes || 0, true)]) +
         "</p></div>" +
         '<div class="painel-section-head-actions">' +
+        render_list_limit_controls("despesas", list_limit) +
         meta_html +
         '<span class="painel-section-link" data-route-list="Despesa do Escritorio">' +
         __("Ver todas") +
@@ -2529,6 +2588,7 @@ function render_custas(custas, total_mes, compact, list_meta, list_limit) {
         __("Repasse · mês calendário: {0}", [fmt_currency(total_mes || 0, true)]) +
         "</p></div>" +
         '<div class="painel-section-head-actions">' +
+        render_list_limit_controls("custas", list_limit) +
         meta_html +
         '<span class="painel-section-link" data-route-list="Custa Processual">' +
         __("Ver todas") +
