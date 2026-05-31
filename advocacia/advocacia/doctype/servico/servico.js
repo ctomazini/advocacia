@@ -107,3 +107,41 @@ function aplicar_mascara_processo_servico(frm) {
 		AdvocaciaMasks.setupServicoProcessoMask(frm);
 	}
 }
+
+function servico_quick_entry_pseudo_form(dialog) {
+	return {
+		fields_dict: dialog.fields_dict,
+		doc: dialog.doc,
+		set_value: function (fieldname, value) {
+			dialog.doc[fieldname] = value;
+			if (dialog.fields_dict[fieldname]) {
+				dialog.fields_dict[fieldname].set_value(value);
+			}
+		},
+	};
+}
+
+function setup_servico_quick_entry_masks(dialog) {
+	if (!window.AdvocaciaMasks) return;
+	const pseudo = servico_quick_entry_pseudo_form(dialog);
+	AdvocaciaMasks.setupServicoProcessoMask(pseudo);
+
+	["tipo", "numeracao_legada", "numero_processo"].forEach(function (fieldname) {
+		const field = dialog.fields_dict[fieldname];
+		if (!field || !field.$input) return;
+		field.$input.off("change.servico_qe").on("change.servico_qe", function () {
+			setTimeout(function () {
+				AdvocaciaMasks.setupServicoProcessoMask(servico_quick_entry_pseudo_form(dialog));
+			}, 50);
+		});
+	});
+}
+
+frappe.ui.form.ServicoQuickEntryForm = class ServicoQuickEntryForm extends (
+	frappe.ui.form.QuickEntryForm
+) {
+	render_dialog() {
+		super.render_dialog();
+		setup_servico_quick_entry_masks(this);
+	}
+};
