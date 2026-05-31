@@ -2,6 +2,84 @@ import os
 
 import frappe
 
+# Ordem canônica da sidebar Advocacia (espelha workspace_sidebar/advocacia.json).
+# Seções: Dia a Dia | Gestão de Casos | Financeiro | Relatórios | Cadastros
+SIDEBAR_LINK_ORDER = (
+	# Dia a Dia
+	("Painel", "painel", "Page"),
+	("Prazos", "Controle de Prazos", "DocType"),
+	("Audiências", "Audiencia", "DocType"),
+	("Tarefas", "Tarefa", "DocType"),
+	("Comunicações", "Comunicacao", "DocType"),
+	# Gestão de Casos
+	("Serviços", "Servico", "DocType"),
+	("Clientes", "Cliente", "DocType"),
+	("Registro de Horas", "Registro de Horas", "DocType"),
+	("Registro de Atos", "Registro de Atos", "DocType"),
+	("Custas Processuais", "Custa Processual", "DocType"),
+	# Financeiro
+	("Pagamentos", "Pagamento", "DocType"),
+	("Honorários", "Acordo de Honorarios Processuais", "DocType"),
+	("Despesas", "Despesa do Escritorio", "DocType"),
+	("Documentos", "Template Documento", "DocType"),
+	# Relatórios
+	("Produtividade", "produtividade", "Report"),
+	("Horas por Serviço", "horas_por_servico", "Report"),
+	("Inadimplência", "inadimplencia", "Report"),
+	("Fluxo de Caixa", "fluxo_de_caixa", "Report"),
+	("Honorários por Cliente", "honorarios_por_cliente", "Report"),
+	("Carteira Ativa", "carteira_ativa", "Report"),
+	# Cadastros
+	("Comarca", "Comarca", "DocType"),
+	("Vara", "Vara", "DocType"),
+	("Tribunal", "Tribunal", "DocType"),
+	("Fase Processual", "Fase Processual", "DocType"),
+)
+
+SIDEBAR_SECTIONS = (
+	{"label": "Dia a Dia", "collapsible": 0, "keep_closed": 0},
+	{"label": "Gestão de Casos", "collapsible": 0, "keep_closed": 0},
+	{"label": "Financeiro", "collapsible": 1, "keep_closed": 0},
+	{"label": "Relatórios", "collapsible": 1, "keep_closed": 1},
+	{"label": "Cadastros", "collapsible": 1, "keep_closed": 1},
+)
+
+
+def _validate_sidebar_links():
+	"""Garante que o JSON importado mantém os 24 links na ordem esperada."""
+	if not frappe.db.exists("Workspace Sidebar", "Advocacia"):
+		return
+
+	links = frappe.get_all(
+		"Workspace Sidebar Item",
+		filters={"parent": "Advocacia", "type": "Link"},
+		fields=["label", "link_to", "link_type", "idx"],
+		order_by="idx asc",
+	)
+
+	if len(links) != len(SIDEBAR_LINK_ORDER):
+		frappe.log_error(
+			title="Advocacia sidebar: contagem de links divergente",
+			message=f"Esperado {len(SIDEBAR_LINK_ORDER)}, encontrado {len(links)}",
+		)
+		return
+
+	for idx, (expected, link) in enumerate(zip(SIDEBAR_LINK_ORDER, links, strict=True)):
+		label, link_to, link_type = expected
+		if (
+			link.label != label
+			or link.link_to != link_to
+			or link.link_type != link_type
+		):
+			frappe.log_error(
+				title="Advocacia sidebar: ordem divergente",
+				message=(
+					f"Posição {idx + 1}: esperado {label}/{link_to}/{link_type}, "
+					f"encontrado {link.label}/{link.link_to}/{link.link_type}"
+				),
+			)
+			return
+
 
 def ensure_advocacia_sidebar():
 	"""Garante Workspace Sidebar e Desktop Icon do app (sync idempotente)."""
@@ -12,5 +90,7 @@ def ensure_advocacia_sidebar():
 		path = frappe.get_app_path("advocacia", folder, filename)
 		if os.path.exists(path):
 			frappe.import_doc(path)
+
+	_validate_sidebar_links()
 	frappe.clear_cache()
 	frappe.db.commit()

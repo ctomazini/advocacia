@@ -9,6 +9,17 @@
   {
    "child": 0,
    "collapsible": 0,
+   "icon": "sun",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Dia a Dia",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Section Break"
+  },
+  {
+   "child": 1,
+   "collapsible": 0,
    "icon": "layout-dashboard",
    "indent": 0,
    "keep_closed": 0,
@@ -19,67 +30,7 @@
    "type": "Link"
   },
   {
-   "child": 0,
-   "collapsible": 0,
-   "icon": "folder",
-   "indent": 0,
-   "keep_closed": 0,
-   "label": "Serviços",
-   "link_to": "Servico",
-   "link_type": "DocType",
-   "show_arrow": 0,
-   "type": "Link"
-  },
-  {
-   "child": 0,
-   "collapsible": 0,
-   "icon": "wallet",
-   "indent": 0,
-   "keep_closed": 0,
-   "label": "Pagamentos",
-   "link_to": "Pagamento",
-   "link_type": "DocType",
-   "show_arrow": 0,
-   "type": "Link"
-  },
-  {
-   "child": 0,
-   "collapsible": 0,
-   "icon": "receipt",
-   "indent": 0,
-   "keep_closed": 0,
-   "label": "Despesas",
-   "link_to": "Despesa do Escritorio",
-   "link_type": "DocType",
-   "show_arrow": 0,
-   "type": "Link"
-  },
-  {
-   "child": 0,
-   "collapsible": 0,
-   "icon": "circle-dollar-sign",
-   "indent": 0,
-   "keep_closed": 0,
-   "label": "Custas Processuais",
-   "link_to": "Custa Processual",
-   "link_type": "DocType",
-   "show_arrow": 0,
-   "type": "Link"
-  },
-  {
-   "child": 0,
-   "collapsible": 0,
-   "icon": "money-coins-1",
-   "indent": 0,
-   "keep_closed": 0,
-   "label": "Honorários",
-   "link_to": "Acordo de Honorarios Processuais",
-   "link_type": "DocType",
-   "show_arrow": 0,
-   "type": "Link"
-  },
-  {
-   "child": 0,
+   "child": 1,
    "collapsible": 0,
    "icon": "clock-alert",
    "indent": 0,
@@ -91,7 +42,7 @@
    "type": "Link"
   },
   {
-   "child": 0,
+   "child": 1,
    "collapsible": 0,
    "icon": "calendar-days",
    "indent": 0,
@@ -103,7 +54,19 @@
    "type": "Link"
   },
   {
-   "child": 0,
+   "child": 1,
+   "collapsible": 0,
+   "icon": "list-todo",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Tarefas",
+   "link_to": "Tarefa",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 1,
    "collapsible": 0,
    "icon": "message-circle",
    "indent": 0,
@@ -117,41 +80,28 @@
   {
    "child": 0,
    "collapsible": 0,
-   "icon": "list-todo",
+   "icon": "briefcase",
    "indent": 0,
    "keep_closed": 0,
-   "label": "Tarefas",
-   "link_to": "Tarefa",
+   "label": "Gestão de Casos",
    "link_type": "DocType",
    "show_arrow": 0,
-   "type": "Link"
+   "type": "Section Break"
   },
   {
-   "child": 0,
+   "child": 1,
    "collapsible": 0,
-   "icon": "clock",
+   "icon": "folder",
    "indent": 0,
    "keep_closed": 0,
-   "label": "Registro de Horas",
-   "link_to": "Registro de Horas",
+   "label": "Serviços",
+   "link_to": "Servico",
    "link_type": "DocType",
    "show_arrow": 0,
    "type": "Link"
   },
   {
-   "child": 0,
-   "collapsible": 0,
-   "icon": "clipboard",
-   "indent": 0,
-   "keep_closed": 0,
-   "label": "Registro de Atos",
-   "link_to": "Registro de Atos",
-   "link_type": "DocType",
-   "show_arrow": 0,
-   "type": "Link"
-  },
-  {
-   "child": 0,
+   "child": 1,
    "collapsible": 0,
    "icon": "users",
    "indent": 0,
@@ -163,7 +113,90 @@
    "type": "Link"
   },
   {
+   "child": 1,
+   "collapsible": 0,
+   "icon": "clock",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Registro de Horas",
+   "link_to": "Registro de Horas",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 1,
+   "collapsible": 0,
+   "icon": "clipboard",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Registro de Atos",
+   "link_to": "Registro de Atos",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 1,
+   "collapsible": 0,
+   "icon": "circle-dollar-sign",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Custas Processuais",
+   "link_to": "Custa Processual",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
    "child": 0,
+   "collapsible": 1,
+   "icon": "wallet",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Financeiro",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Section Break"
+  },
+  {
+   "child": 1,
+   "collapsible": 0,
+   "icon": "wallet",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Pagamentos",
+   "link_to": "Pagamento",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 1,
+   "collapsible": 0,
+   "icon": "money-coins-1",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Honorários",
+   "link_to": "Acordo de Honorarios Processuais",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 1,
+   "collapsible": 0,
+   "icon": "receipt",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Despesas",
+   "link_to": "Despesa do Escritorio",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 1,
    "collapsible": 0,
    "icon": "file-text",
    "indent": 0,
@@ -179,11 +212,35 @@
    "collapsible": 1,
    "icon": "file-bar-chart",
    "indent": 0,
-   "keep_closed": 0,
+   "keep_closed": 1,
    "label": "Relatórios",
    "link_type": "DocType",
    "show_arrow": 0,
    "type": "Section Break"
+  },
+  {
+   "child": 1,
+   "collapsible": 0,
+   "icon": "chart-bar",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Produtividade",
+   "link_to": "produtividade",
+   "link_type": "Report",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 1,
+   "collapsible": 0,
+   "icon": "timer",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Horas por Serviço",
+   "link_to": "horas_por_servico",
+   "link_type": "Report",
+   "show_arrow": 0,
+   "type": "Link"
   },
   {
    "child": 1,
@@ -229,30 +286,6 @@
    "keep_closed": 0,
    "label": "Carteira Ativa",
    "link_to": "carteira_ativa",
-   "link_type": "Report",
-   "show_arrow": 0,
-   "type": "Link"
-  },
-  {
-   "child": 1,
-   "collapsible": 0,
-   "icon": "chart-bar",
-   "indent": 0,
-   "keep_closed": 0,
-   "label": "Produtividade",
-   "link_to": "produtividade",
-   "link_type": "Report",
-   "show_arrow": 0,
-   "type": "Link"
-  },
-  {
-   "child": 1,
-   "collapsible": 0,
-   "icon": "timer",
-   "indent": 0,
-   "keep_closed": 0,
-   "label": "Horas por Serviço",
-   "link_to": "horas_por_servico",
    "link_type": "Report",
    "show_arrow": 0,
    "type": "Link"
@@ -317,7 +350,7 @@
    "type": "Link"
   }
  ],
- "modified": "2026-05-29 18:00:00.000000",
+ "modified": "2026-05-31 21:30:00.000000",
  "modified_by": "Administrator",
  "module": "Advocacia",
  "name": "Advocacia",
