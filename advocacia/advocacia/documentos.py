@@ -97,10 +97,10 @@ def _build_context(servico, cliente, addr, contato, hoje):
 	context["data_hoje_extenso"] = _formatar_data_extenso(hoje)
 
 	telefone = ""
+	email = ""
 	if contato:
-		telefone = contato.celular or contato.telefone or ""
-	else:
-		telefone = cliente.celular or cliente.telefone or ""
+		telefone = contato.get("celular") or contato.get("telefone") or ""
+		email = contato.get("email") or ""
 
 	context.update(
 		{
@@ -126,7 +126,7 @@ def _build_context(servico, cliente, addr, contato, hoje):
 			"estado_civil": cliente.estado_civil or "",
 			"profissao": cliente.profissao or "",
 			"telefone": telefone,
-			"email": (contato.email if contato and contato.email else cliente.email) or "",
+			"email": email,
 			"representante": cliente.representante or "",
 			"cpf_representante": cliente.cpf_representante or "",
 			"endereco": addr.logradouro if addr else "",
