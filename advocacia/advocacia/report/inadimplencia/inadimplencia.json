@@ -5,10 +5,10 @@
  "doctype": "Report",
  "is_standard": "Yes",
  "module": "Advocacia",
- "name": "Inadimplência",
+ "name": "inadimplencia",
  "owner": "Administrator",
  "ref_doctype": "Pagamento",
- "report_name": "Inadimplência",
+ "report_name": "inadimplencia",
  "report_type": "Script Report",
  "roles": [
   {

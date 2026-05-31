@@ -1,4 +1,4 @@
-frappe.query_reports["Inadimplência"] = {
+frappe.query_reports["inadimplencia"] = {
 	filters: [
 		{
 			fieldname: "cliente",
