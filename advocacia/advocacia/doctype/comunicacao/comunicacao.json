@@ -1,0 +1,155 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-05-31 12:00:00",
+ "custom": 0,
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "informacoes_section",
+  "servico",
+  "cliente",
+  "column_break_info",
+  "data",
+  "tipo",
+  "detalhes_section",
+  "assunto",
+  "resumo",
+  "proximos_passos_section",
+  "proximos_passos",
+  "gerar_tarefa",
+  "tarefa"
+ ],
+ "fields": [
+  {
+   "fieldname": "informacoes_section",
+   "fieldtype": "Section Break",
+   "label": "Informações"
+  },
+  {
+   "fieldname": "servico",
+   "fieldtype": "Link",
+   "options": "Servico",
+   "label": "Serviço",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "cliente",
+   "fieldtype": "Link",
+   "options": "Cliente",
+   "label": "Cliente",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "column_break_info",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "data",
+   "fieldtype": "Datetime",
+   "label": "Data",
+   "reqd": 1,
+   "default": "Now",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "tipo",
+   "fieldtype": "Select",
+   "label": "Tipo",
+   "reqd": 1,
+   "in_list_view": 1,
+   "options": "Telefone\nWhatsApp\nEmail\nReunião Presencial\nReunião Virtual\nOutro"
+  },
+  {
+   "fieldname": "detalhes_section",
+   "fieldtype": "Section Break",
+   "label": "Detalhes"
+  },
+  {
+   "fieldname": "assunto",
+   "fieldtype": "Data",
+   "label": "Assunto",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "resumo",
+   "fieldtype": "Text Editor",
+   "label": "Resumo"
+  },
+  {
+   "fieldname": "proximos_passos_section",
+   "fieldtype": "Section Break",
+   "label": "Próximos Passos",
+   "collapsible": 1
+  },
+  {
+   "fieldname": "proximos_passos",
+   "fieldtype": "Small Text",
+   "label": "Próximos Passos"
+  },
+  {
+   "fieldname": "gerar_tarefa",
+   "fieldtype": "Check",
+   "label": "Gerar Tarefa",
+   "default": "0"
+  },
+  {
+   "fieldname": "tarefa",
+   "fieldtype": "Link",
+   "options": "Tarefa",
+   "label": "Tarefa Gerada",
+   "read_only": 1,
+   "depends_on": "eval:doc.tarefa"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 0,
+ "is_tree": 0,
+ "issingle": 0,
+ "istable": 0,
+ "links": [],
+ "modified": "2026-05-31 12:00:00",
+ "modified_by": "Administrator",
+ "module": "Advocacia",
+ "name": "Comunicacao",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "Advocacia Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1
+  },
+  {
+   "role": "Advocacia User",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 0,
+   "report": 1,
+   "export": 1
+  },
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1
+  }
+ ],
+ "states": [],
+ "autoname": "format:COM-{YYYY}-{####}",
+ "title_field": "assunto",
+ "search_fields": "servico,cliente,assunto,tipo,data",
+ "sort_field": "data",
+ "sort_order": "DESC",
+ "quick_entry": 0,
+ "track_changes": 1
+}
