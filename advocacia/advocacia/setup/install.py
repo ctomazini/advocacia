@@ -3,7 +3,6 @@ import frappe
 from advocacia.advocacia.setup.translations import ensure_doctype_translations
 from advocacia.advocacia.setup.sidebar import ensure_advocacia_sidebar
 from advocacia.advocacia.setup.reports import ensure_advocacia_reports
-from advocacia.advocacia.setup.workspace import ensure_advocacia_workspace
 
 
 def after_install():
@@ -14,6 +13,5 @@ def after_install():
 			)
 	ensure_doctype_translations()
 	ensure_advocacia_sidebar()
-	ensure_advocacia_workspace()
 	ensure_advocacia_reports()
 	frappe.db.commit()
