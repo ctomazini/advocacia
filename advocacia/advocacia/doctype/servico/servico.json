@@ -198,6 +198,24 @@
    "is_child_table": 0,
    "custom": 0,
    "doctype": "DocType Link"
+  },
+  {
+   "group": "Financeiro",
+   "link_doctype": "Custa Processual",
+   "link_fieldname": "servico",
+   "doctype": "DocType Link"
+  },
+  {
+   "group": "Comunicação",
+   "link_doctype": "Comunicacao",
+   "link_fieldname": "servico",
+   "doctype": "DocType Link"
+  },
+  {
+   "group": "Produtividade",
+   "link_doctype": "Registro de Horas",
+   "link_fieldname": "servico",
+   "doctype": "DocType Link"
   }
  ],
  "fields": [

@@ -7,6 +7,7 @@ from frappe.utils import (
 	flt,
 	get_first_day,
 	get_last_day,
+	getdate,
 	today,
 )
 
@@ -48,6 +49,10 @@ def get_painel_data(limit_start=0, limit_page_length=20):
 	tarefas = _get_tarefas(hoje, limit_start, limit_page_length)
 	despesas_pendentes = _get_despesas_pendentes()
 	total_despesas_mes = _get_total_despesas_mes(mes_inicio, mes_fim)
+	custas_pendentes_repasse = _get_custas_pendentes_repasse()
+	total_custas_mes = _get_total_custas_mes(mes_inicio, mes_fim)
+	ultimas_comunicacoes = _get_ultimas_comunicacoes()
+	horas_semana = _get_horas_semana(hoje)
 
 	return {
 		"kpis": kpis,
@@ -57,6 +62,10 @@ def get_painel_data(limit_start=0, limit_page_length=20):
 		"parcelas": parcelas,
 		"despesas_pendentes": despesas_pendentes,
 		"total_despesas_mes": total_despesas_mes,
+		"custas_pendentes_repasse": custas_pendentes_repasse,
+		"total_custas_mes": total_custas_mes,
+		"ultimas_comunicacoes": ultimas_comunicacoes,
+		"horas_semana": horas_semana,
 		"audiencias": audiencias,
 		"prazos": prazos,
 		"tarefas": tarefas,
@@ -401,6 +410,70 @@ def _get_total_despesas_mes(mes_inicio, mes_fim):
 		AND status != 'Cancelado'
 		""",
 		(mes_inicio, mes_fim),
+		as_dict=True,
+	)
+	return flt(result[0].total if result else 0)
+
+
+def _get_custas_pendentes_repasse():
+	if not frappe.has_permission("Custa Processual", "read"):
+		return []
+	if not frappe.db.table_exists("Custa Processual"):
+		return []
+	return frappe.get_all(
+		"Custa Processual",
+		filters={"repassar_cliente": 1, "status": "Pago"},
+		fields=["name", "descricao", "tipo", "valor", "servico", "cliente", "data_pagamento"],
+		order_by="data_pagamento ASC",
+		limit=10,
+	)
+
+
+def _get_total_custas_mes(mes_inicio, mes_fim):
+	if not frappe.has_permission("Custa Processual", "read"):
+		return 0
+	if not frappe.db.table_exists("Custa Processual"):
+		return 0
+	result = frappe.db.sql(
+		"""
+		SELECT COALESCE(SUM(valor), 0) as total
+		FROM `tabCusta Processual`
+		WHERE data_pagamento BETWEEN %s AND %s
+		AND status IN ('Pago', 'Repassado')
+		""",
+		(mes_inicio, mes_fim),
+		as_dict=True,
+	)
+	return flt(result[0].total if result else 0)
+
+
+def _get_ultimas_comunicacoes():
+	if not frappe.has_permission("Comunicacao", "read"):
+		return []
+	if not frappe.db.table_exists("Comunicacao"):
+		return []
+	return frappe.get_all(
+		"Comunicacao",
+		fields=["name", "assunto", "tipo", "cliente", "servico", "data"],
+		order_by="data DESC",
+		limit=5,
+	)
+
+
+def _get_horas_semana(hoje):
+	if not frappe.has_permission("Registro de Horas", "read"):
+		return 0
+	if not frappe.db.table_exists("Registro de Horas"):
+		return 0
+	week_start = add_days(hoje, -getdate(hoje).weekday())
+	week_end = add_days(week_start, 6)
+	result = frappe.db.sql(
+		"""
+		SELECT COALESCE(SUM(duracao_horas), 0) as total
+		FROM `tabRegistro de Horas`
+		WHERE data BETWEEN %s AND %s
+		""",
+		(week_start, week_end),
 		as_dict=True,
 	)
 	return flt(result[0].total if result else 0)

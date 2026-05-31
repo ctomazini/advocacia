@@ -281,3 +281,51 @@ def get_acordo_pagamentos(acordo_name):
 		fields=["name", "status", "parcela_origem_id", "valor"],
 		order_by="creation asc",
 	)
+
+
+def create_test_custa_processual(servico=None, descricao=None, tipo="Taxa Judicial", valor=500, **kwargs):
+	if not servico:
+		servico = create_test_servico().name
+	data = {
+		"doctype": "Custa Processual",
+		"servico": servico,
+		"descricao": descricao or _uid("Custa Teste"),
+		"tipo": tipo,
+		"valor": valor,
+	}
+	data.update(kwargs)
+	doc = frappe.get_doc(data)
+	doc.insert(ignore_permissions=True)
+	return doc
+
+
+def create_test_comunicacao(cliente=None, assunto=None, tipo="Telefone", **kwargs):
+	if not cliente:
+		cliente = create_test_cliente().name
+	data = {
+		"doctype": "Comunicacao",
+		"cliente": cliente,
+		"assunto": assunto or _uid("Comunicação Teste"),
+		"tipo": tipo,
+		"data": now_datetime(),
+	}
+	data.update(kwargs)
+	doc = frappe.get_doc(data)
+	doc.insert(ignore_permissions=True)
+	return doc
+
+
+def create_test_registro_horas(servico=None, atividade=None, duracao_minutos=60, **kwargs):
+	if not servico:
+		servico = create_test_servico().name
+	data = {
+		"doctype": "Registro de Horas",
+		"servico": servico,
+		"data": today(),
+		"atividade": atividade or _uid("Atividade Teste"),
+		"duracao_minutos": duracao_minutos,
+	}
+	data.update(kwargs)
+	doc = frappe.get_doc(data)
+	doc.insert(ignore_permissions=True)
+	return doc

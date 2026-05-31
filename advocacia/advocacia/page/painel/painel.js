@@ -933,6 +933,9 @@ function render_painel($container, d) {
     html += render_financeiro(d.financeiro);
     html += render_parcelas(d.parcelas);
     html += render_despesas(d.despesas_pendentes, d.total_despesas_mes);
+    html += render_custas(d.custas_pendentes_repasse, d.total_custas_mes);
+    html += render_horas_semana(d.horas_semana);
+    html += render_comunicacoes(d.ultimas_comunicacoes);
     html += '<div class="painel-secondary-grid">';
     html += render_secundario(
         __("Agenda — 7 dias"),
@@ -1574,6 +1577,130 @@ function render_despesas(despesas, total_mes) {
             '">' +
             fmt_currency(d.valor) +
             "</div></div></div>";
+    });
+    h += "</div></div></section>";
+    return h;
+}
+
+function render_custas(custas, total_mes) {
+    var h =
+        '<section class="painel-section" id="painel-custas"><div class="painel-section-head">' +
+        "<div><h2 class='painel-section-title'>" +
+        __("Custas Processuais") +
+        "</h2>" +
+        '<p class="painel-section-sub">' +
+        __("Gastos repassáveis — pagas aguardando repasse ao cliente") +
+        "</p></div>" +
+        '<span class="painel-section-link" data-route-list="Custa Processual">' +
+        __("Ver todas") +
+        "</span></div>";
+
+    h +=
+        '<div class="painel-kpi-grid painel-kpi-grid--inline" style="margin-bottom:12px">' +
+        '<div class="painel-kpi-card"><div class="painel-kpi-label">' +
+        __("Custas Pagas no Mês") +
+        '</div><div class="painel-kpi-value">' +
+        fmt_currency(total_mes || 0) +
+        "</div></div></div>";
+
+    if (!custas || !custas.length) {
+        return (
+            h +
+            '<div class="painel-panel">' +
+            render_empty_state(
+                "receipt",
+                __("Nenhuma custa pendente de repasse"),
+                __("Custas pagas marcadas para repasse aparecerão aqui.")
+            ) +
+            "</div></section>"
+        );
+    }
+
+    h += '<div class="painel-panel"><div class="painel-schedule-list">';
+    custas.forEach(function (c) {
+        h +=
+            '<div class="painel-schedule-item" data-custa="' +
+            frappe.utils.escape_html(c.name || "") +
+            '">' +
+            '<div class="painel-schedule-main">' +
+            '<div class="painel-op-title">' +
+            frappe.utils.escape_html(c.descricao || c.name) +
+            "</div>" +
+            '<div class="painel-op-sub">' +
+            frappe.utils.escape_html(c.tipo || "") +
+            (c.servico ? " · " + frappe.utils.escape_html(c.servico) : "") +
+            "</div></div>" +
+            '<div class="painel-schedule-side">' +
+            '<span class="indicator-pill blue">' + __("Aguardando repasse") + "</span>" +
+            '<div class="painel-op-valor warn">' +
+            fmt_currency(c.valor) +
+            "</div></div></div>";
+    });
+    h += "</div></div></section>";
+    return h;
+}
+
+function render_horas_semana(horas) {
+    return (
+        '<section class="painel-section painel-section--inline" id="painel-horas">' +
+        '<div class="painel-kpi-grid painel-kpi-grid--inline">' +
+        '<div class="painel-kpi-card painel-kpi-card--clickable" data-route-list="Registro de Horas">' +
+        '<div class="painel-kpi-label">' +
+        __("Horas Registradas (semana)") +
+        "</div>" +
+        '<div class="painel-kpi-value">' +
+        (horas || 0).toFixed(1) +
+        " h</div></div></div></section>"
+    );
+}
+
+function render_comunicacoes(comunicacoes) {
+    var h =
+        '<section class="painel-section" id="painel-comunicacoes"><div class="painel-section-head">' +
+        "<div><h2 class='painel-section-title'>" +
+        __("Últimas Comunicações") +
+        "</h2>" +
+        '<p class="painel-section-sub">' +
+        __("Interações recentes com clientes") +
+        "</p></div>" +
+        '<span class="painel-section-link" data-route-list="Comunicacao">' +
+        __("Ver todas") +
+        "</span></div>";
+
+    if (!comunicacoes || !comunicacoes.length) {
+        return (
+            h +
+            '<div class="painel-panel">' +
+            render_empty_state(
+                "message",
+                __("Nenhuma comunicação registrada"),
+                __("Ligações, e-mails e reuniões aparecerão aqui.")
+            ) +
+            "</div></section>"
+        );
+    }
+
+    h += '<div class="painel-panel"><div class="painel-schedule-list">';
+    comunicacoes.forEach(function (c) {
+        h +=
+            '<div class="painel-schedule-item" data-comunicacao="' +
+            frappe.utils.escape_html(c.name || "") +
+            '">' +
+            '<div class="painel-schedule-main">' +
+            '<div class="painel-op-title">' +
+            frappe.utils.escape_html(c.assunto || c.name) +
+            "</div>" +
+            '<div class="painel-op-sub">' +
+            frappe.utils.escape_html(c.tipo || "") +
+            (c.cliente ? " · " + frappe.utils.escape_html(c.cliente) : "") +
+            "</div></div>" +
+            '<div class="painel-schedule-side">' +
+            (c.data
+                ? '<span class="painel-op-sub">' +
+                  frappe.utils.escape_html(frappe.datetime.str_to_user(c.data)) +
+                  "</span>"
+                : "") +
+            "</div></div>";
     });
     h += "</div></div></section>";
     return h;
