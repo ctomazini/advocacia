@@ -16,7 +16,8 @@
    "reqd": 1,
    "unique": 1,
    "in_list_view": 1,
-   "in_standard_filter": 1
+   "in_standard_filter": 1,
+   "allow_in_quick_entry": 1
   },
   {
    "fieldname": "abbreviation",
@@ -24,7 +25,8 @@
    "fieldtype": "Data",
    "reqd": 1,
    "unique": 1,
-   "in_list_view": 1
+   "in_list_view": 1,
+   "allow_in_quick_entry": 1
   },
   {
    "fieldname": "jurisdiction",
@@ -33,7 +35,8 @@
    "reqd": 1,
    "options": "Estadual\nFederal\nTrabalho\nSuperior\nMilitar\nEleitoral",
    "in_list_view": 1,
-   "in_standard_filter": 1
+   "in_standard_filter": 1,
+   "allow_in_quick_entry": 1
   }
  ],
  "permissions": [
@@ -69,5 +72,6 @@
   }
  ],
  "sort_field": "tribunal_name",
- "sort_order": "ASC"
+ "sort_order": "ASC",
+ "quick_entry": 1
 }

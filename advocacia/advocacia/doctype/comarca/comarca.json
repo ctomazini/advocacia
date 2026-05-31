@@ -16,7 +16,8 @@
    "reqd": 1,
    "unique": 1,
    "in_list_view": 1,
-   "in_standard_filter": 1
+   "in_standard_filter": 1,
+   "allow_in_quick_entry": 1
   },
   {
    "fieldname": "uf",
@@ -25,7 +26,8 @@
    "reqd": 1,
    "options": "AC\nAL\nAM\nAP\nBA\nCE\nDF\nES\nGO\nMA\nMG\nMS\nMT\nPA\nPB\nPE\nPI\nPR\nRJ\nRN\nRO\nRR\nRS\nSC\nSE\nSP\nTO",
    "in_list_view": 1,
-   "in_standard_filter": 1
+   "in_standard_filter": 1,
+   "allow_in_quick_entry": 1
   },
   {
    "fieldname": "city",
@@ -68,5 +70,6 @@
   }
  ],
  "sort_field": "comarca_name",
- "sort_order": "ASC"
+ "sort_order": "ASC",
+ "quick_entry": 1
 }

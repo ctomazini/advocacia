@@ -26,7 +26,8 @@
    "reqd": 1,
    "in_list_view": 1,
    "in_global_search": 1,
-   "bold": 1
+   "bold": 1,
+   "allow_in_quick_entry": 1
   },
   {
    "fieldname": "status",
