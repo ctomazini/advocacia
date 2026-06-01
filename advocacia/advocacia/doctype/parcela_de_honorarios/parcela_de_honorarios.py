@@ -36,6 +36,7 @@ class ParceladeHonorarios(Document):
 
 	@frappe.whitelist()
 	def registrar_recebimento(self):
+		self.check_permission("write")
 		self.data_recebimento = today()
 		self.atualizar_status()
 		self.save()
@@ -43,6 +44,7 @@ class ParceladeHonorarios(Document):
 
 	@frappe.whitelist()
 	def registrar_repasse(self):
+		self.check_permission("write")
 		self.data_repasse = today()
 		self.status = "Repassado"
 		self.save()
