@@ -12,6 +12,7 @@ class Servico(Document):
 			self.numeracao_legada = 0
 
 	def validate(self):
+		self.compor_titulo()
 		if self.tipo != "Processo Judicial":
 			return
 
@@ -24,6 +25,18 @@ class Servico(Document):
 			self.numero_processo = limpar_numerico(validar_cnj(numero))
 		else:
 			self.numero_processo = numero
+
+	def compor_titulo(self):
+		parts = []
+		if self.cliente:
+			cliente_nome = frappe.db.get_value("Cliente", self.cliente, "nome") or self.cliente
+			if cliente_nome:
+				parts.append(cliente_nome)
+		if self.tipo:
+			parts.append(self.tipo)
+		if self.status:
+			parts.append(self.status)
+		self.title = " · ".join(parts) if parts else (self.name or "")
 
 
 def format_servico_link_label(doc=None, servico_name=None):

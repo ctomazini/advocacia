@@ -17,3 +17,11 @@ class CustaProcessual(Document):
 			self.status = "Pago"
 		if self.data_repasse and self.status == "Pago":
 			self.status = "Repassado"
+		self.compor_titulo()
+
+	def compor_titulo(self):
+		cliente_label = ""
+		if self.cliente:
+			cliente_label = frappe.db.get_value("Cliente", self.cliente, "nome") or self.cliente
+		descricao = (self.descricao or "").strip() or "Custa"
+		self.title = f"{cliente_label} — {descricao}" if cliente_label else descricao

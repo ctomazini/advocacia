@@ -18,6 +18,7 @@
   "registro_atos",
   "numero_parcela",
   "descricao",
+  "title",
   "sec_origem",
   "parcela_origem_id",
   "sincronizado_em",
@@ -198,6 +199,14 @@
    "fieldname": "comprovante",
    "fieldtype": "Attach",
    "label": "Comprovante"
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "label": "Título",
+   "hidden": 1,
+   "read_only": 1,
+   "in_list_view": 1
   }
  ],
  "index_web_pages_for_search": 1,
@@ -244,6 +253,7 @@
  "sort_field": "data_vencimento",
  "sort_order": "ASC",
  "states": [],
- "title_field": "descricao",
- "track_changes": 1
+ "title_field": "title",
+ "track_changes": 1,
+ "show_title_field_in_link": 1
 }

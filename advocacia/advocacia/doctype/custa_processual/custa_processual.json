@@ -12,6 +12,7 @@
   "tipo",
   "column_break_info",
   "descricao",
+  "title",
   "status",
   "valores_section",
   "valor",
@@ -139,6 +140,14 @@
    "fieldname": "observacoes",
    "fieldtype": "Small Text",
    "label": "Observações"
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "label": "Título",
+   "hidden": 1,
+   "read_only": 1,
+   "in_list_view": 1
   }
  ],
  "index_web_pages_for_search": 1,
@@ -183,10 +192,11 @@
  ],
  "states": [],
  "autoname": "format:CUST-{YYYY}-{####}",
- "title_field": "descricao",
+ "title_field": "title",
  "search_fields": "servico,cliente,tipo,status,descricao",
  "sort_field": "data_pagamento",
  "sort_order": "DESC",
  "quick_entry": 1,
- "track_changes": 1
+ "track_changes": 1,
+ "show_title_field_in_link": 1
 }

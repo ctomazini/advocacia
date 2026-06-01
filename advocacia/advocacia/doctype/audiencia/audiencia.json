@@ -14,7 +14,7 @@
  "app": null,
  "autoname": "format:AUD-{####}",
  "naming_rule": "Expression (old style)",
- "title_field": "tipo",
+ "title_field": "title",
  "image_field": null,
  "timeline_field": null,
  "sort_field": "modified",
@@ -54,7 +54,7 @@
  "email_append_to": 0,
  "subject_field": null,
  "sender_field": null,
- "show_title_field_in_link": 0,
+ "show_title_field_in_link": 1,
  "migration_hash": null,
  "translated_doctype": 0,
  "is_calendar_and_gantt": 0,
@@ -1136,7 +1136,33 @@
    "documentation_url": null,
    "placeholder": null,
    "doctype": "DocField"
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "label": "Título",
+   "hidden": 1,
+   "read_only": 1,
+   "in_list_view": 1
   }
  ],
- "states": []
+ "states": [],
+ "field_order": [
+  "informacoes_section",
+  "servico",
+  "cliente",
+  "column_break_info",
+  "data_hora",
+  "status_aud",
+  "detalhes_section",
+  "tipo",
+  "title",
+  "modalidade",
+  "link_virtual",
+  "column_break_det",
+  "local_vara",
+  "resultado",
+  "observacoes_section",
+  "observacoes"
+ ]
 }

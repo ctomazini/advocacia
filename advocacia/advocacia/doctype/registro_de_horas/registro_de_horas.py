@@ -17,6 +17,7 @@ class RegistrodeHoras(Document):
 			self.duracao_minutos = max(0, int(diff / 60))
 
 		self.duracao_horas = round((self.duracao_minutos or 0) / 60, 2)
+		self.compor_titulo()
 
 		if self.timer_ativo and self.has_value_changed("duracao_minutos"):
 			frappe.throw(
@@ -24,6 +25,13 @@ class RegistrodeHoras(Document):
 					"Não é possível editar a duração manualmente enquanto o timer está ativo. Pare o timer primeiro."
 				)
 			)
+
+	def compor_titulo(self):
+		cliente_label = ""
+		if self.cliente:
+			cliente_label = frappe.db.get_value("Cliente", self.cliente, "nome") or self.cliente
+		atividade = (self.atividade or "").strip() or "Horas"
+		self.title = f"{cliente_label} — {atividade}" if cliente_label else atividade
 
 	@frappe.whitelist()
 	def iniciar_timer(self):

@@ -9,6 +9,14 @@ class ControledePrazos(Document):
 			self.cliente = frappe.db.get_value("Servico", self.servico, "cliente")
 		if not self.cliente:
 			frappe.throw(_("Cliente é obrigatório. Selecione um Serviço válido."))
+		self.compor_titulo()
+
+	def compor_titulo(self):
+		cliente_label = ""
+		if self.cliente:
+			cliente_label = frappe.db.get_value("Cliente", self.cliente, "nome") or self.cliente
+		descricao = (self.descricao or "").strip() or "Prazo"
+		self.title = f"{cliente_label} — {descricao}" if cliente_label else descricao
 
 
 @frappe.whitelist()
@@ -30,6 +38,7 @@ def get_events(start, end, filters=None, doctype=None, field_map=None, fields=No
 			"name",
 			"data_prazo",
 			"descricao",
+			"title",
 			"cliente",
 			"servico",
 			"status",

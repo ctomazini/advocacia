@@ -47,6 +47,23 @@ class Pagamento(Document):
 					_("Já existe pagamento para a origem {0}.").format(self.parcela_origem_id)
 				)
 
+		self.compor_titulo()
+
+	def compor_titulo(self):
+		parts = []
+		if self.cliente:
+			cliente_label = frappe.db.get_value("Cliente", self.cliente, "nome") or self.cliente
+			if cliente_label:
+				parts.append(cliente_label)
+		if self.tipo_origem:
+			parts.append(self.tipo_origem)
+		if self.numero_parcela:
+			parts.append(_("Parc. {0}").format(self.numero_parcela))
+		descricao = (self.descricao or "").strip()
+		if descricao:
+			parts.append(descricao[:80])
+		self.title = " — ".join(parts) if parts else (self.name or _("Pagamento"))
+
 	def before_save(self):
 		if self.is_new() and self.status == "Cancelado":
 			frappe.throw(_("Não é permitido criar pagamento já cancelado."))

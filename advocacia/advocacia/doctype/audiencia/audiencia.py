@@ -9,6 +9,14 @@ class Audiencia(Document):
 			self.cliente = frappe.db.get_value("Servico", self.servico, "cliente")
 		if not self.cliente:
 			frappe.throw(_("Cliente é obrigatório. Selecione um Serviço válido."))
+		self.compor_titulo()
+
+	def compor_titulo(self):
+		cliente_label = ""
+		if self.cliente:
+			cliente_label = frappe.db.get_value("Cliente", self.cliente, "nome") or self.cliente
+		base = self.tipo or _("Audiência")
+		self.title = f"{cliente_label} — {base}" if cliente_label else base
 
 
 @frappe.whitelist()
@@ -31,6 +39,7 @@ def get_events(start, end, filters=None, doctype=None, field_map=None, fields=No
 			"data_hora",
 			"cliente",
 			"tipo",
+			"title",
 			"servico",
 			"status_aud",
 			"modalidade",
@@ -38,6 +47,5 @@ def get_events(start, end, filters=None, doctype=None, field_map=None, fields=No
 		order_by="data_hora asc",
 	)
 	for row in rows:
-		parts = [row.get("cliente") or "", row.get("tipo") or ""]
-		row["title"] = " - ".join(p for p in parts if p) or row.name
+		row["title"] = row.get("title") or row.get("tipo") or row.name
 	return rows

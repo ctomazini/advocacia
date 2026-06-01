@@ -84,3 +84,9 @@ class TestServico(FrappeTestCase):
 			"Audiencia", filters={"servico": servico.name}, pluck="name"
 		)
 		self.assertIn(aud.name, vinculadas)
+
+	def test_titulo_composto(self):
+		cliente = create_test_cliente()
+		servico = create_test_servico(cliente=cliente.name)
+		self.assertIn(cliente.nome, servico.title)
+		self.assertIn("Consultoria", servico.title)

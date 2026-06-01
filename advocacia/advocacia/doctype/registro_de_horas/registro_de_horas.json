@@ -20,6 +20,7 @@
   "duracao_horas",
   "atividade_section",
   "atividade",
+  "title",
   "categoria",
   "descricao",
   "cobravel",
@@ -159,6 +160,14 @@
    "label": "Timer Ativo",
    "read_only": 1,
    "description": "Flag: 1=correndo, 0=parado"
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "label": "Título",
+   "hidden": 1,
+   "read_only": 1,
+   "in_list_view": 1
   }
  ],
  "index_web_pages_for_search": 1,
@@ -203,10 +212,11 @@
  ],
  "states": [],
  "autoname": "format:HRS-{YYYY}-{####}",
- "title_field": "atividade",
+ "title_field": "title",
  "search_fields": "servico,cliente,atividade,data",
  "sort_field": "data",
  "sort_order": "DESC",
  "quick_entry": 1,
- "track_changes": 1
+ "track_changes": 1,
+ "show_title_field_in_link": 1
 }

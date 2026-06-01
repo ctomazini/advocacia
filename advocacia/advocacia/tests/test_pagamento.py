@@ -26,6 +26,12 @@ class TestPagamento(FrappeTestCase):
 		pag.save(ignore_permissions=True)
 		self.assertEqual(pag.status, "Recebido")
 
+	def test_titulo_composto(self):
+		acordo = create_test_acordo(num_parcelas=1, valor_total=500)
+		pag = frappe.get_doc("Pagamento", get_acordo_pagamentos(acordo.name)[0].name)
+		cliente_nome = frappe.db.get_value("Cliente", pag.cliente, "nome")
+		self.assertIn(cliente_nome, pag.title)
+
 	def test_scheduler_marca_vencido(self):
 		acordo = create_test_acordo(num_parcelas=1, valor_total=500)
 		pag_name = get_acordo_pagamentos(acordo.name)[0].name

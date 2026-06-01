@@ -157,5 +157,6 @@
    "print": 1,
    "email": 1
   }
- ]
+ ],
+ "show_title_field_in_link": 1
 }
