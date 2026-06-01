@@ -10,8 +10,15 @@ class AcordodeHonorariosProcessuais(Document):
             self.cliente = frappe.db.get_value("Servico", self.servico, "cliente")
         if not self.cliente:
             frappe.throw(_("Cliente é obrigatório. Selecione um Serviço válido."))
+        self.compor_titulo()
         self._validar_financeiro()
         self._validar_parcelas()
+
+    def compor_titulo(self):
+        cliente_label = ""
+        if self.cliente:
+            cliente_label = frappe.db.get_value("Cliente", self.cliente, "nome") or self.cliente
+        self.title = f"{cliente_label} - Honorários" if cliente_label else "Honorários"
 
     def _eh_direto(self):
         return self.modo_honorarios == "Honorários Diretos"

@@ -10,9 +10,16 @@ class RegistrodeAtos(Document):
 			self.cliente = frappe.db.get_value("Servico", self.servico, "cliente")
 		if not self.cliente:
 			frappe.throw(_("Cliente é obrigatório. Selecione um Serviço válido."))
+		self.compor_titulo()
 		self._validar_reversao_atos_faturados()
 		self._calcular_totais()
 		self._atualizar_status()
+
+	def compor_titulo(self):
+		cliente_label = ""
+		if self.cliente:
+			cliente_label = frappe.db.get_value("Cliente", self.cliente, "nome") or self.cliente
+		self.title = f"{cliente_label} - Atos" if cliente_label else "Atos"
 
 	def _validar_reversao_atos_faturados(self):
 		if getattr(frappe.flags, "in_atos_cobranca_sync", False):

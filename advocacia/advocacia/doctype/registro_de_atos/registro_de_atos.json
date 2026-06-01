@@ -14,7 +14,7 @@
  "app": null,
  "autoname": "format:ATOS-{####}",
  "naming_rule": "Expression (old style)",
- "title_field": "servico",
+ "title_field": "title",
  "image_field": null,
  "timeline_field": null,
  "sort_field": "modified",
@@ -1439,6 +1439,17 @@
    "make_attachment_public": 0,
    "documentation_url": null,
    "placeholder": null,
+   "doctype": "DocField"
+  },
+  {
+   "fieldname": "title",
+   "label": "Título",
+   "fieldtype": "Data",
+   "read_only": 1,
+   "hidden": 1,
+   "parent": "Registro de Atos",
+   "parentfield": "fields",
+   "parenttype": "DocType",
    "doctype": "DocField"
   }
  ],
