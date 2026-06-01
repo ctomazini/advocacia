@@ -4,7 +4,7 @@ Aplicativo Frappe v16 para gestão jurídica de escritórios de advocacia no Bra
 
 **Versão:** 0.6.0 · **Branch:** `frappe-v16`
 
-Documentação técnica completa: [CODEBASE_FINAL.md](./CODEBASE_FINAL.md)
+Documentação técnica completa: [CODEBASE.md](./CODEBASE.md)
 
 ## Requisitos
 
