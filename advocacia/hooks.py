@@ -67,10 +67,7 @@ doc_events = {
         "on_update": "advocacia.advocacia.tasks.on_parcela_update",
     },
     "Pagamento": {
-        "on_update": [
-            "advocacia.advocacia.tasks.on_pagamento_update",
-            "advocacia.advocacia.financeiro.on_pagamento_update_honorarios",
-        ],
+        "on_update": "advocacia.advocacia.financeiro.processar_pagamento_on_update",
         "on_trash": "advocacia.advocacia.financeiro.on_pagamento_trash",
     },
     "Audiencia": {

@@ -259,6 +259,14 @@ def on_pagamento_trash(doc, method=None):
 	_limpar_vinculo_pagamento_na_parcela(doc)
 
 
+def processar_pagamento_on_update(doc, method=None):
+	"""Handler único de Pagamento.on_update — orquestra tarefas e honorários na ordem original."""
+	from advocacia.advocacia.tasks import on_pagamento_update as sync_tarefas_on_pagamento
+
+	sync_tarefas_on_pagamento(doc, method)
+	on_pagamento_update_honorarios(doc, method)
+
+
 def on_pagamento_update_honorarios(doc, method=None):
 	"""Propaga status do Pagamento de honorários para parcela e recalcula acordo."""
 	if getattr(frappe.flags, "in_pagamento_sync", False):
