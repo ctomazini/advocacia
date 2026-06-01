@@ -448,7 +448,8 @@
   {
    "fieldname": "cobranca_id",
    "label": "Pagamento",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
+   "options": "Pagamento",
    "read_only": 1,
    "in_list_view": 1,
    "parent": "Ato Advocaticio",
