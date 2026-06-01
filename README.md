@@ -32,7 +32,7 @@ bench --site seu-site.local set-config allow_tests true
 bench --site seu-site.local run-tests --app advocacia
 ```
 
-Suíte atual: **149 testes** (`FrappeTestCase`).
+Suíte atual: **198 testes** (`FrappeTestCase`).
 
 ## Google Calendar (sincronização de agenda)
 

@@ -31,7 +31,6 @@ class RegistrodeHoras(Document):
 		self.timer_inicio = now_datetime()
 		self.timer_ativo = 1
 		self.save(ignore_permissions=True)
-		frappe.db.commit()
 
 		return {"timer_inicio": str(self.timer_inicio)}
 
@@ -50,7 +49,6 @@ class RegistrodeHoras(Document):
 		self.timer_inicio = None
 		self.timer_ativo = 0
 		self.save(ignore_permissions=True)
-		frappe.db.commit()
 
 		return {
 			"duracao_minutos": self.duracao_minutos,

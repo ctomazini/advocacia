@@ -9,9 +9,7 @@
 			if (doc.title) {
 				parts.push(doc.title);
 			}
-			if (doc.cliente_name) {
-				parts.push(doc.cliente_name);
-			} else if (doc.cliente && typeof doc.cliente === "string" && doc.cliente !== value) {
+			if (doc.cliente && typeof doc.cliente === "string" && doc.cliente !== value) {
 				parts.push(doc.cliente);
 			}
 			if (doc.numero_processo) {

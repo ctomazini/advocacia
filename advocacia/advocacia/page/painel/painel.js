@@ -2746,11 +2746,12 @@ function painel_init_finance_chart($root, fin, page) {
     var labels = [];
     var values = [];
     var colors = [];
+    var css = getComputedStyle(document.documentElement);
     var tone_colors = {
-        danger: "#e03636",
-        success: "#28a745",
-        warning: "#f59e0b",
-        neutral: "#6c757d",
+        danger: css.getPropertyValue("--red-500").trim(),
+        success: css.getPropertyValue("--green-500").trim(),
+        warning: css.getPropertyValue("--orange-500").trim(),
+        neutral: css.getPropertyValue("--gray-600").trim(),
     };
     (fin.grafico || []).forEach(function (g) {
         if (flt(g.valor) <= 0) return;

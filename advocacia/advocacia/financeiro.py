@@ -97,9 +97,6 @@ def _sincronizar_pagamentos_do_acordo_impl(acordo, commit=False):
 
 	cancelados += _cancelar_pagamentos_orfaos(acordo.name, active_origem_ids)
 
-	if commit:
-		frappe.db.commit()
-
 	frappe.logger().info(
 		"Sync pagamentos acordo {0}: +{1} ~{2} cancelados {3}".format(
 			acordo.name, criados, atualizados, cancelados
@@ -117,7 +114,6 @@ def migrar_pagamentos_existentes():
 		result = sincronizar_pagamentos_do_acordo(doc, commit=False)
 		total_criados += result.get("criados", 0)
 		total_atualizados += result.get("atualizados", 0)
-	frappe.db.commit()
 	frappe.logger().info(
 		"Migração pagamentos: {0} acordos, {1} criados, {2} atualizados".format(
 			len(acordos), total_criados, total_atualizados
@@ -370,7 +366,6 @@ def bulk_delete_pagamentos(names):
 		try:
 			frappe.flags.in_bulk_delete = True
 			frappe.delete_doc("Pagamento", doc.name, force=0, ignore_permissions=False)
-			frappe.db.commit()
 			excluidos.append(doc.name)
 		except Exception as e:
 			frappe.db.rollback()
@@ -381,33 +376,6 @@ def bulk_delete_pagamentos(names):
 		"ignorados": ignorados,
 		"total": len(names),
 	}
-
-
-def _exibir_resultado_bulk_delete(deleted, skipped):
-	if deleted and not skipped:
-		frappe.msgprint(
-			_("Excluídos {0} pagamento(s).").format(len(deleted)),
-			title=_("Exclusão em massa"),
-			indicator="green",
-		)
-	elif deleted and skipped:
-		frappe.msgprint(
-			_(
-				"Excluídos {0} pagamento(s). Ignorados {1} "
-				"(recebidos/repassados ou bloqueados)."
-			).format(len(deleted), len(skipped)),
-			title=_("Exclusão parcial"),
-			indicator="orange",
-		)
-	elif skipped:
-		frappe.msgprint(
-			_(
-				"Nenhum pagamento excluído. {0} registro(s) bloqueado(s). "
-				"Pagamentos recebidos/repassados precisam ser cancelados antes."
-			).format(len(skipped)),
-			title=_("Exclusão bloqueada"),
-			indicator="red",
-		)
 
 
 @frappe.whitelist()
@@ -491,8 +459,6 @@ def sincronizar_pagamento_atos(registro_name, data_vencimento=None):
 		registro.save(ignore_permissions=True)
 	finally:
 		frappe.flags.in_atos_cobranca_sync = False
-
-	frappe.db.commit()
 
 	acao = "criado" if criado else "atualizado"
 	frappe.logger().info(
@@ -638,7 +604,6 @@ def cancelar_cobranca_pagamento_atos(pagamento_name):
 
 	pagamento.status = "Cancelado"
 	pagamento.save(ignore_permissions=False)
-	frappe.db.commit()
 
 	return {
 		"success": True,
@@ -662,7 +627,6 @@ def cancelar_pagamento_honorarios(pagamento_name):
 
 	pagamento.status = "Cancelado"
 	pagamento.save(ignore_permissions=False)
-	frappe.db.commit()
 
 	return {
 		"success": True,

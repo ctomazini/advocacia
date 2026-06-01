@@ -512,7 +512,6 @@ def gerar_documento(servico_name, template_name):
 	context = _build_context(servico_name)
 	template_doc = frappe.get_doc("Template Documento", template_name)
 	result = _render_and_attach(servico_name, template_doc, context)
-	frappe.db.commit()
 	return result
 
 
@@ -549,9 +548,6 @@ def gerar_documentos_em_lote(servico_name, template_names):
 				title=f"Erro ao gerar documento {template_name}",
 				message=frappe.get_traceback(),
 			)
-
-	if gerados:
-		frappe.db.commit()
 
 	return {
 		"success": True,

@@ -25,14 +25,6 @@ PAGAMENTO_FIELDS = [
 	"numero_parcela",
 ]
 
-LIMITS = {
-	"audiencias": 5,
-	"prazos": 5,
-	"tarefas": 8,
-	"comunicacoes": 5,
-	"parcelas": 10,
-}
-
 LIST_LIMIT_MAX = 100
 
 DEFAULT_LIST_LIMIT_KEYS = (
@@ -932,7 +924,6 @@ def _marcar_pagamento_recebido(pagamento_name):
 	doc.valor_recebido = flt(doc.valor_recebido) or flt(doc.valor)
 	doc.save(ignore_permissions=False)
 	sync_parcela_from_pagamento(doc)
-	frappe.db.commit()
 
 	return {"ok": True, "name": doc.name, "parent": doc.acordo}
 
@@ -951,6 +942,5 @@ def _marcar_parcela_legado_recebida(parcela_name):
 		from advocacia.advocacia.financeiro import sincronizar_pagamentos_do_acordo
 
 		sincronizar_pagamentos_do_acordo(acordo)
-	frappe.db.commit()
 
 	return {"ok": True, "name": doc.name, "parent": doc.parent}

@@ -30,7 +30,6 @@ def verificar_parcelas_vencidas():
 	frappe.logger().info(
 		"Vencidos atualizados: {0} pagamentos, {1} parcelas".format(len(pagamentos), len(parcelas))
 	)
-	frappe.db.commit()
 
 
 def verificar_despesas_vencidas():
@@ -45,7 +44,6 @@ def verificar_despesas_vencidas():
 
 	if despesas:
 		frappe.logger().info("Despesas marcadas como atrasadas: {0}".format(len(despesas)))
-		frappe.db.commit()
 
 
 def notificar_parcelas_vencidas():
@@ -78,7 +76,6 @@ def notificar_parcelas_vencidas():
 		count += 1
 
 	frappe.logger().info("Notificacoes de pagamentos vencidos enviadas: {0}".format(count))
-	frappe.db.commit()
 
 
 def notificar_audiencias_hoje():
@@ -123,7 +120,6 @@ def notificar_audiencias_hoje():
 		count += 1
 
 	frappe.logger().info("Notificacoes de audiencias hoje enviadas: {0}".format(count))
-	frappe.db.commit()
 
 
 def on_parcela_update(doc, method=None):
@@ -190,19 +186,6 @@ def _marcar_acordo_quitado_se_completo(acordo_name, usar_pagamentos=False):
 		update_modified=True,
 	)
 	frappe.logger().info("Acordo {0} quitado".format(acordo_name))
-
-
-def _parcela_recipients(parcela):
-	users = []
-	if parcela.owner:
-		users.append(parcela.owner)
-	if parcela.parenttype == "Acordo de Honorarios Processuais" and parcela.parent:
-		acordo_owner = frappe.db.get_value(
-			"Acordo de Honorarios Processuais", parcela.parent, "owner"
-		)
-		if acordo_owner and acordo_owner not in users:
-			users.append(acordo_owner)
-	return users or ["Administrator"]
 
 
 def _pagamento_recipients(pagamento):
@@ -311,5 +294,3 @@ def verificar_status_servicos():
 
 		frappe.db.set_value("Servico", nome, "status", "Arquivado")
 		frappe.logger().info("Servico {0} arquivado automaticamente".format(nome))
-
-	frappe.db.commit()
