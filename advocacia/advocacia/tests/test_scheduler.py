@@ -85,11 +85,14 @@ class TestScheduler(FrappeTestCase):
 			self.assertTrue(mock_notify.called)
 
 	def test_notificar_audiencias_amanha_nao_dispara(self):
-		create_test_audiencia(data_hora=add_days(now_datetime(), 1))
+		aud_amanha = create_test_audiencia(data_hora=add_days(now_datetime(), 1))
 		with patch("advocacia.advocacia.tasks.enqueue_create_notification") as mock_notify:
 			notificar_audiencias_hoje()
-			# Pode haver outras audiências hoje no site; garantir que a de amanhã não é a única
-			pass
+			notified_docnames = [
+				call.kwargs.get("doc", {}).get("document_name")
+				for call in mock_notify.call_args_list
+			]
+			self.assertNotIn(aud_amanha.name, notified_docnames)
 
 	def test_verificar_despesas_vencidas(self):
 		desp = create_test_despesa(data_vencimento=add_days(today(), -1))

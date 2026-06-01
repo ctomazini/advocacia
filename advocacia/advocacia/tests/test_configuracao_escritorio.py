@@ -1,0 +1,58 @@
+import frappe
+from frappe.exceptions import ValidationError
+from frappe.tests.utils import FrappeTestCase
+
+
+class TestConfiguracaoEscritorio(FrappeTestCase):
+	def tearDown(self):
+		frappe.db.rollback()
+
+	def test_read_single(self):
+		cfg = frappe.get_single("Configuracao do Escritorio")
+		self.assertEqual(cfg.doctype, "Configuracao do Escritorio")
+
+	def test_update_single(self):
+		cfg = frappe.get_single("Configuracao do Escritorio")
+		cfg.razao_social = "Escritório Teste Advocacia LTDA"
+		cfg.advogada = "Dra. Teste"
+		cfg.oab = "OAB/RS 123456"
+		cfg.endereco = "Rua Teste, 100, Porto Alegre/RS"
+		cfg.cnpj = "11222333000181"
+		cfg.save(ignore_permissions=True)
+
+		reloaded = frappe.get_single("Configuracao do Escritorio")
+		self.assertEqual(reloaded.razao_social, "Escritório Teste Advocacia LTDA")
+		self.assertEqual(reloaded.advogada, "Dra. Teste")
+		self.assertEqual(reloaded.oab, "OAB/RS 123456")
+
+	def test_required_razao_social_falha(self):
+		cfg = frappe.get_single("Configuracao do Escritorio")
+		original = cfg.razao_social
+		cfg.razao_social = ""
+		with self.assertRaises(ValidationError):
+			cfg.save(ignore_permissions=True)
+		cfg.razao_social = original
+
+	def test_required_advogada_falha(self):
+		cfg = frappe.get_single("Configuracao do Escritorio")
+		original = cfg.advogada
+		cfg.advogada = ""
+		with self.assertRaises(ValidationError):
+			cfg.save(ignore_permissions=True)
+		cfg.advogada = original
+
+	def test_required_oab_falha(self):
+		cfg = frappe.get_single("Configuracao do Escritorio")
+		original = cfg.oab
+		cfg.oab = ""
+		with self.assertRaises(ValidationError):
+			cfg.save(ignore_permissions=True)
+		cfg.oab = original
+
+	def test_required_endereco_falha(self):
+		cfg = frappe.get_single("Configuracao do Escritorio")
+		original = cfg.endereco
+		cfg.endereco = ""
+		with self.assertRaises(ValidationError):
+			cfg.save(ignore_permissions=True)
+		cfg.endereco = original

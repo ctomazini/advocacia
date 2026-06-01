@@ -112,14 +112,17 @@ class TestRegistroHoras(FrappeTestCase):
 			get_timer_ativo_usuario,
 		)
 
-		frappe.db.sql(
-			"""
-			UPDATE `tabRegistro de Horas`
-			SET timer_ativo = 0, timer_inicio = NULL
-			WHERE timer_ativo = 1 AND owner = %s
-			""",
-			frappe.session.user,
-		)
+		for reg_name in frappe.get_all(
+			"Registro de Horas",
+			filters={"timer_ativo": 1, "owner": frappe.session.user},
+			pluck="name",
+		):
+			frappe.db.set_value(
+				"Registro de Horas",
+				reg_name,
+				{"timer_ativo": 0, "timer_inicio": None},
+				update_modified=False,
+			)
 
 		reg = create_test_registro_horas(duracao_minutos=30)
 		self.assertIsNone(get_timer_ativo_usuario())
