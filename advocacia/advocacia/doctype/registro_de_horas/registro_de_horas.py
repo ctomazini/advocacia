@@ -25,17 +25,19 @@ class RegistrodeHoras(Document):
 
 	@frappe.whitelist()
 	def iniciar_timer(self):
+		self.check_permission("write")
 		if self.timer_ativo:
 			frappe.throw(_("Timer já está em execução para este registro."))
 
 		self.timer_inicio = now_datetime()
 		self.timer_ativo = 1
-		self.save(ignore_permissions=True)
+		self.save()
 
 		return {"timer_inicio": str(self.timer_inicio)}
 
 	@frappe.whitelist()
 	def parar_timer(self):
+		self.check_permission("write")
 		if not self.timer_ativo:
 			frappe.throw(_("Nenhum timer ativo para este registro."))
 
@@ -48,7 +50,7 @@ class RegistrodeHoras(Document):
 
 		self.timer_inicio = None
 		self.timer_ativo = 0
-		self.save(ignore_permissions=True)
+		self.save()
 
 		return {
 			"duracao_minutos": self.duracao_minutos,

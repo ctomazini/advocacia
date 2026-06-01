@@ -25,7 +25,7 @@ def verificar_parcelas_vencidas():
 		pluck="name",
 	)
 	for name in parcelas:
-		frappe.db.set_value("Parcela de Honorarios", name, "status", "Vencida", update_modified=False)
+		frappe.db.set_value("Parcela de Honorarios", name, "status", "Vencido", update_modified=False)
 
 	frappe.logger().info(
 		"Vencidos atualizados: {0} pagamentos, {1} parcelas".format(len(pagamentos), len(parcelas))
@@ -128,7 +128,7 @@ def on_parcela_update(doc, method=None):
 
 	sync_pagamento_from_parcela(doc)
 
-	if doc.status != "Recebida":
+	if doc.status != "Recebido":
 		return
 	if doc.parenttype != "Acordo de Honorarios Processuais" or not doc.parent:
 		return
@@ -171,7 +171,7 @@ def _marcar_acordo_quitado_se_completo(acordo_name, usar_pagamentos=False):
 			},
 			fields=["status"],
 		)
-		if not parcelas or not all(p.status == "Recebida" for p in parcelas):
+		if not parcelas or not all(p.status == "Recebido" for p in parcelas):
 			return
 
 	acordo_status = frappe.db.get_value("Acordo de Honorarios Processuais", acordo_name, "status")
@@ -265,7 +265,7 @@ def verificar_status_servicos():
 		for ac in acordos:
 			count_parcela = frappe.db.count(
 				"Parcela de Honorarios",
-				{"parent": ac.name, "status": ["in", ["Pendente", "Vencida"]]},
+				{"parent": ac.name, "status": ["in", ["Pendente", "Vencido"]]},
 			)
 			count_pag = frappe.db.count(
 				"Pagamento",

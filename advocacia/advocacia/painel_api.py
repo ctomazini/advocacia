@@ -883,7 +883,13 @@ def _vara_label(vara_link):
 		return ""
 	try:
 		return frappe.db.get_value("Vara", vara_link, "vara_name") or vara_link
+	except frappe.DoesNotExistError:
+		return vara_link
 	except Exception:
+		frappe.log_error(
+			title="Advocacia painel _vara_label",
+			message=frappe.get_traceback(),
+		)
 		return vara_link
 
 
@@ -931,10 +937,10 @@ def _marcar_pagamento_recebido(pagamento_name):
 def _marcar_parcela_legado_recebida(parcela_name):
 	"""Fallback para parcelas ainda sem Pagamento vinculado."""
 	doc = frappe.get_doc("Parcela de Honorarios", parcela_name)
-	if doc.status in ("Recebida", "Repassada"):
+	if doc.status in ("Recebido", "Repassado"):
 		frappe.throw(_("Parcela já está {0}").format(doc.status))
 
-	doc.status = "Recebida"
+	doc.status = "Recebido"
 	doc.data_recebimento = today()
 	doc.save(ignore_permissions=False)
 	if doc.parent:

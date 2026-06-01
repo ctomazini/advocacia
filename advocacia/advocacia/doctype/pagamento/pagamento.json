@@ -2,6 +2,7 @@
  "actions": [],
  "allow_rename": 1,
  "autoname": "naming_series:",
+ "naming_rule": "By \"Naming Series\" field",
  "creation": "2026-05-29 12:00:00.000000",
  "custom": 0,
  "doctype": "DocType",

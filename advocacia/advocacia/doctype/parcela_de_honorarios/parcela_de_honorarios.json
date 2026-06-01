@@ -550,7 +550,7 @@
    "oldfieldname": null,
    "fieldtype": "Select",
    "oldfieldtype": null,
-   "options": "Pendente\nVencida\nRecebida\nRepassada\nCancelada",
+   "options": "Pendente\nVencido\nRecebido\nRepassado\nCancelado",
    "search_index": 0,
    "show_dashboard": 0,
    "hidden": 0,

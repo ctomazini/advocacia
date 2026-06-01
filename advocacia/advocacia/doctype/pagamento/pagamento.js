@@ -94,10 +94,10 @@ function configurar_botoes_honorarios(frm) {
 			const msg_recebido =
 				frm.doc.status === "Recebido" || frm.doc.status === "Repassado"
 					? __(
-							"Cancelar pagamento já recebido? A parcela no acordo voltará para <strong>Cancelada</strong> e o acordo deixará de constar como quitado se aplicável."
+							"Cancelar pagamento já recebido? A parcela no acordo voltará para <strong>Cancelado</strong> e o acordo deixará de constar como quitado se aplicável."
 					  )
 					: __(
-							"Cancelar este pagamento? A parcela correspondente no acordo será marcada como <strong>Cancelada</strong>."
+							"Cancelar este pagamento? A parcela correspondente no acordo será marcada como <strong>Cancelado</strong>."
 					  );
 
 			frappe.confirm(msg_recebido, function () {

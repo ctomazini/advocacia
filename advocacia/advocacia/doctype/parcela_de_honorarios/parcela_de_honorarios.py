@@ -13,24 +13,24 @@ class ParceladeHonorarios(Document):
 		if not self.is_new() and self.name:
 			old_id = frappe.db.get_value(self.doctype, self.name, "parcela_origem_id")
 			if old_id and self.parcela_origem_id and self.parcela_origem_id != old_id:
-				frappe.throw(_("ID de origem da parcela n?o pode ser alterado."))
+				frappe.throw(_("ID de origem da parcela não pode ser alterado."))
 
 	def before_save(self):
 		self.atualizar_status()
 
 	def atualizar_status(self):
-		if self.status in ("Cancelada", "Repassada"):
+		if self.status in ("Cancelado", "Repassado"):
 			return
 		if self.data_recebimento:
 			if self.valor_cliente and self.valor_cliente > 0:
 				if self.data_repasse:
-					self.status = "Repassada"
+					self.status = "Repassado"
 				else:
-					self.status = "Recebida"
+					self.status = "Recebido"
 			else:
-				self.status = "Recebida"
+				self.status = "Recebido"
 		elif self.vencimento and str(self.vencimento) < today():
-			self.status = "Vencida"
+			self.status = "Vencido"
 		else:
 			self.status = "Pendente"
 
@@ -44,6 +44,6 @@ class ParceladeHonorarios(Document):
 	@frappe.whitelist()
 	def registrar_repasse(self):
 		self.data_repasse = today()
-		self.status = "Repassada"
+		self.status = "Repassado"
 		self.save()
 		return {"status": self.status}

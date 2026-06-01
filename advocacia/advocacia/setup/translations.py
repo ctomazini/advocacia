@@ -41,7 +41,12 @@ def ensure_doctype_translations():
 						"contributed": 0,
 					}
 				).insert(ignore_permissions=True)
-			except Exception:
+			except frappe.DoesNotExistError:
 				pass
+			except Exception:
+				frappe.log_error(
+					title="Advocacia translations seed",
+					message=frappe.get_traceback(),
+				)
 	frappe.db.commit()
 	frappe.clear_cache()

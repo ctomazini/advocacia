@@ -8,6 +8,7 @@
  "quick_entry": 1,
  "track_changes": 1,
  "autoname": "naming_series:",
+ "naming_rule": "By \"Naming Series\" field",
  "naming_series_options": "TAR-.YYYY.-",
  "title_field": "titulo",
  "search_fields": "titulo,status,responsavel,servico,cliente",

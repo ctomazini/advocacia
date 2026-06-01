@@ -2,17 +2,17 @@ frappe.ui.form.on('Parcela de Honorarios', {
     refresh: function(frm) {
         const cores = {
             'Pendente': 'orange',
-            'Vencida': 'red',
-            'Recebida': 'green',
-            'Repassada': 'blue',
-            'Cancelada': 'gray'
+            'Vencido': 'red',
+            'Recebido': 'green',
+            'Repassado': 'blue',
+            'Cancelado': 'gray'
         };
         frm.page.set_indicator(frm.doc.status, cores[frm.doc.status] || 'gray');
 
         if (frm.is_new()) return;
 
         // Botão Registrar Recebimento
-        if (!frm.doc.data_recebimento && frm.doc.status !== 'Cancelada') {
+        if (!frm.doc.data_recebimento && frm.doc.status !== 'Cancelado') {
             var valor_receb = frm.doc.valor_total || frm.doc.valor_advogada || 0;
             frm.add_custom_button('✓ Registrar Recebimento', function() {
                 frappe.confirm(

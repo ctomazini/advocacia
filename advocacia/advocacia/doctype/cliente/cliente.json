@@ -8,6 +8,7 @@
  "quick_entry": 1,
  "track_changes": 1,
  "autoname": "format:CLI-{####}",
+ "naming_rule": "Expression",
  "title_field": "nome",
  "search_fields": "nome,cpf,cnpj",
  "fields": [

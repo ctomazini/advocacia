@@ -91,7 +91,7 @@ class TestPagamento(FrappeTestCase):
 			filters={"parent": acordo.name},
 			fields=["status"],
 		)[0]
-		self.assertEqual(parcela.status, "Recebida")
+		self.assertEqual(parcela.status, "Recebido")
 
 	def test_valor_negativo_falha(self):
 		acordo = create_test_acordo(num_parcelas=1, valor_total=100)

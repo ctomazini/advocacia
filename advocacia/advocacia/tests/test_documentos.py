@@ -8,10 +8,8 @@ from frappe.tests.utils import FrappeTestCase
 from advocacia.advocacia.documentos import (
 	_build_context,
 	_formatar_data_extenso,
-	gerar_documento,
 	gerar_documentos_em_lote,
 	get_kits_disponiveis,
-	get_placeholders_disponiveis,
 	get_placeholders_referencia,
 	get_templates_disponiveis,
 )
@@ -50,11 +48,6 @@ class TestDocumentos(FrappeTestCase):
 		self.assertIn("Cliente", grupos)
 		self.assertIn("Serviço", grupos)
 
-	def test_get_placeholders_disponiveis_compat(self):
-		result = get_placeholders_disponiveis()
-		self.assertIsInstance(result, dict)
-		self.assertIn("Cliente", result)
-
 	def test_data_extenso_marco_com_cedilha(self):
 		self.assertIn("março", _formatar_data_extenso("2026-03-15"))
 
@@ -68,60 +61,6 @@ class TestDocumentos(FrappeTestCase):
 		self.assertEqual(context["nome"], context["cliente_nome"])
 		self.assertIn("data_hoje", context)
 		self.assertIn("data_hoje_extenso", context)
-
-	def test_gerar_documento_template_inexistente(self):
-		servico = create_test_servico()
-		with self.assertRaises(Exception):
-			gerar_documento(servico.name, "Template Inexistente XYZ")
-
-	def test_gerar_documento_com_template_minimo(self):
-		try:
-			from docx import Document as DocxDocument
-		except ImportError:
-			self.skipTest("python-docx não instalado")
-
-		_ensure_test_escritorio_config()
-		servico = create_test_servico()
-
-		with tempfile.NamedTemporaryFile(suffix=".docx", delete=False) as tmp:
-			doc = DocxDocument()
-			doc.add_paragraph("Cliente: {{ nome }}")
-			doc.add_paragraph("Estruturado: {{ cliente_nome }}")
-			doc.add_paragraph("Escritório: {{ escritorio_advogada }}")
-			doc.add_paragraph("Serviço: {{ servico }}")
-			doc.save(tmp.name)
-			tmp_path = tmp.name
-
-		try:
-			file_doc = frappe.get_doc(
-				{
-					"doctype": "File",
-					"file_name": "template_teste.docx",
-					"file_url": "/private/files/template_teste.docx",
-					"is_private": 1,
-				}
-			)
-			with open(tmp_path, "rb") as f:
-				file_doc.content = f.read()
-			file_doc.save(ignore_permissions=True)
-
-			template = frappe.get_doc(
-				{
-					"doctype": "Template Documento",
-					"titulo": f"Template Teste {frappe.generate_hash(length=4)}",
-					"tipo_documento": "Contrato",
-					"arquivo": file_doc.file_url,
-					"habilitado": 1,
-				}
-			)
-			template.insert(ignore_permissions=True)
-
-			result = gerar_documento(servico.name, template.name)
-			self.assertIn("file_url", result)
-			self.assertTrue(result["file_url"])
-		finally:
-			if os.path.exists(tmp_path):
-				os.unlink(tmp_path)
 
 	def test_gerar_documentos_em_lote(self):
 		try:

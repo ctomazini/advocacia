@@ -508,14 +508,6 @@ def _parse_template_names(template_names):
 
 
 @frappe.whitelist()
-def gerar_documento(servico_name, template_name):
-	context = _build_context(servico_name)
-	template_doc = frappe.get_doc("Template Documento", template_name)
-	result = _render_and_attach(servico_name, template_doc, context)
-	return result
-
-
-@frappe.whitelist()
 def gerar_documentos_em_lote(servico_name, template_names):
 	if not frappe.has_permission("Servico", "read"):
 		frappe.throw(_("Sem permissão"), frappe.PermissionError)
@@ -596,26 +588,5 @@ def get_kits_disponiveis():
 @frappe.whitelist()
 def get_placeholders_referencia():
 	"""Referência organizada de placeholders para UI e templates."""
+	frappe.has_permission("Template Documento", "read", throw=True)
 	return PLACEHOLDER_REFERENCIA
-
-
-@frappe.whitelist()
-def get_placeholders_disponiveis():
-	"""Compatibilidade com UI antiga — converte referência para dict por grupo."""
-	grupos = {}
-	for bloco in PLACEHOLDER_REFERENCIA:
-		grupo = bloco["grupo"]
-		grupos[grupo] = [
-			{
-				"placeholder": item["placeholder"],
-				"label": item.get("label") or item["placeholder"],
-				"fieldtype": "alias" if grupo.startswith("Legados") else "Data"
-				if grupo == "Data"
-				else "computed"
-				if bloco.get("condicional")
-				else "Data",
-				"alias": item.get("alias"),
-			}
-			for item in bloco["items"]
-		]
-	return grupos

@@ -35,6 +35,7 @@ class DespesadoEscritorio(Document):
 @frappe.whitelist()
 def gerar_proxima_despesa(source_name):
 	"""Cria nova despesa baseada na recorrente, com data de vencimento avançada."""
+	frappe.has_permission("Despesa do Escritorio", "create", throw=True)
 	source = frappe.get_doc("Despesa do Escritorio", source_name)
 	if not source.recorrente or not source.proximo_vencimento:
 		frappe.throw(
@@ -47,6 +48,5 @@ def gerar_proxima_despesa(source_name):
 	nova.status = "Pendente"
 	nova.comprovante = None
 	nova.proximo_vencimento = None
-	nova.insert(ignore_permissions=True)
-	frappe.db.commit()
+	nova.insert()
 	return nova.name

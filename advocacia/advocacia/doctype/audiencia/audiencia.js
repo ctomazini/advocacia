@@ -1,6 +1,6 @@
 frappe.ui.form.on("Audiencia", {
 	refresh(frm) {
-		if (frm.doc.modalidade === "Virtual") {
+		if (frm.doc.modalidade === "Virtual" || frm.doc.modalidade === "Híbrida") {
 			frm.add_custom_button(__("🖥️ Entrar na Audiência"), function () {
 				if (frm.doc.link_virtual) {
 					window.open(frm.doc.link_virtual, "_blank");
@@ -17,7 +17,7 @@ frappe.ui.form.on("Audiencia", {
 		}
 	},
 	modalidade(frm) {
-		if (frm.doc.modalidade !== "Virtual") {
+		if (frm.doc.modalidade === "Presencial") {
 			frm.set_value("link_virtual", "");
 		}
 	},

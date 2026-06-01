@@ -4,18 +4,18 @@ from frappe.utils import add_days, cstr, flt, getdate, now_datetime, today
 
 STATUS_PARCELA_TO_PAGAMENTO = {
 	"Pendente": "Pendente",
-	"Vencida": "Vencido",
-	"Recebida": "Recebido",
-	"Repassada": "Repassado",
-	"Cancelada": "Cancelado",
+	"Vencido": "Vencido",
+	"Recebido": "Recebido",
+	"Repassado": "Repassado",
+	"Cancelado": "Cancelado",
 }
 
 STATUS_PAGAMENTO_TO_PARCELA = {
 	"Pendente": "Pendente",
-	"Vencido": "Vencida",
-	"Recebido": "Recebida",
-	"Repassado": "Repassada",
-	"Cancelado": "Cancelada",
+	"Vencido": "Vencido",
+	"Recebido": "Recebido",
+	"Repassado": "Repassado",
+	"Cancelado": "Cancelado",
 	"Renegociado": "Pendente",
 }
 
@@ -140,15 +140,15 @@ def sync_parcela_from_pagamento(pagamento):
 
 	updates = {}
 	if pagamento.status == "Recebido":
-		updates["status"] = "Recebida"
+		updates["status"] = "Recebido"
 		updates["data_recebimento"] = pagamento.data_recebimento or today()
 	elif pagamento.status == "Repassado":
-		updates["status"] = "Repassada"
+		updates["status"] = "Repassado"
 		updates["data_recebimento"] = pagamento.data_recebimento or today()
 	elif pagamento.status == "Vencido":
-		updates["status"] = "Vencida"
+		updates["status"] = "Vencido"
 	elif pagamento.status == "Cancelado":
-		updates["status"] = "Cancelada"
+		updates["status"] = "Cancelado"
 	elif pagamento.status == "Pendente":
 		updates["status"] = "Pendente"
 
@@ -183,7 +183,7 @@ def sync_pagamento_from_parcela(parcela):
 	updates = {}
 	if pagamento.status != new_status and pagamento.status in ("Pendente", "Vencido"):
 		updates["status"] = new_status
-	if parcela.status in ("Recebida", "Repassada") and parcela.get("data_recebimento"):
+	if parcela.status in ("Recebido", "Repassado") and parcela.get("data_recebimento"):
 		if not pagamento.data_recebimento:
 			updates["data_recebimento"] = parcela.data_recebimento
 

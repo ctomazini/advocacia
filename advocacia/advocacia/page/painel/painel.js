@@ -3339,7 +3339,7 @@ function build_parcelas_criticas(parcelas, limit) {
                     '<button type="button" class="painel-btn-recebida" data-pagamento="' +
                     frappe.utils.escape_html(p.name || "") +
                     '">✓ ' +
-                    __("Recebida") +
+                    __("Recebido") +
                     "</button>";
             }
             return (
@@ -3517,7 +3517,7 @@ function render_parcelas(parcelas, compact, list_meta, list_limit) {
                 '<button type="button" class="painel-btn-recebida" data-pagamento="' +
                 frappe.utils.escape_html(p.name || "") +
                 '">✓ ' +
-                __("Recebida") +
+                __("Recebido") +
                 "</button>";
         }
         h +=
@@ -3982,7 +3982,7 @@ function fmt_datetime(iso, hora) {
 }
 
 function _is_vencido(status) {
-    return status === "Vencida" || status === "Vencido";
+    return status === "Vencido";
 }
 
 function _pagamento_pode_receber(status) {
@@ -3991,15 +3991,12 @@ function _pagamento_pode_receber(status) {
 
 function status_pill(status) {
     var map = {
-        Vencida: "red",
         Vencido: "red",
         Pendente: "orange",
-        Recebida: "green",
         Recebido: "green",
-        Repassada: "blue",
         Repassado: "blue",
-        Cancelada: "gray",
         Cancelado: "gray",
+        Cancelada: "gray",
         "Em Andamento": "blue",
         Concluída: "green",
         Alta: "red",
@@ -4118,7 +4115,7 @@ $(document).on("click", ".painel-btn-recebida", function (e) {
                     if (page && typeof load_painel === "function") load_painel(page);
                 })
                 .catch(function (err) {
-                    btn.prop("disabled", false).text("✓ " + __("Recebida"));
+                    btn.prop("disabled", false).text("✓ " + __("Recebido"));
                     frappe.msgprint(err.message || __("Erro ao marcar parcela"));
                 });
         }

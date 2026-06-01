@@ -22,6 +22,7 @@ def notificar_prazos_diario():
 			"responsavel",
 			"dias_notificacao",
 		],
+		limit_page_length=500,
 	)
 
 	prazos_urgentes = []

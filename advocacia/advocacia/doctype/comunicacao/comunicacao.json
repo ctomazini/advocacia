@@ -149,6 +149,7 @@
  ],
  "states": [],
  "autoname": "format:COM-{YYYY}-{####}",
+ "naming_rule": "Expression",
  "title_field": "assunto",
  "search_fields": "servico,cliente,assunto,tipo,data",
  "sort_field": "data",
