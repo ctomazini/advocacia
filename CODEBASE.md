@@ -1,6 +1,6 @@
 # CODEBASE — App Advocacia (Frappe v16)
 
-> Gerado em 2026-05-31 — re-audit final, branch `frappe-v16`. Frappe puro, sem ERPNext.
+> Gerado em 2026-06-01 — re-audit final pós-correções. Branch `frappe-v16` (use esta branch, não `main`). Frappe puro, sem ERPNext.
 
 ---
 
