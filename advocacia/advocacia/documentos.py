@@ -574,14 +574,23 @@ def get_kits_disponiveis():
 		filters={"habilitado": 1},
 		order_by="titulo",
 	)
+	if not kits:
+		return kits
+
+	kit_names = [kit.name for kit in kits]
+	item_rows = frappe.get_all(
+		"Kit Documento Item",
+		filters={"parent": ["in", kit_names]},
+		fields=["parent", "template", "ordem"],
+		order_by="parent asc, ordem asc, idx asc",
+	)
+	templates_por_kit = {name: [] for name in kit_names}
+	for row in item_rows:
+		if row.template:
+			templates_por_kit.setdefault(row.parent, []).append(row.template)
+
 	for kit in kits:
-		rows = frappe.get_all(
-			"Kit Documento Item",
-			filters={"parent": kit.name},
-			fields=["template", "ordem"],
-			order_by="ordem asc, idx asc",
-		)
-		kit["templates"] = [row.template for row in rows if row.template]
+		kit["templates"] = templates_por_kit.get(kit.name, [])
 	return kits
 
 

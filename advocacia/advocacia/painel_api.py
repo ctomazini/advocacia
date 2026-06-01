@@ -88,6 +88,31 @@ def _list_cap(list_limits, key):
 	return _effective_list_cap(list_limits.get(key, 5))
 
 
+def _servico_lookup(servico_names, extra_fields):
+	names = list({name for name in servico_names if name})
+	if not names:
+		return {}
+	fields = ["name"] + [f for f in extra_fields if f != "name"]
+	rows = frappe.get_all("Servico", filters={"name": ["in", names]}, fields=fields)
+	return {row.name: row for row in rows}
+
+
+def _cliente_nome_lookup(cliente_names):
+	names = list({name for name in cliente_names if name})
+	if not names:
+		return {}
+	rows = frappe.get_all("Cliente", filters={"name": ["in", names]}, fields=["name", "nome"])
+	return {row.name: row.nome or row.name for row in rows}
+
+
+def _user_nome_lookup(user_names):
+	names = list({name for name in user_names if name})
+	if not names:
+		return {}
+	rows = frappe.get_all("User", filters={"name": ["in", names]}, fields=["name", "full_name"])
+	return {row.name: row.full_name or row.name for row in rows}
+
+
 @frappe.whitelist()
 def get_painel_data(
 	limit_start=0,
@@ -586,6 +611,13 @@ def _get_audiencias(hoje, periodo_fim, limit):
 		order_by="data_hora asc",
 		limit_page_length=limit,
 	)
+	servicos_sem_cliente = [
+		a.servico for a in rows if a.get("servico") and not a.get("cliente")
+	]
+	cliente_por_servico = {
+		sv.name: sv.cliente
+		for sv in _servico_lookup(servicos_sem_cliente, ["cliente"]).values()
+	}
 	for a in rows:
 		data_hora = a.get("data_hora")
 		if data_hora:
@@ -598,7 +630,7 @@ def _get_audiencias(hoje, periodo_fim, limit):
 			a["dias_restantes"] = 0
 		a["vara_label"] = _vara_label(a.get("local_vara"))
 		if a.get("servico") and not a.get("cliente"):
-			a["cliente"] = frappe.db.get_value("Servico", a.servico, "cliente") or ""
+			a["cliente"] = cliente_por_servico.get(a.servico) or ""
 	return rows
 
 
@@ -614,13 +646,16 @@ def _get_prazos(hoje, periodo_fim, limit):
 		limit_page_length=limit * 3,
 	)
 	prioridade_ordem = {"Alta": 0, "Média": 1, "Media": 1, "Baixa": 2, "Normal": 3}
+	servico_map = _servico_lookup(
+		[p.servico for p in rows if p.servico], ["cliente", "title", "numero_processo"]
+	)
 	for p in rows:
 		p["dias_restantes"] = date_diff(p.data_prazo, hoje) if p.data_prazo else 0
 		p["cliente_nome"] = p.cliente or ""
+		p["servico_titulo"] = ""
+		p["numero_processo"] = ""
 		if p.servico:
-			sv = frappe.db.get_value(
-				"Servico", p.servico, ["cliente", "title", "numero_processo"], as_dict=True
-			)
+			sv = servico_map.get(p.servico)
 			if sv:
 				if not p["cliente_nome"]:
 					p["cliente_nome"] = sv.cliente or ""
@@ -644,6 +679,10 @@ def _get_tarefas(hoje, limit_start, limit):
 		limit_start=limit_start,
 		limit_page_length=limit,
 	)
+	servico_map = _servico_lookup(
+		[t.servico for t in rows if t.servico], ["cliente", "title"]
+	)
+	user_map = _user_nome_lookup([t.responsavel for t in rows if t.responsavel])
 	for t in rows:
 		if t.data_limite:
 			t["dias_restantes"] = date_diff(t.data_limite, hoje)
@@ -652,16 +691,11 @@ def _get_tarefas(hoje, limit_start, limit):
 		t["cliente_nome"] = ""
 		t["servico_titulo"] = ""
 		if t.servico:
-			sv = frappe.db.get_value(
-				"Servico", t.servico, ["cliente", "title"], as_dict=True
-			)
+			sv = servico_map.get(t.servico)
 			if sv:
 				t["cliente_nome"] = sv.cliente or ""
 				t["servico_titulo"] = sv.title or ""
-		if t.responsavel:
-			t["responsavel_nome"] = frappe.db.get_value("User", t.responsavel, "full_name") or t.responsavel
-		else:
-			t["responsavel_nome"] = ""
+		t["responsavel_nome"] = user_map.get(t.responsavel) if t.responsavel else ""
 	return rows
 
 
@@ -749,6 +783,15 @@ def _get_comunicacoes_pendentes(limit=LIST_LIMIT_MAX):
 		limit_page_length=LIST_LIMIT_MAX,
 	)
 
+	tarefa_status_map = {
+		row.name: row.status
+		for row in frappe.get_all(
+			"Tarefa",
+			filters={"name": ["in", list({c.tarefa for c in rows if c.tarefa})]},
+			fields=["name", "status"],
+		)
+	}
+
 	pendentes = []
 	for c in rows:
 		dias = date_diff(hoje, getdate(c.data)) if c.data else 0
@@ -759,7 +802,7 @@ def _get_comunicacoes_pendentes(limit=LIST_LIMIT_MAX):
 			motivo = _("Aguardando follow-up")
 			urgencia = 0
 		elif c.tarefa:
-			status_tarefa = frappe.db.get_value("Tarefa", c.tarefa, "status")
+			status_tarefa = tarefa_status_map.get(c.tarefa)
 			if status_tarefa in ("Pendente", "Em Andamento"):
 				motivo = _("Tarefa em aberto")
 				urgencia = 1
@@ -833,7 +876,21 @@ def _get_horas_periodo(hoje, periodo_fim):
 
 
 def _enriquecer_pagamentos(pagamentos, hoje):
-	cache_servico = {}
+	cache_servico = _servico_lookup(
+		[p.get("servico") for p in pagamentos if p.get("servico")],
+		["title", "tipo", "numero_processo", "cliente"],
+	)
+	cliente_links = set()
+	for p in pagamentos:
+		if p.get("cliente"):
+			cliente_links.add(p.get("cliente"))
+		servico = p.get("servico")
+		if servico:
+			sv_cliente = (cache_servico.get(servico) or {}).get("cliente")
+			if sv_cliente:
+				cliente_links.add(sv_cliente)
+	cliente_nomes = _cliente_nome_lookup(cliente_links)
+
 	for p in pagamentos:
 		p["parent"] = p.get("acordo") or p.get("registro_atos")
 		p["valor_total"] = p.get("valor")
@@ -841,11 +898,7 @@ def _enriquecer_pagamentos(pagamentos, hoje):
 		p["origem_label"] = _pagamento_origem_label(p)
 
 		cliente_link = p.get("cliente")
-		p["cliente_nome"] = cliente_link or ""
-		if cliente_link and frappe.db.exists("Cliente", cliente_link):
-			nome = frappe.db.get_value("Cliente", cliente_link, "nome")
-			if nome:
-				p["cliente_nome"] = nome
+		p["cliente_nome"] = cliente_nomes.get(cliente_link, cliente_link or "")
 
 		servico = p.get("servico")
 		p["servico_ref"] = servico or ""
@@ -853,19 +906,12 @@ def _enriquecer_pagamentos(pagamentos, hoje):
 		p["servico_tipo"] = ""
 		p["numero_processo"] = ""
 		if servico:
-			if servico not in cache_servico:
-				cache_servico[servico] = frappe.db.get_value(
-					"Servico",
-					servico,
-					["title", "tipo", "numero_processo", "cliente"],
-					as_dict=True,
-				) or {}
-			sv = cache_servico[servico]
+			sv = cache_servico.get(servico) or {}
 			p["servico_titulo"] = sv.get("title") or ""
 			p["servico_tipo"] = sv.get("tipo") or ""
 			p["numero_processo"] = sv.get("numero_processo") or ""
-			if not p["cliente_nome"] and sv.get("cliente"):
-				p["cliente_nome"] = sv.get("cliente")
+			if not p.get("cliente") and sv.get("cliente"):
+				p["cliente_nome"] = cliente_nomes.get(sv.get("cliente"), sv.get("cliente"))
 
 		vencimento = p.get("data_vencimento")
 		if vencimento:

@@ -252,44 +252,69 @@ def verificar_status_servicos():
 		filters={"status": "Em andamento"},
 		fields=["name"],
 	)
+	if not servicos:
+		return
+
+	servico_names = [s.name for s in servicos]
+	acordos = frappe.get_all(
+		"Acordo de Honorarios Processuais",
+		filters={"servico": ["in", servico_names], "status": "Vigente"},
+		fields=["name", "servico"],
+	)
+	acordo_names = [ac.name for ac in acordos]
+	servicos_com_parcela_aberta = set()
+
+	if acordo_names:
+		parcelas_abertas = frappe.get_all(
+			"Parcela de Honorarios",
+			filters={
+				"parent": ["in", acordo_names],
+				"status": ["in", ["Pendente", "Vencido"]],
+			},
+			fields=["parent"],
+			pluck="parent",
+		)
+		pagamentos_abertos = frappe.get_all(
+			"Pagamento",
+			filters={
+				"acordo": ["in", acordo_names],
+				"status": ["in", ["Pendente", "Vencido"]],
+			},
+			fields=["acordo"],
+			pluck="acordo",
+		)
+		acordos_com_pendencia = set(parcelas_abertas) | set(pagamentos_abertos)
+		for ac in acordos:
+			if ac.name in acordos_com_pendencia:
+				servicos_com_parcela_aberta.add(ac.servico)
+
+	servicos_com_prazo = set(
+		frappe.get_all(
+			"Controle de Prazos",
+			filters={"servico": ["in", servico_names], "status": "Pendente"},
+			fields=["servico"],
+			pluck="servico",
+		)
+	)
+	servicos_com_audiencia = set(
+		frappe.get_all(
+			"Audiencia",
+			filters={
+				"servico": ["in", servico_names],
+				"data_hora": [">=", f"{hoje} 00:00:00"],
+			},
+			fields=["servico"],
+			pluck="servico",
+		)
+	)
 
 	for s in servicos:
 		nome = s.name
-
-		acordos = frappe.get_all(
-			"Acordo de Honorarios Processuais",
-			filters={"servico": nome, "status": ["in", ["Vigente"]]},
-			fields=["name"],
-		)
-		tem_parcela_aberta = False
-		for ac in acordos:
-			count_parcela = frappe.db.count(
-				"Parcela de Honorarios",
-				{"parent": ac.name, "status": ["in", ["Pendente", "Vencido"]]},
-			)
-			count_pag = frappe.db.count(
-				"Pagamento",
-				{"acordo": ac.name, "status": ["in", ["Pendente", "Vencido"]]},
-			)
-			if count_parcela > 0 or count_pag > 0:
-				tem_parcela_aberta = True
-				break
-
-		if tem_parcela_aberta:
+		if nome in servicos_com_parcela_aberta:
 			continue
-
-		tem_prazo = frappe.db.count(
-			"Controle de Prazos",
-			{"servico": nome, "status": "Pendente"},
-		)
-		if tem_prazo:
+		if nome in servicos_com_prazo:
 			continue
-
-		tem_audiencia = frappe.db.count(
-			"Audiencia",
-			{"servico": nome, "data_hora": [">=", f"{hoje} 00:00:00"]},
-		)
-		if tem_audiencia:
+		if nome in servicos_com_audiencia:
 			continue
 
 		frappe.db.set_value("Servico", nome, "status", "Arquivado")
