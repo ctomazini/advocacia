@@ -136,3 +136,26 @@ class TestRegistroHoras(FrappeTestCase):
 
 		reg.parar_timer()
 		self.assertIsNone(get_timer_ativo_usuario())
+
+	def test_get_timer_ativo_usuario_sem_permissao_retorna_none(self):
+		from advocacia.advocacia.doctype.registro_de_horas.registro_de_horas import (
+			get_timer_ativo_usuario,
+		)
+
+		user_email = f"timer_sem_perm_{frappe.generate_hash(length=6)}@example.com"
+		if not frappe.db.exists("User", user_email):
+			frappe.get_doc(
+				{
+					"doctype": "User",
+					"email": user_email,
+					"first_name": "Timer",
+					"last_name": "SemPerm",
+					"send_welcome_email": 0,
+				}
+			).insert(ignore_permissions=True)
+
+		frappe.set_user(user_email)
+		try:
+			self.assertIsNone(get_timer_ativo_usuario())
+		finally:
+			frappe.set_user("Administrator")

@@ -2,6 +2,7 @@ frappe.provide("advocacia.timer_global");
 
 (function () {
 	var WIDGET_ID = "advocacia-timer-global";
+	var DOCTYPE = "Registro de Horas";
 	var SYNC_MS = 45000;
 	var API = "advocacia.advocacia.doctype.registro_de_horas.registro_de_horas.get_timer_ativo_usuario";
 
@@ -9,6 +10,7 @@ frappe.provide("advocacia.timer_global");
 	var tickInterval = null;
 	var syncInterval = null;
 	var syncing = false;
+	var syncDisabled = false;
 
 	function pad(n) {
 		return String(n).padStart(2, "0");
@@ -30,6 +32,48 @@ frappe.provide("advocacia.timer_global");
 			return frappe.utils.icon("clock", "sm") || "";
 		} catch (e) {
 			return "⏱";
+		}
+	}
+
+	function canUseTimer() {
+		return (
+			frappe.session.user !== "Guest" &&
+			frappe.model &&
+			typeof frappe.model.can_read === "function" &&
+			frappe.model.can_read(DOCTYPE)
+		);
+	}
+
+	function isPermissionError(err) {
+		if (!err) return false;
+		if (typeof err === "object") {
+			if (err.httpStatus === 403 || err.status === 403) return true;
+			if (err.exc_type === "PermissionError") return true;
+		}
+		var msg = String(err.message || err._error_message || err || "");
+		return (
+			msg.indexOf("403") !== -1 ||
+			msg.indexOf("Not permitted") !== -1 ||
+			msg.indexOf("not whitelisted") !== -1 ||
+			msg.indexOf("Not Allowed") !== -1
+		);
+	}
+
+	function stopSyncLoop() {
+		if (syncInterval) {
+			clearInterval(syncInterval);
+			syncInterval = null;
+		}
+	}
+
+	function disableSync(reason) {
+		syncDisabled = true;
+		stopSyncLoop();
+		state = null;
+		stopTicking();
+		renderWidget();
+		if (reason && frappe.session.user !== "Guest") {
+			console.debug("advocacia.timer_global: sync desativado —", reason);
 		}
 	}
 
@@ -92,7 +136,7 @@ frappe.provide("advocacia.timer_global");
 		el.title = __("Timer em execução — clique para abrir o registro");
 		el.onclick = function () {
 			if (state && state.name) {
-				frappe.set_route("Form", "Registro de Horas", state.name);
+				frappe.set_route("Form", DOCTYPE, state.name);
 			}
 		};
 		document.body.appendChild(el);
@@ -144,20 +188,29 @@ frappe.provide("advocacia.timer_global");
 	}
 
 	function syncFromServer() {
-		if (frappe.session.user === "Guest" || syncing) return;
+		if (syncDisabled || !canUseTimer() || syncing) return;
 		syncing = true;
-		frappe
-			.xcall(API)
-			.then(function (data) {
-				applyState(data);
-			})
-			.finally(function () {
+		frappe.call({
+			method: API,
+			quiet: true,
+			no_spinner: true,
+			callback: function (r) {
+				applyState(r.message);
+			},
+			error: function (err) {
+				if (isPermissionError(err)) {
+					disableSync("sem permissão para Registro de Horas");
+					return;
+				}
+			},
+			always: function () {
 				syncing = false;
-			});
+			},
+		});
 	}
 
 	function ensureSyncLoop() {
-		if (syncInterval) return;
+		if (syncInterval || syncDisabled || !canUseTimer()) return;
 		syncFromServer();
 		syncInterval = setInterval(syncFromServer, SYNC_MS);
 	}
@@ -167,13 +220,13 @@ frappe.provide("advocacia.timer_global");
 	};
 
 	frappe.after_ajax(function () {
-		if (frappe.session.user !== "Guest") {
+		if (canUseTimer()) {
 			ensureSyncLoop();
 		}
 	});
 
 	$(document).on("page-change", function () {
-		if (frappe.session.user !== "Guest" && !state) {
+		if (canUseTimer() && !syncDisabled && !state) {
 			syncFromServer();
 		}
 	});
