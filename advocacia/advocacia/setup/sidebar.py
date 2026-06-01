@@ -48,7 +48,7 @@ SIDEBAR_SECTIONS = (
 
 
 def _validate_sidebar_links():
-	"""Garante que o JSON importado mantém os 24 links na ordem esperada."""
+	"""Garante que o JSON importado mantém os 26 links na ordem esperada."""
 	if not frappe.db.exists("Workspace Sidebar", "Advocacia"):
 		return
 
