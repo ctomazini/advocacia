@@ -10,10 +10,11 @@
  "autoname": "naming_series:",
  "naming_rule": "By \"Naming Series\" field",
  "naming_series_options": "TAR-.YYYY.-",
- "title_field": "titulo",
- "search_fields": "titulo,status,responsavel,servico,cliente",
+ "title_field": "title",
+ "search_fields": "titulo,cliente,status",
  "field_order": [
   "informacoes_section",
+  "title",
   "servico",
   "cliente",
   "col_break_1",
@@ -124,6 +125,14 @@
    "options": "TAR-.YYYY.-",
    "default": "TAR-.YYYY.-",
    "hidden": 1
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "label": "Título",
+   "read_only": 0,
+   "hidden": 0,
+   "in_list_view": 1
   }
  ],
  "permissions": [
@@ -157,6 +166,5 @@
    "print": 1,
    "email": 1
   }
- ],
- "show_title_field_in_link": 1
+ ]
 }

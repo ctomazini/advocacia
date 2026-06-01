@@ -7,7 +7,7 @@
  "track_changes": 1,
  "autoname": "field:comarca_name",
  "title_field": "comarca_name",
- "search_fields": "comarca_name,city,uf",
+ "search_fields": "comarca_name,uf",
  "fields": [
   {
    "fieldname": "comarca_name",
@@ -71,6 +71,5 @@
  ],
  "sort_field": "comarca_name",
  "sort_order": "ASC",
- "quick_entry": 1,
- "show_title_field_in_link": 1
+ "quick_entry": 1
 }

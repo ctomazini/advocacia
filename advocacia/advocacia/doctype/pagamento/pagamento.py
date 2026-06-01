@@ -4,6 +4,7 @@ from frappe.model.document import Document
 from frappe.utils import flt
 
 from advocacia.advocacia.financeiro import TIPO_ATOS, TIPO_HONORARIOS, is_pagamento_atos
+from advocacia.advocacia.titulos import fmt_date, get_cliente_nome, join_context_parts, join_title_parts
 
 
 class Pagamento(Document):
@@ -47,22 +48,14 @@ class Pagamento(Document):
 					_("Já existe pagamento para a origem {0}.").format(self.parcela_origem_id)
 				)
 
-		self.compor_titulo()
+		self._compor_titulo()
 
-	def compor_titulo(self):
-		parts = []
-		if self.cliente:
-			cliente_label = frappe.db.get_value("Cliente", self.cliente, "nome") or self.cliente
-			if cliente_label:
-				parts.append(cliente_label)
-		if self.tipo_origem:
-			parts.append(self.tipo_origem)
-		if self.numero_parcela:
-			parts.append(_("Parc. {0}").format(self.numero_parcela))
-		descricao = (self.descricao or "").strip()
-		if descricao:
-			parts.append(descricao[:80])
-		self.title = " — ".join(parts) if parts else (self.name or _("Pagamento"))
+	def _compor_titulo(self):
+		if self.title:
+			return
+		cliente_nome = get_cliente_nome(self.cliente)
+		contexto = join_context_parts(self.tipo_origem, fmt_date(self.data_vencimento))
+		self.title = join_title_parts(cliente_nome, contexto)
 
 	def before_save(self):
 		if self.is_new() and self.status == "Cancelado":

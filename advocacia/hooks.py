@@ -32,17 +32,12 @@ fixtures = [
 app_include_js = [
     "/assets/advocacia/js/masks.js",
     "/assets/advocacia/js/list_nav.js",
-    "/assets/advocacia/js/servico_link.js",
     "/assets/advocacia/js/cliente_from_servico.js",
     "/assets/advocacia/js/timer_global.js",
 ]
 
 standard_queries = {
     "Servico": "advocacia.advocacia.doctype.servico.servico.servico_query",
-}
-
-override_whitelisted_methods = {
-    "frappe.desk.search.get_link_title": "advocacia.advocacia.doctype.servico.servico.get_link_title",
 }
 
 scheduler_events = {

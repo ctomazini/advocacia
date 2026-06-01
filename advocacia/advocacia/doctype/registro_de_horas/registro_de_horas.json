@@ -165,8 +165,8 @@
    "fieldname": "title",
    "fieldtype": "Data",
    "label": "Título",
-   "hidden": 1,
-   "read_only": 1,
+   "hidden": 0,
+   "read_only": 0,
    "in_list_view": 1
   }
  ],
@@ -213,10 +213,9 @@
  "states": [],
  "autoname": "format:HRS-{YYYY}-{####}",
  "title_field": "title",
- "search_fields": "servico,cliente,atividade,data",
+ "search_fields": "atividade,cliente,data",
  "sort_field": "data",
  "sort_order": "DESC",
  "quick_entry": 1,
- "track_changes": 1,
- "show_title_field_in_link": 1
+ "track_changes": 1
 }

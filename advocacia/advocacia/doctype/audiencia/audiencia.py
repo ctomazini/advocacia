@@ -3,20 +3,23 @@ from frappe import _
 from frappe.model.document import Document
 
 
+from advocacia.advocacia.titulos import fmt_datetime, get_cliente_nome, join_context_parts, join_title_parts
+
+
 class Audiencia(Document):
 	def validate(self):
 		if not self.cliente and self.servico:
 			self.cliente = frappe.db.get_value("Servico", self.servico, "cliente")
 		if not self.cliente:
 			frappe.throw(_("Cliente é obrigatório. Selecione um Serviço válido."))
-		self.compor_titulo()
+		self._compor_titulo()
 
-	def compor_titulo(self):
-		cliente_label = ""
-		if self.cliente:
-			cliente_label = frappe.db.get_value("Cliente", self.cliente, "nome") or self.cliente
-		base = self.tipo or _("Audiência")
-		self.title = f"{cliente_label} — {base}" if cliente_label else base
+	def _compor_titulo(self):
+		if self.title:
+			return
+		cliente_nome = get_cliente_nome(self.cliente)
+		contexto = join_context_parts(self.tipo or _("Audiência"), fmt_datetime(self.data_hora))
+		self.title = join_title_parts(cliente_nome, contexto)
 
 
 @frappe.whitelist()

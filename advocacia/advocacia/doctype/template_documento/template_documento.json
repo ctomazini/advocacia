@@ -99,6 +99,5 @@
   }
  ],
  "sort_field": "titulo",
- "sort_order": "ASC",
- "show_title_field_in_link": 1
+ "sort_order": "ASC"
 }

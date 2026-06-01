@@ -54,7 +54,6 @@
  "email_append_to": 0,
  "subject_field": null,
  "sender_field": null,
- "show_title_field_in_link": 1,
  "migration_hash": null,
  "translated_doctype": 0,
  "is_calendar_and_gantt": 0,

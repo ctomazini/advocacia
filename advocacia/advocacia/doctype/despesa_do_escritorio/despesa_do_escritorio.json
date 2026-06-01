@@ -8,6 +8,7 @@
  "engine": "InnoDB",
  "field_order": [
   "informacoes_section",
+  "title",
   "descricao",
   "categoria",
   "column_break_info",
@@ -152,6 +153,14 @@
    "fieldname": "observacoes",
    "fieldtype": "Small Text",
    "label": "Observações"
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "label": "Título",
+   "read_only": 0,
+   "hidden": 0,
+   "in_list_view": 1
   }
  ],
  "index_web_pages_for_search": 1,
@@ -194,12 +203,11 @@
    "write": 1
   }
  ],
- "search_fields": "descricao,categoria,status,data_vencimento",
+ "search_fields": "descricao,categoria,status",
  "sort_field": "data_vencimento",
  "sort_order": "ASC",
  "states": [],
- "title_field": "descricao",
+ "title_field": "title",
  "track_changes": 1,
- "quick_entry": 1,
- "show_title_field_in_link": 1
+ "quick_entry": 1
 }

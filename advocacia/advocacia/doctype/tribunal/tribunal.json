@@ -7,7 +7,7 @@
  "track_changes": 1,
  "autoname": "field:tribunal_name",
  "title_field": "tribunal_name",
- "search_fields": "tribunal_name,abbreviation,jurisdiction",
+ "search_fields": "tribunal_name,abbreviation",
  "fields": [
   {
    "fieldname": "tribunal_name",
@@ -73,6 +73,5 @@
  ],
  "sort_field": "tribunal_name",
  "sort_order": "ASC",
- "quick_entry": 1,
- "show_title_field_in_link": 1
+ "quick_entry": 1
 }

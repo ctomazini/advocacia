@@ -92,11 +92,10 @@
    "write": 1
   }
  ],
- "search_fields": "titulo,descricao",
+ "search_fields": "titulo",
  "sort_field": "titulo",
  "sort_order": "ASC",
  "states": [],
  "title_field": "titulo",
- "track_changes": 1,
- "show_title_field_in_link": 1
+ "track_changes": 1
 }

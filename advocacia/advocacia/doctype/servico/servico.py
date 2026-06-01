@@ -3,6 +3,7 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.utils import cint
 
+from advocacia.advocacia.titulos import get_cliente_nome, join_title_parts
 from advocacia.advocacia.validators import limpar_numerico, validar_cnj
 
 
@@ -12,7 +13,7 @@ class Servico(Document):
 			self.numeracao_legada = 0
 
 	def validate(self):
-		self.compor_titulo()
+		self._compor_titulo()
 		if self.tipo != "Processo Judicial":
 			return
 
@@ -26,17 +27,18 @@ class Servico(Document):
 		else:
 			self.numero_processo = numero
 
-	def compor_titulo(self):
-		parts = []
-		if self.cliente:
-			cliente_nome = frappe.db.get_value("Cliente", self.cliente, "nome") or self.cliente
-			if cliente_nome:
-				parts.append(cliente_nome)
+	def _compor_titulo(self):
+		if self.title:
+			return
+		partes = []
+		cliente_nome = get_cliente_nome(self.cliente)
+		if cliente_nome:
+			partes.append(cliente_nome)
 		if self.tipo:
-			parts.append(self.tipo)
-		if self.status:
-			parts.append(self.status)
-		self.title = " · ".join(parts) if parts else (self.name or "")
+			partes.append(self.tipo)
+		if self.numero_processo:
+			partes.append(self.numero_processo)
+		self.title = join_title_parts(*partes)
 
 
 def format_servico_link_label(doc=None, servico_name=None):
@@ -46,35 +48,29 @@ def format_servico_link_label(doc=None, servico_name=None):
 	elif not hasattr(doc, "get"):
 		doc = frappe._dict(doc)
 
-	title = (doc.get("title") or doc.get("name") or "").strip()
-	parts = [title] if title else []
+	title = (doc.get("title") or "").strip()
+	if title:
+		return title
 
-	cliente = doc.get("cliente")
-	if cliente:
-		cliente_nome = frappe.db.get_value("Cliente", cliente, "nome") or cliente
-		if cliente_nome and cliente_nome not in parts:
-			parts.append(cliente_nome)
+	partes = []
+	cliente_nome = get_cliente_nome(doc.get("cliente"))
+	if cliente_nome:
+		partes.append(cliente_nome)
+	if doc.get("tipo"):
+		partes.append(doc.get("tipo"))
 
 	numero_processo = doc.get("numero_processo") or ""
 	if numero_processo:
-		if cint(doc.get("numeracao_legada")):
-			if numero_processo not in parts:
-				parts.append(numero_processo)
-		else:
+		if not cint(doc.get("numeracao_legada")):
 			digits = "".join(ch for ch in str(numero_processo) if ch.isdigit())
 			if len(digits) == 20:
 				numero_processo = (
 					f"{digits[:7]}-{digits[7:9]}.{digits[9:13]}."
 					f"{digits[13]}.{digits[14:16]}.{digits[16:]}"
 				)
-			if numero_processo not in parts:
-				parts.append(numero_processo)
+		partes.append(numero_processo)
 
-	status = doc.get("status")
-	if status and status not in parts:
-		parts.append(status)
-
-	return " · ".join(parts) if parts else doc.get("name") or servico_name or ""
+	return join_title_parts(*partes) if partes else (doc.get("name") or servico_name or "")
 
 
 @frappe.whitelist()
@@ -113,12 +109,3 @@ def servico_query(doctype, txt, searchfield, start, page_len, filters):
 
 	return [(row.name, format_servico_link_label(doc=row)) for row in rows]
 
-
-@frappe.whitelist()
-def get_link_title(doctype, docname):
-	if doctype == "Servico":
-		return format_servico_link_label(servico_name=docname)
-
-	from frappe.desk.search import get_link_title as frappe_get_link_title
-
-	return frappe_get_link_title(doctype, docname)

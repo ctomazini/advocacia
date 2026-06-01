@@ -4,6 +4,9 @@ from frappe.model.document import Document
 from frappe.utils import now_datetime, time_diff_in_seconds
 
 
+from advocacia.advocacia.titulos import fmt_date, get_cliente_nome, join_context_parts, join_title_parts
+
+
 class RegistrodeHoras(Document):
 	def validate(self):
 		if not self.cliente and self.servico:
@@ -17,7 +20,7 @@ class RegistrodeHoras(Document):
 			self.duracao_minutos = max(0, int(diff / 60))
 
 		self.duracao_horas = round((self.duracao_minutos or 0) / 60, 2)
-		self.compor_titulo()
+		self._compor_titulo()
 
 		if self.timer_ativo and self.has_value_changed("duracao_minutos"):
 			frappe.throw(
@@ -26,12 +29,13 @@ class RegistrodeHoras(Document):
 				)
 			)
 
-	def compor_titulo(self):
-		cliente_label = ""
-		if self.cliente:
-			cliente_label = frappe.db.get_value("Cliente", self.cliente, "nome") or self.cliente
+	def _compor_titulo(self):
+		if self.title:
+			return
+		cliente_nome = get_cliente_nome(self.cliente)
 		atividade = (self.atividade or "").strip() or "Horas"
-		self.title = f"{cliente_label} — {atividade}" if cliente_label else atividade
+		contexto = join_context_parts(atividade, fmt_date(self.data))
+		self.title = join_title_parts(cliente_nome, contexto)
 
 	@frappe.whitelist()
 	def iniciar_timer(self):

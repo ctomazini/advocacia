@@ -7,7 +7,7 @@
  "track_changes": 1,
  "autoname": "field:vara_name",
  "title_field": "vara_name",
- "search_fields": "vara_name,comarca,court_type",
+ "search_fields": "vara_name,comarca",
  "fields": [
   {
    "fieldname": "vara_name",
@@ -72,6 +72,5 @@
  ],
  "sort_field": "vara_name",
  "sort_order": "ASC",
- "quick_entry": 1,
- "show_title_field_in_link": 1
+ "quick_entry": 1
 }
