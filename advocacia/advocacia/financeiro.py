@@ -58,7 +58,7 @@ def sincronizar_pagamentos_do_acordo(acordo_doc, commit=False):
 
 def _sincronizar_pagamentos_do_acordo_impl(acordo, commit=False):
 	_ensure_parcela_origem_ids(acordo)
-	parcelas = acordo.get("table_ztjx") or []
+	parcelas = acordo.get("parcelas") or []
 	active_origem_ids = set()
 	criados = atualizados = cancelados = 0
 
@@ -644,7 +644,7 @@ def _as_acordo_doc(acordo_doc):
 
 
 def _ensure_parcela_origem_ids(acordo):
-	for parcela in acordo.get("table_ztjx") or []:
+	for parcela in acordo.get("parcelas") or []:
 		if parcela.parcela_origem_id:
 			continue
 		new_id = _gerar_parcela_origem_id()

@@ -99,10 +99,10 @@ frappe.ui.form.on('Parcela de Honorarios', {
         recalcular_total_linha(cdt, cdn);
         somar_totais(frm);
     },
-    table_ztjx_remove: function(frm) {
+    parcelas_remove: function(frm) {
         somar_totais(frm);
     },
-    table_ztjx_add: function(frm) {
+    parcelas_add: function(frm) {
         controlar_grid_parcelas(frm);
         somar_totais(frm);
     }
@@ -171,7 +171,7 @@ function controlar_campos(frm) {
 }
 
 function controlar_grid_parcelas(frm) {
-    var grid = frm.fields_dict.table_ztjx && frm.fields_dict.table_ztjx.grid;
+    var grid = frm.fields_dict.parcelas && frm.fields_dict.parcelas.grid;
     if (!grid) {
         return;
     }
@@ -201,7 +201,7 @@ function controlar_grid_parcelas(frm) {
 }
 
 function configurar_clique_pagamento_grid(frm) {
-    var grid = frm.fields_dict.table_ztjx && frm.fields_dict.table_ztjx.grid;
+    var grid = frm.fields_dict.parcelas && frm.fields_dict.parcelas.grid;
     if (!grid) {
         return;
     }
@@ -228,7 +228,7 @@ function configurar_clique_pagamento_grid(frm) {
             return;
         }
 
-        var parcela = (frm.doc.table_ztjx || []).find(function(r) {
+        var parcela = (frm.doc.parcelas || []).find(function(r) {
             return String(r.idx) === String(idx);
         });
         if (!parcela || !parcela.pagamento) {
@@ -338,10 +338,10 @@ function gerar_tabela_parcelas(frm) {
     if (direto) {
         // Modo Direto: parcelas simples, sem divisão nem sucumbência
         var valor_parcela = total / parcelas;
-        frm.clear_table('table_ztjx');
+        frm.clear_table('parcelas');
         for (var i = 0; i < parcelas; i++) {
             var dt = frappe.datetime.add_months(data_inicio, i);
-            var row = frm.add_child('table_ztjx');
+            var row = frm.add_child('parcelas');
             row.vencimento = dt;
             row.valor_advogada = 0;
             row.valor_cliente = 0;
@@ -350,7 +350,7 @@ function gerar_tabela_parcelas(frm) {
             row.descrição = 'Parcela ' + (i + 1) + ' de ' + parcelas;
             row.status = 'Pendente';
         }
-        frm.refresh_field('table_ztjx');
+        frm.refresh_field('parcelas');
         somar_totais(frm);
         frappe.msgprint(parcelas + ' parcelas geradas com sucesso!');
         return;
@@ -373,10 +373,10 @@ function gerar_tabela_parcelas(frm) {
     ], function(values) {
         var parcela_adv = valor_adv / parcelas;
         var parcela_cli = valor_cli / parcelas;
-        frm.clear_table('table_ztjx');
+        frm.clear_table('parcelas');
         for (var i = 0; i < parcelas; i++) {
             var dt = frappe.datetime.add_months(data_inicio, i);
-            var row = frm.add_child('table_ztjx');
+            var row = frm.add_child('parcelas');
             row.vencimento = dt;
             row.valor_advogada = parcela_adv;
             row.valor_cliente = parcela_cli;
@@ -394,7 +394,7 @@ function gerar_tabela_parcelas(frm) {
             }
             row.valor_total = row.valor_advogada + row.valor_cliente + row.valor_sucumbência;
         }
-        frm.refresh_field('table_ztjx');
+        frm.refresh_field('parcelas');
         somar_totais(frm);
         frappe.msgprint(parcelas + ' parcelas geradas com sucesso!');
     }, 'Como distribuir a sucumbência?', 'Gerar');
@@ -403,7 +403,7 @@ function gerar_tabela_parcelas(frm) {
 function somar_totais(frm) {
     if (eh_direto(frm)) {
         var total_parcelas = 0;
-        (frm.doc.table_ztjx || []).forEach(function(row) {
+        (frm.doc.parcelas || []).forEach(function(row) {
             total_parcelas += row.valor_total || 0;
         });
         frm.set_value('total_advogada', total_parcelas || frm.doc.valor_total_do_acordo || 0);
@@ -413,7 +413,7 @@ function somar_totais(frm) {
     var total_adv = 0;
     var total_cli = 0;
     var total_suc = 0;
-    (frm.doc.table_ztjx || []).forEach(function(row) {
+    (frm.doc.parcelas || []).forEach(function(row) {
         total_adv += row.valor_advogada || 0;
         total_cli += row.valor_cliente || 0;
         total_suc += row.valor_sucumbência || 0;

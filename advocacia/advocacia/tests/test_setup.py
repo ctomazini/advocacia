@@ -112,7 +112,7 @@ def create_test_acordo(
 	num_parcelas=2,
 	parcelas=None,
 ):
-	"""Cria Acordo com parcelas na child table table_ztjx."""
+	"""Cria Acordo com parcelas na child table parcelas."""
 	if not servico:
 		servico_doc = create_test_servico()
 		servico = servico_doc.name
@@ -135,7 +135,7 @@ def create_test_acordo(
 			"valor_total_do_acordo": valor_total,
 			"número_de_parcelas": num_parcelas,
 			"data_primeira_parcela": today(),
-			"table_ztjx": parcelas or [],
+			"parcelas": parcelas or [],
 		}
 	)
 	doc.insert(ignore_permissions=True)

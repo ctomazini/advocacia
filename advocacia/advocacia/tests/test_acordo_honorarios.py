@@ -22,16 +22,16 @@ class TestAcordoHonorarios(FrappeTestCase):
 			num_parcelas=2,
 		)
 		self.assertEqual(flt(acordo.valor_total_do_acordo), 10000)
-		self.assertEqual(len(acordo.table_ztjx), 2)
+		self.assertEqual(len(acordo.parcelas), 2)
 
 	def test_parcelas_soma_igual_total(self):
 		acordo = create_test_acordo(valor_total=10000, num_parcelas=5)
-		soma = sum(flt(p.valor_total) for p in acordo.table_ztjx)
+		soma = sum(flt(p.valor_total) for p in acordo.parcelas)
 		self.assertAlmostEqual(soma, 10000, places=2)
 
 	def test_parcelas_status_pendente(self):
 		acordo = create_test_acordo(num_parcelas=3)
-		self.assertTrue(all(p.status == "Pendente" for p in acordo.table_ztjx))
+		self.assertTrue(all(p.status == "Pendente" for p in acordo.parcelas))
 
 	def test_sync_cria_pagamentos(self):
 		acordo = create_test_acordo(num_parcelas=3, valor_total=9000)
@@ -40,11 +40,11 @@ class TestAcordoHonorarios(FrappeTestCase):
 
 	def test_parcela_origem_id_vinculado(self):
 		acordo = create_test_acordo(num_parcelas=2)
-		for parcela in acordo.table_ztjx:
+		for parcela in acordo.parcelas:
 			self.assertTrue(parcela.parcela_origem_id)
 		pagamentos = get_acordo_pagamentos(acordo.name)
 		origem_ids = {p.parcela_origem_id for p in pagamentos}
-		parcela_ids = {p.parcela_origem_id for p in acordo.table_ztjx}
+		parcela_ids = {p.parcela_origem_id for p in acordo.parcelas}
 		self.assertEqual(origem_ids, parcela_ids)
 
 	def test_sem_servico_falha(self):
@@ -68,7 +68,7 @@ class TestAcordoHonorarios(FrappeTestCase):
 					"tipo_de_cobrança": "Valor fixo",
 					"número_de_parcelas": 2,
 					"data_primeira_parcela": today(),
-					"table_ztjx": [
+					"parcelas": [
 						{
 							"vencimento": today(),
 							"valor_total": 100,
@@ -90,7 +90,7 @@ class TestAcordoHonorarios(FrappeTestCase):
 					"modo_honorarios": "Honorários Diretos",
 					"tipo_de_cobrança": "Valor fixo",
 					"valor_total_do_acordo": 10000,
-					"table_ztjx": [
+					"parcelas": [
 						{
 							"vencimento": today(),
 							"valor_total": 1000,
@@ -140,7 +140,7 @@ class TestAcordoHonorarios(FrappeTestCase):
 				"honorários_de_sucumbência": sucumbencia,
 				"número_de_parcelas": 3,
 				"data_primeira_parcela": today(),
-				"table_ztjx": [
+				"parcelas": [
 					{
 						"vencimento": today(),
 						"valor_advogada": 3000,
@@ -172,6 +172,6 @@ class TestAcordoHonorarios(FrappeTestCase):
 			}
 		)
 		doc.insert(ignore_permissions=True)
-		soma = sum(flt(p.valor_total) for p in doc.table_ztjx)
+		soma = sum(flt(p.valor_total) for p in doc.parcelas)
 		self.assertAlmostEqual(soma, valor_acordo + sucumbencia, places=2)
 		self.assertAlmostEqual(flt(doc.valor_advogada) + flt(doc.valor_cliente), valor_acordo, places=2)

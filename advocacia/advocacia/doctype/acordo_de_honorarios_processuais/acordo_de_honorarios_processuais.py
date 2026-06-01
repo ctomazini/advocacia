@@ -18,7 +18,7 @@ class AcordodeHonorariosProcessuais(Document):
 
     def _validar_financeiro(self):
         total_acordo = flt(self.valor_total_do_acordo)
-        parcelas = self.get("table_ztjx") or []
+        parcelas = self.get("parcelas") or []
 
         if parcelas and total_acordo <= 0:
             frappe.throw(_("Valor total do acordo deve ser maior que zero."))
@@ -73,7 +73,7 @@ class AcordodeHonorariosProcessuais(Document):
                 frappe.throw(_("Percentual de sucumbência deve estar entre 0 e 100."))
 
     def _validar_parcelas(self):
-        parcelas = self.get("table_ztjx") or []
+        parcelas = self.get("parcelas") or []
         if not parcelas:
             return
 

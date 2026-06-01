@@ -27,7 +27,7 @@ class TestFinanceiro(FrappeTestCase):
 		acordo = create_test_acordo(num_parcelas=1, valor_total=1000)
 		pag_name = get_acordo_pagamentos(acordo.name)[0].name
 		acordo_doc = frappe.get_doc("Acordo de Honorarios Processuais", acordo.name)
-		acordo_doc.table_ztjx[0].valor_total = 1500
+		acordo_doc.parcelas[0].valor_total = 1500
 		acordo_doc.valor_total_do_acordo = 1500
 		acordo_doc.save(ignore_permissions=True)
 		resync_pagamentos_acordo(acordo.name)

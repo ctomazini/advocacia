@@ -2083,7 +2083,7 @@
    "parentfield": "fields",
    "parenttype": "DocType",
    "idx": 28,
-   "fieldname": "table_ztjx",
+   "fieldname": "parcelas",
    "label": "",
    "oldfieldname": null,
    "fieldtype": "Table",
