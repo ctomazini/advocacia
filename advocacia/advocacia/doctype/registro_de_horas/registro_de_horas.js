@@ -15,7 +15,24 @@ frappe.ui.form.on("Registro de Horas", {
 		} else {
 			frm.events._stop_visual_timer(frm);
 			frm.events._disable_beforeunload(frm);
+			if (frm.doc.servico && frm.doc.atividade) {
+				frm.add_custom_button(
+					__("Salvar e Iniciar Timer"),
+					() => frm.events.salvar_e_iniciar_timer(frm),
+					__("Timer")
+				);
+				frm.change_custom_button_type(__("Salvar e Iniciar Timer"), __("Timer"), "primary");
+			}
 		}
+	},
+
+	salvar_e_iniciar_timer(frm) {
+		if (!frm.doc.duracao_minutos) {
+			frm.set_value("duracao_minutos", 0);
+		}
+		frm.save().then(function () {
+			frm.events.iniciar_timer(frm);
+		});
 	},
 
 	iniciar_timer(frm) {

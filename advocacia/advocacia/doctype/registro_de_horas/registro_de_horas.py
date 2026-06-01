@@ -9,12 +9,14 @@ class RegistrodeHoras(Document):
 		if not self.cliente and self.servico:
 			self.cliente = frappe.db.get_value("Servico", self.servico, "cliente")
 
+		if self.duracao_minutos is None:
+			self.duracao_minutos = 0
+
 		if self.hora_inicio and self.hora_fim and not self.duracao_minutos:
 			diff = time_diff_in_seconds(self.hora_fim, self.hora_inicio)
 			self.duracao_minutos = max(0, int(diff / 60))
 
-		if self.duracao_minutos:
-			self.duracao_horas = round(self.duracao_minutos / 60, 2)
+		self.duracao_horas = round((self.duracao_minutos or 0) / 60, 2)
 
 		if self.timer_ativo and self.has_value_changed("duracao_minutos"):
 			frappe.throw(

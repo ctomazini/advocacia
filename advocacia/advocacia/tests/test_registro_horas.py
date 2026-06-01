@@ -15,6 +15,21 @@ class TestRegistroHoras(FrappeTestCase):
 		self.assertTrue(reg.name)
 		self.assertEqual(reg.duracao_horas, 1.0)
 
+	def test_create_sem_duracao_para_iniciar_timer(self):
+		reg = frappe.get_doc(
+			{
+				"doctype": "Registro de Horas",
+				"servico": create_test_servico().name,
+				"data": frappe.utils.today(),
+				"atividade": "Atendimento inicial",
+			}
+		).insert(ignore_permissions=True)
+		self.assertEqual(reg.duracao_minutos, 0)
+		self.assertEqual(reg.duracao_horas, 0.0)
+		reg.iniciar_timer()
+		reg.reload()
+		self.assertEqual(reg.timer_ativo, 1)
+
 	def test_calculo_duracao_inicio_fim(self):
 		reg = frappe.get_doc(
 			{
