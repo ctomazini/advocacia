@@ -4,11 +4,11 @@ from frappe.tests.utils import FrappeTestCase
 
 from advocacia.advocacia.tests.test_setup import (
 	VALID_CELULAR,
-	VALID_CNPJ,
 	VALID_CPF,
 	VALID_CPF_DIGITS,
 	VALID_EMAIL,
 	VALID_FIXO,
+	_gerar_cnpj_valido,
 	_gerar_cpf_valido,
 	create_test_cliente,
 )
@@ -33,7 +33,7 @@ class TestCliente(FrappeTestCase):
 		cliente = create_test_cliente(
 			tipo_pessoa="Pessoa Jurídica",
 			nome=f"Empresa Teste {frappe.generate_hash(length=6)}",
-			cnpj=VALID_CNPJ,
+			cnpj=_gerar_cnpj_valido(),
 		)
 		self.assertEqual(cliente.tipo_pessoa, "Pessoa Jurídica")
 		self.assertTrue(frappe.db.exists("Cliente", cliente.name))

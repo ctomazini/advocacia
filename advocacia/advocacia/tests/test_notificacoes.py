@@ -34,8 +34,20 @@ class TestNotificacoes(FrappeTestCase):
 			self.assertTrue(kwargs["recipients"])
 
 	@patch("frappe.sendmail")
-	def test_sem_prazos_urgentes_nao_envia(self, mock_sendmail):
-		create_test_prazo(data_prazo=add_days(today(), 30), dias_notificacao=3)
+	@patch("advocacia.advocacia.notificacoes.frappe.get_all")
+	def test_sem_prazos_urgentes_nao_envia(self, mock_get_all, mock_sendmail):
+		mock_get_all.return_value = [
+			frappe._dict(
+				name="PRAZO-TEST-LONGO",
+				servico="SERV-TEST",
+				cliente="CLI-TEST",
+				data_prazo=add_days(today(), 30),
+				descricao="Prazo fora da janela",
+				prioridade="Normal",
+				responsavel=None,
+				dias_notificacao=3,
+			)
+		]
 		notificar_prazos_diario()
 		mock_sendmail.assert_not_called()
 

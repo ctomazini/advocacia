@@ -1,9 +1,10 @@
-"""Testes do padrão de títulos `{ID} — {cliente}`."""
+"""Testes do padrão de títulos `{ID} — {descritor}`."""
 
 import frappe
 from frappe.tests.utils import FrappeTestCase
 from frappe.utils import get_datetime, today
 
+from advocacia.advocacia.titulos import TITLE_SEPARATOR, join_title_parts
 from advocacia.advocacia.tests.test_setup import (
 	create_test_acordo,
 	create_test_audiencia,
@@ -13,6 +14,10 @@ from advocacia.advocacia.tests.test_setup import (
 	create_test_servico,
 	get_acordo_pagamentos,
 )
+
+
+def _titulo_composto(doc, descritor):
+	return join_title_parts(doc.name, descritor)
 
 
 class TestTitulosIdCliente(FrappeTestCase):
@@ -33,25 +38,28 @@ class TestTitulosIdCliente(FrappeTestCase):
 		registro = create_test_registro_atos()
 		self.assertTrue(registro.title)
 		self.assertTrue(registro.title.startswith(registro.name))
+		self.assertIn(TITLE_SEPARATOR, registro.title)
 
 	def test_registro_atos_titulo_manual_preservado(self):
 		registro = create_test_registro_atos()
-		registro.title = "Meu título custom"
+		descritor = "Meu título custom"
+		registro.title = descritor
 		registro.save(ignore_permissions=True)
 		registro.reload()
-		self.assertEqual(registro.title, "Meu título custom")
+		self.assertEqual(registro.title, _titulo_composto(registro, descritor))
 
 	def test_registro_atos_titulo_manual_no_insert(self):
 		servico = create_test_servico()
+		descritor = "Custom no insert"
 		registro = frappe.get_doc(
 			{
 				"doctype": "Registro de Atos",
 				"servico": servico.name,
-				"title": "Custom no insert",
+				"title": descritor,
 				"atos": [{"data": today(), "tipo": "Inicial", "valor": 100}],
 			}
 		).insert(ignore_permissions=True)
-		self.assertEqual(registro.title, "Custom no insert")
+		self.assertEqual(registro.title, _titulo_composto(registro, descritor))
 
 	def test_audiencia_titulo_distintivo_por_id(self):
 		servico = create_test_servico()
@@ -68,10 +76,11 @@ class TestTitulosIdCliente(FrappeTestCase):
 
 	def test_audiencia_titulo_manual_preservado(self):
 		aud = create_test_audiencia()
-		aud.title = "Meu título custom"
+		descritor = "Meu título custom"
+		aud.title = descritor
 		aud.save(ignore_permissions=True)
 		aud.reload()
-		self.assertEqual(aud.title, "Meu título custom")
+		self.assertEqual(aud.title, _titulo_composto(aud, descritor))
 
 	def test_pagamento_titulo_distintivo_por_id(self):
 		acordo = create_test_acordo(num_parcelas=2, valor_total=1000)
@@ -84,17 +93,19 @@ class TestTitulosIdCliente(FrappeTestCase):
 
 	def test_pagamento_titulo_manual_preservado(self):
 		pag = create_test_pagamento()
-		pag.title = "Meu título custom"
+		descritor = "Meu título custom"
+		pag.title = descritor
 		pag.save(ignore_permissions=True)
 		pag.reload()
-		self.assertEqual(pag.title, "Meu título custom")
+		self.assertEqual(pag.title, _titulo_composto(pag, descritor))
 
 	def test_servico_titulo_manual_preservado(self):
 		servico = create_test_servico()
-		servico.title = "Meu título custom"
+		descritor = "Meu título custom"
+		servico.title = descritor
 		servico.save(ignore_permissions=True)
 		servico.reload()
-		self.assertEqual(servico.title, "Meu título custom")
+		self.assertEqual(servico.title, _titulo_composto(servico, descritor))
 
 	def test_servico_titulo_id_cliente(self):
 		cliente = create_test_cliente()
