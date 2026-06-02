@@ -4,7 +4,7 @@ from frappe.model.document import Document
 from frappe.utils import flt
 
 
-from advocacia.advocacia.titulos import fmt_date, get_cliente_nome, join_title_parts
+from advocacia.advocacia.titulos import aplicar_titulo_pos_insert, recompor_titulo_se_vazio
 
 
 class RegistrodeAtos(Document):
@@ -13,18 +13,13 @@ class RegistrodeAtos(Document):
 			self.cliente = frappe.db.get_value("Servico", self.servico, "cliente")
 		if not self.cliente:
 			frappe.throw(_("Cliente é obrigatório. Selecione um Serviço válido."))
-		self._compor_titulo()
+		recompor_titulo_se_vazio(self)
 		self._validar_reversao_atos_faturados()
 		self._calcular_totais()
 		self._atualizar_status()
 
-	def _compor_titulo(self):
-		if self.title:
-			return
-		cliente_nome = get_cliente_nome(self.cliente)
-		data = fmt_date(self.data_abertura)
-		contexto = f"Atos {data}".strip() if data else "Atos"
-		self.title = join_title_parts(cliente_nome, contexto)
+	def after_insert(self):
+		aplicar_titulo_pos_insert(self)
 
 	def _validar_reversao_atos_faturados(self):
 		if getattr(frappe.flags, "in_atos_cobranca_sync", False):

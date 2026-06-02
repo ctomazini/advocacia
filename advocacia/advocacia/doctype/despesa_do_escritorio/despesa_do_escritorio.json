@@ -209,5 +209,6 @@
  "states": [],
  "title_field": "title",
  "track_changes": 1,
- "quick_entry": 1
+ "quick_entry": 1,
+ "show_title_field_in_link": 1
 }

@@ -3,22 +3,18 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.utils import add_months, getdate, today
 
-from advocacia.advocacia.titulos import fmt_date, join_title_parts
+from advocacia.advocacia.titulos import aplicar_titulo_pos_insert, recompor_titulo_se_vazio
 
 
 class DespesadoEscritorio(Document):
 	def validate(self):
-		self._compor_titulo()
+		recompor_titulo_se_vazio(self, usar_descricao=True)
 		self.atualizar_status()
 		if self.recorrente and self.data_vencimento:
 			self.calcular_proximo_vencimento()
 
-	def _compor_titulo(self):
-		if self.title:
-			return
-		descricao = (self.descricao or "").strip()
-		data = fmt_date(self.data_vencimento)
-		self.title = join_title_parts(descricao, data)
+	def after_insert(self):
+		aplicar_titulo_pos_insert(self, usar_descricao=True)
 
 	def atualizar_status(self):
 		if self.status == "Cancelado":

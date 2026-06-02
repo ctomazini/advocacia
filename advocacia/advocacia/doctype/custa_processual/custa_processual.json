@@ -197,5 +197,6 @@
  "sort_field": "data_pagamento",
  "sort_order": "DESC",
  "quick_entry": 1,
- "track_changes": 1
+ "track_changes": 1,
+ "show_title_field_in_link": 1
 }

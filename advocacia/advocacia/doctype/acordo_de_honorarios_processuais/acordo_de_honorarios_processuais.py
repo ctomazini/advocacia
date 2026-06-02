@@ -3,7 +3,7 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.utils import flt, getdate
 
-from advocacia.advocacia.titulos import get_cliente_nome, join_title_parts
+from advocacia.advocacia.titulos import aplicar_titulo_pos_insert, recompor_titulo_se_vazio
 
 
 class AcordodeHonorariosProcessuais(Document):
@@ -12,15 +12,12 @@ class AcordodeHonorariosProcessuais(Document):
             self.cliente = frappe.db.get_value("Servico", self.servico, "cliente")
         if not self.cliente:
             frappe.throw(_("Cliente é obrigatório. Selecione um Serviço válido."))
-        self._compor_titulo()
         self._validar_financeiro()
         self._validar_parcelas()
+        recompor_titulo_se_vazio(self)
 
-    def _compor_titulo(self):
-        if self.title:
-            return
-        cliente_nome = get_cliente_nome(self.cliente)
-        self.title = join_title_parts(cliente_nome, "Honorários")
+    def after_insert(self):
+        aplicar_titulo_pos_insert(self)
 
     def _eh_direto(self):
         return self.modo_honorarios == "Honorários Diretos"

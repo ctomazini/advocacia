@@ -3,7 +3,12 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.utils import cint
 
-from advocacia.advocacia.titulos import get_cliente_nome, join_title_parts
+from advocacia.advocacia.titulos import (
+	aplicar_titulo_pos_insert,
+	get_cliente_nome,
+	join_title_parts,
+	recompor_titulo_se_vazio,
+)
 from advocacia.advocacia.validators import limpar_numerico, validar_cnj
 
 
@@ -13,8 +18,8 @@ class Servico(Document):
 			self.numeracao_legada = 0
 
 	def validate(self):
-		self._compor_titulo()
 		if self.tipo != "Processo Judicial":
+			recompor_titulo_se_vazio(self)
 			return
 
 		legado = cint(self.numeracao_legada)
@@ -26,23 +31,14 @@ class Servico(Document):
 			self.numero_processo = limpar_numerico(validar_cnj(numero))
 		else:
 			self.numero_processo = numero
+		recompor_titulo_se_vazio(self)
 
-	def _compor_titulo(self):
-		if self.title:
-			return
-		partes = []
-		cliente_nome = get_cliente_nome(self.cliente)
-		if cliente_nome:
-			partes.append(cliente_nome)
-		if self.tipo:
-			partes.append(self.tipo)
-		if self.numero_processo:
-			partes.append(self.numero_processo)
-		self.title = join_title_parts(*partes)
+	def after_insert(self):
+		aplicar_titulo_pos_insert(self)
 
 
 def format_servico_link_label(doc=None, servico_name=None):
-	"""Rótulo legível para links e autocomplete de Serviço."""
+	"""Rótulo secundário para autocomplete de Serviço."""
 	if doc is None:
 		doc = frappe.get_cached_doc("Servico", servico_name)
 	elif not hasattr(doc, "get"):
@@ -52,25 +48,11 @@ def format_servico_link_label(doc=None, servico_name=None):
 	if title:
 		return title
 
-	partes = []
 	cliente_nome = get_cliente_nome(doc.get("cliente"))
-	if cliente_nome:
-		partes.append(cliente_nome)
-	if doc.get("tipo"):
-		partes.append(doc.get("tipo"))
-
-	numero_processo = doc.get("numero_processo") or ""
-	if numero_processo:
-		if not cint(doc.get("numeracao_legada")):
-			digits = "".join(ch for ch in str(numero_processo) if ch.isdigit())
-			if len(digits) == 20:
-				numero_processo = (
-					f"{digits[:7]}-{digits[7:9]}.{digits[9:13]}."
-					f"{digits[13]}.{digits[14:16]}.{digits[16:]}"
-				)
-		partes.append(numero_processo)
-
-	return join_title_parts(*partes) if partes else (doc.get("name") or servico_name or "")
+	name = doc.get("name") or servico_name or ""
+	if name and cliente_nome:
+		return join_title_parts(name, cliente_nome)
+	return cliente_nome or name
 
 
 @frappe.whitelist()
@@ -108,4 +90,3 @@ def servico_query(doctype, txt, searchfield, start, page_len, filters):
 	)
 
 	return [(row.name, format_servico_link_label(doc=row)) for row in rows]
-

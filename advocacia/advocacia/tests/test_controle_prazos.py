@@ -28,8 +28,8 @@ class TestControlePrazos(FrappeTestCase):
 		servico = create_test_servico()
 		cliente_nome = frappe.db.get_value("Cliente", servico.cliente, "nome")
 		prazo = create_test_prazo(servico=servico.name, descricao="Contestação")
+		self.assertIn(prazo.name, prazo.title)
 		self.assertIn(cliente_nome, prazo.title)
-		self.assertIn("Contestação", prazo.title)
 
 	def test_get_events(self):
 		prazo = create_test_prazo(data_prazo=today())

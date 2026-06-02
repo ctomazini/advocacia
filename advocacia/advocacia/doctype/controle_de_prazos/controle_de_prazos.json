@@ -1149,5 +1149,6 @@
   "dias_notificacao",
   "observacoes_section",
   "observacoes"
- ]
+ ],
+ "show_title_field_in_link": 1
 }

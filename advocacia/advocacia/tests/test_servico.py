@@ -88,5 +88,5 @@ class TestServico(FrappeTestCase):
 	def test_titulo_composto(self):
 		cliente = create_test_cliente()
 		servico = create_test_servico(cliente=cliente.name)
+		self.assertIn(servico.name, servico.title)
 		self.assertIn(cliente.nome, servico.title)
-		self.assertIn("Consultoria", servico.title)

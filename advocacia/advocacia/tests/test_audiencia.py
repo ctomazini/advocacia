@@ -53,5 +53,5 @@ class TestAudiencia(FrappeTestCase):
 		servico = create_test_servico()
 		cliente_nome = frappe.db.get_value("Cliente", servico.cliente, "nome")
 		aud = create_test_audiencia(servico=servico.name, tipo="Instrução")
+		self.assertIn(aud.name, aud.title)
 		self.assertIn(cliente_nome, aud.title)
-		self.assertIn("Instrução", aud.title)

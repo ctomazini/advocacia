@@ -1453,5 +1453,6 @@
    "in_list_view": 1
   }
  ],
- "states": []
+ "states": [],
+ "show_title_field_in_link": 1
 }

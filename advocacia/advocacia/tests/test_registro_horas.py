@@ -34,8 +34,8 @@ class TestRegistroHoras(FrappeTestCase):
 		servico = create_test_servico()
 		cliente_nome = frappe.db.get_value("Cliente", servico.cliente, "nome")
 		reg = create_test_registro_horas(servico=servico.name, atividade="Reunião")
+		self.assertIn(reg.name, reg.title)
 		self.assertIn(cliente_nome, reg.title)
-		self.assertIn("Reunião", reg.title)
 
 	def test_calculo_duracao_inicio_fim(self):
 		reg = frappe.get_doc(

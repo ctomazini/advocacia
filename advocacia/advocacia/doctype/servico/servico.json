@@ -1568,5 +1568,6 @@
    "doctype": "DocField"
   }
  ],
- "states": []
+ "states": [],
+ "show_title_field_in_link": 1
 }
