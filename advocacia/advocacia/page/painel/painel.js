@@ -2552,7 +2552,7 @@ function render_proxima_audiencia_card(a, ordem) {
         '<div class="painel-prox-row"><span class="painel-prox-row-label">' +
         __("Serviço") +
         '</span><span class="painel-prox-row-value">' +
-        frappe.utils.escape_html(a.servico || "—") +
+        frappe.utils.escape_html(a.servico_titulo || a.servico || "—") +
         "</span></div>";
     if (local && mod !== "Virtual") {
         h +=

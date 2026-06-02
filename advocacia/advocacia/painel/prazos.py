@@ -112,10 +112,10 @@ def _get_audiencias(hoje, periodo_fim, limit):
 		order_by="data_hora asc",
 		limit_page_length=limit,
 	)
-	servicos_sem_cliente = [
-		a.servico for a in rows if a.get("servico") and not a.get("cliente")
-	]
-	servico_map = _servico_lookup(servicos_sem_cliente, ["cliente", "title"])
+	servico_map = _servico_lookup(
+		[a.servico for a in rows if a.get("servico")],
+		["cliente", "title"],
+	)
 	cliente_por_servico = {name: sv.cliente for name, sv in servico_map.items()}
 	cliente_nome_map = _cliente_nome_lookup(
 		[a.cliente for a in rows if a.cliente] + [sv.cliente for sv in servico_map.values() if sv.cliente]

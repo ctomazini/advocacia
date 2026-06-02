@@ -3,7 +3,12 @@ from frappe.tests.utils import FrappeTestCase
 from frappe.utils import today
 
 from advocacia.advocacia.painel_api import get_painel_data, marcar_parcela_recebida
-from advocacia.advocacia.tests.test_setup import create_test_acordo, get_acordo_pagamentos
+from advocacia.advocacia.tests.test_setup import (
+	create_test_acordo,
+	create_test_audiencia,
+	create_test_servico,
+	get_acordo_pagamentos,
+)
 
 
 class TestPainelApi(FrappeTestCase):
@@ -106,3 +111,15 @@ class TestPainelApi(FrappeTestCase):
 				data["list_meta"]["despesas"]["showing"],
 				data["list_meta"]["despesas"]["total"],
 			)
+
+	def test_audiencias_incluem_servico_titulo(self):
+		servico = create_test_servico()
+		create_test_audiencia(servico=servico.name)
+		data = get_painel_data(periodo_dias=30)
+		audiencias = [a for a in data["audiencias"] if a.get("servico") == servico.name]
+		self.assertTrue(audiencias, "audiência de teste deve aparecer no painel")
+		self.assertTrue(
+			audiencias[0].get("servico_titulo"),
+			"servico_titulo deve vir preenchido (não só o ID)",
+		)
+		self.assertIn(servico.name, audiencias[0]["servico_titulo"])
