@@ -8,13 +8,16 @@ from advocacia.advocacia.titulos import aplicar_titulo_pos_insert, recompor_titu
 
 class DespesadoEscritorio(Document):
 	def validate(self):
-		recompor_titulo_se_vazio(self, usar_descricao=True)
+		self._compor_titulo()
 		self.atualizar_status()
 		if self.recorrente and self.data_vencimento:
 			self.calcular_proximo_vencimento()
 
 	def after_insert(self):
 		aplicar_titulo_pos_insert(self, usar_descricao=True)
+
+	def _compor_titulo(self):
+		recompor_titulo_se_vazio(self, usar_descricao=True)
 
 	def atualizar_status(self):
 		if self.status == "Cancelado":

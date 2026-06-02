@@ -20,7 +20,7 @@ class RegistrodeHoras(Document):
 			self.duracao_minutos = max(0, int(diff / 60))
 
 		self.duracao_horas = round((self.duracao_minutos or 0) / 60, 2)
-		recompor_titulo_se_vazio(self)
+		self._compor_titulo()
 
 		if self.timer_ativo and self.has_value_changed("duracao_minutos"):
 			frappe.throw(
@@ -31,6 +31,9 @@ class RegistrodeHoras(Document):
 
 	def after_insert(self):
 		aplicar_titulo_pos_insert(self)
+
+	def _compor_titulo(self):
+		recompor_titulo_se_vazio(self)
 
 	@frappe.whitelist()
 	def iniciar_timer(self):

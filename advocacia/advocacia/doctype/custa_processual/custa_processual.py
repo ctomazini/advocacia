@@ -19,7 +19,10 @@ class CustaProcessual(Document):
 			self.status = "Pago"
 		if self.data_repasse and self.status == "Pago":
 			self.status = "Repassado"
-		recompor_titulo_se_vazio(self)
+		self._compor_titulo()
 
 	def after_insert(self):
 		aplicar_titulo_pos_insert(self)
+
+	def _compor_titulo(self):
+		recompor_titulo_se_vazio(self)

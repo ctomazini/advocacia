@@ -48,10 +48,13 @@ class Pagamento(Document):
 					_("Já existe pagamento para a origem {0}.").format(self.parcela_origem_id)
 				)
 
-		recompor_titulo_se_vazio(self)
+		self._compor_titulo()
 
 	def after_insert(self):
 		aplicar_titulo_pos_insert(self)
+
+	def _compor_titulo(self):
+		recompor_titulo_se_vazio(self)
 
 	def before_save(self):
 		if self.is_new() and self.status == "Cancelado":

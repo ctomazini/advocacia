@@ -12,10 +12,13 @@ class ControledePrazos(Document):
 			self.cliente = frappe.db.get_value("Servico", self.servico, "cliente")
 		if not self.cliente:
 			frappe.throw(_("Cliente é obrigatório. Selecione um Serviço válido."))
-		recompor_titulo_se_vazio(self)
+		self._compor_titulo()
 
 	def after_insert(self):
 		aplicar_titulo_pos_insert(self)
+
+	def _compor_titulo(self):
+		recompor_titulo_se_vazio(self)
 
 
 @frappe.whitelist()

@@ -12,11 +12,14 @@ class Comunicacao(Document):
 			frappe.throw(_("Tipo é obrigatório."))
 		if self.servico and not self.cliente:
 			self.cliente = frappe.db.get_value("Servico", self.servico, "cliente")
-		recompor_titulo_se_vazio(self)
+		self._compor_titulo()
 
 	def after_insert(self):
 		aplicar_titulo_pos_insert(self)
 		self._criar_tarefa_vinculada()
+
+	def _compor_titulo(self):
+		recompor_titulo_se_vazio(self)
 
 	def on_update(self):
 		self._criar_tarefa_vinculada()

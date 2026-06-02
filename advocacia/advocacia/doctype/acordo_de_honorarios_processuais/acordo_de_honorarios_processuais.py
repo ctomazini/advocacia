@@ -14,10 +14,13 @@ class AcordodeHonorariosProcessuais(Document):
             frappe.throw(_("Cliente é obrigatório. Selecione um Serviço válido."))
         self._validar_financeiro()
         self._validar_parcelas()
-        recompor_titulo_se_vazio(self)
+        self._compor_titulo()
 
     def after_insert(self):
         aplicar_titulo_pos_insert(self)
+
+    def _compor_titulo(self):
+        recompor_titulo_se_vazio(self)
 
     def _eh_direto(self):
         return self.modo_honorarios == "Honorários Diretos"

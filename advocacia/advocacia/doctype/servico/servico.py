@@ -19,7 +19,7 @@ class Servico(Document):
 
 	def validate(self):
 		if self.tipo != "Processo Judicial":
-			recompor_titulo_se_vazio(self)
+			self._compor_titulo()
 			return
 
 		legado = cint(self.numeracao_legada)
@@ -31,6 +31,9 @@ class Servico(Document):
 			self.numero_processo = limpar_numerico(validar_cnj(numero))
 		else:
 			self.numero_processo = numero
+		self._compor_titulo()
+
+	def _compor_titulo(self):
 		recompor_titulo_se_vazio(self)
 
 	def after_insert(self):
