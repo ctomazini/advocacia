@@ -1,4 +1,5 @@
 frappe.listview_settings["Pagamento"] = {
+	hide_name_column: true,
 	add_fields: ["status", "data_vencimento", "cliente", "servico", "valor"],
 	get_indicator(doc) {
 		if (doc.status === "Vencido") {

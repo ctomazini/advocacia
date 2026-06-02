@@ -43,11 +43,16 @@ def _resolver_descritor(doc, usar_descricao=False):
 
 def aplicar_titulo_pos_insert(doc, usar_descricao=False):
 	"""Preenche title após insert quando ainda vazio."""
-	if doc.title:
-		return
 	if not doc.name or str(doc.name).startswith("new-"):
 		return
-	descritor = _resolver_descritor(doc, usar_descricao=usar_descricao)
+	titulo_atual = (doc.title or "").strip()
+	prefixo = f"{doc.name}{TITLE_SEPARATOR}"
+	if titulo_atual.startswith(prefixo):
+		return
+	if not titulo_atual:
+		descritor = _resolver_descritor(doc, usar_descricao=usar_descricao)
+	else:
+		descritor = titulo_atual
 	novo = join_title_parts(doc.name, descritor)
 	if novo:
 		doc.db_set("title", novo, update_modified=False)
@@ -55,9 +60,7 @@ def aplicar_titulo_pos_insert(doc, usar_descricao=False):
 
 
 def recompor_titulo_se_vazio(doc, usar_descricao=False):
-	"""Recompõe title em re-save se usuário limpou o campo."""
-	if doc.title:
-		return
+	"""Garante title sempre no formato `{ID} — {descritor}`."""
 	if doc.is_new() or not doc.name or str(doc.name).startswith("new-"):
 		return
 	aplicar_titulo_pos_insert(doc, usar_descricao=usar_descricao)

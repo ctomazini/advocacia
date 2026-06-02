@@ -2,7 +2,7 @@
  "actions": [],
  "allow_rename": 1,
  "autoname": "format:DESP-{YYYY}-{####}",
-"naming_rule": "Expression",
+ "naming_rule": "Expression",
  "creation": "2026-05-29 12:00:00.000000",
  "custom": 0,
  "doctype": "DocType",
@@ -48,7 +48,7 @@
   {
    "fieldname": "categoria",
    "fieldtype": "Select",
-   "in_list_view": 1,
+   "in_list_view": 0,
    "in_standard_filter": 1,
    "label": "Categoria",
    "options": "Aluguel\nEnergia\nÁgua\nInternet\nTelefone\nSoftware/Assinatura\nMaterial de Escritório\nImpostos\nContabilidade\nManutenção\nOutros",
@@ -71,7 +71,7 @@
    "default": "Pendente",
    "fieldname": "status",
    "fieldtype": "Select",
-   "in_list_view": 1,
+   "in_list_view": 0,
    "in_standard_filter": 1,
    "label": "Status",
    "options": "Pendente\nPago\nAtrasado\nCancelado"
@@ -209,7 +209,24 @@
  "search_fields": "descricao,categoria,status",
  "sort_field": "data_vencimento",
  "sort_order": "ASC",
- "states": [],
+ "states": [
+  {
+   "title": "Pendente",
+   "color": "Orange"
+  },
+  {
+   "title": "Pago",
+   "color": "Green"
+  },
+  {
+   "title": "Atrasado",
+   "color": "Red"
+  },
+  {
+   "title": "Cancelado",
+   "color": "Grey"
+  }
+ ],
  "title_field": "title",
  "track_changes": 1,
  "quick_entry": 1,

@@ -338,7 +338,7 @@
    "options": "Honorários Diretos\nAcordo com Divisão",
    "default": "Honorários Diretos",
    "reqd": 1,
-   "in_list_view": 1,
+   "in_list_view": 0,
    "in_standard_filter": 1,
    "bold": 1,
    "allow_in_quick_entry": 1
@@ -459,7 +459,7 @@
    "columns": 0,
    "default": "Vigente",
    "description": null,
-   "in_list_view": 1,
+   "in_list_view": 0,
    "fetch_if_empty": 0,
    "in_filter": 0,
    "remember_last_selected_value": 0,
@@ -2590,6 +2590,23 @@
    "in_list_view": 0
   }
  ],
- "states": [],
+ "states": [
+  {
+   "title": "Vigente",
+   "color": "Green"
+  },
+  {
+   "title": "Encerrado",
+   "color": "Grey"
+  },
+  {
+   "title": "Cancelado",
+   "color": "Red"
+  },
+  {
+   "title": "Quitado",
+   "color": "Blue"
+  }
+ ],
  "show_title_field_in_link": 1
 }

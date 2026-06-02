@@ -51,7 +51,7 @@
    "label": "Cliente",
    "read_only": 1,
    "fetch_from": "servico.cliente",
-   "in_list_view": 1
+   "in_list_view": 0
   },
   {
    "fieldname": "column_break_info",
@@ -103,7 +103,7 @@
    "fieldtype": "Float",
    "label": "Duração (horas)",
    "read_only": 1,
-   "in_list_view": 1
+   "in_list_view": 0
   },
   {
    "fieldname": "atividade_section",
@@ -216,7 +216,7 @@
  ],
  "states": [],
  "autoname": "format:HRS-{YYYY}-{####}",
-"naming_rule": "Expression",
+ "naming_rule": "Expression",
  "title_field": "title",
  "search_fields": "atividade,cliente,data",
  "sort_field": "data",

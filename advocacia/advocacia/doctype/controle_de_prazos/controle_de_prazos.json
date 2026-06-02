@@ -519,7 +519,7 @@
    "columns": 0,
    "default": "Pendente",
    "description": null,
-   "in_list_view": 1,
+   "in_list_view": 0,
    "fetch_if_empty": 0,
    "in_filter": 0,
    "remember_last_selected_value": 0,
@@ -663,7 +663,7 @@
    "columns": 0,
    "default": null,
    "description": null,
-   "in_list_view": 1,
+   "in_list_view": 0,
    "fetch_if_empty": 0,
    "in_filter": 0,
    "remember_last_selected_value": 0,
@@ -735,7 +735,7 @@
    "columns": 0,
    "default": "Média",
    "description": null,
-   "in_list_view": 1,
+   "in_list_view": 0,
    "fetch_if_empty": 0,
    "in_filter": 0,
    "remember_last_selected_value": 0,
@@ -1134,7 +1134,20 @@
    "in_list_view": 0
   }
  ],
- "states": [],
+ "states": [
+  {
+   "title": "Pendente",
+   "color": "Orange"
+  },
+  {
+   "title": "Concluído",
+   "color": "Green"
+  },
+  {
+   "title": "Vencido",
+   "color": "Red"
+  }
+ ],
  "field_order": [
   "informacoes_section",
   "title",

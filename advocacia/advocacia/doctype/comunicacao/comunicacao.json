@@ -32,7 +32,7 @@
    "fieldtype": "Link",
    "options": "Servico",
    "label": "Serviço",
-   "in_list_view": 1
+   "in_list_view": 0
   },
   {
    "fieldname": "cliente",
@@ -61,7 +61,7 @@
    "fieldtype": "Select",
    "label": "Tipo",
    "reqd": 1,
-   "in_list_view": 1,
+   "in_list_view": 0,
    "options": "Telefone\nWhatsApp\nEmail\nReunião Presencial\nReunião Virtual\nOutro"
   },
   {
