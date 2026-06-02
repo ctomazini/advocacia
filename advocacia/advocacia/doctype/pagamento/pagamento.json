@@ -1,15 +1,15 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "naming_series:",
- "naming_rule": "By \"Naming Series\" field",
+ "autoname": "format:PAG-{YYYY}-{####}",
+ "naming_rule": "Expression",
  "creation": "2026-05-29 12:00:00.000000",
  "custom": 0,
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "naming_series",
   "sec_relacionamentos",
+  "title",
   "servico",
   "cliente",
   "col_rel_1",
@@ -18,7 +18,6 @@
   "registro_atos",
   "numero_parcela",
   "descricao",
-  "title",
   "sec_origem",
   "parcela_origem_id",
   "sincronizado_em",
@@ -36,13 +35,6 @@
  ],
  "fields": [
   {
-   "default": "PAY-.YYYY.-",
-   "fieldname": "naming_series",
-   "fieldtype": "Select",
-   "label": "Série",
-   "options": "PAY-.YYYY.-"
-  },
-  {
    "fieldname": "sec_relacionamentos",
    "fieldtype": "Section Break",
    "label": "Relacionamentos"
@@ -51,7 +43,7 @@
    "default": "Honorários (Parcela)",
    "fieldname": "tipo_origem",
    "fieldtype": "Select",
-   "in_list_view": 1,
+   "in_list_view": 0,
    "in_standard_filter": 1,
    "label": "Origem",
    "options": "Honorários (Parcela)\nAtos Advocatícios"
@@ -59,7 +51,7 @@
   {
    "fieldname": "acordo",
    "fieldtype": "Link",
-   "in_list_view": 1,
+   "in_list_view": 0,
    "in_standard_filter": 1,
    "label": "Acordo",
    "mandatory_depends_on": "eval:doc.tipo_origem=='Honorários (Parcela)'",
@@ -78,7 +70,7 @@
   {
    "fieldname": "servico",
    "fieldtype": "Link",
-   "in_list_view": 1,
+   "in_list_view": 0,
    "in_standard_filter": 1,
    "label": "Serviço",
    "options": "Servico",
@@ -88,7 +80,7 @@
   {
    "fieldname": "cliente",
    "fieldtype": "Link",
-   "in_list_view": 1,
+   "in_list_view": 0,
    "in_standard_filter": 1,
    "label": "Cliente",
    "options": "Cliente",
@@ -206,7 +198,9 @@
    "label": "Título",
    "hidden": 0,
    "read_only": 0,
-   "in_list_view": 1
+   "allow_in_quick_entry": 1,
+   "idx": 2,
+   "in_list_view": 0
   }
  ],
  "index_web_pages_for_search": 1,

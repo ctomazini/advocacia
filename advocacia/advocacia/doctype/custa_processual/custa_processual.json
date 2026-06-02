@@ -7,12 +7,12 @@
  "engine": "InnoDB",
  "field_order": [
   "informacoes_section",
+  "title",
   "servico",
   "cliente",
   "tipo",
   "column_break_info",
   "descricao",
-  "title",
   "status",
   "valores_section",
   "valor",
@@ -56,7 +56,7 @@
    "label": "Tipo",
    "reqd": 1,
    "allow_in_quick_entry": 1,
-   "in_list_view": 1,
+   "in_list_view": 0,
    "options": "Taxa Judicial\nPerícia\nCertidão\nDeslocamento\nCópia/Impressão\nCorreios\nCartório\nDiligência\nOutros"
   },
   {
@@ -76,7 +76,7 @@
    "fieldtype": "Select",
    "label": "Status",
    "default": "Pendente",
-   "in_list_view": 1,
+   "in_list_view": 0,
    "in_standard_filter": 1,
    "options": "Pendente\nPago\nRepassado\nCancelado"
   },
@@ -90,7 +90,8 @@
    "fieldtype": "Currency",
    "label": "Valor",
    "reqd": 1,
-   "allow_in_quick_entry": 1
+   "allow_in_quick_entry": 1,
+   "in_list_view": 1
   },
   {
    "fieldname": "data_pagamento",
@@ -147,7 +148,9 @@
    "label": "Título",
    "hidden": 0,
    "read_only": 0,
-   "in_list_view": 1
+   "allow_in_quick_entry": 1,
+   "idx": 2,
+   "in_list_view": 0
   }
  ],
  "index_web_pages_for_search": 1,
@@ -192,6 +195,7 @@
  ],
  "states": [],
  "autoname": "format:CUST-{YYYY}-{####}",
+"naming_rule": "Expression",
  "title_field": "title",
  "search_fields": "descricao,cliente,status",
  "sort_field": "data_pagamento",

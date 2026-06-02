@@ -2,6 +2,7 @@
  "actions": [],
  "allow_rename": 1,
  "autoname": "format:DESP-{YYYY}-{####}",
+"naming_rule": "Expression",
  "creation": "2026-05-29 12:00:00.000000",
  "custom": 0,
  "doctype": "DocType",
@@ -159,8 +160,10 @@
    "fieldtype": "Data",
    "label": "Título",
    "read_only": 0,
+   "allow_in_quick_entry": 1,
    "hidden": 0,
-   "in_list_view": 1
+   "idx": 2,
+   "in_list_view": 0
   }
  ],
  "index_web_pages_for_search": 1,

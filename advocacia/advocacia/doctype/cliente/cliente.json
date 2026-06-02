@@ -7,7 +7,7 @@
  "istable": 0,
  "quick_entry": 1,
  "track_changes": 1,
- "autoname": "format:CLI-{####}",
+ "autoname": "format:CLI-{YYYY}-{####}",
  "naming_rule": "Expression",
  "title_field": "nome",
  "search_fields": "nome,cpf,cnpj",
@@ -29,7 +29,7 @@
    "fieldtype": "Data",
    "reqd": 1,
    "allow_in_quick_entry": 1,
-   "in_list_view": 1,
+   "in_list_view": 0,
    "in_global_search": 1,
    "bold": 1
   },
