@@ -59,10 +59,10 @@ def _save_or_create_event(event_name, event_data):
 	if event_name:
 		event = frappe.get_doc("Event", event_name)
 		event.update(event_data)
-		event.save(ignore_permissions=True)
+		event.save(ignore_permissions=True)  # sistema sincroniza Event em nome do usuário
 	else:
 		event = frappe.get_doc({"doctype": "Event", **event_data})
-		event.insert(ignore_permissions=True)
+		event.insert(ignore_permissions=True)  # sistema sincroniza Event em nome do usuário
 
 
 def _cancel_linked_event(doc):

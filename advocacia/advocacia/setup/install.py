@@ -39,7 +39,7 @@ def after_install():
 	for role in ["Advocacia User", "Advocacia Manager"]:
 		if not frappe.db.exists("Role", role):
 			frappe.get_doc({"doctype": "Role", "role_name": role, "is_custom": 1}).insert(
-				ignore_permissions=True
+				ignore_permissions=True  # setup: cria roles durante install como Administrator
 			)
 	ensure_event_custom_fields()
 	ensure_doctype_translations()

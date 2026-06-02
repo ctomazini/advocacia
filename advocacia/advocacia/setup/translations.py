@@ -40,7 +40,7 @@ def ensure_doctype_translations():
 						"translated_text": translated,
 						"contributed": 0,
 					}
-				).insert(ignore_permissions=True)
+				).insert(ignore_permissions=True)  # setup: seed de traduções como Administrator
 			except frappe.DoesNotExistError:
 				pass
 			except Exception:

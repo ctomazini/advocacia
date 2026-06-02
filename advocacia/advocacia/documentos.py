@@ -494,7 +494,7 @@ def _render_and_attach(servico_name, template_doc, context):
 			"is_private": 1,
 		}
 	)
-	anexo.save(ignore_permissions=True)
+	anexo.save(ignore_permissions=True)  # File anexado ao Serviço — permissão de write no Serviço já validada
 
 	return {"file_url": anexo.file_url, "file_name": nome_arquivo}
 

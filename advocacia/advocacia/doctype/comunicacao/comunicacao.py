@@ -40,5 +40,6 @@ class Comunicacao(Document):
 				"data_limite": add_days(today(), 3),
 			}
 		)
-		tarefa.insert(ignore_permissions=True)
+		frappe.has_permission("Tarefa", "create", throw=True)
+		tarefa.insert()
 		self.db_set("tarefa", tarefa.name)

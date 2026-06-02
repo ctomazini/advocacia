@@ -2,6 +2,15 @@ import frappe
 from frappe import _
 from frappe.utils import add_days, cstr, flt, getdate, now_datetime, today
 
+# ── ignore_permissions justificativa ──────────────────────────────────
+# As funções de sincronização (sincronizar_pagamentos_do_acordo,
+# sincronizar_cobranca_atos, processar_pagamento_on_update) rodam como
+# doc_events disparados pelo save do usuário no Acordo/Registro/Pagamento.
+# O sistema cria/atualiza Pagamentos filho em nome do usuário autenticado.
+# O acesso ao doc-pai já foi validado pelo Frappe antes do doc_event.
+# Por isso ignore_permissions=True é intencional nessas operações.
+# ──────────────────────────────────────────────────────────────────────
+
 STATUS_PARCELA_TO_PAGAMENTO = {
 	"Pendente": "Pendente",
 	"Vencido": "Vencido",

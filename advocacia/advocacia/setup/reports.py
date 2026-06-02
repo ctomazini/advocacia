@@ -48,7 +48,7 @@ def _import_report_json(path):
 		for field in _REPORT_SYNC_FIELDS:
 			if field in data:
 				doc.set(field, data[field])
-		doc.save(ignore_permissions=True)
+		doc.save(ignore_permissions=True)  # migrate: sincroniza reports do app
 	else:
 		frappe.import_doc(path)
 
@@ -64,7 +64,7 @@ def ensure_advocacia_reports():
 				name,
 			)
 			continue
-		frappe.delete_doc("Report", name, force=True, ignore_permissions=True)
+		frappe.delete_doc("Report", name, force=True, ignore_permissions=True)  # migrate: remove report obsoleto
 
 	base = frappe.get_app_path("advocacia", "advocacia", "report")
 	for rel in REPORT_JSON_PATHS:
