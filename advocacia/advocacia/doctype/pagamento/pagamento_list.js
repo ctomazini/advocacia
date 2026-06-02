@@ -1,6 +1,23 @@
 frappe.listview_settings["Pagamento"] = {
 	hide_name_column: true,
-	add_fields: ["status", "data_vencimento", "cliente", "servico", "valor"],
+	add_fields: ["status", "data_vencimento", "cliente", "servico", "valor", "tipo_origem", "acordo", "registro_atos"],
+	formatters: {
+		tipo_origem(value, _df, doc) {
+			const origem = (value || "").trim();
+			if (!origem) return "";
+
+			let link = "";
+			if (origem === "Honorários (Parcela)" && doc.acordo) {
+				link = frappe.utils.get_form_link("Acordo de Honorarios Processuais", doc.acordo, true);
+			} else if (origem === "Atos Advocatícios" && doc.registro_atos) {
+				link = frappe.utils.get_form_link("Registro de Atos", doc.registro_atos, true);
+			}
+
+			if (!link) return frappe.utils.escape_html(origem);
+
+			return `<a href="${link}" class="text-muted">${frappe.utils.escape_html(origem)}</a>`;
+		},
+	},
 	get_indicator(doc) {
 		if (doc.status === "Vencido") {
 			return [__("Vencido"), "red", "status,=,Vencido"];
