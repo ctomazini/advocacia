@@ -32,20 +32,6 @@ function painel_polish_frappe_chrome() {
 function inject_painel_styles() {
     $("#painel-advocacia-styles").remove();
     var css = `
-        body.advocacia-painel-active .page-head {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 4px;
-        }
-        body.advocacia-painel-active .page-head .title-area .title-text {
-            visibility: hidden;
-            height: 0;
-            margin: 0;
-            overflow: hidden;
-        }
-        body.advocacia-painel-active .layout-main-section {
-            padding-top: 0;
-        }
         .painel-root {
             --painel-radius: 16px;
             --painel-radius-sm: 12px;
@@ -67,6 +53,7 @@ function inject_painel_styles() {
             padding: 12px 16px 64px;
             color: var(--text-color);
             -webkit-font-smoothing: antialiased;
+            overflow: visible;
         }
         @media (min-width: 1024px) {
             .painel-root { padding: 12px 28px 64px; }
@@ -768,19 +755,6 @@ function inject_painel_styles() {
             .painel-parcela-main { min-width: 100%; }
         }
         @media (max-width: 768px) {
-            body.advocacia-painel-active .layout-main-section-wrapper {
-                padding-left: 0;
-                padding-right: 0;
-            }
-            body.advocacia-painel-active .page-head {
-                padding-left: 12px;
-                padding-right: 12px;
-            }
-            body.advocacia-painel-active .page-head .page-actions .btn {
-                min-height: 36px;
-                padding: 6px 12px;
-                font-size: 12px;
-            }
             .painel-root {
                 padding: 0 12px 72px;
                 --painel-gap: 28px;
@@ -2573,7 +2547,7 @@ function render_proxima_audiencia_card(a, ordem) {
         '<div class="painel-prox-row"><span class="painel-prox-row-label">' +
         __("Cliente") +
         '</span><span class="painel-prox-row-value">' +
-        frappe.utils.escape_html(a.cliente || "—") +
+        frappe.utils.escape_html(a.cliente_nome || a.cliente || "—") +
         "</span></div>" +
         '<div class="painel-prox-row"><span class="painel-prox-row-label">' +
         __("Serviço") +
@@ -2978,7 +2952,7 @@ function render_comunicacoes_pendentes(comunicacoes, periodo_dias, list_meta, li
             '">' +
             '<div class="painel-com-main">' +
             '<div class="painel-com-cliente">' +
-            frappe.utils.escape_html(c.cliente || __("Sem cliente")) +
+            frappe.utils.escape_html(c.cliente_nome || c.cliente || __("Sem cliente")) +
             "</div>" +
             '<div class="painel-com-assunto">' +
             frappe.utils.escape_html(c.assunto || c.name) +
@@ -3257,7 +3231,7 @@ function build_timeline_items(d) {
             time: a.hora || (a.tipo === "prazo" ? __("Prazo") : __("Hoje")),
             title: a.titulo,
             sub:
-                (a.cliente ? a.cliente + " · " : "") +
+                ((a.cliente_nome || a.cliente) ? (a.cliente_nome || a.cliente) + " · " : "") +
                 (a.tipo === "prazo"
                     ? a.dias === 0
                         ? __("Vence hoje")
@@ -3274,7 +3248,7 @@ function build_timeline_items(d) {
             sort: 2,
             time: a.hora || __("—"),
             title: a.tipo || __("Audiência"),
-            sub: (a.cliente || "") + (a.vara_label ? " · " + a.vara_label : ""),
+            sub: ((a.cliente_nome || a.cliente) || "") + (a.vara_label ? " · " + a.vara_label : ""),
             doctype: "Audiencia",
             docname: a.name,
             pill: "blue",
@@ -3659,7 +3633,7 @@ function render_custas(custas, total_mes, compact, list_meta, list_limit) {
             "</div>" +
             '<div class="painel-op-sub">' +
             frappe.utils.escape_html(c.tipo || "") +
-            (c.servico ? " · " + frappe.utils.escape_html(c.servico) : "") +
+            (c.servico_titulo ? " · " + frappe.utils.escape_html(c.servico_titulo) : "") +
             "</div>" +
             '<span class="indicator-pill blue">' + __("Aguardando repasse") + "</span>" +
             "</div>" +
@@ -3732,7 +3706,7 @@ function render_comunicacoes(comunicacoes) {
             "</div>" +
             '<div class="painel-op-sub">' +
             frappe.utils.escape_html(c.tipo || "") +
-            (c.cliente ? " · " + frappe.utils.escape_html(c.cliente) : "") +
+            ((c.cliente_nome || c.cliente) ? " · " + frappe.utils.escape_html(c.cliente_nome || c.cliente) : "") +
             "</div></div>" +
             '<div class="painel-schedule-side">' +
             (c.data
@@ -3841,7 +3815,7 @@ function render_audiencia_items(audiencias) {
                 "</div>" +
                 '<div class="painel-schedule-body">' +
                 '<div class="painel-schedule-title">' +
-                frappe.utils.escape_html(a.cliente || "—") +
+                frappe.utils.escape_html(a.cliente_nome || a.cliente || "—") +
                 "</div>" +
                 '<div class="painel-schedule-sub">' +
                 frappe.utils.escape_html(a.tipo || __("Audiência")) +

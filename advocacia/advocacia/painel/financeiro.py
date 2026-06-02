@@ -124,13 +124,25 @@ def _get_custas_pendentes_repasse(limit=LIST_LIMIT_MAX):
 		return []
 	if not frappe.db.table_exists("Custa Processual"):
 		return []
-	return frappe.get_all(
+	rows = frappe.get_all(
 		"Custa Processual",
 		filters={"repassar_cliente": 1, "status": "Pago"},
 		fields=["name", "descricao", "tipo", "valor", "servico", "cliente", "data_pagamento"],
 		order_by="data_pagamento ASC",
 		limit=min(cint(limit or LIST_LIMIT_MAX), LIST_LIMIT_MAX),
 	)
+	servico_map = _servico_lookup([c.servico for c in rows if c.servico], ["cliente", "title"])
+	cliente_nome_map = _cliente_nome_lookup(
+		[c.cliente for c in rows if c.cliente]
+		+ [sv.cliente for sv in servico_map.values() if sv.cliente]
+	)
+	for c in rows:
+		c["cliente_nome"] = cliente_nome_map.get(c.cliente, c.cliente or "")
+		sv = servico_map.get(c.servico) if c.servico else None
+		c["servico_titulo"] = (sv.title if sv else "") or ""
+		if not c["cliente_nome"] and sv and sv.cliente:
+			c["cliente_nome"] = cliente_nome_map.get(sv.cliente, sv.cliente)
+	return rows
 def _get_despesas_pendentes(limit=LIST_LIMIT_MAX):
 	if not frappe.has_permission("Despesa do Escritorio", "read"):
 		return []
@@ -228,9 +240,13 @@ def _marcar_parcela_legado_recebida(parcela_name):
 	return {"ok": True, "name": doc.name, "parent": doc.parent}
 def _pagamento_origem_label(pagamento):
 	if pagamento.get("acordo"):
-		return pagamento.acordo
+		return (
+			frappe.db.get_value("Acordo de Honorarios Processuais", pagamento.acordo, "title")
+			or pagamento.acordo
+		)
 	if pagamento.get("registro_atos"):
-		return _("Atos: {0}").format(pagamento.registro_atos)
+		registro_title = frappe.db.get_value("Registro de Atos", pagamento.registro_atos, "title")
+		return _("Atos: {0}").format(registro_title or pagamento.registro_atos)
 	return pagamento.get("tipo_origem") or ""
 def _vara_label(vara_link):
 	if not vara_link:

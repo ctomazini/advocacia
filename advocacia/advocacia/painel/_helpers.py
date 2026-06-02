@@ -19,12 +19,16 @@ DEFAULT_LIST_LIMIT_KEYS = (
 	"despesas",
 	"custas",
 )
-def _cliente_nome_lookup(cliente_names):
-	names = list({name for name in cliente_names if name})
+def _nomes_lookup(doctype, names, campo_nome):
+	"""Retorna dict {name: nome_legivel} para uma lista de IDs."""
+	names = list({name for name in names if name})
 	if not names:
 		return {}
-	rows = frappe.get_all("Cliente", filters={"name": ["in", names]}, fields=["name", "nome"])
-	return {row.name: row.nome or row.name for row in rows}
+	rows = frappe.get_all(doctype, filters={"name": ["in", names]}, fields=["name", campo_nome])
+	return {row.name: row.get(campo_nome) or row.name for row in rows}
+
+def _cliente_nome_lookup(cliente_names):
+	return _nomes_lookup("Cliente", cliente_names, "nome")
 def _effective_list_cap(list_limit):
 	if not list_limit:
 		return LIST_LIMIT_MAX

@@ -36,7 +36,7 @@ def _build_timeline(hoje, periodo_fim, audiencias, prazos, tarefas):
 				"data": a.get("data") or hoje,
 				"hora": a.get("hora") or "",
 				"titulo": a.get("tipo") or _("Audiência"),
-				"subtitulo": a.get("cliente") or "",
+				"subtitulo": a.get("cliente_nome") or a.get("cliente") or "",
 				"detalhe": a.get("vara_label") or "",
 				"doctype": "Audiencia",
 				"docname": a.get("name"),
@@ -112,6 +112,11 @@ def _get_comunicacoes_pendentes(limit=LIST_LIMIT_MAX):
 		order_by="data asc",
 		limit_page_length=LIST_LIMIT_MAX,
 	)
+	servico_map = _servico_lookup([c.servico for c in rows if c.servico], ["cliente", "title"])
+	cliente_nome_map = _cliente_nome_lookup(
+		[c.cliente for c in rows if c.cliente]
+		+ [sv.cliente for sv in servico_map.values() if sv.cliente]
+	)
 
 	tarefa_status_map = {
 		row.name: row.status
@@ -150,6 +155,11 @@ def _get_comunicacoes_pendentes(limit=LIST_LIMIT_MAX):
 		c["dias_sem_retorno"] = dias
 		c["motivo_pendencia"] = motivo
 		c["urgencia_ordem"] = urgencia
+		c["cliente_nome"] = cliente_nome_map.get(c.cliente, c.cliente or "")
+		sv = servico_map.get(c.servico) if c.servico else None
+		c["servico_titulo"] = (sv.title if sv else "") or ""
+		if not c["cliente_nome"] and sv and sv.cliente:
+			c["cliente_nome"] = cliente_nome_map.get(sv.cliente, sv.cliente)
 		pendentes.append(c)
 
 	pendentes.sort(key=lambda x: (x.get("urgencia_ordem", 9), -x.get("dias_sem_retorno", 0)))
@@ -198,6 +208,7 @@ def _get_tarefas(hoje, limit_start, limit):
 	servico_map = _servico_lookup(
 		[t.servico for t in rows if t.servico], ["cliente", "title"]
 	)
+	cliente_nome_map = _cliente_nome_lookup([sv.cliente for sv in servico_map.values() if sv.cliente])
 	user_map = _user_nome_lookup([t.responsavel for t in rows if t.responsavel])
 	for t in rows:
 		if t.data_limite:
@@ -209,7 +220,7 @@ def _get_tarefas(hoje, limit_start, limit):
 		if t.servico:
 			sv = servico_map.get(t.servico)
 			if sv:
-				t["cliente_nome"] = sv.cliente or ""
+				t["cliente_nome"] = cliente_nome_map.get(sv.cliente, sv.cliente or "")
 				t["servico_titulo"] = sv.title or ""
 		t["responsavel_nome"] = user_map.get(t.responsavel) if t.responsavel else ""
 	return rows
@@ -218,9 +229,21 @@ def _get_ultimas_comunicacoes(limit=5):
 		return []
 	if not frappe.db.table_exists("Comunicacao"):
 		return []
-	return frappe.get_all(
+	rows = frappe.get_all(
 		"Comunicacao",
 		fields=["name", "assunto", "tipo", "cliente", "servico", "data"],
 		order_by="data DESC",
 		limit=min(cint(limit or 5), LIST_LIMIT_MAX),
 	)
+	servico_map = _servico_lookup([c.servico for c in rows if c.servico], ["cliente", "title"])
+	cliente_nome_map = _cliente_nome_lookup(
+		[c.cliente for c in rows if c.cliente]
+		+ [sv.cliente for sv in servico_map.values() if sv.cliente]
+	)
+	for c in rows:
+		c["cliente_nome"] = cliente_nome_map.get(c.cliente, c.cliente or "")
+		sv = servico_map.get(c.servico) if c.servico else None
+		c["servico_titulo"] = (sv.title if sv else "") or ""
+		if not c["cliente_nome"] and sv and sv.cliente:
+			c["cliente_nome"] = cliente_nome_map.get(sv.cliente, sv.cliente)
+	return rows

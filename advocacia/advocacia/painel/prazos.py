@@ -11,7 +11,11 @@ from frappe.utils import (
 	today,
 )
 
-from advocacia.advocacia.painel._helpers import LIST_LIMIT_MAX, _servico_lookup
+from advocacia.advocacia.painel._helpers import (
+	LIST_LIMIT_MAX,
+	_cliente_nome_lookup,
+	_servico_lookup,
+)
 from advocacia.advocacia.painel.financeiro import _vara_label
 
 def _build_alertas(hoje, periodo_fim):
@@ -28,6 +32,7 @@ def _build_alertas(hoje, periodo_fim):
 		order_by="data_prazo asc",
 		limit_page_length=20,
 	)
+	cliente_nome_map = _cliente_nome_lookup([p.cliente for p in prazos_criticos if p.cliente])
 	for p in prazos_criticos:
 		dias = date_diff(p.data_prazo, hoje)
 		alertas.append(
@@ -37,6 +42,7 @@ def _build_alertas(hoje, periodo_fim):
 				"titulo": p.descricao or p.name,
 				"data": p.data_prazo,
 				"cliente": p.cliente or "",
+				"cliente_nome": cliente_nome_map.get(p.cliente, p.cliente or ""),
 				"dias": dias,
 				"doctype": "Controle de Prazos",
 				"docname": p.name,
@@ -50,6 +56,7 @@ def _build_alertas(hoje, periodo_fim):
 		order_by="data_hora asc",
 		limit_page_length=20,
 	)
+	cliente_nome_aud = _cliente_nome_lookup([a.cliente for a in audiencias_hoje if a.cliente])
 	for a in audiencias_hoje:
 		alertas.append(
 			{
@@ -59,6 +66,7 @@ def _build_alertas(hoje, periodo_fim):
 				"data": str(a.data_hora)[:10] if a.data_hora else hoje,
 				"hora": str(a.data_hora)[11:16] if a.data_hora else "",
 				"cliente": a.cliente or "",
+				"cliente_nome": cliente_nome_aud.get(a.cliente, a.cliente or ""),
 				"vara": _vara_label(a.local_vara),
 				"modalidade": a.modalidade or "",
 				"doctype": "Audiencia",
@@ -107,10 +115,11 @@ def _get_audiencias(hoje, periodo_fim, limit):
 	servicos_sem_cliente = [
 		a.servico for a in rows if a.get("servico") and not a.get("cliente")
 	]
-	cliente_por_servico = {
-		sv.name: sv.cliente
-		for sv in _servico_lookup(servicos_sem_cliente, ["cliente"]).values()
-	}
+	servico_map = _servico_lookup(servicos_sem_cliente, ["cliente", "title"])
+	cliente_por_servico = {name: sv.cliente for name, sv in servico_map.items()}
+	cliente_nome_map = _cliente_nome_lookup(
+		[a.cliente for a in rows if a.cliente] + [sv.cliente for sv in servico_map.values() if sv.cliente]
+	)
 	for a in rows:
 		data_hora = a.get("data_hora")
 		if data_hora:
@@ -124,6 +133,9 @@ def _get_audiencias(hoje, periodo_fim, limit):
 		a["vara_label"] = _vara_label(a.get("local_vara"))
 		if a.get("servico") and not a.get("cliente"):
 			a["cliente"] = cliente_por_servico.get(a.servico) or ""
+		a["cliente_nome"] = cliente_nome_map.get(a.get("cliente"), a.get("cliente") or "")
+		sv = servico_map.get(a.get("servico")) if a.get("servico") else None
+		a["servico_titulo"] = (sv.title if sv else "") or ""
 	return rows
 def _get_prazos(hoje, periodo_fim, limit):
 	rows = frappe.get_all(
@@ -140,16 +152,20 @@ def _get_prazos(hoje, periodo_fim, limit):
 	servico_map = _servico_lookup(
 		[p.servico for p in rows if p.servico], ["cliente", "title", "numero_processo"]
 	)
+	cliente_nome_map = _cliente_nome_lookup(
+		[p.cliente for p in rows if p.cliente]
+		+ [sv.cliente for sv in servico_map.values() if sv.cliente]
+	)
 	for p in rows:
 		p["dias_restantes"] = date_diff(p.data_prazo, hoje) if p.data_prazo else 0
-		p["cliente_nome"] = p.cliente or ""
+		p["cliente_nome"] = cliente_nome_map.get(p.cliente, p.cliente or "")
 		p["servico_titulo"] = ""
 		p["numero_processo"] = ""
 		if p.servico:
 			sv = servico_map.get(p.servico)
 			if sv:
 				if not p["cliente_nome"]:
-					p["cliente_nome"] = sv.cliente or ""
+					p["cliente_nome"] = cliente_nome_map.get(sv.cliente, sv.cliente or "")
 				p["servico_titulo"] = sv.title or ""
 				p["numero_processo"] = sv.numero_processo or ""
 	rows.sort(
