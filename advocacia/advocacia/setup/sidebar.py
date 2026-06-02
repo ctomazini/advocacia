@@ -39,12 +39,45 @@ SIDEBAR_LINK_ORDER = (
 )
 
 SIDEBAR_SECTIONS = (
-	{"label": "Dia a Dia", "collapsible": 0, "keep_closed": 0},
-	{"label": "Gestão de Casos", "collapsible": 0, "keep_closed": 0},
+	# Frappe v16: Section Break com filhos exige collapsible=1, senão toggle() quebra
+	# ao fechar a sidebar (evento sidebar-expand) e o scroll do desk trava.
+	{"label": "Dia a Dia", "collapsible": 1, "keep_closed": 0},
+	{"label": "Gestão de Casos", "collapsible": 1, "keep_closed": 0},
 	{"label": "Financeiro", "collapsible": 1, "keep_closed": 0},
 	{"label": "Relatórios", "collapsible": 1, "keep_closed": 1},
 	{"label": "Cadastros", "collapsible": 1, "keep_closed": 1},
 )
+
+
+def _validate_section_break_collapsible():
+	"""Section Break com filhos deve ter collapsible=1 (requisito do Frappe v16 sidebar JS)."""
+	if not frappe.db.exists("Workspace Sidebar", "Advocacia"):
+		return
+
+	sections = frappe.get_all(
+		"Workspace Sidebar Item",
+		filters={"parent": "Advocacia", "type": "Section Break"},
+		fields=["label", "collapsible", "idx"],
+		order_by="idx asc",
+	)
+	links = frappe.get_all(
+		"Workspace Sidebar Item",
+		filters={"parent": "Advocacia", "type": "Link"},
+		fields=["idx"],
+		order_by="idx asc",
+	)
+	link_idxs = [row.idx for row in links]
+
+	for section in sections:
+		has_children = any(idx > section.idx for idx in link_idxs)
+		if has_children and not section.collapsible:
+			frappe.log_error(
+				title="Advocacia sidebar: Section Break sem collapsible",
+				message=(
+					f'Seção "{section.label}" tem itens filhos mas collapsible=0; '
+					"isso quebra Sidebar.close() no desk (toggle sem $drop_icon)."
+				),
+			)
 
 
 def _validate_sidebar_links():
@@ -94,5 +127,6 @@ def ensure_advocacia_sidebar():
 			frappe.import_doc(path)
 
 	_validate_sidebar_links()
+	_validate_section_break_collapsible()
 	frappe.clear_cache()
 	frappe.db.commit()
