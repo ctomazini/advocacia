@@ -261,10 +261,9 @@ def _vara_label(vara_link):
 			message=frappe.get_traceback(),
 		)
 		return vara_link
-def marcar_parcela(parcela_name):
+def marcar_parcela(parcela_name: str) -> dict:
 	"""Marca Pagamento como Recebido (compat: parametro parcela_name = name do Pagamento)."""
-	if not frappe.has_permission("Pagamento", "write"):
-		frappe.throw(_("Sem permissão"), frappe.PermissionError)
+	frappe.has_permission("Pagamento", "write", throw=True)
 
 	if frappe.db.exists("Pagamento", parcela_name):
 		return _marcar_pagamento_recebido(parcela_name)

@@ -60,7 +60,15 @@ def format_servico_link_label(doc=None, servico_name=None):
 
 @frappe.whitelist()
 @frappe.validate_and_sanitize_search_inputs
-def servico_query(doctype, txt, searchfield, start, page_len, filters):
+def servico_query(
+	doctype: str,
+	txt: str,
+	searchfield: str,
+	start: int,
+	page_len: int,
+	filters,
+) -> list[tuple[str, str]]:
+	frappe.has_permission("Servico", "read", throw=True)
 	txt = (txt or "").strip()
 	list_filters = dict(filters or {})
 

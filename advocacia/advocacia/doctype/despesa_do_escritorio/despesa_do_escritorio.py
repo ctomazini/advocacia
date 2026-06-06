@@ -42,7 +42,7 @@ class DespesadoEscritorio(Document):
 
 
 @frappe.whitelist()
-def gerar_proxima_despesa(source_name):
+def gerar_proxima_despesa(source_name: str) -> str:
 	"""Cria nova despesa baseada na recorrente, com data de vencimento avançada."""
 	frappe.has_permission("Despesa do Escritorio", "create", throw=True)
 	source = frappe.get_doc("Despesa do Escritorio", source_name)

@@ -35,16 +35,16 @@ class ParceladeHonorarios(Document):
 			self.status = "Pendente"
 
 	@frappe.whitelist()
-	def registrar_recebimento(self):
-		self.check_permission("write")
+	def registrar_recebimento(self) -> dict:
+		frappe.has_permission("Acordo de Honorarios Processuais", "write", throw=True)
 		self.data_recebimento = today()
 		self.atualizar_status()
 		self.save()
 		return {"status": self.status}
 
 	@frappe.whitelist()
-	def registrar_repasse(self):
-		self.check_permission("write")
+	def registrar_repasse(self) -> dict:
+		frappe.has_permission("Acordo de Honorarios Processuais", "write", throw=True)
 		self.data_repasse = today()
 		self.status = "Repassado"
 		self.save()

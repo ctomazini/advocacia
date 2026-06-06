@@ -22,10 +22,16 @@ class ControledePrazos(Document):
 
 
 @frappe.whitelist()
-def get_events(start, end, filters=None, doctype=None, field_map=None, fields=None):
+def get_events(
+	start: str,
+	end: str,
+	filters=None,
+	doctype: str | None = None,
+	field_map=None,
+	fields=None,
+) -> list[dict]:
 	"""Eventos do calendario para Controle de Prazos."""
-	if not frappe.has_permission("Controle de Prazos", "read"):
-		frappe.throw(_("Not Permitted"), frappe.PermissionError)
+	frappe.has_permission("Controle de Prazos", "read", throw=True)
 
 	filter_list = [["data_prazo", "between", [start, end]]]
 	if filters:

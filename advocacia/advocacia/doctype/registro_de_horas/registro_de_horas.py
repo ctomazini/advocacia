@@ -36,8 +36,8 @@ class RegistrodeHoras(Document):
 		recompor_titulo_se_vazio(self)
 
 	@frappe.whitelist()
-	def iniciar_timer(self):
-		self.check_permission("write")
+	def iniciar_timer(self) -> dict:
+		frappe.has_permission("Registro de Horas", "write", doc=self, throw=True)
 		if self.timer_ativo:
 			frappe.throw(_("Timer já está em execução para este registro."))
 
@@ -48,8 +48,8 @@ class RegistrodeHoras(Document):
 		return {"timer_inicio": str(self.timer_inicio)}
 
 	@frappe.whitelist()
-	def parar_timer(self):
-		self.check_permission("write")
+	def parar_timer(self) -> dict:
+		frappe.has_permission("Registro de Horas", "write", doc=self, throw=True)
 		if not self.timer_ativo:
 			frappe.throw(_("Nenhum timer ativo para este registro."))
 
@@ -72,7 +72,7 @@ class RegistrodeHoras(Document):
 
 
 @frappe.whitelist()
-def get_timer_ativo_usuario():
+def get_timer_ativo_usuario() -> dict | None:
 	"""Retorna o registro com timer ativo do usuário logado, se existir."""
 	if frappe.session.user == "Guest":
 		return None

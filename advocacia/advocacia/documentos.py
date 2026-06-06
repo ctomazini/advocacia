@@ -508,9 +508,8 @@ def _parse_template_names(template_names):
 
 
 @frappe.whitelist()
-def gerar_documentos_em_lote(servico_name, template_names):
-	if not frappe.has_permission("Servico", "read"):
-		frappe.throw(_("Sem permissão"), frappe.PermissionError)
+def gerar_documentos_em_lote(servico_name: str, template_names) -> dict:
+	frappe.has_permission("Servico", "read", throw=True)
 
 	nomes = _parse_template_names(template_names)
 	if not nomes:
@@ -552,9 +551,8 @@ def gerar_documentos_em_lote(servico_name, template_names):
 
 
 @frappe.whitelist()
-def get_templates_disponiveis():
-	if not frappe.has_permission("Template Documento", "read"):
-		frappe.throw(_("Sem permissão"), frappe.PermissionError)
+def get_templates_disponiveis() -> list[dict]:
+	frappe.has_permission("Template Documento", "read", throw=True)
 	return frappe.get_all(
 		"Template Documento",
 		fields=["name", "titulo", "tipo_documento", "descricao"],
@@ -564,9 +562,8 @@ def get_templates_disponiveis():
 
 
 @frappe.whitelist()
-def get_kits_disponiveis():
-	if not frappe.has_permission("Kit de Documentos", "read"):
-		frappe.throw(_("Sem permissão"), frappe.PermissionError)
+def get_kits_disponiveis() -> list[dict]:
+	frappe.has_permission("Kit de Documentos", "read", throw=True)
 
 	kits = frappe.get_all(
 		"Kit de Documentos",
@@ -595,7 +592,7 @@ def get_kits_disponiveis():
 
 
 @frappe.whitelist()
-def get_placeholders_referencia():
+def get_placeholders_referencia() -> dict:
 	"""Referência organizada de placeholders para UI e templates."""
 	frappe.has_permission("Template Documento", "read", throw=True)
 	return PLACEHOLDER_REFERENCIA

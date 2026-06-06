@@ -330,7 +330,7 @@ def verificar_acordo_quitado(acordo_name):
 
 
 @frappe.whitelist()
-def resync_pagamentos_acordo(acordo_name):
+def resync_pagamentos_acordo(acordo_name: str) -> dict:
 	"""Re-sincroniza pagamentos do Acordo sem precisar editar campos."""
 	acordo = frappe.get_doc("Acordo de Honorarios Processuais", acordo_name)
 	frappe.has_permission(
@@ -346,7 +346,7 @@ def resync_pagamentos_acordo(acordo_name):
 
 
 @frappe.whitelist()
-def bulk_delete_pagamentos(names):
+def bulk_delete_pagamentos(names) -> dict:
 	"""Exclusão em massa síncrona com feedback (contorna fila padrão do Frappe para >10)."""
 	import json
 
@@ -396,16 +396,15 @@ def bulk_delete_pagamentos(names):
 
 
 @frappe.whitelist()
-def gerar_pagamento_atos(registro_name, data_vencimento=None):
+def gerar_pagamento_atos(registro_name: str, data_vencimento: str | None = None) -> dict:
 	"""Sincroniza atos pendentes com o Pagamento aberto do registro (idempotente)."""
 	return sincronizar_pagamento_atos(registro_name, data_vencimento)
 
 
 @frappe.whitelist()
-def sincronizar_pagamento_atos(registro_name, data_vencimento=None):
+def sincronizar_pagamento_atos(registro_name: str, data_vencimento: str | None = None) -> dict:
 	"""Upsert: atualiza Pagamento Atos aberto ou cria um novo lote fechado."""
-	if not frappe.has_permission("Registro de Atos", "write"):
-		frappe.throw(_("Sem permissão"), frappe.PermissionError)
+	frappe.has_permission("Registro de Atos", "write", throw=True)
 
 	registro = frappe.get_doc("Registro de Atos", registro_name)
 	vencimento = getdate(data_vencimento or registro.data_vencimento_cobranca or add_days(today(), 30))
@@ -601,10 +600,9 @@ def _limpar_ultimo_pagamento_se_apontar(registro_name, pagamento_name):
 
 
 @frappe.whitelist()
-def cancelar_cobranca_pagamento_atos(pagamento_name):
+def cancelar_cobranca_pagamento_atos(pagamento_name: str) -> dict:
 	"""Cancela cobrança de atos e libera vínculos no Registro."""
-	if not frappe.has_permission("Pagamento", "write"):
-		frappe.throw(_("Sem permissão"), frappe.PermissionError)
+	frappe.has_permission("Pagamento", "write", throw=True)
 
 	pagamento = frappe.get_doc("Pagamento", pagamento_name)
 	if not is_pagamento_atos(pagamento):
@@ -630,10 +628,9 @@ def cancelar_cobranca_pagamento_atos(pagamento_name):
 
 
 @frappe.whitelist()
-def cancelar_pagamento_honorarios(pagamento_name):
+def cancelar_pagamento_honorarios(pagamento_name: str) -> dict:
 	"""Cancela pagamento de honorários e propaga status para a parcela do acordo."""
-	if not frappe.has_permission("Pagamento", "write"):
-		frappe.throw(_("Sem permissão"), frappe.PermissionError)
+	frappe.has_permission("Pagamento", "write", throw=True)
 
 	pagamento = frappe.get_doc("Pagamento", pagamento_name)
 	if is_pagamento_atos(pagamento):

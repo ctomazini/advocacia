@@ -22,8 +22,8 @@ class Tarefa(Document):
 			self.data_conclusao = today()
 
 	@frappe.whitelist()
-	def concluir(self):
-		self.check_permission("write")
+	def concluir(self) -> dict:
+		frappe.has_permission("Tarefa", "write", doc=self, throw=True)
 		self.status = "Concluída"
 		self.data_conclusao = today()
 		self.save()
