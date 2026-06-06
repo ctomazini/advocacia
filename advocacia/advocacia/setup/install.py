@@ -1,9 +1,11 @@
 import frappe
 from frappe.custom.doctype.custom_field.custom_field import create_custom_field
 
-from advocacia.advocacia.setup.translations import ensure_doctype_translations
-from advocacia.advocacia.setup.sidebar import ensure_advocacia_sidebar
+from advocacia.advocacia.setup.permissions import setup_permissions
 from advocacia.advocacia.setup.reports import ensure_advocacia_reports
+from advocacia.advocacia.setup.roles import create_roles
+from advocacia.advocacia.setup.sidebar import ensure_advocacia_sidebar
+from advocacia.advocacia.setup.translations import ensure_doctype_translations
 
 
 def _ensure_event_custom_fields():
@@ -36,11 +38,8 @@ def ensure_event_custom_fields():
 
 
 def after_install():
-	for role in ["Advocacia User", "Advocacia Manager"]:
-		if not frappe.db.exists("Role", role):
-			frappe.get_doc({"doctype": "Role", "role_name": role, "is_custom": 1}).insert(
-				ignore_permissions=True  # setup: cria roles durante install como Administrator
-			)
+	create_roles()
+	setup_permissions()
 	ensure_event_custom_fields()
 	ensure_doctype_translations()
 	ensure_advocacia_sidebar()

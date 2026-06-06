@@ -13,7 +13,7 @@ class ParceladeHonorarios(Document):
 		if not self.is_new() and self.name:
 			old_id = frappe.db.get_value(self.doctype, self.name, "parcela_origem_id")
 			if old_id and self.parcela_origem_id and self.parcela_origem_id != old_id:
-				frappe.throw(_("ID de origem da parcela não pode ser alterado."))
+				frappe.throw(_("ID de origem da parcela n?o pode ser alterado."))
 
 	def before_save(self):
 		self.atualizar_status()

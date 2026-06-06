@@ -84,3 +84,60 @@ def _user_nome_lookup(user_names):
 		return {}
 	rows = frappe.get_all("User", filters={"name": ["in", names]}, fields=["name", "full_name"])
 	return {row.name: row.full_name or row.name for row in rows}
+
+
+def user_is_advocacia_manager() -> bool:
+	"""True se o usuário atual tem role Advocacia Manager."""
+	return "Advocacia Manager" in frappe.get_roles()
+
+
+_KPIS_FINANCIAL_KEYS = (
+	"parcelas_vencidas",
+	"parcelas_a_vencer_30d",
+	"recebido_mes",
+	"recebido_periodo",
+	"recebido_hoje",
+	"previsto_mes",
+	"honorarios_ativos",
+	"custas_abertas",
+	"taxa_recebimento",
+)
+
+_RESUMO_FINANCIAL_KEYS = (
+	"parcelas_vencidas",
+	"previsto_periodo_valor",
+	"previsto_semana_valor",
+)
+
+
+def strip_financial_payload(data: dict) -> dict:
+	"""Remove dados financeiros do payload do painel para Advocacia User."""
+	if user_is_advocacia_manager():
+		return data
+
+	for key in (
+		"financeiro",
+		"parcelas",
+		"despesas_pendentes",
+		"total_despesas_mes",
+		"custas_pendentes_repasse",
+		"total_custas_mes",
+	):
+		data.pop(key, None)
+
+	kpis = data.get("kpis")
+	if isinstance(kpis, dict):
+		for key in _KPIS_FINANCIAL_KEYS:
+			kpis.pop(key, None)
+
+	resumo = data.get("resumo")
+	if isinstance(resumo, dict):
+		for key in _RESUMO_FINANCIAL_KEYS:
+			resumo.pop(key, None)
+
+	list_meta = data.get("list_meta")
+	if isinstance(list_meta, dict):
+		for key in ("parcelas", "despesas", "custas"):
+			list_meta.pop(key, None)
+
+	return data

@@ -11,6 +11,7 @@ from advocacia.advocacia.painel._helpers import (
 	_list_cap,
 	_normalize_list_limits,
 	_normalize_periodo_dias,
+	strip_financial_payload,
 )
 
 
@@ -84,27 +85,29 @@ def get(
 		"custas": {"showing": len(custas_pendentes_repasse), "total": len(custas_all)},
 	}
 
-	return {
-		"periodo_dias": periodo_dias,
-		"list_limit": list_limit,
-		"list_limits": list_limits,
-		"list_meta": list_meta,
-		"kpis": kpis,
-		"resumo": resumo,
-		"financeiro": financeiro,
-		"alertas": alertas,
-		"centro_atencao": centro_atencao,
-		"timeline": timeline,
-		"parcelas": parcelas,
-		"despesas_pendentes": despesas_pendentes,
-		"total_despesas_mes": total_despesas_mes,
-		"custas_pendentes_repasse": custas_pendentes_repasse,
-		"total_custas_mes": total_custas_mes,
-		"comunicacoes_pendentes": comunicacoes_pendentes,
-		"ultimas_comunicacoes": ultimas_comunicacoes,
-		"horas_semana": horas_semana,
-		"horas_periodo": horas_periodo,
-		"audiencias": audiencias[:timeline_cap],
-		"prazos": prazos[:timeline_cap],
-		"tarefas": tarefas,
-	}
+	return strip_financial_payload(
+		{
+			"periodo_dias": periodo_dias,
+			"list_limit": list_limit,
+			"list_limits": list_limits,
+			"list_meta": list_meta,
+			"kpis": kpis,
+			"resumo": resumo,
+			"financeiro": financeiro,
+			"alertas": alertas,
+			"centro_atencao": centro_atencao,
+			"timeline": timeline,
+			"parcelas": parcelas,
+			"despesas_pendentes": despesas_pendentes,
+			"total_despesas_mes": total_despesas_mes,
+			"custas_pendentes_repasse": custas_pendentes_repasse,
+			"total_custas_mes": total_custas_mes,
+			"comunicacoes_pendentes": comunicacoes_pendentes,
+			"ultimas_comunicacoes": ultimas_comunicacoes,
+			"horas_semana": horas_semana,
+			"horas_periodo": horas_periodo,
+			"audiencias": audiencias[:timeline_cap],
+			"prazos": prazos[:timeline_cap],
+			"tarefas": tarefas,
+		}
+	)
