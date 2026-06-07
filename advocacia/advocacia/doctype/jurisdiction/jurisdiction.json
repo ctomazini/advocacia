@@ -5,6 +5,7 @@
  "custom": 0,
  "istable": 0,
  "track_changes": 1,
+ "allow_import": 1,
  "autoname": "field:jurisdiction_name",
  "naming_rule": "By fieldname",
  "title_field": "jurisdiction_name",

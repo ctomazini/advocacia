@@ -109,10 +109,12 @@ after_migrate = [
     "advocacia.advocacia.setup.reinstalar_istable_doctypes",
     "advocacia.advocacia.setup.roles.create_roles",
     "advocacia.advocacia.setup.permissions.setup_permissions",
+    "advocacia.advocacia.setup.seed.ensure_seed_data",
     "advocacia.advocacia.setup.install.after_install",
     "advocacia.advocacia.setup.install.ensure_event_custom_fields",
     "advocacia.advocacia.setup.translations.ensure_doctype_translations",
     "advocacia.advocacia.setup.sidebar.ensure_advocacia_sidebar",
     "advocacia.advocacia.setup.reports.ensure_advocacia_reports",
     "advocacia.advocacia.setup.workspace.ensure_advocacia_workspace",
+    "advocacia.advocacia.setup.print_formats.ensure_advocacia_print_formats",
 ]
