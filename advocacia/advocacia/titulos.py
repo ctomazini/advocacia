@@ -67,16 +67,10 @@ def recompor_titulo_se_vazio(doc, usar_descricao=False):
 
 
 def backfill_titulos_vazios():
-	"""Recompõe apenas registros com title vazio (conservador)."""
-	atualizados = 0
-	for dt, usar_descricao in COMPOSTOS.items():
-		for row in frappe.get_all(dt, fields=["name", "title"]):
-			if row.get("title"):
-				continue
-			doc = frappe.get_doc(dt, row.name)
-			aplicar_titulo_pos_insert(doc, usar_descricao=usar_descricao)
-			if frappe.db.get_value(dt, row.name, "title"):
-				atualizados += 1
-	frappe.db.commit()
-	frappe.logger().info("backfill_titulos_vazios: %s registros atualizados", atualizados)
-	return atualizados
+	"""Recompõe apenas registros com title vazio (conservador).
+
+	Uso manual: bench execute advocacia.advocacia.titulos.backfill_titulos_vazios
+	"""
+	from advocacia.advocacia.setup.titles import ensure_backfill_titles
+
+	return ensure_backfill_titles(commit=True)
