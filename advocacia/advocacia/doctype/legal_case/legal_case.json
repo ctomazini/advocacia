@@ -28,7 +28,7 @@
  "smallicon": null,
  "allow_copy": 0,
  "allow_rename": 1,
- "allow_import": 0,
+ "allow_import": 1,
  "hide_toolbar": 0,
  "track_seen": 0,
  "max_attachments": 0,
@@ -118,98 +118,57 @@
  ],
  "links": [
   {
-   "parent": "Legal Case",
-   "parentfield": "links",
-   "parenttype": "DocType",
-   "idx": 1,
    "group": "Honorários",
    "link_doctype": "Fee Agreement",
    "link_fieldname": "legal_case",
-   "parent_doctype": null,
-   "table_fieldname": null,
-   "hidden": 0,
-   "is_child_table": 0,
-   "custom": 0,
-   "doctype": "DocType Link"
+   "idx": 1
   },
   {
-   "parent": "Legal Case",
-   "parentfield": "links",
-   "parenttype": "DocType",
-   "idx": 2,
+   "group": "Honorários",
+   "link_doctype": "Legal Payment",
+   "link_fieldname": "legal_case",
+   "idx": 2
+  },
+  {
    "group": "Atos",
    "link_doctype": "Service Record",
    "link_fieldname": "legal_case",
-   "parent_doctype": null,
-   "table_fieldname": null,
-   "hidden": 0,
-   "is_child_table": 0,
-   "custom": 0,
-   "doctype": "DocType Link"
+   "idx": 3
   },
   {
-   "parent": "Legal Case",
-   "parentfield": "links",
-   "parenttype": "DocType",
-   "idx": 3,
    "group": "Agenda",
    "link_doctype": "Hearing",
    "link_fieldname": "legal_case",
-   "parent_doctype": null,
-   "table_fieldname": null,
-   "hidden": 0,
-   "is_child_table": 0,
-   "custom": 0,
-   "doctype": "DocType Link"
+   "idx": 4
   },
   {
-   "parent": "Legal Case",
-   "parentfield": "links",
-   "parenttype": "DocType",
-   "idx": 4,
    "group": "Agenda",
    "link_doctype": "Deadline",
    "link_fieldname": "legal_case",
-   "parent_doctype": null,
-   "table_fieldname": null,
-   "hidden": 0,
-   "is_child_table": 0,
-   "custom": 0,
-   "doctype": "DocType Link"
+   "idx": 5
   },
   {
    "group": "Financeiro",
    "link_doctype": "Court Cost",
    "link_fieldname": "legal_case",
-   "doctype": "DocType Link",
-   "idx": 5
+   "idx": 6
   },
   {
    "group": "Comunicação",
    "link_doctype": "Case Communication",
    "link_fieldname": "legal_case",
-   "doctype": "DocType Link",
-   "idx": 6
+   "idx": 7
   },
   {
    "group": "Produtividade",
    "link_doctype": "Time Entry",
    "link_fieldname": "legal_case",
-   "doctype": "DocType Link",
-   "idx": 7
+   "idx": 8
   },
   {
    "group": "Produtividade",
    "link_doctype": "Legal Task",
    "link_fieldname": "legal_case",
-   "doctype": "DocType Link",
-   "idx": 8
-  },
-  {
-   "group": "Financeiro",
-   "link_doctype": "Legal Payment",
-   "link_fieldname": "legal_case",
-   "doctype": "DocType Link",
    "idx": 9
   }
  ],

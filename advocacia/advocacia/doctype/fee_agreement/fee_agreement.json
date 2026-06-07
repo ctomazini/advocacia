@@ -118,7 +118,7 @@
  ],
  "links": [
   {
-   "group": "Financeiro",
+   "group": "Pagamentos",
    "link_doctype": "Legal Payment",
    "link_fieldname": "fee_agreement",
    "idx": 1
