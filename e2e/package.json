@@ -1,0 +1,12 @@
+{
+  "name": "advocacia-e2e",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node run-e2e.mjs",
+    "install:browsers": "playwright install chromium"
+  },
+  "dependencies": {
+    "playwright": "1.60.0"
+  }
+}

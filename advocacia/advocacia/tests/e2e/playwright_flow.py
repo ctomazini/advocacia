@@ -19,6 +19,8 @@ Uso:
   bench --site advocacia.local serve --port 8000 --noreload
 
   python advocacia/advocacia/tests/e2e/playwright_flow.py
+
+Deprecated: prefira o pacote npm em ../../e2e/ (`npm test` após `npm install`).
 """
 
 from __future__ import annotations
