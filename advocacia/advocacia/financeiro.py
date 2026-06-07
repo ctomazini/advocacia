@@ -464,7 +464,7 @@ def sincronizar_pagamento_atos(registro_name: str, data_vencimento: str | None =
 
 	for ato in novos:
 		ato.status = "Cobrado"
-		ato.cobranca_id = pagamento.name
+		ato.pagamento = pagamento.name
 
 	registro.ultimo_pagamento = pagamento.name
 	registro._calcular_totais()
@@ -510,7 +510,7 @@ def _classificar_atos_para_sync(registro, pagamento_name):
 	incluidos = []
 	novos = []
 	for ato in registro.atos or []:
-		if ato.status == "Cobrado" and ato.cobranca_id == pagamento_name:
+		if ato.status == "Cobrado" and ato.pagamento == pagamento_name:
 			incluidos.append(ato)
 		elif ato.status == "Pendente" and flt(ato.valor) > 0:
 			novos.append(ato)
@@ -556,9 +556,9 @@ def liberar_vinculos_pagamento_atos(pagamento, revert_atos=True):
 	if revert_atos:
 		registro = frappe.get_doc("Registro de Atos", registro_name)
 		for ato in registro.atos or []:
-			if ato.cobranca_id == pagamento.name and ato.status == "Cobrado":
+			if ato.pagamento == pagamento.name and ato.status == "Cobrado":
 				ato.status = "Pendente"
-				ato.cobranca_id = None
+				ato.pagamento = None
 				changed = True
 
 		if changed:

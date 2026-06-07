@@ -445,7 +445,7 @@
    "doctype": "DocField"
   },
   {
-   "fieldname": "cobranca_id",
+   "fieldname": "pagamento",
    "label": "Pagamento",
    "fieldtype": "Link",
    "options": "Pagamento",

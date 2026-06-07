@@ -31,9 +31,10 @@ class TestRegistroAtos(FrappeTestCase):
 
 	def test_atos_marcados_cobrado(self):
 		registro = create_test_registro_atos()
-		gerar_pagamento_atos(registro.name)
+		result = gerar_pagamento_atos(registro.name)
 		registro.reload()
 		self.assertTrue(all(a.status == "Cobrado" for a in registro.atos))
+		self.assertTrue(all(a.pagamento == result["pagamento"] for a in registro.atos))
 		self.assertEqual(registro.status, "Cobrado")
 
 	def test_cobranca_parcial(self):
