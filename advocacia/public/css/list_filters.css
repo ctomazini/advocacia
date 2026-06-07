@@ -1,0 +1,29 @@
+/* Desktop: filtros padrão sempre visíveis na barra horizontal */
+@media (min-width: 768px) {
+	.frappe-list .page-form .standard-filter-section.advocacia-filters-desktop-visible {
+		display: flex !important;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.5rem;
+	}
+}
+
+/* Mobile: filtros agrupados — ocultos até o botão de toggle nativo */
+@media (max-width: 767px) {
+	.frappe-list .page-form .standard-filter-section {
+		display: none;
+		width: 100%;
+		flex-wrap: wrap;
+		align-items: stretch;
+		gap: 0.5rem;
+		margin-top: 0.25rem;
+	}
+
+	.frappe-list .page-form .standard-filter-section.advocacia-filters-mobile-open {
+		display: flex !important;
+	}
+
+	.frappe-list .page-form .filter-selector .filter-toggle {
+		margin-right: 0.25rem;
+	}
+}

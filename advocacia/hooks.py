@@ -29,6 +29,10 @@ fixtures = [
     },
 ]
 
+app_include_css = [
+    "/assets/advocacia/css/list_filters.css",
+]
+
 app_include_js = [
     "/assets/advocacia/js/masks.js",
     "/assets/advocacia/js/painel/utils.js",
@@ -39,6 +43,7 @@ app_include_js = [
     "/assets/advocacia/js/painel/financeiro.js",
     "/assets/advocacia/js/painel/index.js",
     "/assets/advocacia/js/list_nav.js",
+    "/assets/advocacia/js/list_filters.js",
     "/assets/advocacia/js/cliente_from_servico.js",
     "/assets/advocacia/js/timer_global.js",
 ]
