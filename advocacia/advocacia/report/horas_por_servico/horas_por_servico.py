@@ -10,7 +10,7 @@ from frappe.utils import flt
 
 def execute(filters=None):
 	filters = frappe._dict(filters or {})
-	if not frappe.db.table_exists("Registro de Horas"):
+	if not frappe.db.table_exists("Time Entry"):
 		return _get_columns(), []
 
 	columns = _get_columns()
@@ -21,17 +21,17 @@ def execute(filters=None):
 def _get_columns():
 	return [
 		{
-			"fieldname": "servico",
+			"fieldname": "legal_case",
 			"label": _("Serviço"),
 			"fieldtype": "Link",
-			"options": "Servico",
+			"options": "Legal Case",
 			"width": 120,
 		},
 		{
-			"fieldname": "cliente",
-			"label": _("Cliente"),
+			"fieldname": "client",
+			"label": _("Client"),
 			"fieldtype": "Link",
-			"options": "Cliente",
+			"options": "Client",
 			"width": 160,
 		},
 		{"fieldname": "area", "label": _("Área"), "fieldtype": "Data", "width": 120},
@@ -70,21 +70,21 @@ def _get_columns():
 
 def _get_data(filters):
 	query_filters = {}
-	if filters.get("servico"):
-		query_filters["servico"] = filters.servico
-	if filters.get("cliente"):
-		query_filters["cliente"] = filters.cliente
+	if filters.get("legal_case"):
+		query_filters["legal_case"] = filters.legal_case
+	if filters.get("client"):
+		query_filters["client"] = filters.client
 
 	registros = frappe.get_all(
-		"Registro de Horas",
+		"Time Entry",
 		filters=query_filters,
-		fields=["servico", "cliente", "duracao_horas", "cobravel"],
+		fields=["legal_case", "client", "duracao_horas", "cobravel"],
 		limit_page_length=0,
 	)
 
 	by_servico = defaultdict(
 		lambda: {
-			"cliente": "",
+			"client": "",
 			"total": 0.0,
 			"cobravel": 0.0,
 			"nao_cobravel": 0.0,
@@ -92,10 +92,10 @@ def _get_data(filters):
 	)
 
 	for r in registros:
-		if not r.servico:
+		if not r.legal_case:
 			continue
-		b = by_servico[r.servico]
-		b["cliente"] = r.cliente or b["cliente"]
+		b = by_servico[r.legal_case]
+		b["client"] = r.client or b["client"]
 		h = flt(r.duracao_horas)
 		b["total"] += h
 		if r.cobravel:
@@ -105,22 +105,22 @@ def _get_data(filters):
 
 	honorarios = {}
 	for row in frappe.get_all(
-		"Acordo de Honorarios Processuais",
-		fields=["servico", "valor_total_do_acordo"],
+		"Fee Agreement",
+		fields=["legal_case", "valor_total_do_acordo"],
 		limit_page_length=0,
 	):
-		if row.servico:
-			honorarios[row.servico] = honorarios.get(row.servico, 0) + flt(row.valor_total_do_acordo)
+		if row.legal_case:
+			honorarios[row.legal_case] = honorarios.get(row.legal_case, 0) + flt(row.valor_total_do_acordo)
 
 	rows = []
 	for servico, stats in sorted(by_servico.items()):
-		area = frappe.db.get_value("Servico", servico, "area") or ""
+		area = frappe.db.get_value("Legal Case", servico, "area") or ""
 		valor_hon = honorarios.get(servico, 0)
 		valor_hora = valor_hon / stats["total"] if stats["total"] else 0
 		rows.append(
 			{
-				"servico": servico,
-				"cliente": stats["cliente"],
+				"legal_case": servico,
+				"client": stats["client"],
 				"area": area,
 				"total_horas": round(stats["total"], 2),
 				"horas_cobraveis": round(stats["cobravel"], 2),

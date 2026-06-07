@@ -78,11 +78,11 @@ frappe.provide("advocacia.painel.audiencias");
 	    var when = U.painel_timeline_when_label(a.data, a.hora, a.dias_restantes);
 	    var mod = a.modalidade || "Presencial";
 	    var local =
-	        a.vara_label ||
-	        (mod === "Presencial" || mod === "Híbrida" ? a.local_vara || "" : "");
+	        a.court_branch_link_label ||
+	        (mod === "Presencial" || mod === "Híbrida" ? a.court_branch || "" : "");
 	    var entrar = A.painel_audiencia_entrar_html(a);
 	    var h =
-	        '<div class="painel-prox-card" data-dt="Audiencia" data-dn="' +
+	        '<div class="painel-prox-card" data-dt="Hearing" data-dn="' +
 	        frappe.utils.escape_html(a.name || "") +
 	        '">' +
 	        '<div class="painel-prox-card-head">' +
@@ -102,14 +102,14 @@ frappe.provide("advocacia.painel.audiencias");
 	        "</div>" +
 	        '<div class="painel-prox-meta">' +
 	        '<div class="painel-prox-row"><span class="painel-prox-row-label">' +
-	        __("Cliente") +
+	        __("Client") +
 	        '</span><span class="painel-prox-row-value">' +
-	        frappe.utils.escape_html(a.cliente_nome || a.cliente || "—") +
+	        frappe.utils.escape_html(a.client_nome || a.client || "—") +
 	        "</span></div>" +
 	        '<div class="painel-prox-row"><span class="painel-prox-row-label">' +
 	        __("Serviço") +
 	        '</span><span class="painel-prox-row-value">' +
-	        frappe.utils.escape_html(a.servico_titulo || a.servico || "—") +
+	        frappe.utils.escape_html(a.legal_case_titulo || a.legal_case || "—") +
 	        "</span></div>";
 	    if (local && mod !== "Virtual") {
 	        h +=
@@ -184,7 +184,7 @@ frappe.provide("advocacia.painel.audiencias");
 	            return (
 	                '<div class="' +
 	                card_cls +
-	                '" data-dt="Audiencia" data-dn="' +
+	                '" data-dt="Hearing" data-dn="' +
 	                frappe.utils.escape_html(a.name) +
 	                '">' +
 	                '<div class="painel-schedule-when">' +
@@ -200,11 +200,11 @@ frappe.provide("advocacia.painel.audiencias");
 	                "</div>" +
 	                '<div class="painel-schedule-body">' +
 	                '<div class="painel-schedule-title">' +
-	                frappe.utils.escape_html(a.cliente_nome || a.cliente || "—") +
+	                frappe.utils.escape_html(a.client_nome || a.client || "—") +
 	                "</div>" +
 	                '<div class="painel-schedule-sub">' +
 	                frappe.utils.escape_html(a.tipo || __("Audiência")) +
-	                (a.vara_label ? " · " + frappe.utils.escape_html(a.vara_label) : "") +
+	                (a.court_branch_link_label ? " · " + frappe.utils.escape_html(a.court_branch_link_label) : "") +
 	                "</div></div>" +
 	                '<div class="painel-schedule-meta">' +
 	                U.status_pill(a.modalidade || "Presencial") +

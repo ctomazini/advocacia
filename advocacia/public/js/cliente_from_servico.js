@@ -1,14 +1,14 @@
 (function () {
 	const DOCTYPES_COM_SERVICO = [
-		"Tarefa",
-		"Audiencia",
-		"Controle de Prazos",
-		"Comunicacao",
-		"Registro de Horas",
-		"Registro de Atos",
-		"Acordo de Honorarios Processuais",
-		"Custa Processual",
-		"Pagamento",
+		"Legal Task",
+		"Hearing",
+		"Deadline",
+		"Case Communication",
+		"Time Entry",
+		"Service Record",
+		"Fee Agreement",
+		"Court Cost",
+		"Legal Payment",
 	];
 
 	function fetch_cliente_from_servico(servico, callback) {
@@ -16,27 +16,27 @@
 			callback("");
 			return;
 		}
-		frappe.db.get_value("Servico", servico, "cliente", (value) => {
-			callback((value && value.cliente) || "");
+		frappe.db.get_value("Legal Case", servico, "client", (value) => {
+			callback((value && value.client) || "");
 		});
 	}
 
 	function sync_cliente_no_form(frm) {
-		if (!frm.fields_dict.cliente || !frm.fields_dict.servico) {
+		if (!frm.fields_dict.client || !frm.fields_dict.legal_case) {
 			return;
 		}
-		if (!frm.doc.servico) {
-			if (frm.doc.cliente) {
-				frm.set_value("cliente", "");
+		if (!frm.doc.legal_case) {
+			if (frm.doc.client) {
+				frm.set_value("client", "");
 			}
 			return;
 		}
-		if (frm.doc.cliente) {
+		if (frm.doc.client) {
 			return;
 		}
-		fetch_cliente_from_servico(frm.doc.servico, (cliente) => {
-			if (cliente && frm.doc.cliente !== cliente) {
-				frm.set_value("cliente", cliente);
+		fetch_cliente_from_servico(frm.doc.legal_case, (cliente) => {
+			if (cliente && frm.doc.client !== cliente) {
+				frm.set_value("client", cliente);
 			}
 		});
 	}
@@ -44,8 +44,8 @@
 	DOCTYPES_COM_SERVICO.forEach((doctype) => {
 		frappe.ui.form.on(doctype, {
 			servico(frm) {
-				fetch_cliente_from_servico(frm.doc.servico, (cliente) => {
-					frm.set_value("cliente", cliente);
+				fetch_cliente_from_servico(frm.doc.legal_case, (cliente) => {
+					frm.set_value("client", cliente);
 				});
 			},
 			refresh(frm) {
@@ -66,20 +66,20 @@
 		if (!DOCTYPES_COM_SERVICO.includes(me.doctype)) {
 			return;
 		}
-		const servico_field = me.fields_dict && me.fields_dict.servico;
+		const servico_field = me.fields_dict && me.fields_dict.legal_case;
 		if (!servico_field) {
 			return;
 		}
 
 		const atualizar_cliente = () => {
-			const servico = me.get_value("servico");
+			const servico = me.get_value("legal_case");
 			fetch_cliente_from_servico(servico, (cliente) => {
-				me.doc.cliente = cliente || "";
+				me.doc.client = cliente || "";
 			});
 		};
 
 		servico_field.$input.on("change", atualizar_cliente);
-		if (me.doc.servico && !me.doc.cliente) {
+		if (me.doc.legal_case && !me.doc.client) {
 			atualizar_cliente();
 		}
 	}
@@ -93,12 +93,12 @@
 		const me = this;
 		if (
 			DOCTYPES_COM_SERVICO.includes(me.doctype) &&
-			me.doc.servico &&
-			!me.doc.cliente
+			me.doc.legal_case &&
+			!me.doc.client
 		) {
-			fetch_cliente_from_servico(me.doc.servico, (cliente) => {
+			fetch_cliente_from_servico(me.doc.legal_case, (cliente) => {
 				if (cliente) {
-					me.doc.cliente = cliente;
+					me.doc.client = cliente;
 				}
 				original_open_doc.call(me, set_hooks);
 			});

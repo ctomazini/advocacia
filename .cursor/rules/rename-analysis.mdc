@@ -1,0 +1,14 @@
+---
+description: Read-only analysis — no code changes allowed
+globs:
+  - "apps/advocacia/**"
+  - "apps/engenharia/**"
+alwaysApply: true
+---
+
+# REGRAS DESTA FASE
+
+1. **ZERO MODIFICAÇÕES**: Este prompt é SOMENTE análise. Nenhum arquivo deve ser alterado, criado ou deletado (exceto o RENAME_ANALYSIS.md de output).
+2. **ENGENHARIA READ-ONLY**: Ler `apps/engenharia/` apenas como referência de nomenclatura EN.
+3. **EXAUSTIVIDADE**: Todo grep/find deve cobrir TODO o diretório do app. Não amostrar — varrer completo.
+4. **CONFLITOS COM CORE**: Frappe core tem DocTypes nativos (Task, Communication, ToDo, Event, File, etc.). Se um nome proposto colide, sinalizar como ❌ CONFLITO.

@@ -1,10 +1,10 @@
 frappe.query_reports["inadimplencia"] = {
 	filters: [
 		{
-			fieldname: "cliente",
-			label: __("Cliente"),
+			fieldname: "client",
+			label: __("Client"),
 			fieldtype: "Link",
-			options: "Cliente",
+			options: "Client",
 		},
 		{
 			fieldname: "de_data",

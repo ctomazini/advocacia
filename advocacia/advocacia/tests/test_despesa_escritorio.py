@@ -3,7 +3,7 @@ from frappe.exceptions import MandatoryError, ValidationError
 from frappe.tests.utils import FrappeTestCase
 from frappe.utils import add_days, add_months, getdate, today
 
-from advocacia.advocacia.doctype.despesa_do_escritorio.despesa_do_escritorio import gerar_proxima_despesa
+from advocacia.advocacia.doctype.office_expense.office_expense import gerar_proxima_despesa
 from advocacia.advocacia.tasks import verificar_despesas_vencidas
 from advocacia.advocacia.tests.test_setup import create_test_despesa
 
@@ -40,25 +40,25 @@ class TestDespesaEscritorio(FrappeTestCase):
 
 	def test_scheduler_marca_atrasado(self):
 		desp = create_test_despesa(data_vencimento=add_days(today(), -2))
-		frappe.db.set_value("Despesa do Escritorio", desp.name, "status", "Pendente")
+		frappe.db.set_value("Office Expense", desp.name, "status", "Pendente")
 		verificar_despesas_vencidas()
 		self.assertEqual(
-			frappe.db.get_value("Despesa do Escritorio", desp.name, "status"), "Atrasado"
+			frappe.db.get_value("Office Expense", desp.name, "status"), "Atrasado"
 		)
 
 	def test_despesa_paga_nao_alterada_scheduler(self):
 		desp = create_test_despesa(data_vencimento=add_days(today(), -2))
-		frappe.db.set_value("Despesa do Escritorio", desp.name, "status", "Pago")
+		frappe.db.set_value("Office Expense", desp.name, "status", "Pago")
 		verificar_despesas_vencidas()
 		self.assertEqual(
-			frappe.db.get_value("Despesa do Escritorio", desp.name, "status"), "Pago"
+			frappe.db.get_value("Office Expense", desp.name, "status"), "Pago"
 		)
 
 	def test_gerar_proxima_despesa(self):
 		venc = getdate("2026-06-01")
 		desp = create_test_despesa(data_vencimento=venc, recorrente=1, frequencia="Mensal")
 		nova_name = gerar_proxima_despesa(desp.name)
-		nova = frappe.get_doc("Despesa do Escritorio", nova_name)
+		nova = frappe.get_doc("Office Expense", nova_name)
 		self.assertEqual(getdate(nova.data_vencimento), getdate("2026-07-01"))
 		self.assertEqual(nova.status, "Pendente")
 
@@ -71,7 +71,7 @@ class TestDespesaEscritorio(FrappeTestCase):
 		with self.assertRaises(MandatoryError):
 			frappe.get_doc(
 				{
-					"doctype": "Despesa do Escritorio",
+					"doctype": "Office Expense",
 					"categoria": "Aluguel",
 					"valor": 100,
 				}

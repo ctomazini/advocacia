@@ -50,32 +50,32 @@ grep '"custom": 1' → zero resultados
 | DocType | naming_rule | autoname | Status |
 | --- | --- | --- | --- |
 | Transacionais (13) | Expression | `format:PREFIX-{YYYY}-{####}` | ✅ |
-| Kit de Documentos, Template Documento | By fieldname | `field:titulo` | ✅ |
-| Comarca, Tribunal, Vara, Fase Processual | **AUSENTE** | `field:*_name` | ⚠️ Falta `naming_rule` explícito |
-| Configuracao do Escritorio (Single) | **AUSENTE** | **AUSENTE** | ⚠️ Single — aceitável, mas sem `search_fields` |
+| Document Kit, Document Template | By fieldname | `field:titulo` | ✅ |
+| Jurisdiction, Court, Court Branch, Case Phase | **AUSENTE** | `field:*_name` | ⚠️ Falta `naming_rule` explícito |
+| Office Settings (Single) | **AUSENTE** | **AUSENTE** | ⚠️ Single — aceitável, mas sem `search_fields` |
 
 #### 1.3 `title_field` + `show_title_field_in_link` — ⚠️
 - 18/19 standalones com `title_field` definido — ✅
-- **Configuracao do Escritorio:** `title_field` ausente — ⚠️
+- **Office Settings:** `title_field` ausente — ⚠️
 - Todos standalones: `show_title_field_in_link: 1` — ✅
 
 #### 1.4 `search_fields` — ⚠️
-- **Configuracao do Escritorio:** `search_fields` ausente — ⚠️
+- **Office Settings:** `search_fields` ausente — ⚠️
 - Demais standalones: preenchidos — ✅
 
 #### 1.5 DocType names — idioma — ❌ (⚠️ congelado advocacia)
 
-24 DocTypes em português (`Servico`, `Audiencia`, `Comarca`, …).
+24 DocTypes em português (`Legal Case`, `Hearing`, `Jurisdiction`, …).
 
 - Padrão engenharia (EN Title Case): **24 × ❌**
 - `REGRAS_ADVOCACIA.md`: **congelado — não renomear** → tratar como ⚠️ débito consciente, não bloqueante para este app
 
 #### 1.6 Fieldnames — ⚠️
-- **12 fieldnames** com acentos PT (`tipo_de_cobrança`, `observações`, `descrição`, …) — ⚠️
+- **12 fieldnames** com acentos PT (`billing_type`, `remarks`, `description`, …) — ⚠️
 - **~15 column_break** auto-gerados (`column_break_info`, `column_break_parc`, …) — ⚠️ cosmético
 
 #### 1.7 Link fields tipados — ✅
-Falsos positivos do grep (`comarca_name`, `phase_name` são campos de autoname Data, não Links mal tipados). Referências reais (Comarca, Vara, Tribunal, Cliente, Servico) usam `Link` — ✅
+Falsos positivos do grep (`jurisdiction_name`, `case_phase_name` são campos de autoname Data, não Links mal tipados). Referências reais (Jurisdiction, Court Branch, Court, Client, Legal Case) usam `Link` — ✅
 
 #### 1.8 Prefixos autoname — ✅
 12 prefixos únicos, zero colisão (`ACOR-`, `AUD-`, `CLI-`, …).
@@ -83,9 +83,9 @@ Falsos positivos do grep (`comarca_name`, `phase_name` são campos de autoname D
 #### 1.9 `idx` duplicado — ⚠️
 | DocType | idx duplicados |
 | --- | --- |
-| Acordo de Honorarios Processuais | {2, 4} |
-| Audiencia | {4} |
-| Controle de Prazos | {4} |
+| Fee Agreement | {2, 4} |
+| Hearing | {4} |
+| Deadline | {4} |
 
 ---
 
@@ -196,7 +196,7 @@ fixtures/workspace.json
 Sem `server_script.json` ou `client_script.json` no Git.
 
 #### 4.4 `doc_events` — ✅
-Um handler por `(DocType, evento)`. Pagamento: handler único `processar_pagamento_on_update` — ✅
+Um handler por `(DocType, evento)`. Legal Payment: handler único `processar_pagamento_on_update` — ✅
 
 #### 4.5 `scheduler_events` — ✅
 - **daily:** 5 jobs (parcelas, despesas, notificações, audiências, prazos)
@@ -225,7 +225,7 @@ Lógica equivalente hoje vive em `financeiro.py` — scripts devem ser **desabil
 
 | Nome | dt | Problema |
 | --- | --- | --- |
-| Navegacao Advocacia | Servico | Referencia `Sales Invoice`, `Customer` (ERPNext); duplica FAB removido do Git |
+| Navegacao Advocacia | Legal Case | Referencia `Sales Invoice`, `Customer` (ERPNext); duplica FAB removido do Git |
 
 Substituído por `list_nav.js` + painel hero — **remover do banco**.
 
@@ -255,8 +255,8 @@ Principais endpoints cobertos:
 ### SEÇÃO 7 — Workspace — ⚠️
 
 Fixture `fixtures/workspace.json`:
-- **Content blocks:** 12 shortcuts (Painel, Serviços, Honorários, Pagamentos, …)
-- **shortcuts[]:** 18 entradas (inclui Comarca, Vara, Tribunal, Tarefas, Documentos extras)
+- **Content blocks:** 12 shortcuts (Painel, Serviços, Honorários, Legal Payments, …)
+- **shortcuts[]:** 18 entradas (inclui Jurisdiction, Court Branch, Court, Legal Tasks, Documentos extras)
 - Content ↔ shortcuts: **12/12 presentes** no array — ✅
 - Shortcuts extras sem bloco visual no content — ⚠️ cosmético (links sidebar cobrem)
 
@@ -271,8 +271,8 @@ Arquivos Python com indentação por espaços (amostra):
 - `validators.py`
 - `tests/e2e/playwright_flow.py`
 - `setup/seed_demo.py`
-- `doctype/comarca/comarca.py`, `vara/vara.py`, `tribunal/tribunal.py`, `fase_processual/fase_processual.py`
-- `doctype/acordo_de_honorarios_processuais/acordo_de_honorarios_processuais.py`
+- `doctype/jurisdiction/jurisdiction.py`, `vara/vara.py`, `tribunal/tribunal.py`, `fase_processual/fase_processual.py`
+- `doctype/fee_agreement/fee_agreement.py`
 
 Maioria do codebase usa tabs — ⚠️ inconsistência, não bloqueante.
 
@@ -337,7 +337,7 @@ Script: `scripts/add_field_descriptions.py`.
 1. Zero `custom: 1`
 2. 24 DocTypes `custom: 0`
 3. Prefixos autoname sem colisão
-4. Links tipados (Comarca, Vara, Cliente, Servico, …)
+4. Links tipados (Jurisdiction, Court Branch, Client, Legal Case, …)
 5. Auto-título via `titulos.py`
 6. Zero Server Script no Git
 7. Zero Client Script no Git fixtures
@@ -376,7 +376,7 @@ Script: `scripts/add_field_descriptions.py`.
 ### ⚠️ Atenção (22)
 1. DocTypes PT (congelado — débito consciente)
 2. `naming_rule` ausente em 5 cadastros auxiliares + Single
-3. `Configuracao do Escritorio` sem title/search
+3. `Office Settings` sem title/search
 4. idx duplicado (3 DocTypes)
 5. Fieldnames PT com acentos
 6. column_break auto-gerados
@@ -393,7 +393,7 @@ Script: `scripts/add_field_descriptions.py`.
 17. Reinstall limpo não executado
 18. E2E Playwright depende `install-deps` + `--noreload`
 19. Template/Kit E2E podem falhar sem fixture docx
-20. Port fieldnames EN auxiliares (`phase_name`, `city`)
+20. Port fieldnames EN auxiliares (`case_phase_name`, `city`)
 21. Chart.js vs frappe.ui.Chart (backlog)
 22. `agent_api.py` inexistente (pós-deploy)
 
@@ -412,7 +412,7 @@ Script: `scripts/add_field_descriptions.py`.
 
 ### P0 — Antes do deploy (bloqueante)
 
-1. **Remover/desabilitar os 4 Server Scripts** no site de produção (via UI ou `frappe.delete_doc`). Validar fluxo Acordo → Pagamento só via `financeiro.py`.
+1. **Remover/desabilitar os 4 Server Scripts** no site de produção (via UI ou `frappe.delete_doc`). Validar fluxo Acordo → Legal Payment só via `financeiro.py`.
 2. **Remover Client Script `Navegacao Advocacia`**. Confirmar que `list_nav.js` + painel hero cobrem navegação.
 3. **Substituir `cur_frm` em `list_nav.js`** por API v16 (`frappe.ui.form.get_open_form()` ou handler com `frm` no callback do `frappe.ui.form.on`).
 4. **Executar reinstall limpo:**
@@ -425,8 +425,8 @@ Script: `scripts/add_field_descriptions.py`.
 
 ### P1 — Pré go-live (recomendado)
 
-5. Corrigir **idx duplicados** em Acordo, Audiencia, Controle de Prazos.
-6. Adicionar **`naming_rule`** explícito em Comarca, Vara, Tribunal, Fase Processual.
+5. Corrigir **idx duplicados** em Acordo, Hearing, Deadline.
+6. Adicionar **`naming_rule`** explícito em Jurisdiction, Court Branch, Court, Case Phase.
 7. Remover **`commit=True`** de `resync_pagamentos_acordo` (confiar no auto-commit Frappe).
 8. Adicionar **`has_permission` direto** em `gerar_pagamento_atos`.
 9. Adicionar **`limit_page_length`** nos schedulers de `tasks.py`.

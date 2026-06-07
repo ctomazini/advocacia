@@ -35,7 +35,7 @@ def _create_test_template():
 
 		template = frappe.get_doc(
 			{
-				"doctype": "Template Documento",
+				"doctype": "Document Template",
 				"titulo": _uid("Template Kit"),
 				"tipo_documento": "Contrato",
 				"arquivo": file_doc.file_url,
@@ -61,12 +61,12 @@ class TestKitDeDocumentos(FrappeTestCase):
 		titulo = _uid("Kit Teste")
 		kit = frappe.get_doc(
 			{
-				"doctype": "Kit de Documentos",
+				"doctype": "Document Kit",
 				"titulo": titulo,
 				"templates": [{"template": self.template_name, "ordem": 0}],
 			}
 		).insert(ignore_permissions=True)
-		self.assertTrue(frappe.db.exists("Kit de Documentos", kit.name))
+		self.assertTrue(frappe.db.exists("Document Kit", kit.name))
 		self.assertEqual(kit.titulo, titulo)
 		self.assertEqual(len(kit.templates), 1)
 		self.assertEqual(kit.templates[0].template, self.template_name)
@@ -75,12 +75,12 @@ class TestKitDeDocumentos(FrappeTestCase):
 		titulo = _uid("Kit Read")
 		kit = frappe.get_doc(
 			{
-				"doctype": "Kit de Documentos",
+				"doctype": "Document Kit",
 				"titulo": titulo,
 				"templates": [{"template": self.template_name, "ordem": 1}],
 			}
 		).insert(ignore_permissions=True)
-		loaded = frappe.get_doc("Kit de Documentos", kit.name)
+		loaded = frappe.get_doc("Document Kit", kit.name)
 		self.assertEqual(loaded.titulo, titulo)
 		self.assertEqual(loaded.templates[0].ordem, 1)
 
@@ -88,24 +88,24 @@ class TestKitDeDocumentos(FrappeTestCase):
 		titulo = _uid("Kit Update")
 		kit = frappe.get_doc(
 			{
-				"doctype": "Kit de Documentos",
+				"doctype": "Document Kit",
 				"titulo": titulo,
 				"templates": [{"template": self.template_name, "ordem": 0}],
 			}
 		).insert(ignore_permissions=True)
 		kit.append("templates", {"template": self.template_name, "ordem": 1})
 		kit.save(ignore_permissions=True)
-		reloaded = frappe.get_doc("Kit de Documentos", kit.name)
+		reloaded = frappe.get_doc("Document Kit", kit.name)
 		self.assertEqual(len(reloaded.templates), 2)
 		reloaded.templates = reloaded.templates[:1]
 		reloaded.save(ignore_permissions=True)
-		self.assertEqual(len(frappe.get_doc("Kit de Documentos", kit.name).templates), 1)
+		self.assertEqual(len(frappe.get_doc("Document Kit", kit.name).templates), 1)
 
 	def test_titulo_obrigatorio_falha(self):
 		with self.assertRaises(ValidationError):
 			frappe.get_doc(
 				{
-					"doctype": "Kit de Documentos",
+					"doctype": "Document Kit",
 					"templates": [{"template": self.template_name, "ordem": 0}],
 				}
 			).insert(ignore_permissions=True)
@@ -114,7 +114,7 @@ class TestKitDeDocumentos(FrappeTestCase):
 		with self.assertRaises(ValidationError):
 			frappe.get_doc(
 				{
-					"doctype": "Kit de Documentos",
+					"doctype": "Document Kit",
 					"titulo": _uid("Kit Sem Template"),
 				}
 			).insert(ignore_permissions=True)
@@ -123,7 +123,7 @@ class TestKitDeDocumentos(FrappeTestCase):
 		titulo = _uid("Kit Dup")
 		frappe.get_doc(
 			{
-				"doctype": "Kit de Documentos",
+				"doctype": "Document Kit",
 				"titulo": titulo,
 				"templates": [{"template": self.template_name, "ordem": 0}],
 			}
@@ -131,7 +131,7 @@ class TestKitDeDocumentos(FrappeTestCase):
 		with self.assertRaises((DuplicateEntryError, frappe.UniqueValidationError)):
 			frappe.get_doc(
 				{
-					"doctype": "Kit de Documentos",
+					"doctype": "Document Kit",
 					"titulo": titulo,
 					"templates": [{"template": self.template_name, "ordem": 0}],
 				}

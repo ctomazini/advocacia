@@ -5,7 +5,7 @@ from frappe.utils import add_months, flt, today
 
 from advocacia.advocacia.tests.test_setup import (
 	create_test_acordo,
-	create_test_servico,
+	create_test_legal_case,
 	get_acordo_pagamentos,
 )
 
@@ -22,16 +22,16 @@ class TestAcordoHonorarios(FrappeTestCase):
 			num_parcelas=2,
 		)
 		self.assertEqual(flt(acordo.valor_total_do_acordo), 10000)
-		self.assertEqual(len(acordo.parcelas), 2)
+		self.assertEqual(len(acordo.fee_installments), 2)
 
 	def test_parcelas_soma_igual_total(self):
 		acordo = create_test_acordo(valor_total=10000, num_parcelas=5)
-		soma = sum(flt(p.valor_total) for p in acordo.parcelas)
+		soma = sum(flt(p.valor_total) for p in acordo.fee_installments)
 		self.assertAlmostEqual(soma, 10000, places=2)
 
 	def test_parcelas_status_pendente(self):
 		acordo = create_test_acordo(num_parcelas=3)
-		self.assertTrue(all(p.status == "Pendente" for p in acordo.parcelas))
+		self.assertTrue(all(p.status == "Pendente" for p in acordo.fee_installments))
 
 	def test_sync_cria_pagamentos(self):
 		acordo = create_test_acordo(num_parcelas=3, valor_total=9000)
@@ -40,35 +40,35 @@ class TestAcordoHonorarios(FrappeTestCase):
 
 	def test_parcela_origem_id_vinculado(self):
 		acordo = create_test_acordo(num_parcelas=2)
-		for parcela in acordo.parcelas:
+		for parcela in acordo.fee_installments:
 			self.assertTrue(parcela.parcela_origem_id)
 		pagamentos = get_acordo_pagamentos(acordo.name)
 		origem_ids = {p.parcela_origem_id for p in pagamentos}
-		parcela_ids = {p.parcela_origem_id for p in acordo.parcelas}
+		parcela_ids = {p.parcela_origem_id for p in acordo.fee_installments}
 		self.assertEqual(origem_ids, parcela_ids)
 
 	def test_sem_servico_falha(self):
 		with self.assertRaises(ValidationError):
 			frappe.get_doc(
 				{
-					"doctype": "Acordo de Honorarios Processuais",
+					"doctype": "Fee Agreement",
 					"modo_honorarios": "Honorários Diretos",
-					"tipo_de_cobrança": "Valor fixo",
+					"billing_type": "Valor fixo",
 				}
 			).insert(ignore_permissions=True)
 
 	def test_parcelas_sem_valor_total_falha(self):
-		servico = create_test_servico().name
+		servico = create_test_legal_case().name
 		with self.assertRaises(ValidationError):
 			frappe.get_doc(
 				{
-					"doctype": "Acordo de Honorarios Processuais",
-					"servico": servico,
+					"doctype": "Fee Agreement",
+					"legal_case": servico,
 					"modo_honorarios": "Honorários Diretos",
-					"tipo_de_cobrança": "Valor fixo",
-					"número_de_parcelas": 2,
+					"billing_type": "Valor fixo",
+					"installment_count": 2,
 					"data_primeira_parcela": today(),
-					"parcelas": [
+					"fee_installments": [
 						{
 							"vencimento": today(),
 							"valor_total": 100,
@@ -79,18 +79,18 @@ class TestAcordoHonorarios(FrappeTestCase):
 			).insert(ignore_permissions=True)
 
 	def test_soma_parcelas_diferente_total_falha(self):
-		servico = create_test_servico().name
-		cliente = frappe.db.get_value("Servico", servico, "cliente")
+		servico = create_test_legal_case().name
+		cliente = frappe.db.get_value("Legal Case", servico, "client")
 		with self.assertRaises(ValidationError):
 			frappe.get_doc(
 				{
-					"doctype": "Acordo de Honorarios Processuais",
-					"servico": servico,
-					"cliente": cliente,
+					"doctype": "Fee Agreement",
+					"legal_case": servico,
+					"client": cliente,
 					"modo_honorarios": "Honorários Diretos",
-					"tipo_de_cobrança": "Valor fixo",
+					"billing_type": "Valor fixo",
 					"valor_total_do_acordo": 10000,
-					"parcelas": [
+					"fee_installments": [
 						{
 							"vencimento": today(),
 							"valor_total": 1000,
@@ -107,71 +107,71 @@ class TestAcordoHonorarios(FrappeTestCase):
 
 		acordo = create_test_acordo(num_parcelas=1, valor_total=1000)
 		for pag in get_acordo_pagamentos(acordo.name):
-			doc = frappe.get_doc("Pagamento", pag.name)
+			doc = frappe.get_doc("Legal Payment", pag.name)
 			doc.status = "Recebido"
 			doc.data_recebimento = today()
 			doc.valor_recebido = doc.valor
 			doc.save(ignore_permissions=True)
 			on_pagamento_update(doc, "on_update")
 
-		status = frappe.db.get_value("Acordo de Honorarios Processuais", acordo.name, "status")
+		status = frappe.db.get_value("Fee Agreement", acordo.name, "status")
 		self.assertEqual(status, "Quitado")
 
 	def test_acordo_divisao_com_sucumbencia_soma_parcelas(self):
 		"""Acordo 30k + 10% sucumbência: parcelas somam 33k, base adv+cli = 30k."""
-		servico = create_test_servico().name
-		cliente = frappe.db.get_value("Servico", servico, "cliente")
+		servico = create_test_legal_case().name
+		cliente = frappe.db.get_value("Legal Case", servico, "client")
 		valor_acordo = 30000
 		valor_adv = 9000
 		valor_cli = 21000
 		sucumbencia = 3000
 		doc = frappe.get_doc(
 			{
-				"doctype": "Acordo de Honorarios Processuais",
-				"servico": servico,
-				"cliente": cliente,
+				"doctype": "Fee Agreement",
+				"legal_case": servico,
+				"client": cliente,
 				"modo_honorarios": "Acordo com Divisão",
-				"tipo_de_cobrança": "Percentual do acordo",
+				"billing_type": "Percentual do acordo",
 				"percentual_advogada": 30,
 				"percentual_cliente": 70,
 				"valor_total_do_acordo": valor_acordo,
 				"valor_advogada": valor_adv,
 				"valor_cliente": valor_cli,
-				"honorários_de_sucumbência": sucumbencia,
-				"número_de_parcelas": 3,
+				"contingency_fee_amount": sucumbencia,
+				"installment_count": 3,
 				"data_primeira_parcela": today(),
-				"parcelas": [
+				"fee_installments": [
 					{
 						"vencimento": today(),
 						"valor_advogada": 3000,
 						"valor_cliente": 7000,
-						"valor_sucumbência": 3000,
+						"contingency_amount": 3000,
 						"valor_total": 13000,
 						"status": "Pendente",
-						"descrição": "Parcela 1 + Sucumbência",
+						"description": "Parcela 1 + Sucumbência",
 					},
 					{
 						"vencimento": add_months(today(), 1),
 						"valor_advogada": 3000,
 						"valor_cliente": 7000,
-						"valor_sucumbência": 0,
+						"contingency_amount": 0,
 						"valor_total": 10000,
 						"status": "Pendente",
-						"descrição": "Parcela 2",
+						"description": "Parcela 2",
 					},
 					{
 						"vencimento": add_months(today(), 2),
 						"valor_advogada": 3000,
 						"valor_cliente": 7000,
-						"valor_sucumbência": 0,
+						"contingency_amount": 0,
 						"valor_total": 10000,
 						"status": "Pendente",
-						"descrição": "Parcela 3",
+						"description": "Parcela 3",
 					},
 				],
 			}
 		)
 		doc.insert(ignore_permissions=True)
-		soma = sum(flt(p.valor_total) for p in doc.parcelas)
+		soma = sum(flt(p.valor_total) for p in doc.fee_installments)
 		self.assertAlmostEqual(soma, valor_acordo + sucumbencia, places=2)
 		self.assertAlmostEqual(flt(doc.valor_advogada) + flt(doc.valor_cliente), valor_acordo, places=2)

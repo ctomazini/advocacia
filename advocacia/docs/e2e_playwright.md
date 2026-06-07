@@ -8,7 +8,7 @@
 
 ## Objetivo
 
-Validar o fluxo completo na UI (Cliente → Serviço → satélites) com dados fictícios, **sem alterar documentos existentes**. Complementa a suite `run-tests` (230 testes backend), que não cobre interação browser.
+Validar o fluxo completo na UI (Client → Serviço → satélites) com dados fictícios, **sem alterar documentos existentes**. Complementa a suite `run-tests` (230 testes backend), que não cobre interação browser.
 
 ---
 
@@ -54,7 +54,7 @@ python advocacia/advocacia/tests/e2e/playwright_flow.py
 
 ## DocTypes percorridos (ordem)
 
-Comarca, Tribunal, Vara, Fase Processual, Cliente, Servico, Acordo de Honorarios Processuais, Registro de Atos, Audiencia, Controle de Prazos, Tarefa, Comunicacao, Registro de Horas, Custa Processual, Despesa do Escritorio, Template Documento, Kit de Documentos.
+Jurisdiction, Court, Court Branch, Case Phase, Client, Legal Case, Fee Agreement, Service Record, Hearing, Deadline, Legal Task, Case Communication, Time Entry, Court Cost, Office Expense, Document Template, Document Kit.
 
 ---
 
@@ -62,8 +62,8 @@ Comarca, Tribunal, Vara, Fase Processual, Cliente, Servico, Acordo de Honorarios
 
 | Item | Nota |
 | --- | --- |
-| Template Documento | Exige arquivo `.docx` anexo — pode falhar sem fixture |
-| Kit de Documentos | Exige child table `templates` — pode falhar sem template |
+| Document Template | Exige arquivo `.docx` anexo — pode falhar sem fixture |
+| Document Kit | Exige child table `templates` — pode falhar sem template |
 | Login Playwright puro | Script usa WSGI (`werkzeug.test.Client`) para cookies + Playwright para UI |
 | `install-deps` | Sem libs do sistema, Chromium falha com `libnspr4.so` |
 

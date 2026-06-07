@@ -18,7 +18,7 @@ fixtures = [
                 "in",
                 [
                     "Advocacia - Prazo vencendo",
-                    "Advocacia - Audiencia amanha",
+                    "Advocacia - Hearing amanha",
                 ],
             ]
         ],
@@ -41,6 +41,9 @@ app_include_js = [
     "/assets/advocacia/js/painel/audiencias.js",
     "/assets/advocacia/js/painel/timeline.js",
     "/assets/advocacia/js/painel/financeiro.js",
+    "/assets/advocacia/js/painel/refresh.js",
+    "/assets/advocacia/js/painel/sections.js",
+    "/assets/advocacia/js/painel/handlers.js",
     "/assets/advocacia/js/painel/index.js",
     "/assets/advocacia/js/list_nav.js",
     "/assets/advocacia/js/list_filters.js",
@@ -49,7 +52,7 @@ app_include_js = [
 ]
 
 standard_queries = {
-    "Servico": "advocacia.advocacia.doctype.servico.servico.servico_query",
+    "Legal Case": "advocacia.advocacia.doctype.legal_case.legal_case.legal_case_query",
 }
 
 scheduler_events = {
@@ -66,22 +69,22 @@ scheduler_events = {
 }
 
 doc_events = {
-    "Acordo de Honorarios Processuais": {
+    "Fee Agreement": {
         "on_update": "advocacia.advocacia.financeiro.sincronizar_pagamentos_hook",
     },
-    "Parcela de Honorarios": {
+    "Fee Installment": {
         "on_update": "advocacia.advocacia.tasks.on_parcela_update",
     },
-    "Pagamento": {
+    "Legal Payment": {
         # Handler único: tarefas + sync honorários/parcela (financeiro.processar_pagamento_on_update)
         "on_update": "advocacia.advocacia.financeiro.processar_pagamento_on_update",
         "on_trash": "advocacia.advocacia.financeiro.on_pagamento_trash",
     },
-    "Audiencia": {
+    "Hearing": {
         "after_insert": "advocacia.advocacia.calendar_sync.sync_audiencia_to_event",
         "on_update": "advocacia.advocacia.calendar_sync.sync_audiencia_to_event",
     },
-    "Controle de Prazos": {
+    "Deadline": {
         "after_insert": "advocacia.advocacia.calendar_sync.sync_prazo_to_event",
         "on_update": "advocacia.advocacia.calendar_sync.sync_prazo_to_event",
     },

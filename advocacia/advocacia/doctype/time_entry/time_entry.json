@@ -1,0 +1,267 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-05-31 12:00:00",
+ "custom": 0,
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "informacoes_section",
+  "title",
+  "servico",
+  "cliente",
+  "column_break_info",
+  "data",
+  "responsavel",
+  "tempo_section",
+  "hora_inicio",
+  "hora_fim",
+  "column_break_tempo",
+  "duracao_minutos",
+  "duracao_horas",
+  "atividade_section",
+  "atividade",
+  "categoria",
+  "descricao",
+  "cobravel",
+  "timer_section",
+  "timer_display",
+  "timer_inicio",
+  "timer_ativo"
+ ],
+ "fields": [
+  {
+   "fieldname": "informacoes_section",
+   "fieldtype": "Section Break",
+   "label": "Informações",
+   "idx": 1
+  },
+  {
+   "fieldname": "legal_case",
+   "fieldtype": "Link",
+   "options": "Legal Case",
+   "label": "Serviço",
+   "reqd": 1,
+   "allow_in_quick_entry": 1,
+   "in_list_view": 1,
+   "description": "Serviço onde a atividade foi realizada.",
+   "in_standard_filter": 1,
+   "idx": 2
+  },
+  {
+   "fieldname": "client",
+   "fieldtype": "Link",
+   "options": "Client",
+   "label": "Client",
+   "read_only": 1,
+   "fetch_from": "servico.cliente",
+   "in_list_view": 0,
+   "description": "Preenchido automaticamente a partir do serviço.",
+   "idx": 3
+  },
+  {
+   "fieldname": "column_break_info",
+   "fieldtype": "Column Break",
+   "idx": 4
+  },
+  {
+   "fieldname": "data",
+   "fieldtype": "Date",
+   "label": "Data",
+   "reqd": 1,
+   "default": "Today",
+   "allow_in_quick_entry": 1,
+   "in_list_view": 1,
+   "description": "Data da atividade.",
+   "in_standard_filter": 1,
+   "idx": 5
+  },
+  {
+   "fieldname": "responsavel",
+   "fieldtype": "Link",
+   "options": "User",
+   "label": "Responsável",
+   "description": "Profissional que registrou a atividade.",
+   "in_standard_filter": 1,
+   "idx": 6
+  },
+  {
+   "fieldname": "tempo_section",
+   "fieldtype": "Section Break",
+   "label": "Tempo",
+   "idx": 7
+  },
+  {
+   "fieldname": "hora_inicio",
+   "fieldtype": "Time",
+   "label": "Hora Início",
+   "description": "Hora de início (timer).",
+   "idx": 8
+  },
+  {
+   "fieldname": "hora_fim",
+   "fieldtype": "Time",
+   "label": "Hora Fim",
+   "description": "Hora de término (timer).",
+   "idx": 9
+  },
+  {
+   "fieldname": "column_break_tempo",
+   "fieldtype": "Column Break",
+   "idx": 10
+  },
+  {
+   "fieldname": "duracao_minutos",
+   "fieldtype": "Int",
+   "label": "Duração (min)",
+   "default": "0",
+   "description": "Preenchido ao parar o timer ou informando início/fim manualmente",
+   "idx": 11
+  },
+  {
+   "fieldname": "duracao_horas",
+   "fieldtype": "Float",
+   "label": "Duração (horas)",
+   "read_only": 1,
+   "in_list_view": 0,
+   "description": "Duração convertida em horas. Calculada automaticamente.",
+   "idx": 12
+  },
+  {
+   "fieldname": "atividade_section",
+   "fieldtype": "Section Break",
+   "label": "Atividade",
+   "idx": 13
+  },
+  {
+   "fieldname": "atividade",
+   "fieldtype": "Data",
+   "label": "Atividade",
+   "reqd": 1,
+   "allow_in_quick_entry": 1,
+   "in_list_view": 1,
+   "description": "Descrição curta da atividade realizada.",
+   "idx": 14
+  },
+  {
+   "fieldname": "categoria",
+   "fieldtype": "Select",
+   "label": "Categoria",
+   "options": "Estudo/Pesquisa\nRedação\nAudiência\nReunião\nDeslocamento\nAtendimento\nAdministrativo\nOutro",
+   "description": "Categoria da atividade: Reunião, Petição, Pesquisa, etc.",
+   "in_standard_filter": 1,
+   "idx": 15
+  },
+  {
+   "fieldname": "descricao",
+   "fieldtype": "Small Text",
+   "label": "Detalhes",
+   "description": "Detalhamento complementar da atividade.",
+   "idx": 16
+  },
+  {
+   "fieldname": "cobravel",
+   "fieldtype": "Check",
+   "label": "Cobrável",
+   "default": "1",
+   "description": "Marque se o tempo deve entrar em relatórios de cobrança.",
+   "idx": 17
+  },
+  {
+   "fieldname": "timer_section",
+   "fieldtype": "Section Break",
+   "label": "Timer",
+   "idx": 18
+  },
+  {
+   "fieldname": "timer_display",
+   "fieldtype": "HTML",
+   "label": "Tempo Decorrido",
+   "description": "Widget visual do contador (client-side)",
+   "idx": 19
+  },
+  {
+   "fieldname": "timer_inicio",
+   "fieldtype": "Datetime",
+   "hidden": 1,
+   "label": "Início do Timer",
+   "read_only": 1,
+   "description": "Timestamp server-side do início",
+   "idx": 20
+  },
+  {
+   "fieldname": "timer_ativo",
+   "fieldtype": "Check",
+   "default": "0",
+   "hidden": 1,
+   "label": "Timer Ativo",
+   "read_only": 1,
+   "description": "Flag: 1=correndo, 0=parado",
+   "idx": 21
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "label": "Título",
+   "hidden": 0,
+   "read_only": 0,
+   "allow_in_quick_entry": 1,
+   "idx": 22,
+   "in_list_view": 0,
+   "description": "Título automático no formato ID — descritor."
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 0,
+ "is_tree": 0,
+ "issingle": 0,
+ "istable": 0,
+ "links": [],
+ "modified": "2026-05-31 12:00:00",
+ "modified_by": "Administrator",
+ "module": "Advocacia",
+ "name": "Time Entry",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "Advocacia Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "idx": 1
+  },
+  {
+   "role": "Advocacia User",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 0,
+   "report": 1,
+   "export": 1,
+   "idx": 2
+  },
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "idx": 3
+  }
+ ],
+ "states": [],
+ "autoname": "format:HRS-{YYYY}-{####}",
+ "naming_rule": "Expression",
+ "title_field": "title",
+ "search_fields": "atividade,cliente,data",
+ "sort_field": "data",
+ "sort_order": "DESC",
+ "quick_entry": 1,
+ "track_changes": 1,
+ "show_title_field_in_link": 1
+}

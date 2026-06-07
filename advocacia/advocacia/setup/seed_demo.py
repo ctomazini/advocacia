@@ -18,7 +18,7 @@ import frappe
 from frappe.utils import add_days, add_months, flt, get_datetime, now_datetime, today
 
 from advocacia.advocacia.financeiro import gerar_pagamento_atos, sincronizar_pagamentos_do_acordo
-from advocacia.advocacia.tests.test_setup import create_test_servico
+from advocacia.advocacia.tests.test_setup import create_test_legal_case
 from advocacia.advocacia.validators import _calcular_dv_cnj, _calcular_dv_cnpj, _calcular_dv_cpf
 
 DEMO_MARKER = "_DEMO_"
@@ -39,81 +39,81 @@ def _demo_cnpj(seed: int) -> str:
 
 
 CREATION_ORDER = [
-	"Comarca",
-	"Tribunal",
-	"Vara",
-	"Fase Processual",
-	"Cliente",
-	"Servico",
-	"Acordo de Honorarios Processuais",
-	"Registro de Atos",
-	"Pagamento",
-	"Audiencia",
-	"Controle de Prazos",
-	"Tarefa",
-	"Comunicacao",
-	"Registro de Horas",
-	"Custa Processual",
-	"Despesa do Escritorio",
-	"Template Documento",
-	"Kit de Documentos",
+	"Jurisdiction",
+	"Court",
+	"Court Branch",
+	"Case Phase",
+	"Client",
+	"Legal Case",
+	"Fee Agreement",
+	"Service Record",
+	"Legal Payment",
+	"Hearing",
+	"Deadline",
+	"Legal Task",
+	"Case Communication",
+	"Time Entry",
+	"Court Cost",
+	"Office Expense",
+	"Document Template",
+	"Document Kit",
 ]
 
 TEARDOWN_ORDER = [
-	"Registro de Horas",
-	"Comunicacao",
-	"Tarefa",
-	"Custa Processual",
-	"Despesa do Escritorio",
-	"Pagamento",
-	"Audiencia",
-	"Controle de Prazos",
-	"Registro de Atos",
-	"Acordo de Honorarios Processuais",
-	"Servico",
-	"Cliente",
-	"Template Documento",
-	"Kit de Documentos",
-	"Vara",
-	"Comarca",
-	"Tribunal",
-	"Fase Processual",
+	"Time Entry",
+	"Case Communication",
+	"Legal Task",
+	"Court Cost",
+	"Office Expense",
+	"Legal Payment",
+	"Hearing",
+	"Deadline",
+	"Service Record",
+	"Fee Agreement",
+	"Legal Case",
+	"Client",
+	"Document Template",
+	"Document Kit",
+	"Court Branch",
+	"Jurisdiction",
+	"Court",
+	"Case Phase",
 ]
 
 DEMO_MARKER_FIELDS: dict[str, str] = {
-	"Cliente": "nome",
-	"Servico": "observacoes",
-	"Acordo de Honorarios Processuais": "observações",
-	"Registro de Atos": "observacoes",
-	"Pagamento": "descricao",
-	"Audiencia": "observacoes",
-	"Controle de Prazos": "descricao",
-	"Tarefa": "titulo",
-	"Comunicacao": "assunto",
-	"Registro de Horas": "atividade",
-	"Custa Processual": "descricao",
-	"Despesa do Escritorio": "descricao",
+	"Client": "nome",
+	"Legal Case": "observacoes",
+	"Fee Agreement": "remarks",
+	"Service Record": "observacoes",
+	"Legal Payment": "descricao",
+	"Hearing": "observacoes",
+	"Deadline": "descricao",
+	"Legal Task": "titulo",
+	"Case Communication": "assunto",
+	"Time Entry": "atividade",
+	"Court Cost": "descricao",
+	"Office Expense": "descricao",
 }
 
 AUTONAME_FIELD_DOCTYPES: dict[str, str] = {
-	"Comarca": "comarca_name",
-	"Vara": "vara_name",
-	"Tribunal": "tribunal_name",
-	"Fase Processual": "phase_name",
-	"Template Documento": "titulo",
-	"Kit de Documentos": "titulo",
+	"Jurisdiction": "jurisdiction_name",
+	"Court Branch": "court_branch_name",
+	"Court": "court_name",
+	"Case Phase": "case_phase_name",
+	"Document Template": "titulo",
+	"Document Kit": "titulo",
 }
 
 SERVICO_LINKED_DOCTYPES = (
-	"Pagamento",
-	"Audiencia",
-	"Controle de Prazos",
-	"Tarefa",
-	"Comunicacao",
-	"Registro de Horas",
-	"Custa Processual",
-	"Acordo de Honorarios Processuais",
-	"Registro de Atos",
+	"Legal Payment",
+	"Hearing",
+	"Deadline",
+	"Legal Task",
+	"Case Communication",
+	"Time Entry",
+	"Court Cost",
+	"Fee Agreement",
+	"Service Record",
 )
 
 _refs: dict[str, Any] = {}
@@ -232,7 +232,7 @@ def _get_or_create(doctype: str, name_field: str, name_value: str, doc_dict: dic
 
 def _get_demo_cliente_names() -> list[str]:
 	return frappe.get_all(
-		"Cliente",
+		"Client",
 		filters={"nome": ["like", f"%{DEMO_MARKER}%"]},
 		pluck="name",
 	)
@@ -240,7 +240,7 @@ def _get_demo_cliente_names() -> list[str]:
 
 def _get_demo_servico_names() -> list[str]:
 	return frappe.get_all(
-		"Servico",
+		"Legal Case",
 		filters={"observacoes": ["like", f"%{DEMO_MARKER}%"]},
 		pluck="name",
 	)
@@ -270,7 +270,7 @@ def _get_demo_doc_names(
 
 	if doctype in SERVICO_LINKED_DOCTYPES and demo_servicos:
 		names.update(
-			frappe.get_all(doctype, filters={"servico": ["in", demo_servicos]}, pluck="name")
+			frappe.get_all(doctype, filters={"legal_case": ["in", demo_servicos]}, pluck="name")
 		)
 
 	return list(names)
@@ -287,7 +287,7 @@ def _count_demo(doctype: str) -> int:
 		servicos = _get_demo_servico_names()
 		if not servicos:
 			return 0
-		return frappe.db.count(doctype, {"servico": ["in", servicos]})
+		return frappe.db.count(doctype, {"legal_case": ["in", servicos]})
 	return 0
 
 
@@ -300,7 +300,7 @@ def _cnj_valido(seq: int) -> str:
 
 def _endereco_demo(cidade: str = "Novo Hamburgo", estado: str = "RS", tipo: str = "Residencial"):
 	return {
-		"doctype": "Endereco Cliente",
+		"doctype": "Client Address",
 		"tipo": tipo,
 		"cep": "93510000",
 		"logradouro": "Rua das Flores",
@@ -314,7 +314,7 @@ def _endereco_demo(cidade: str = "Novo Hamburgo", estado: str = "RS", tipo: str 
 
 def _contato_demo(nome: str, email: str):
 	return {
-		"doctype": "Contato Cliente",
+		"doctype": "Client Contact",
 		"nome": nome,
 		"tipo": "Principal",
 		"celular": "51987654321",
@@ -357,39 +357,39 @@ def _create_docx_file(paragraph: str = "Template demo {{ cliente }}") -> str | N
 
 def _seed_cadastros() -> None:
 	comarcas_data = [
-		{"comarca_name": _demo_label("Novo Hamburgo"), "uf": "RS", "city": "Novo Hamburgo"},
-		{"comarca_name": _demo_label("São Leopoldo"), "uf": "RS", "city": "São Leopoldo"},
-		{"comarca_name": _demo_label("Porto Alegre"), "uf": "RS", "city": "Porto Alegre"},
-		{"comarca_name": _demo_label("Canoas"), "uf": "RS", "city": "Canoas"},
+		{"jurisdiction_name": _demo_label("Novo Hamburgo"), "uf": "RS", "city": "Novo Hamburgo"},
+		{"jurisdiction_name": _demo_label("São Leopoldo"), "uf": "RS", "city": "São Leopoldo"},
+		{"jurisdiction_name": _demo_label("Porto Alegre"), "uf": "RS", "city": "Porto Alegre"},
+		{"jurisdiction_name": _demo_label("Canoas"), "uf": "RS", "city": "Canoas"},
 	]
 	comarcas = []
 	for data in comarcas_data:
 		comarcas.append(
-			_get_or_create("Comarca", "comarca_name", data["comarca_name"], {"doctype": "Comarca", **data})
+			_get_or_create("Jurisdiction", "jurisdiction_name", data["jurisdiction_name"], {"doctype": "Jurisdiction", **data})
 		)
 	_refs["comarcas"] = comarcas
 
 	tribunais_data = [
-		{"tribunal_name": _demo_label("TJRS"), "abbreviation": "TJRS", "jurisdiction": "Estadual"},
-		{"tribunal_name": _demo_label("TRF4"), "abbreviation": "TRF4", "jurisdiction": "Federal"},
-		{"tribunal_name": _demo_label("TRT4"), "abbreviation": "TRT4", "jurisdiction": "Trabalho"},
+		{"court_name": _demo_label("TJRS"), "abbreviation": "TJRS", "jurisdiction": "Estadual"},
+		{"court_name": _demo_label("TRF4"), "abbreviation": "TRF4", "jurisdiction": "Federal"},
+		{"court_name": _demo_label("TRT4"), "abbreviation": "TRT4", "jurisdiction": "Trabalho"},
 	]
 	tribunais = []
 	for data in tribunais_data:
 		tribunais.append(
-			_get_or_create("Tribunal", "tribunal_name", data["tribunal_name"], {"doctype": "Tribunal", **data})
+			_get_or_create("Court", "court_name", data["court_name"], {"doctype": "Court", **data})
 		)
 	_refs["tribunais"] = tribunais
 
 	varas_data = [
-		{"vara_name": _demo_label("1ª Vara Cível"), "comarca": comarcas[0].name, "court_type": "Cível"},
-		{"vara_name": _demo_label("2ª Vara Cível"), "comarca": comarcas[1].name, "court_type": "Cível"},
-		{"vara_name": _demo_label("Vara do Trabalho"), "comarca": comarcas[2].name, "court_type": "Trabalho"},
-		{"vara_name": _demo_label("JEC"), "comarca": comarcas[3].name, "court_type": "Juizado Especial"},
+		{"court_branch_name": _demo_label("1ª Court Branch Cível"), "jurisdiction": comarcas[0].name, "court_type": "Cível"},
+		{"court_branch_name": _demo_label("2ª Court Branch Cível"), "jurisdiction": comarcas[1].name, "court_type": "Cível"},
+		{"court_branch_name": _demo_label("Court Branch do Trabalho"), "jurisdiction": comarcas[2].name, "court_type": "Trabalho"},
+		{"court_branch_name": _demo_label("JEC"), "jurisdiction": comarcas[3].name, "court_type": "Juizado Especial"},
 	]
 	varas = []
 	for data in varas_data:
-		varas.append(_get_or_create("Vara", "vara_name", data["vara_name"], {"doctype": "Vara", **data}))
+		varas.append(_get_or_create("Court Branch", "court_branch_name", data["court_branch_name"], {"doctype": "Court Branch", **data}))
 	_refs["varas"] = varas
 
 	fases_data = [
@@ -401,13 +401,13 @@ def _seed_cadastros() -> None:
 	]
 	fases = []
 	for nome, ordem in fases_data:
-		phase_name = _demo_label(nome)
+		case_phase_name = _demo_label(nome)
 		fases.append(
 			_get_or_create(
-				"Fase Processual",
-				"phase_name",
-				phase_name,
-				{"doctype": "Fase Processual", "phase_name": phase_name, "sort_order": ordem},
+				"Case Phase",
+				"case_phase_name",
+				case_phase_name,
+				{"doctype": "Case Phase", "case_phase_name": case_phase_name, "sort_order": ordem},
 			)
 		)
 	_refs["fases"] = fases
@@ -429,15 +429,15 @@ def _seed_clientes() -> None:
 	clientes = []
 	for tipo, nome, cpf, cnpj, email, cidade in specs:
 		filters = {"nome": nome}
-		if frappe.db.exists("Cliente", filters):
-			clientes.append(frappe.get_doc("Cliente", filters))
+		if frappe.db.exists("Client", filters):
+			clientes.append(frappe.get_doc("Client", filters))
 			continue
 		data: dict[str, Any] = {
-			"doctype": "Cliente",
+			"doctype": "Client",
 			"tipo_pessoa": tipo,
 			"nome": nome,
-			"enderecos": [_endereco_demo(cidade=cidade)],
-			"contatos": [_contato_demo(nome.replace(DEMO_MARKER, "").strip(), email)],
+			"addresses": [_endereco_demo(cidade=cidade)],
+			"contacts": [_contato_demo(nome.replace(DEMO_MARKER, "").strip(), email)],
 		}
 		if cpf:
 			data["cpf"] = cpf
@@ -459,30 +459,30 @@ def _seed_servicos() -> None:
 
 	specs = [
 		(clientes[0], "Consultoria", {}),
-		(clientes[0], "Processo Judicial", {"numero_processo": _cnj_valido(101), "comarca": comarcas[0].name, "vara": varas[0].name, "tribunal": tribunal.name, "fase_processual": fases[0].name}),
-		(clientes[1], "Processo Judicial", {"numero_processo": _cnj_valido(2), "comarca": comarcas[1].name, "vara": varas[1].name, "tribunal": tribunal.name, "fase_processual": fases[1].name}),
+		(clientes[0], "Processo Judicial", {"numero_processo": _cnj_valido(101), "jurisdiction": comarcas[0].name, "court_branch_link": varas[0].name, "court": tribunal.name, "case_phase": fases[0].name}),
+		(clientes[1], "Processo Judicial", {"numero_processo": _cnj_valido(2), "jurisdiction": comarcas[1].name, "court_branch_link": varas[1].name, "court": tribunal.name, "case_phase": fases[1].name}),
 		(clientes[2], "Administrativo", {}),
 		(clientes[3], "Consultoria", {}),
-		(clientes[4], "Processo Judicial", {"numero_processo": _cnj_valido(3), "comarca": comarcas[2].name, "vara": varas[2].name, "tribunal": tribunal.name, "fase_processual": fases[2].name}),
+		(clientes[4], "Processo Judicial", {"numero_processo": _cnj_valido(3), "jurisdiction": comarcas[2].name, "court_branch_link": varas[2].name, "court": tribunal.name, "case_phase": fases[2].name}),
 		(clientes[5], "Diligência", {}),
-		(clientes[6], "Processo Judicial", {"numero_processo": _cnj_valido(4), "comarca": comarcas[3].name, "vara": varas[3].name, "tribunal": tribunal.name, "fase_processual": fases[3].name}),
+		(clientes[6], "Processo Judicial", {"numero_processo": _cnj_valido(4), "jurisdiction": comarcas[3].name, "court_branch_link": varas[3].name, "court": tribunal.name, "case_phase": fases[3].name}),
 		(clientes[7], "Consultoria", {}),
-		(clientes[8], "Processo Judicial", {"numero_processo": _cnj_valido(5), "comarca": comarcas[0].name, "vara": varas[0].name, "tribunal": _refs["tribunais"][1].name}),
-		(clientes[9], "Processo Judicial", {"numero_processo": _cnj_valido(6), "comarca": comarcas[1].name, "vara": varas[1].name, "tribunal": _refs["tribunais"][2].name, "fase_processual": fases[4].name}),
+		(clientes[8], "Processo Judicial", {"numero_processo": _cnj_valido(5), "jurisdiction": comarcas[0].name, "court_branch_link": varas[0].name, "court": _refs["tribunais"][1].name}),
+		(clientes[9], "Processo Judicial", {"numero_processo": _cnj_valido(6), "jurisdiction": comarcas[1].name, "court_branch_link": varas[1].name, "court": _refs["tribunais"][2].name, "case_phase": fases[4].name}),
 		(clientes[0], "Contrato", {}),
 		(clientes[1], "Consultoria", {}),
-		(clientes[2], "Processo Judicial", {"numero_processo": _cnj_valido(7), "comarca": comarcas[2].name, "vara": varas[2].name, "tribunal": tribunal.name}),
+		(clientes[2], "Processo Judicial", {"numero_processo": _cnj_valido(7), "jurisdiction": comarcas[2].name, "court_branch_link": varas[2].name, "court": tribunal.name}),
 		(clientes[3], "Diligência", {}),
 		(clientes[4], "Administrativo", {}),
-		(clientes[5], "Processo Judicial", {"numero_processo": _cnj_valido(8), "comarca": comarcas[3].name, "vara": varas[3].name, "tribunal": tribunal.name, "fase_processual": fases[1].name}),
+		(clientes[5], "Processo Judicial", {"numero_processo": _cnj_valido(8), "jurisdiction": comarcas[3].name, "court_branch_link": varas[3].name, "court": tribunal.name, "case_phase": fases[1].name}),
 	]
 
 	servicos = []
 	for cliente, tipo, extra in specs:
-		if frappe.db.exists("Servico", {"cliente": cliente.name, "observacoes": marker_obs, "tipo": tipo}):
+		if frappe.db.exists("Legal Case", {"client": cliente.name, "observacoes": marker_obs, "tipo": tipo}):
 			continue
 		servicos.append(
-			create_test_servico(
+			create_test_legal_case(
 				cliente=cliente.name,
 				tipo=tipo,
 				observacoes=marker_obs,
@@ -492,9 +492,9 @@ def _seed_servicos() -> None:
 	if len(servicos) < len(specs):
 		# Recarrega todos os serviços demo se parte já existia
 		servicos = [
-			frappe.get_doc("Servico", n)
+			frappe.get_doc("Legal Case", n)
 			for n in frappe.get_all(
-				"Servico",
+				"Legal Case",
 				filters={"observacoes": ["like", f"%{DEMO_MARKER}%"]},
 				pluck="name",
 				order_by="creation asc",
@@ -518,32 +518,32 @@ def _seed_acordos() -> None:
 	acordos = []
 	for servico, valor, parcelas in specs:
 		if frappe.get_all(
-			"Acordo de Honorarios Processuais",
-			filters={"servico": servico.name, "observações": ["like", f"%{DEMO_MARKER}%"]},
+			"Fee Agreement",
+			filters={"legal_case": servico.name, "remarks": ["like", f"%{DEMO_MARKER}%"]},
 			limit=1,
 		):
 			continue
 		valor_parcela = flt(valor) / parcelas
 		acordo = _insert(
 			{
-				"doctype": "Acordo de Honorarios Processuais",
-				"servico": servico.name,
+				"doctype": "Fee Agreement",
+				"legal_case": servico.name,
 				"modo_honorarios": "Honorários Diretos",
-				"tipo_de_cobrança": "Valor fixo",
+				"billing_type": "Valor fixo",
 				"valor_total_do_acordo": valor,
-				"número_de_parcelas": parcelas,
+				"installment_count": parcelas,
 				"data_primeira_parcela": today(),
-				"observações": _demo_text("Acordo de honorários demo"),
-				"parcelas": [
+				"remarks": _demo_text("Acordo de honorários demo"),
+				"fee_installments": [
 					{
-						"doctype": "Parcela de Honorarios",
+						"doctype": "Fee Installment",
 						"vencimento": add_months(today(), i),
 						"valor_total": valor_parcela,
 						"valor_advogada": valor_parcela,
 						"valor_cliente": 0,
-						"valor_sucumbência": 0,
+						"contingency_amount": 0,
 						"status": "Pendente",
-						"descrição": _demo_text(f"Parcela {i + 1}"),
+						"description": _demo_text(f"Parcela {i + 1}"),
 					}
 					for i in range(parcelas)
 				],
@@ -552,17 +552,17 @@ def _seed_acordos() -> None:
 		sincronizar_pagamentos_do_acordo(acordo)
 		acordos.append(acordo)
 	_refs["acordos"] = acordos or [
-		frappe.get_doc("Acordo de Honorarios Processuais", n)
+		frappe.get_doc("Fee Agreement", n)
 		for n in frappe.get_all(
-			"Acordo de Honorarios Processuais",
-			filters={"observações": ["like", f"%{DEMO_MARKER}%"]},
+			"Fee Agreement",
+			filters={"remarks": ["like", f"%{DEMO_MARKER}%"]},
 			pluck="name",
 		)
 	]
 
 
 def _ato_row(data, tipo, valor, descricao):
-	return {"data": data, "tipo": tipo, "valor": valor, "descrição": _demo_text(descricao)}
+	return {"data": data, "tipo": tipo, "valor": valor, "description": _demo_text(descricao)}
 
 
 def _seed_registro_atos() -> None:
@@ -570,18 +570,18 @@ def _seed_registro_atos() -> None:
 	registros = []
 	for idx, servico in enumerate(servicos):
 		if _demo_exists(
-			"Registro de Atos",
-			{"servico": servico.name, "observacoes": ["like", f"%{DEMO_MARKER}%"]},
+			"Service Record",
+			{"legal_case": servico.name, "observacoes": ["like", f"%{DEMO_MARKER}%"]},
 		):
 			continue
 		registros.append(
 			_insert(
 				{
-					"doctype": "Registro de Atos",
-					"servico": servico.name,
+					"doctype": "Service Record",
+					"legal_case": servico.name,
 					"data_abertura": add_days(today(), -10 + idx),
 					"observacoes": _demo_text(f"Registro de atos demo {idx + 1}"),
-					"atos": [
+					"acts": [
 						_ato_row(today(), "Inicial", 1000 + idx * 200, f"Petição {idx + 1}"),
 						_ato_row(today(), "Defesa", 1500, f"Defesa {idx + 1}"),
 					],
@@ -589,9 +589,9 @@ def _seed_registro_atos() -> None:
 			)
 		)
 	_refs["registros_atos"] = registros or [
-		frappe.get_doc("Registro de Atos", n)
+		frappe.get_doc("Service Record", n)
 		for n in frappe.get_all(
-			"Registro de Atos",
+			"Service Record",
 			filters={"observacoes": ["like", f"%{DEMO_MARKER}%"]},
 			pluck="name",
 		)
@@ -603,41 +603,41 @@ def _seed_registro_atos() -> None:
 def _seed_pagamentos() -> None:
 	"""Marca pagamentos sincronizados e varia status para cenários do painel."""
 	for pag in frappe.get_all(
-		"Pagamento",
-		filters={"servico": ["in", [s.name for s in _refs["servicos"]]]},
+		"Legal Payment",
+		filters={"legal_case": ["in", [s.name for s in _refs["servicos"]]]},
 		fields=["name", "descricao"],
 	):
 		if DEMO_MARKER not in (pag.descricao or ""):
 			frappe.db.set_value(
-				"Pagamento",
+				"Legal Payment",
 				pag.name,
 				"descricao",
-				_demo_text(pag.descricao or "Pagamento demo"),
+				_demo_text(pag.descricao or "Legal Payment demo"),
 				update_modified=False,
 			)
 
 	pagamentos = frappe.get_all(
-		"Pagamento",
+		"Legal Payment",
 		filters={"descricao": ["like", f"%{DEMO_MARKER}%"]},
 		pluck="name",
 		order_by="creation asc",
 	)
 	if pagamentos:
-		p1 = frappe.get_doc("Pagamento", pagamentos[0])
+		p1 = frappe.get_doc("Legal Payment", pagamentos[0])
 		p1.status = "Recebido"
 		p1.data_recebimento = today()
 		p1.valor_recebido = p1.valor
 		p1.save(ignore_permissions=True)
 	if len(pagamentos) > 1:
 		frappe.db.set_value(
-			"Pagamento",
+			"Legal Payment",
 			pagamentos[1],
 			{"data_vencimento": add_days(today(), -7), "status": "Vencido"},
 			update_modified=True,
 		)
 	if len(pagamentos) > 2:
 		frappe.db.set_value(
-			"Pagamento",
+			"Legal Payment",
 			pagamentos[2],
 			{"data_vencimento": add_days(today(), -30), "status": "Vencido"},
 			update_modified=True,
@@ -662,14 +662,14 @@ def _seed_audiencias() -> None:
 	]
 	for servico, offset, modalidade, status_aud, tipo in specs:
 		if _demo_exists(
-			"Audiencia",
-			{"servico": servico.name, "tipo": tipo, "observacoes": ["like", f"%{DEMO_MARKER}%"]},
+			"Hearing",
+			{"legal_case": servico.name, "tipo": tipo, "observacoes": ["like", f"%{DEMO_MARKER}%"]},
 		):
 			continue
 		_insert(
 			{
-				"doctype": "Audiencia",
-				"servico": servico.name,
+				"doctype": "Hearing",
+				"legal_case": servico.name,
 				"data_hora": get_datetime(add_days(today(), offset)),
 				"tipo": tipo,
 				"modalidade": modalidade,
@@ -695,14 +695,14 @@ def _seed_prazos() -> None:
 	]
 	for servico, offset, prioridade, status, descricao in specs:
 		if _demo_exists(
-			"Controle de Prazos",
-			{"servico": servico.name, "descricao": ["like", f"%{DEMO_MARKER}%"]},
+			"Deadline",
+			{"legal_case": servico.name, "descricao": ["like", f"%{DEMO_MARKER}%"]},
 		):
 			continue
 		_insert(
 			{
-				"doctype": "Controle de Prazos",
-				"servico": servico.name,
+				"doctype": "Deadline",
+				"legal_case": servico.name,
 				"data_prazo": add_days(today(), offset),
 				"descricao": _demo_text(descricao),
 				"prioridade": prioridade,
@@ -726,12 +726,12 @@ def _seed_tarefas() -> None:
 		(servicos[9], "Atualizar andamento", "Em Andamento", "Normal", 4),
 	]
 	for servico, titulo, status, prioridade, offset in specs:
-		if _demo_exists("Tarefa", {"servico": servico.name, "titulo": ["like", f"%{DEMO_MARKER}%"]}):
+		if _demo_exists("Legal Task", {"legal_case": servico.name, "titulo": ["like", f"%{DEMO_MARKER}%"]}):
 			continue
 		_insert(
 			{
-				"doctype": "Tarefa",
-				"servico": servico.name,
+				"doctype": "Legal Task",
+				"legal_case": servico.name,
 				"titulo": _demo_text(titulo),
 				"status": status,
 				"prioridade": prioridade,
@@ -754,13 +754,13 @@ def _seed_comunicacoes() -> None:
 		(clientes[8], servicos[min(10, len(servicos) - 1)], "Atualização processual", "Outro"),
 	]
 	for cliente, servico, assunto, tipo in specs:
-		if _demo_exists("Comunicacao", {"assunto": ["like", f"%{DEMO_MARKER}%"], "servico": servico.name}):
+		if _demo_exists("Case Communication", {"assunto": ["like", f"%{DEMO_MARKER}%"], "legal_case": servico.name}):
 			continue
 		_insert(
 			{
-				"doctype": "Comunicacao",
-				"cliente": cliente.name,
-				"servico": servico.name,
+				"doctype": "Case Communication",
+				"client": cliente.name,
+				"legal_case": servico.name,
 				"assunto": _demo_text(assunto),
 				"tipo": tipo,
 				"data": now_datetime(),
@@ -780,14 +780,14 @@ def _seed_registro_horas() -> None:
 	]
 	for servico, atividade, minutos in specs:
 		if _demo_exists(
-			"Registro de Horas",
-			{"servico": servico.name, "atividade": ["like", f"%{DEMO_MARKER}%"]},
+			"Time Entry",
+			{"legal_case": servico.name, "atividade": ["like", f"%{DEMO_MARKER}%"]},
 		):
 			continue
 		_insert(
 			{
-				"doctype": "Registro de Horas",
-				"servico": servico.name,
+				"doctype": "Time Entry",
+				"legal_case": servico.name,
 				"data": add_days(today(), -3),
 				"atividade": _demo_text(atividade),
 				"duracao_minutos": minutos,
@@ -806,14 +806,14 @@ def _seed_custas() -> None:
 	]
 	for servico, tipo, valor, descricao in specs:
 		if _demo_exists(
-			"Custa Processual",
-			{"servico": servico.name, "descricao": ["like", f"%{DEMO_MARKER}%"]},
+			"Court Cost",
+			{"legal_case": servico.name, "descricao": ["like", f"%{DEMO_MARKER}%"]},
 		):
 			continue
 		_insert(
 			{
-				"doctype": "Custa Processual",
-				"servico": servico.name,
+				"doctype": "Court Cost",
+				"legal_case": servico.name,
 				"tipo": tipo,
 				"descricao": _demo_text(descricao),
 				"valor": valor,
@@ -829,11 +829,11 @@ def _seed_despesas() -> None:
 	]
 	for descricao, categoria, valor, offset, recorrente in specs:
 		marked = _demo_text(descricao)
-		if frappe.db.exists("Despesa do Escritorio", {"descricao": marked}):
+		if frappe.db.exists("Office Expense", {"descricao": marked}):
 			continue
 		_insert(
 			{
-				"doctype": "Despesa do Escritorio",
+				"doctype": "Office Expense",
 				"descricao": marked,
 				"categoria": categoria,
 				"valor": valor,
@@ -855,12 +855,12 @@ def _seed_templates() -> None:
 		(_demo_label("Procuração Ad Judicia"), "Contrato"),
 		(_demo_label("Contrato de Honorários"), "Contrato"),
 	]:
-		if frappe.db.exists("Template Documento", titulo):
+		if frappe.db.exists("Document Template", titulo):
 			templates.append(titulo)
 			continue
 		doc = _insert(
 			{
-				"doctype": "Template Documento",
+				"doctype": "Document Template",
 				"titulo": titulo,
 				"tipo_documento": tipo,
 				"descricao": _demo_text(f"Modelo {tipo}"),
@@ -871,10 +871,10 @@ def _seed_templates() -> None:
 		templates.append(doc.name)
 
 	kit_titulo = _demo_label("Kit Inicial Processual")
-	if not frappe.db.exists("Kit de Documentos", kit_titulo):
+	if not frappe.db.exists("Document Kit", kit_titulo):
 		_insert(
 			{
-				"doctype": "Kit de Documentos",
+				"doctype": "Document Kit",
 				"titulo": kit_titulo,
 				"descricao": _demo_text("Kit de documentos para abertura de processo"),
 				"habilitado": 1,
@@ -908,9 +908,9 @@ def reportar_contagens_demo():
 def validar_seed_demo():
 	reportar_contagens_demo()
 	rows = frappe.get_all(
-		"Registro de Atos",
+		"Service Record",
 		filters={"observacoes": ["like", f"%{DEMO_MARKER}%"]},
-		fields=["name", "title", "cliente"],
+		fields=["name", "title", "client"],
 		order_by="name asc",
 	)
 	for row in rows:

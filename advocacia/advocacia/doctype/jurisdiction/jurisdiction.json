@@ -1,0 +1,86 @@
+{
+ "doctype": "DocType",
+ "name": "Jurisdiction",
+ "module": "Advocacia",
+ "custom": 0,
+ "istable": 0,
+ "track_changes": 1,
+ "autoname": "field:jurisdiction_name",
+ "naming_rule": "By fieldname",
+ "title_field": "jurisdiction_name",
+ "search_fields": "jurisdiction_name,uf",
+ "fields": [
+  {
+   "fieldname": "jurisdiction_name",
+   "label": "Nome da Jurisdiction",
+   "fieldtype": "Data",
+   "reqd": 1,
+   "unique": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "allow_in_quick_entry": 1,
+   "description": "Nome único da comarca. Usado como identificador do registro.",
+   "idx": 1
+  },
+  {
+   "fieldname": "uf",
+   "label": "UF",
+   "fieldtype": "Select",
+   "reqd": 1,
+   "options": "AC\nAL\nAM\nAP\nBA\nCE\nDF\nES\nGO\nMA\nMG\nMS\nMT\nPA\nPB\nPE\nPI\nPR\nRJ\nRN\nRO\nRR\nRS\nSC\nSE\nSP\nTO",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "allow_in_quick_entry": 1,
+   "description": "Unidade federativa (UF) da comarca.",
+   "idx": 2
+  },
+  {
+   "fieldname": "city",
+   "label": "Cidade",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "description": "Cidade sede da comarca.",
+   "idx": 3
+  }
+ ],
+ "permissions": [
+  {
+   "role": "Advocacia Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "idx": 1
+  },
+  {
+   "role": "Advocacia User",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 0,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "idx": 2
+  },
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "idx": 3
+  }
+ ],
+ "sort_field": "jurisdiction_name",
+ "sort_order": "ASC",
+ "quick_entry": 1,
+ "show_title_field_in_link": 1
+}

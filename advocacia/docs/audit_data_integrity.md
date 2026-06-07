@@ -19,7 +19,7 @@ Testes dedicados: `test_validators.py` (16 métodos).
 | Dígitos verificadores | Algoritmo Receita Federal (módulo 11) |
 | Campo vazio | Permite (validação condicional no controller) |
 
-**Usado em:** `Cliente` (cpf, cpf_representante), factories de teste, `seed_demo.py` (`_demo_cpf`).
+**Usado em:** `Client` (cpf, cpf_representante), factories de teste, `seed_demo.py` (`_demo_cpf`).
 
 ### CNPJ (`validar_cnpj`)
 
@@ -31,7 +31,7 @@ Testes dedicados: `test_validators.py` (16 métodos).
 | Dígitos verificadores | Pesos Receita Federal |
 | Campo vazio | Permite |
 
-**Usado em:** `Cliente`, `Configuracao do Escritorio`, `seed_demo.py` (`_demo_cnpj`).
+**Usado em:** `Client`, `Office Settings`, `seed_demo.py` (`_demo_cnpj`).
 
 ### CNJ (`validar_cnj`)
 
@@ -42,7 +42,7 @@ Testes dedicados: `test_validators.py` (16 métodos).
 | Ano do processo | Entre 1900 e ano corrente |
 | Máscara UI | `9999999-99.9999.9.99.9999` (`masks.js`) |
 
-**Usado em:** `Servico.numero_processo` (obrigatório para tipo Processo Judicial).
+**Usado em:** `Legal Case.numero_processo` (obrigatório para tipo Processo Judicial).
 
 ### Telefone (`validar_telefone`)
 
@@ -52,7 +52,7 @@ Testes dedicados: `test_validators.py` (16 métodos).
 | Celular | 11 dígitos; nono dígito = 9; segundo dígito local ≠ 0/1 |
 | Fixo | 10 dígitos; primeiro dígito local entre 2 e 5 |
 
-**Usado em:** `Contato Cliente` (telefone, celular), child tables de Cliente.
+**Usado em:** `Client Contact` (telefone, celular), child tables de Client.
 
 ### E-mail (`validar_email`)
 
@@ -61,7 +61,7 @@ Testes dedicados: `test_validators.py` (16 métodos).
 | Normalização | `.strip().lower()` antes de salvar |
 | Formato | Rejeita se sem `@` ou domínio sem `.` |
 
-**Usado em:** `Contato Cliente`, `Cliente` (contatos).
+**Usado em:** `Client Contact`, `Client` (contatos).
 
 ---
 
@@ -69,13 +69,13 @@ Testes dedicados: `test_validators.py` (16 métodos).
 
 | DocType | Campo | Validador | Momento |
 |---|---|---|---|
-| Cliente | cpf | `validar_cpf` | `validate()` |
-| Cliente | cnpj | `validar_cnpj` | `validate()` |
-| Cliente | cpf_representante | `validar_cpf` | `validate()` |
-| Contato Cliente | telefone, celular | `validar_telefone` | `validate()` |
-| Contato Cliente | email | `validar_email` | `validate()` |
-| Servico | numero_processo | `validar_cnj` | `validate()` (se Processo Judicial) |
-| Configuracao do Escritorio | cnpj_escritorio | `validar_cnpj` | `validate()` |
+| Client | cpf | `validar_cpf` | `validate()` |
+| Client | cnpj | `validar_cnpj` | `validate()` |
+| Client | cpf_representante | `validar_cpf` | `validate()` |
+| Client Contact | telefone, celular | `validar_telefone` | `validate()` |
+| Client Contact | email | `validar_email` | `validate()` |
+| Legal Case | numero_processo | `validar_cnj` | `validate()` (se Processo Judicial) |
+| Office Settings | cnpj_escritorio | `validar_cnpj` | `validate()` |
 
 **Princípio:** validação pesada no `.py` do DocType com `frappe.throw()` — JS (`masks.js`) é apenas UX.
 
@@ -85,19 +85,19 @@ Testes dedicados: `test_validators.py` (16 métodos).
 
 | Regra | DocType | Status |
 |---|---|---|
-| Data Fato ≤ Distribuição ≤ Intimação < Prazo Fatal | Controle de Prazos | ✅ `validate()` |
-| CNJ obrigatório se Processo Judicial | Servico | ✅ |
-| Comarca/Vara/Tribunal/Fase — Link rígido | Servico, cadastros | ✅ |
-| CPF ou CNPJ conforme tipo_pessoa | Cliente | ✅ |
-| Endereço principal único | Cliente (child) | ✅ controller |
-| Valores negativos bloqueados | Pagamento, Acordo, Custa | ✅ |
-| Overpayment parcela | Pagamento | ✅ |
+| Data Fato ≤ Distribuição ≤ Intimação < Prazo Fatal | Deadline | ✅ `validate()` |
+| CNJ obrigatório se Processo Judicial | Legal Case | ✅ |
+| Jurisdiction/Court Branch/Court/Fase — Link rígido | Legal Case, cadastros | ✅ |
+| CPF ou CNPJ conforme tipo_pessoa | Client | ✅ |
+| Endereço principal único | Client (child) | ✅ controller |
+| Valores negativos bloqueados | Legal Payment, Acordo, Custa | ✅ |
+| Overpayment parcela | Legal Payment | ✅ |
 
 ---
 
 ## 5.4 Sync financeiro (integridade transacional)
 
-### Acordo de Honorarios → Pagamento
+### Acordo de Honorarios → Legal Payment
 
 | Aspecto | Status |
 |---|---|
@@ -108,7 +108,7 @@ Testes dedicados: `test_validators.py` (16 métodos).
 | Cancelamento órfãos | ✅ |
 | Testes | ✅ `test_financeiro.py`, `test_acordo_honorarios.py` |
 
-### Registro de Atos → Pagamento
+### Service Record → Legal Payment
 
 | Aspecto | Status |
 |---|---|
@@ -140,7 +140,7 @@ Formato: `{name} — {descritor}` com separador `" — "`.
 |---|---|---|
 | CPF válido/inválido/DV | test_validators | 🟢 |
 | CNPJ válido/inválido/DV | test_validators | 🟢 |
-| CNJ DV módulo 97 | test_validators, test_servico | 🟢 |
+| CNJ DV módulo 97 | test_validators, test_legal_case | 🟢 |
 | Telefone DDD/celular/fixo | test_validators | 🟢 |
 | E-mail lower | test_validators | 🟢 |
 | Sync pagamentos acordo | test_financeiro | 🟢 |

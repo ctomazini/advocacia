@@ -78,7 +78,7 @@ def load_doctypes():
 			child_tables.append((name, d))
 		elif d.get("issingle"):
 			single.append((name, d))
-		elif name in ("Comarca", "Vara", "Tribunal", "Fase Processual"):
+		elif name in ("Jurisdiction", "Court Branch", "Court", "Case Phase"):
 			auxiliary.append((name, d))
 		else:
 			standalone.append((name, d))
@@ -139,8 +139,8 @@ def main():
 		("Naming", "`format:PREFIX-{YYYY}-{####}` + `naming_rule: Expression`"),
 		("Títulos", "`titulos.py`: `{ID} — {descritor}`; `show_title_field_in_link`"),
 		("List views", "12 `*_list.js` com `hide_name_column` e `states`"),
-		("Cliente", "`title_field=nome`; badge ID em `cliente_list.js`"),
-		("Pagamento", "Coluna Origem (`tipo_origem` + link Acordo/Registro)"),
+		("Client", "`title_field=nome`; badge ID em `cliente_list.js`"),
+		("Legal Payment", "Coluna Origem (`tipo_origem` + link Acordo/Registro)"),
 		("Painel", "Nomes legíveis via `painel/`; `painel.js` ~4100 linhas"),
 		("Sidebar", "`collapsible: 1` nas seções (fix scroll Frappe v16)"),
 	]:
@@ -176,11 +176,11 @@ def main():
 			L.append(render_dt(name, d))
 	L.append(
 		"### Grafo de links (resumo)\n\n"
-		"`Cliente` ← Servico, Pagamento, Acordo, … · `Comarca` ← Vara, Servico · "
-		"`Servico` hub → Prazos, Audiencia, Atos, Horas, Custas · "
-		"`Acordo` → `Parcela de Honorarios` → Pagamento · "
-		"`Registro de Atos` → `Ato Advocaticio` (`cobranca_id` Link Pagamento) · "
-		"Auxiliares: Comarca, Vara, Tribunal, Fase Processual.\n\n"
+		"`Client` ← Legal Case, Legal Payment, Acordo, … · `Jurisdiction` ← Court Branch, Legal Case · "
+		"`Legal Case` hub → Prazos, Hearing, Atos, Horas, Custas · "
+		"`Acordo` → `Fee Installment` → Legal Payment · "
+		"`Service Record` → `Legal Act Item` (`cobranca_id` Link Legal Payment) · "
+		"Auxiliares: Jurisdiction, Court Branch, Court, Case Phase.\n\n"
 	)
 
 	L.append("## 4. hooks.py\n\n### fixtures\n")
@@ -190,19 +190,19 @@ def main():
 		L.append(f"- `/assets/advocacia/js/{js}`\n")
 	L.append(
 		"\n**Removidos:** `navegacao.js`, widget painel global, `servico_link.js` "
-		"(label de Serviço em `servico_query` / `format_servico_link_label`).\n\n"
+		"(label de Serviço em `legal_case_query` / `format_servico_link_label`).\n\n"
 	)
 	L.append("### doc_events\n\n")
 	L.append(
 		md_table(
 			["DocType", "Evento", "Handler"],
 			[
-				["Acordo de Honorarios Processuais", "on_update", "financeiro.sincronizar_pagamentos_hook"],
-				["Parcela de Honorarios", "on_update", "tasks.on_parcela_update"],
-				["Pagamento", "on_update", "financeiro.processar_pagamento_on_update"],
-				["Pagamento", "on_trash", "financeiro.on_pagamento_trash"],
-				["Audiencia", "after_insert / on_update", "calendar_sync.sync_audiencia_to_event"],
-				["Controle de Prazos", "after_insert / on_update", "calendar_sync.sync_prazo_to_event"],
+				["Fee Agreement", "on_update", "financeiro.sincronizar_pagamentos_hook"],
+				["Fee Installment", "on_update", "tasks.on_parcela_update"],
+				["Legal Payment", "on_update", "financeiro.processar_pagamento_on_update"],
+				["Legal Payment", "on_trash", "financeiro.on_pagamento_trash"],
+				["Hearing", "after_insert / on_update", "calendar_sync.sync_audiencia_to_event"],
+				["Deadline", "after_insert / on_update", "calendar_sync.sync_prazo_to_event"],
 			],
 		)
 	)
@@ -222,14 +222,14 @@ def main():
 		md_table(
 			["Função", "Módulo", "Permissão", "Chamador"],
 			[
-				["get_painel_data", "painel_api → painel.get", "Servico read", "painel.js xcall"],
-				["marcar_parcela_recebida", "painel_api → painel.financeiro", "Pagamento write", "painel.js"],
-				["servico_query", "servico", "query", "Link Servico"],
-				["gerar_documento_servico / em_lote", "documentos", "Servico read/write", "servico.js"],
+				["get_painel_data", "painel_api → painel.get", "Legal Case read", "painel.js xcall"],
+				["marcar_parcela_recebida", "painel_api → painel.financeiro", "Legal Payment write", "painel.js"],
+				["legal_case_query", "legal_case", "query", "Link Legal Case"],
+				["gerar_documento_servico / em_lote", "documentos", "Legal Case read/write", "servico.js"],
 				["get_kits_disponiveis", "documentos", "read", "servico.js"],
 				["get_placeholders_referencia", "documentos", "Template read", "template_documento.js"],
 				["registrar_recebimento/repasse", "parcela", "write", "form"],
-				["concluir", "tarefa", "write", "tarefa.js"],
+				["concluir", "legal_task", "write", "tarefa.js"],
 				["timer APIs", "registro_de_horas", "write", "timer_global.js"],
 				["get_events", "audiencia/prazos", "calendar read", "*_calendar.js"],
 				["gerar_proxima_despesa", "despesa", "create", "form"],
@@ -256,7 +256,7 @@ def main():
 		"produtividade",
 	):
 		L.append(f"- {r}\n")
-	L.append("\nStatus Pagamento: Pendente, Vencido, Recebido, Cancelado, Renegociado, Repassado.\n\n")
+	L.append("\nStatus Legal Payment: Pendente, Vencido, Recebido, Cancelado, Renegociado, Repassado.\n\n")
 	L.append("## 10. Fixtures / Workspace / Sidebar\n\n")
 	L.append("- 26 links sidebar ↔ workspace.\n")
 	L.append("- Seções com `collapsible: 1` (Frappe v16).\n\n")
@@ -265,10 +265,10 @@ def main():
 	L.append("- `bench --site advocacia.local run-tests --app advocacia`\n")
 	L.append("- Última run (site dev): **221** testes, **OK** (jun/2026).\n\n")
 	L.append("## 12. Integrações\n\n")
-	L.append("- calendar_sync → Event; documentos → docxtpl; Configuracao do Escritorio (Single).\n\n")
+	L.append("- calendar_sync → Event; documentos → docxtpl; Office Settings (Single).\n\n")
 	L.append("## 13. Backlog consciente\n\n")
 	L.append("1. Chart.js → frappe.ui.Chart\n")
-	L.append("2. Fieldnames EN auxiliares (`city`, `phase_name`)\n")
+	L.append("2. Fieldnames EN auxiliares (`city`, `case_phase_name`)\n")
 	L.append("3. sql → qb no painel\n")
 	L.append("4. Modularizar `painel.js`\n\n")
 
@@ -287,7 +287,7 @@ def main():
 				["7", "N+1 / limits", "✅", "painel refatorado"],
 				["8", "Dead code", "✅", "P0–P4b limpeza"],
 				["9", "JS = UX", "✅", "Negócio em Python"],
-				["10", "Hooks", "✅", "Pagamento handler único; schedulers"],
+				["10", "Hooks", "✅", "Legal Payment handler único; schedulers"],
 				["11", "Workspace/sidebar", "✅", "collapsible fix"],
 				["12", "Testes", "✅", "221/221 OK"],
 				["13", "Reinstall limpo", "⏳", "Obrigatório pré go-live"],

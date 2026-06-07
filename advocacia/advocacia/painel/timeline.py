@@ -36,9 +36,9 @@ def _build_timeline(hoje, periodo_fim, audiencias, prazos, tarefas):
 				"data": a.get("data") or hoje,
 				"hora": a.get("hora") or "",
 				"titulo": a.get("tipo") or _("Audiência"),
-				"subtitulo": a.get("cliente_nome") or a.get("cliente") or "",
+				"subtitulo": a.get("cliente_nome") or a.get("client") or "",
 				"detalhe": a.get("vara_label") or "",
-				"doctype": "Audiencia",
+				"doctype": "Hearing",
 				"docname": a.get("name"),
 				"urgencia": "red" if a.get("dias_restantes") == 0 else "orange" if a.get("dias_restantes") == 1 else "blue",
 			}
@@ -56,7 +56,7 @@ def _build_timeline(hoje, periodo_fim, audiencias, prazos, tarefas):
 				"titulo": p.get("descricao") or p.get("name"),
 				"subtitulo": p.get("cliente_nome") or "",
 				"detalhe": p.get("prioridade") or "",
-				"doctype": "Controle de Prazos",
+				"doctype": "Deadline",
 				"docname": p.get("name"),
 				"urgencia": urgencia,
 				"dias_restantes": dias,
@@ -73,14 +73,14 @@ def _build_timeline(hoje, periodo_fim, audiencias, prazos, tarefas):
 			urgencia = "gray"
 		items.append(
 			{
-				"tipo": "tarefa",
+				"tipo": "legal_task",
 				"sort_key": sort_key,
 				"data": t.get("data_limite") or hoje,
 				"hora": "",
 				"titulo": t.get("titulo") or t.get("name"),
 				"subtitulo": t.get("cliente_nome") or t.get("responsavel_nome") or "",
 				"detalhe": t.get("status") or "",
-				"doctype": "Tarefa",
+				"doctype": "Legal Task",
 				"docname": t.get("name"),
 				"urgencia": urgencia,
 				"dias_restantes": dias,
@@ -90,39 +90,39 @@ def _build_timeline(hoje, periodo_fim, audiencias, prazos, tarefas):
 	items.sort(key=lambda x: x.get("sort_key") or "")
 	return items
 def _get_comunicacoes_pendentes(limit=LIST_LIMIT_MAX):
-	if not frappe.has_permission("Comunicacao", "read"):
+	if not frappe.has_permission("Case Communication", "read"):
 		return []
-	if not frappe.db.table_exists("Comunicacao"):
+	if not frappe.db.table_exists("Case Communication"):
 		return []
 
 	hoje = today()
 	rows = frappe.get_all(
-		"Comunicacao",
+		"Case Communication",
 		fields=[
 			"name",
 			"assunto",
 			"tipo",
-			"cliente",
-			"servico",
+			"client",
+			"legal_case",
 			"data",
 			"proximos_passos",
 			"gerar_tarefa",
-			"tarefa",
+			"legal_task",
 		],
 		order_by="data asc",
 		limit_page_length=LIST_LIMIT_MAX,
 	)
-	servico_map = _servico_lookup([c.servico for c in rows if c.servico], ["cliente", "title"])
+	servico_map = _servico_lookup([c.legal_case for c in rows if c.legal_case], ["client", "title"])
 	cliente_nome_map = _cliente_nome_lookup(
-		[c.cliente for c in rows if c.cliente]
-		+ [sv.cliente for sv in servico_map.values() if sv.cliente]
+		[c.client for c in rows if c.client]
+		+ [sv.client for sv in servico_map.values() if sv.client]
 	)
 
 	tarefa_status_map = {
 		row.name: row.status
 		for row in frappe.get_all(
-			"Tarefa",
-			filters={"name": ["in", list({c.tarefa for c in rows if c.tarefa})]},
+			"Legal Task",
+			filters={"name": ["in", list({c.legal_task for c in rows if c.legal_task})]},
 			fields=["name", "status"],
 		)
 	}
@@ -133,13 +133,13 @@ def _get_comunicacoes_pendentes(limit=LIST_LIMIT_MAX):
 		motivo = ""
 		urgencia = 2
 
-		if c.proximos_passos and not c.tarefa:
+		if c.proximos_passos and not c.legal_task:
 			motivo = _("Aguardando follow-up")
 			urgencia = 0
-		elif c.tarefa:
-			status_tarefa = tarefa_status_map.get(c.tarefa)
+		elif c.legal_task:
+			status_tarefa = tarefa_status_map.get(c.legal_task)
 			if status_tarefa in ("Pendente", "Em Andamento"):
-				motivo = _("Tarefa em aberto")
+				motivo = _("Legal Task em aberto")
 				urgencia = 1
 			else:
 				continue
@@ -155,24 +155,24 @@ def _get_comunicacoes_pendentes(limit=LIST_LIMIT_MAX):
 		c["dias_sem_retorno"] = dias
 		c["motivo_pendencia"] = motivo
 		c["urgencia_ordem"] = urgencia
-		c["cliente_nome"] = cliente_nome_map.get(c.cliente, c.cliente or "")
-		sv = servico_map.get(c.servico) if c.servico else None
+		c["cliente_nome"] = cliente_nome_map.get(c.client, c.client or "")
+		sv = servico_map.get(c.legal_case) if c.legal_case else None
 		c["servico_titulo"] = (sv.title if sv else "") or ""
-		if not c["cliente_nome"] and sv and sv.cliente:
-			c["cliente_nome"] = cliente_nome_map.get(sv.cliente, sv.cliente)
+		if not c["cliente_nome"] and sv and sv.client:
+			c["cliente_nome"] = cliente_nome_map.get(sv.client, sv.client)
 		pendentes.append(c)
 
 	pendentes.sort(key=lambda x: (x.get("urgencia_ordem", 9), -x.get("dias_sem_retorno", 0)))
 	return pendentes[: min(cint(limit or LIST_LIMIT_MAX), LIST_LIMIT_MAX)]
 def _get_horas_periodo(hoje, periodo_fim):
-	if not frappe.has_permission("Registro de Horas", "read"):
+	if not frappe.has_permission("Time Entry", "read"):
 		return 0
-	if not frappe.db.table_exists("Registro de Horas"):
+	if not frappe.db.table_exists("Time Entry"):
 		return 0
 	result = frappe.db.sql(
 		"""
 		SELECT COALESCE(SUM(duracao_horas), 0) as total
-		FROM `tabRegistro de Horas`
+		FROM `tabTime Entry`
 		WHERE data BETWEEN %s AND %s
 		""",
 		(hoje, periodo_fim),
@@ -180,16 +180,16 @@ def _get_horas_periodo(hoje, periodo_fim):
 	)
 	return flt(result[0].total if result else 0)
 def _get_horas_semana(hoje):
-	if not frappe.has_permission("Registro de Horas", "read"):
+	if not frappe.has_permission("Time Entry", "read"):
 		return 0
-	if not frappe.db.table_exists("Registro de Horas"):
+	if not frappe.db.table_exists("Time Entry"):
 		return 0
 	week_start = add_days(hoje, -getdate(hoje).weekday())
 	week_end = add_days(week_start, 6)
 	result = frappe.db.sql(
 		"""
 		SELECT COALESCE(SUM(duracao_horas), 0) as total
-		FROM `tabRegistro de Horas`
+		FROM `tabTime Entry`
 		WHERE data BETWEEN %s AND %s
 		""",
 		(week_start, week_end),
@@ -198,17 +198,17 @@ def _get_horas_semana(hoje):
 	return flt(result[0].total if result else 0)
 def _get_tarefas(hoje, limit_start, limit):
 	rows = frappe.get_all(
-		"Tarefa",
+		"Legal Task",
 		filters={"status": ["in", ["Pendente", "Em Andamento"]]},
-		fields=["name", "titulo", "status", "prioridade", "data_limite", "servico", "responsavel"],
+		fields=["name", "titulo", "status", "prioridade", "data_limite", "legal_case", "responsavel"],
 		order_by="data_limite asc, prioridade desc",
 		limit_start=limit_start,
 		limit_page_length=limit,
 	)
 	servico_map = _servico_lookup(
-		[t.servico for t in rows if t.servico], ["cliente", "title"]
+		[t.legal_case for t in rows if t.legal_case], ["client", "title"]
 	)
-	cliente_nome_map = _cliente_nome_lookup([sv.cliente for sv in servico_map.values() if sv.cliente])
+	cliente_nome_map = _cliente_nome_lookup([sv.client for sv in servico_map.values() if sv.client])
 	user_map = _user_nome_lookup([t.responsavel for t in rows if t.responsavel])
 	for t in rows:
 		if t.data_limite:
@@ -217,33 +217,33 @@ def _get_tarefas(hoje, limit_start, limit):
 			t["dias_restantes"] = None
 		t["cliente_nome"] = ""
 		t["servico_titulo"] = ""
-		if t.servico:
-			sv = servico_map.get(t.servico)
+		if t.legal_case:
+			sv = servico_map.get(t.legal_case)
 			if sv:
-				t["cliente_nome"] = cliente_nome_map.get(sv.cliente, sv.cliente or "")
+				t["cliente_nome"] = cliente_nome_map.get(sv.client, sv.client or "")
 				t["servico_titulo"] = sv.title or ""
 		t["responsavel_nome"] = user_map.get(t.responsavel) if t.responsavel else ""
 	return rows
 def _get_ultimas_comunicacoes(limit=5):
-	if not frappe.has_permission("Comunicacao", "read"):
+	if not frappe.has_permission("Case Communication", "read"):
 		return []
-	if not frappe.db.table_exists("Comunicacao"):
+	if not frappe.db.table_exists("Case Communication"):
 		return []
 	rows = frappe.get_all(
-		"Comunicacao",
-		fields=["name", "assunto", "tipo", "cliente", "servico", "data"],
+		"Case Communication",
+		fields=["name", "assunto", "tipo", "client", "legal_case", "data"],
 		order_by="data DESC",
 		limit=min(cint(limit or 5), LIST_LIMIT_MAX),
 	)
-	servico_map = _servico_lookup([c.servico for c in rows if c.servico], ["cliente", "title"])
+	servico_map = _servico_lookup([c.legal_case for c in rows if c.legal_case], ["client", "title"])
 	cliente_nome_map = _cliente_nome_lookup(
-		[c.cliente for c in rows if c.cliente]
-		+ [sv.cliente for sv in servico_map.values() if sv.cliente]
+		[c.client for c in rows if c.client]
+		+ [sv.client for sv in servico_map.values() if sv.client]
 	)
 	for c in rows:
-		c["cliente_nome"] = cliente_nome_map.get(c.cliente, c.cliente or "")
-		sv = servico_map.get(c.servico) if c.servico else None
+		c["cliente_nome"] = cliente_nome_map.get(c.client, c.client or "")
+		sv = servico_map.get(c.legal_case) if c.legal_case else None
 		c["servico_titulo"] = (sv.title if sv else "") or ""
-		if not c["cliente_nome"] and sv and sv.cliente:
-			c["cliente_nome"] = cliente_nome_map.get(sv.cliente, sv.cliente)
+		if not c["cliente_nome"] and sv and sv.client:
+			c["cliente_nome"] = cliente_nome_map.get(sv.client, sv.client)
 	return rows

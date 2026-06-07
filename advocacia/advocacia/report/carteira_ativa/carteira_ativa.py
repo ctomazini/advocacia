@@ -18,22 +18,22 @@ def execute(filters=None):
 def _get_columns():
 	return [
 		{
-			"fieldname": "servico",
+			"fieldname": "legal_case",
 			"label": _("Serviço"),
 			"fieldtype": "Link",
-			"options": "Servico",
+			"options": "Legal Case",
 			"width": 120,
 		},
 		{"fieldname": "titulo", "label": _("Título"), "fieldtype": "Data", "width": 200},
 		{
-			"fieldname": "cliente",
-			"label": _("Cliente"),
+			"fieldname": "client",
+			"label": _("Client"),
 			"fieldtype": "Link",
-			"options": "Cliente",
+			"options": "Client",
 			"width": 160,
 		},
 		{"fieldname": "area", "label": _("Área"), "fieldtype": "Data", "width": 100},
-		{"fieldname": "fase", "label": _("Fase Processual"), "fieldtype": "Data", "width": 130},
+		{"fieldname": "fase", "label": _("Case Phase"), "fieldtype": "Data", "width": 130},
 		{
 			"fieldname": "proximo_prazo",
 			"label": _("Próximo Prazo"),
@@ -84,17 +84,17 @@ def _get_data(filters):
 	agora = now_datetime()
 
 	servico_filters = {"status": "Em andamento"}
-	if filters.get("cliente"):
-		servico_filters["cliente"] = filters.cliente
+	if filters.get("client"):
+		servico_filters["client"] = filters.client
 	if filters.get("area"):
 		servico_filters["area"] = filters.area
 	if filters.get("tipo"):
 		servico_filters["tipo"] = filters.tipo
 
 	servicos = frappe.get_all(
-		"Servico",
+		"Legal Case",
 		filters=servico_filters,
-		fields=["name", "title", "cliente", "area", "fase_processual"],
+		fields=["name", "title", "client", "area", "case_phase"],
 		limit_page_length=0,
 	)
 
@@ -104,43 +104,43 @@ def _get_data(filters):
 	names = [s.name for s in servicos]
 
 	prazos = frappe.get_all(
-		"Controle de Prazos",
+		"Deadline",
 		filters={
-			"servico": ["in", names],
+			"legal_case": ["in", names],
 			"status": "Pendente",
 			"data_prazo": [">=", hoje],
 		},
-		fields=["servico", "data_prazo"],
+		fields=["legal_case", "data_prazo"],
 		order_by="data_prazo asc",
 	)
 	prazo_map = {}
 	for p in prazos:
-		if p.servico not in prazo_map:
-			prazo_map[p.servico] = p
+		if p.legal_case not in prazo_map:
+			prazo_map[p.legal_case] = p
 
 	audiencias = frappe.get_all(
-		"Audiencia",
-		filters={"servico": ["in", names], "data_hora": [">=", agora]},
-		fields=["servico", "data_hora", "tipo"],
+		"Hearing",
+		filters={"legal_case": ["in", names], "data_hora": [">=", agora]},
+		fields=["legal_case", "data_hora", "tipo"],
 		order_by="data_hora asc",
 	)
 	audiencia_map = {}
 	for a in audiencias:
-		if a.servico not in audiencia_map:
-			audiencia_map[a.servico] = a
+		if a.legal_case not in audiencia_map:
+			audiencia_map[a.legal_case] = a
 
 	pagamentos = frappe.get_all(
-		"Pagamento",
-		filters={"servico": ["in", names], "status": ["not in", ["Cancelado"]]},
-		fields=["servico", "status", "valor"],
+		"Legal Payment",
+		filters={"legal_case": ["in", names], "status": ["not in", ["Cancelado"]]},
+		fields=["legal_case", "status", "valor"],
 		limit_page_length=0,
 	)
 	pag_map = defaultdict(lambda: {"pendente": 0.0, "vencido": 0.0})
 	for p in pagamentos:
 		if p.status == "Pendente":
-			pag_map[p.servico]["pendente"] += flt(p.valor)
+			pag_map[p.legal_case]["pendente"] += flt(p.valor)
 		elif p.status == "Vencido":
-			pag_map[p.servico]["vencido"] += flt(p.valor)
+			pag_map[p.legal_case]["vencido"] += flt(p.valor)
 
 	rows = []
 	total_valor_pendente = 0.0
@@ -184,11 +184,11 @@ def _get_data(filters):
 
 		rows.append(
 			{
-				"servico": s.name,
+				"legal_case": s.name,
 				"titulo": s.title or s.name,
-				"cliente": s.cliente,
+				"client": s.client,
 				"area": s.area or "",
-				"fase": s.fase_processual or "",
+				"fase": s.case_phase or "",
 				"proximo_prazo": proximo_prazo,
 				"prazo_dias": prazo_dias if prazo_dias is not None else 9999,
 				"proxima_audiencia": proxima_audiencia,

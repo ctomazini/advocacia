@@ -3,39 +3,39 @@ from frappe.exceptions import MandatoryError
 from frappe.tests.utils import FrappeTestCase
 from frappe.utils import today
 
-from advocacia.advocacia.tests.test_setup import create_test_servico, create_test_tarefa
+from advocacia.advocacia.tests.test_setup import create_test_legal_case, create_test_legal_task
 
 
-class TestTarefa(FrappeTestCase):
+class TestLegalTask(FrappeTestCase):
 	def tearDown(self):
 		frappe.db.rollback()
 
-	def test_tarefa_avulsa(self):
-		tarefa = create_test_tarefa()
+	def test_legal_task_avulsa(self):
+		tarefa = create_test_legal_task()
 		self.assertEqual(tarefa.status, "Pendente")
-		self.assertFalse(tarefa.servico)
+		self.assertFalse(tarefa.legal_case)
 
-	def test_tarefa_com_servico(self):
-		servico = create_test_servico()
-		tarefa = create_test_tarefa(servico=servico.name)
-		self.assertEqual(tarefa.servico, servico.name)
-		self.assertEqual(tarefa.cliente, servico.cliente)
+	def test_legal_task_com_servico(self):
+		servico = create_test_legal_case()
+		tarefa = create_test_legal_task(servico=servico.name)
+		self.assertEqual(tarefa.legal_case, servico.name)
+		self.assertEqual(tarefa.client, servico.client)
 
-	def test_cliente_via_servico(self):
-		servico = create_test_servico()
+	def test_client_via_servico(self):
+		servico = create_test_legal_case()
 		tarefa = frappe.get_doc(
 			{
-				"doctype": "Tarefa",
-				"titulo": "Tarefa com serviço",
-				"servico": servico.name,
+				"doctype": "Legal Task",
+				"titulo": "Legal Task com serviço",
+				"legal_case": servico.name,
 				"status": "Pendente",
 			}
 		)
 		tarefa.insert(ignore_permissions=True)
-		self.assertEqual(tarefa.cliente, servico.cliente)
+		self.assertEqual(tarefa.client, servico.client)
 
 	def test_concluir(self):
-		tarefa = create_test_tarefa()
+		tarefa = create_test_legal_task()
 		result = tarefa.concluir()
 		tarefa.reload()
 		self.assertEqual(result["status"], "Concluída")
@@ -44,6 +44,6 @@ class TestTarefa(FrappeTestCase):
 
 	def test_sem_titulo_falha(self):
 		with self.assertRaises(MandatoryError):
-			frappe.get_doc({"doctype": "Tarefa", "status": "Pendente"}).insert(
+			frappe.get_doc({"doctype": "Legal Task", "status": "Pendente"}).insert(
 				ignore_permissions=True
 			)

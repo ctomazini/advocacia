@@ -5,24 +5,24 @@ import frappe
 TITLE_SEPARATOR = " — "
 
 COMPOSTOS = {
-	"Servico": False,
-	"Acordo de Honorarios Processuais": False,
-	"Registro de Atos": False,
-	"Pagamento": False,
-	"Audiencia": False,
-	"Controle de Prazos": False,
-	"Tarefa": False,
-	"Comunicacao": False,
-	"Registro de Horas": False,
-	"Custa Processual": False,
-	"Despesa do Escritorio": True,
+	"Legal Case": False,
+	"Fee Agreement": False,
+	"Service Record": False,
+	"Legal Payment": False,
+	"Hearing": False,
+	"Deadline": False,
+	"Legal Task": False,
+	"Case Communication": False,
+	"Time Entry": False,
+	"Court Cost": False,
+	"Office Expense": True,
 }
 
 
 def get_cliente_nome(cliente):
 	if not cliente:
 		return ""
-	return frappe.db.get_value("Cliente", cliente, "nome") or cliente
+	return frappe.db.get_value("Client", cliente, "nome") or cliente
 
 
 def join_title_parts(*parts):
@@ -31,8 +31,8 @@ def join_title_parts(*parts):
 
 
 def _resolver_descritor(doc, usar_descricao=False):
-	if not usar_descricao and getattr(doc, "cliente", None):
-		descritor = get_cliente_nome(doc.cliente)
+	if not usar_descricao and getattr(doc, "client", None):
+		descritor = get_cliente_nome(doc.client)
 		if descritor:
 			return descritor
 	descritor = (getattr(doc, "descricao", None) or "").strip()

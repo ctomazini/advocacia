@@ -18,14 +18,14 @@
 
 | DocType | Campos descritos |
 |---|---:|
-| Acordo de Honorarios Processuais | 37 |
-| Servico | 22 |
-| Registro de Atos | 22 |
-| Pagamento | 18 |
-| Audiencia | 17 |
-| Controle de Prazos | 16 |
-| Cliente | 16 |
-| Registro de Horas | 16 |
+| Fee Agreement | 37 |
+| Legal Case | 22 |
+| Service Record | 22 |
+| Legal Payment | 18 |
+| Hearing | 17 |
+| Deadline | 16 |
+| Client | 16 |
+| Time Entry | 16 |
 
 ### Campos sem description (14 restantes)
 
@@ -43,12 +43,12 @@ O script acrescenta sufixo *"Visível apenas para Advocacia Manager."* em campos
 
 | Máscara | Padrão | DocTypes |
 |---|---|---|
-| CPF | `999.999.999-99` | Cliente |
-| CNPJ | `99.999.999/9999-99` | Cliente, Configuracao do Escritorio |
-| CNJ | `9999999-99.9999.9.99.9999` | Servico |
-| Celular | `(99) 99999-9999` | Contato Cliente |
-| Fixo | `(99) 9999-9999` | Contato Cliente |
-| CEP | `99999-999` | Endereco Cliente |
+| CPF | `999.999.999-99` | Client |
+| CNPJ | `99.999.999/9999-99` | Client, Office Settings |
+| CNJ | `9999999-99.9999.9.99.9999` | Legal Case |
+| Celular | `(99) 99999-9999` | Client Contact |
+| Fixo | `(99) 9999-9999` | Client Contact |
+| CEP | `99999-999` | Client Address |
 
 **Regra:** JS só UX — validação real em `validators.py` no `validate()` do DocType.
 
@@ -62,7 +62,7 @@ O script acrescenta sufixo *"Visível apenas para Advocacia Manager."* em campos
 | `list_filters.js` | Barra de filtros responsiva (desktop visível / mobile ⇅) |
 | `list_filters.css` | Layout da barra de filtros padrão |
 | `cliente_from_servico.js` | Preenche cliente ao selecionar serviço |
-| `timer_global.js` | Timer de Registro de Horas no desk |
+| `timer_global.js` | Timer de Time Entry no desk |
 
 ---
 
@@ -78,11 +78,11 @@ O script acrescenta sufixo *"Visível apenas para Advocacia Manager."* em campos
 
 | Seção | collapsible | Links |
 |---|---|---|
-| Dia a Dia | 1 | Painel, Prazos, Audiências, Tarefas, Comunicações |
-| Gestão de Casos | 1 | Serviços, Clientes, Horas, Atos, Custas |
-| Financeiro | 1 | Pagamentos, Honorários, Despesas, Documentos, Kits |
+| Dia a Dia | 1 | Painel, Prazos, Audiências, Legal Tasks, Comunicações |
+| Gestão de Casos | 1 | Serviços, Clients, Horas, Atos, Custas |
+| Financeiro | 1 | Legal Payments, Honorários, Despesas, Documentos, Kits |
 | Relatórios | 1 (keep_closed) | 6 Script Reports |
-| Cadastros | 1 (keep_closed) | Comarca, Vara, Tribunal, Fase, Escritório |
+| Cadastros | 1 (keep_closed) | Jurisdiction, Court Branch, Court, Fase, Escritório |
 
 **Fix Frappe v16:** Section Breaks com filhos exigem `collapsible: 1` — sem isso o scroll do desk trava.
 
@@ -98,20 +98,20 @@ O script acrescenta sufixo *"Visível apenas para Advocacia Manager."* em campos
 
 | DocType | hide_name_column | Indicador status | Filtros rápidos |
 |---|---|---|---|
-| Servico | ✅ title | via status | ✅ |
-| Cliente | ✅ nome + badge ID | 🟡 | ✅ |
-| Pagamento | ✅ | ✅ cores + Origem | ✅ |
-| Acordo de Honorarios Processuais | ✅ | ✅ | ✅ |
-| Registro de Atos | ✅ | ✅ | ✅ |
-| Audiencia | ✅ | ✅ | ✅ |
-| Controle de Prazos | ✅ | ✅ | ✅ |
-| Despesa do Escritorio | ✅ | ✅ | ✅ |
-| Custa Processual | ✅ | ✅ | ✅ |
-| Comunicacao | ✅ | 🟡 | ✅ |
-| Tarefa | ✅ | ✅ | ✅ |
-| Registro de Horas | ✅ | 🟡 | ✅ |
+| Legal Case | ✅ title | via status | ✅ |
+| Client | ✅ nome + badge ID | 🟡 | ✅ |
+| Legal Payment | ✅ | ✅ cores + Origem | ✅ |
+| Fee Agreement | ✅ | ✅ | ✅ |
+| Service Record | ✅ | ✅ | ✅ |
+| Hearing | ✅ | ✅ | ✅ |
+| Deadline | ✅ | ✅ | ✅ |
+| Office Expense | ✅ | ✅ | ✅ |
+| Court Cost | ✅ | ✅ | ✅ |
+| Case Communication | ✅ | 🟡 | ✅ |
+| Legal Task | ✅ | ✅ | ✅ |
+| Time Entry | ✅ | 🟡 | ✅ |
 
-**Gap:** cadastros auxiliares (Comarca, Vara, Tribunal) sem `*_list.js` custom — aceitável (poucos registros).
+**Gap:** cadastros auxiliares (Jurisdiction, Court Branch, Court) sem `*_list.js` custom — aceitável (poucos registros).
 
 ---
 
@@ -120,7 +120,7 @@ O script acrescenta sufixo *"Visível apenas para Advocacia Manager."* em campos
 | Padrão | Exemplo |
 |---|---|
 | Transacionais | `SERV-2026-0042 — Silva Advogados Ltda` |
-| Cliente | `CLI-2026-0015 — João da Silva` (title_field = nome) |
+| Client | `CLI-2026-0015 — João da Silva` (title_field = nome) |
 | Cadastros | Nome do campo autoname |
 
 `show_title_field_in_link: 1` nos transacionais — links e painel exibem descritor legível.
@@ -131,25 +131,25 @@ O script acrescenta sufixo *"Visível apenas para Advocacia Manager."* em campos
 
 ### Fluxo 1: Novo processo judicial
 
-1. **Cliente** — CPF/CNPJ validado ✅  
-2. **Comarca / Vara / Tribunal** — cadastro rígido ✅  
-3. **Servico** — tipo Processo Judicial + CNJ ✅  
-4. **Acordo de Honorarios** — parcelas + sync Pagamento ✅  
+1. **Client** — CPF/CNPJ validado ✅  
+2. **Jurisdiction / Court Branch / Court** — cadastro rígido ✅  
+3. **Legal Case** — tipo Processo Judicial + CNJ ✅  
+4. **Acordo de Honorarios** — parcelas + sync Legal Payment ✅  
 5. **Painel** — KPIs e timeline ✅  
 
 **Fricção:** 🟡 Orçamento de honorários complexo (modos Misto/Percentual) — descriptions ajudam.
 
 ### Fluxo 2: Prazo processual
 
-1. **Controle de Prazos** — datas cronológicas validadas ✅  
+1. **Deadline** — datas cronológicas validadas ✅  
 2. **Event** — sync automático ✅  
 3. **Notificação** — scheduler diário ✅  
 
 ### Fluxo 3: Cobrança de atos
 
-1. **Registro de Atos** — tabela Ato Advocaticio ✅  
+1. **Service Record** — tabela Legal Act Item ✅  
 2. **Gerar pagamento** — whitelist sync ✅  
-3. **Pagamento** — coluna Origem na list view ✅  
+3. **Legal Payment** — coluna Origem na list view ✅  
 
 ---
 
@@ -178,10 +178,10 @@ O script acrescenta sufixo *"Visível apenas para Advocacia Manager."* em campos
 ## 3.9 Checklist UX pré-release
 
 - [ ] `bench build --app advocacia` após JS
-- [ ] Smoke: máscara CNJ em Servico novo
+- [ ] Smoke: máscara CNJ em Legal Case novo
 - [ ] Smoke: tooltip em Acordo (campo honorários)
 - [ ] Smoke: sidebar colapsa sem travar scroll
-- [ ] Smoke: lista Pagamento mostra coluna Origem
+- [ ] Smoke: lista Legal Payment mostra coluna Origem
 - [ ] Smoke: Connections em Serviço abre lista filtrada
 - [ ] Smoke: filtros visíveis no desktop / ⇅ no mobile
 

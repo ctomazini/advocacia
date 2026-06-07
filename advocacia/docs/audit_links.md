@@ -1,76 +1,76 @@
 # Seção 2 — Cross-check de Links entre DocTypes
 
-**App:** `advocacia` · **Hub:** `Servico` · **Data:** 2026-06-02 · **Versão:** 0.7.0
+**App:** `advocacia` · **Hub:** `Legal Case` · **Data:** 2026-06-02 · **Versão:** 0.7.0
 
 ---
 
 ## 2.1 Mapa de relacionamentos
 
 ```
-Cliente
-  ├── contatos (Table → Contato Cliente)
-  ├── enderecos (Table → Endereco Cliente)
+Client
+  ├── contatos (Table → Client Contact)
+  ├── enderecos (Table → Client Address)
   └── Linkado POR:
-      ├── Servico.cliente
-      ├── Acordo de Honorarios Processuais.cliente (fetch)
+      ├── Legal Case.cliente
+      ├── Fee Agreement.cliente (fetch)
       └── (fetch_from indireto via servico em satélites)
 
-Servico  [HUB]
-  ├── cliente (Link → Cliente)
+Legal Case  [HUB]
+  ├── cliente (Link → Client)
   ├── comarca, vara, tribunal, fase_processual (Link → cadastros rígidos)
   └── Linkado POR (satélites com campo servico):
-      ├── Acordo de Honorarios Processuais.servico
-      ├── Registro de Atos.servico
-      ├── Audiencia.servico
-      ├── Controle de Prazos.servico
-      ├── Custa Processual.servico
-      ├── Comunicacao.servico
-      ├── Registro de Horas.servico
-      ├── Tarefa.servico
-      └── Pagamento.servico (derivado de acordo/atos)
+      ├── Fee Agreement.servico
+      ├── Service Record.servico
+      ├── Hearing.servico
+      ├── Deadline.servico
+      ├── Court Cost.servico
+      ├── Case Communication.servico
+      ├── Time Entry.servico
+      ├── Legal Task.servico
+      └── Legal Payment.servico (derivado de acordo/atos)
 
-Acordo de Honorarios Processuais
+Fee Agreement
   ├── servico, cliente (Link)
-  ├── parcelas (Table → Parcela de Honorarios)
-  │     └── sync → Pagamento (parcela_origem_id)
-  └── Linkado POR: Pagamento.acordo
+  ├── parcelas (Table → Fee Installment)
+  │     └── sync → Legal Payment (parcela_origem_id)
+  └── Linkado POR: Legal Payment.acordo
 
-Registro de Atos
+Service Record
   ├── servico, cliente (Link)
-  ├── atos (Table → Ato Advocaticio)
-  └── sync → Pagamento (tipo_origem Atos)
+  ├── atos (Table → Legal Act Item)
+  └── sync → Legal Payment (tipo_origem Atos)
 
-Pagamento
+Legal Payment
   ├── servico, cliente, acordo, registro_atos (Link)
   └── Camada financeira única (honorários + atos)
 
-Kit de Documentos
-  ├── itens (Table → Kit Documento Item → Template Documento)
-  └── Sem link direto a Servico (uso via gerador documentos)
+Document Kit
+  ├── itens (Table → Document Kit Item → Document Template)
+  └── Sem link direto a Legal Case (uso via gerador documentos)
 ```
 
 ---
 
-## 2.2 Satélites do hub Servico (9)
+## 2.2 Satélites do hub Legal Case (9)
 
-| DocType | Campo | fetch cliente | Dashboard link no Servico |
+| DocType | Campo | fetch cliente | Dashboard link no Legal Case |
 |---|---|---|---|
-| Acordo de Honorarios Processuais | servico | ✅ | Honorários |
-| Registro de Atos | servico | ✅ | Atos |
-| Audiencia | servico | ✅ | Agenda |
-| Controle de Prazos | servico | ✅ | Agenda |
-| Custa Processual | servico | ✅ | Financeiro |
-| Comunicacao | servico | ✅ | Comunicação |
-| Registro de Horas | servico | ✅ | Produtividade |
-| Tarefa | servico | ✅ | — (sem DocType Link no JSON) |
-| Pagamento | servico | ✅ | — (via acordo/atos) |
+| Fee Agreement | servico | ✅ | Honorários |
+| Service Record | servico | ✅ | Atos |
+| Hearing | servico | ✅ | Agenda |
+| Deadline | servico | ✅ | Agenda |
+| Court Cost | servico | ✅ | Financeiro |
+| Case Communication | servico | ✅ | Comunicação |
+| Time Entry | servico | ✅ | Produtividade |
+| Legal Task | servico | ✅ | — (sem DocType Link no JSON) |
+| Legal Payment | servico | ✅ | — (via acordo/atos) |
 
 **Padrão hub-and-spoke:** satélite carrega `servico` (Link) + `cliente` (Link ou `fetch_from` servico).
 
 Exemplo no Acordo:
 ```python
 if not self.cliente and self.servico:
-    self.cliente = frappe.db.get_value("Servico", self.servico, "cliente")
+    self.cliente = frappe.db.get_value("Legal Case", self.servico, "cliente")
 ```
 
 ---
@@ -79,10 +79,10 @@ if not self.cliente and self.servico:
 
 | Conceito | DocType | autoname | Usado em |
 |---|---|---|---|
-| Comarca | Comarca | field:comarca_name | Servico, Vara |
-| Vara | Vara | field:vara_name | Servico |
-| Tribunal | Tribunal | field:tribunal_name | Servico |
-| Fase processual | Fase Processual | field:phase_name | Servico |
+| Jurisdiction | Jurisdiction | field:jurisdiction_name | Legal Case, Court Branch |
+| Court Branch | Court Branch | field:court_branch_name | Legal Case |
+| Court | Court | field:court_name | Legal Case |
+| Fase processual | Case Phase | field:case_phase_name | Legal Case |
 
 **Proibido:** `Data`/`Small Text` para estes conceitos repetitivos.
 
@@ -92,31 +92,31 @@ if not self.cliente and self.servico:
 
 | Parent | Child | Relação |
 |---|---|---|
-| Cliente | Contato Cliente | contatos |
-| Cliente | Endereco Cliente | enderecos |
-| Acordo de Honorarios Processuais | Parcela de Honorarios | parcelas |
-| Registro de Atos | Ato Advocaticio | atos |
-| Kit de Documentos | Kit Documento Item | itens |
+| Client | Client Contact | contatos |
+| Client | Client Address | enderecos |
+| Fee Agreement | Fee Installment | parcelas |
+| Service Record | Legal Act Item | atos |
+| Document Kit | Document Kit Item | itens |
 
 Child tables **não** têm `title_field` próprio — herdam contexto do pai.
 
 ---
 
-## 2.5 DocType Links no formulário Servico
+## 2.5 DocType Links no formulário Legal Case
 
 Configurados em `servico.json` → aba Connections:
 
 | Grupo | DocType linkado | link_fieldname |
 |---|---|---|
-| Honorários | Acordo de Honorarios Processuais | servico |
-| Atos | Registro de Atos | servico |
-| Agenda | Audiencia | servico |
-| Agenda | Controle de Prazos | servico |
-| Financeiro | Custa Processual | servico |
-| Comunicação | Comunicacao | servico |
-| Produtividade | Registro de Horas | servico |
+| Honorários | Fee Agreement | servico |
+| Atos | Service Record | servico |
+| Agenda | Hearing | servico |
+| Agenda | Deadline | servico |
+| Financeiro | Court Cost | servico |
+| Comunicação | Case Communication | servico |
+| Produtividade | Time Entry | servico |
 
-**Gap menor:** `Tarefa` e `Pagamento` têm `servico` mas não aparecem na aba Connections do Servico — acessíveis via lista filtrada ou painel.
+**Gap menor:** `Legal Task` e `Legal Payment` têm `servico` mas não aparecem na aba Connections do Legal Case — acessíveis via lista filtrada ou painel.
 
 ---
 
@@ -124,11 +124,11 @@ Configurados em `servico.json` → aba Connections:
 
 | Verificação | Status |
 |---|---|
-| Servico exige Cliente | ✅ reqd |
+| Legal Case exige Client | ✅ reqd |
 | Satélite sem servico órfão em produção | 🟡 depende de uso |
-| Delete Servico com filhos | 🟡 Frappe impede se houver link — sem cascade custom |
-| Pagamento órfão após delete acordo | ✅ sync cancela órfãos |
-| standard_queries Servico | ✅ `servico_query` em hooks |
+| Delete Legal Case com filhos | 🟡 Frappe impede se houver link — sem cascade custom |
+| Legal Payment órfão após delete acordo | ✅ sync cancela órfãos |
+| standard_queries Legal Case | ✅ `servico_query` em hooks |
 
 ---
 
@@ -136,7 +136,7 @@ Configurados em `servico.json` → aba Connections:
 
 | Recurso | Uso |
 |---|---|
-| `standard_queries["Servico"]` | Autocomplete filtrado |
+| `standard_queries["Legal Case"]` | Autocomplete filtrado |
 | `list_nav.js` | Painel e Connections → lista com filtros `{servico: X}` etc. |
 | `list_filters.js` | Filtros padrão responsivos em todas as list views |
 | `cliente_from_servico.js` | Preenche cliente ao escolher serviço |
@@ -148,12 +148,12 @@ Configurados em `servico.json` → aba Connections:
 
 | | Advocacia | Engenharia |
 |---|---|---|
-| Hub | Servico | Construction Project |
+| Hub | Legal Case | Construction Project |
 | Satélites com hub link | 9 | 12+ |
 | Domínio | Jurídico BR | Obra/civil |
 | Naming | PT congelado | EN greenfield |
 
-**Não renomear** `Servico` → `Service` — brownfield com dados e fixtures.
+**Não renomear** `Legal Case` → `Service` — brownfield com dados e fixtures.
 
 ---
 
@@ -161,11 +161,11 @@ Configurados em `servico.json` → aba Connections:
 
 Ao criar DocType que orbita um processo:
 
-- [ ] Campo `servico` (Link → Servico, reqd)
+- [ ] Campo `servico` (Link → Legal Case, reqd)
 - [ ] Campo `cliente` com `fetch_from` ou populate em `validate()`
 - [ ] `title_field` + `titulos.py` se transacional
 - [ ] DocType Link no `servico.json` (opcional mas recomendado)
-- [ ] Teste CRUD com `create_test_servico()`
+- [ ] Teste CRUD com `create_test_legal_case()`
 - [ ] Entrada na sidebar/workspace se operacional
 
 ---

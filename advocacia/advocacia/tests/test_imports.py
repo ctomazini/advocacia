@@ -48,8 +48,8 @@ class TestImports(FrappeTestCase):
 		"""Módulos com @frappe.whitelist() citados nos bugs reportados."""
 		modules = [
 			"advocacia.advocacia.documentos",
-			"advocacia.advocacia.doctype.registro_de_horas.registro_de_horas",
-			"advocacia.advocacia.doctype.kit_de_documentos.kit_de_documentos",
+			"advocacia.advocacia.doctype.time_entry.time_entry",
+			"advocacia.advocacia.doctype.document_kit.document_kit",
 		]
 		for mod in modules:
 			with self.subTest(module=mod):

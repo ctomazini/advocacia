@@ -18,10 +18,10 @@ def execute(filters=None):
 def _get_columns():
 	return [
 		{
-			"fieldname": "cliente",
-			"label": _("Cliente"),
+			"fieldname": "client",
+			"label": _("Client"),
 			"fieldtype": "Link",
-			"options": "Cliente",
+			"options": "Client",
 			"width": 180,
 		},
 		{
@@ -83,13 +83,13 @@ def _get_data(filters):
 	elif ate_data:
 		query_filters["data_vencimento"] = ["<=", ate_data]
 
-	if filters.get("cliente"):
-		query_filters["cliente"] = filters.cliente
+	if filters.get("client"):
+		query_filters["client"] = filters.client
 
 	pagamentos = frappe.get_all(
-		"Pagamento",
+		"Legal Payment",
 		filters=query_filters,
-		fields=["cliente", "acordo", "servico", "valor", "valor_recebido", "status"],
+		fields=["client", "fee_agreement", "legal_case", "valor", "valor_recebido", "status"],
 		limit_page_length=0,
 	)
 
@@ -108,7 +108,7 @@ def _get_data(filters):
 
 	grouped = defaultdict(list)
 	for row in pagamentos:
-		grouped[row.cliente].append(row)
+		grouped[row.client].append(row)
 
 	rows = []
 	sum_contratado = sum_recebido = sum_pendente = sum_vencido = 0.0
@@ -126,14 +126,14 @@ def _get_data(filters):
 
 		rows.append(
 			{
-				"cliente": cliente,
+				"client": cliente,
 				"total_contratado": total_contratado,
 				"total_recebido": total_recebido,
 				"total_pendente": total_pendente,
 				"total_vencido": total_vencido,
 				"pct_recebido": pct,
-				"qtd_acordos": len({p.acordo for p in items if p.acordo}),
-				"qtd_servicos": len({p.servico for p in items if p.servico}),
+				"qtd_acordos": len({p.fee_agreement for p in items if p.fee_agreement}),
+				"qtd_servicos": len({p.legal_case for p in items if p.legal_case}),
 			}
 		)
 		sum_contratado += total_contratado

@@ -8,7 +8,7 @@ def sync_audiencia_to_event(doc, method=None):
 		_cancel_linked_event(doc)
 		return
 
-	event_name = _find_linked_event("Audiencia", doc.name)
+	event_name = _find_linked_event("Hearing", doc.name)
 	starts_on = get_datetime(doc.data_hora)
 	ends_on = add_to_date(starts_on, hours=2)
 
@@ -18,7 +18,7 @@ def sync_audiencia_to_event(doc, method=None):
 		"ends_on": ends_on,
 		"event_type": "Public",
 		"description": _audiencia_description(doc),
-		"custom_source_doctype": "Audiencia",
+		"custom_source_doctype": "Hearing",
 		"custom_source_name": doc.name,
 	}
 
@@ -31,7 +31,7 @@ def sync_prazo_to_event(doc, method=None):
 		_cancel_linked_event(doc)
 		return
 
-	source_dt = "Controle de Prazos"
+	source_dt = "Deadline"
 	event_name = _find_linked_event(source_dt, doc.name)
 
 	event_data = {
@@ -80,23 +80,23 @@ def _prazo_color(prioridade):
 
 
 def _audiencia_subject(doc):
-	cliente = frappe.db.get_value("Servico", doc.servico, "cliente") if doc.servico else ""
+	cliente = frappe.db.get_value("Legal Case", doc.legal_case, "client") if doc.legal_case else ""
 	return f"Audiência {doc.tipo}: {cliente}"
 
 
 def _audiencia_description(doc):
-	parts = [f"Tipo: {doc.tipo}", f"Serviço: {doc.servico}"]
+	parts = [f"Tipo: {doc.tipo}", f"Serviço: {doc.legal_case}"]
 	if doc.modalidade == "Virtual" and doc.link_virtual:
 		parts.append(f"Link: {doc.link_virtual}")
-	if doc.local_vara:
-		parts.append(f"Vara: {doc.local_vara}")
+	if doc.court_branch:
+		parts.append(f"Court Branch: {doc.court_branch}")
 	if doc.observacoes:
 		parts.append(f"Obs: {doc.observacoes}")
 	return "\n".join(parts)
 
 
 def _prazo_description(doc):
-	parts = [f"Serviço: {doc.servico}", f"Prioridade: {doc.prioridade or 'Normal'}"]
+	parts = [f"Serviço: {doc.legal_case}", f"Prioridade: {doc.prioridade or 'Normal'}"]
 	if doc.responsavel:
 		parts.append(f"Responsável: {doc.responsavel}")
 	if doc.observacoes:

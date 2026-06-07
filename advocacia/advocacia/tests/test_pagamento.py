@@ -7,19 +7,19 @@ from advocacia.advocacia.financeiro import TIPO_ATOS, TIPO_HONORARIOS
 from advocacia.advocacia.tasks import verificar_parcelas_vencidas
 from advocacia.advocacia.tests.test_setup import (
 	create_test_acordo,
-	create_test_pagamento,
+	create_test_legal_payment,
 	create_test_registro_atos,
 	get_acordo_pagamentos,
 )
 
 
-class TestPagamento(FrappeTestCase):
+class TestLegalPayment(FrappeTestCase):
 	def tearDown(self):
 		frappe.db.rollback()
 
 	def test_pendente_para_recebido(self):
 		acordo = create_test_acordo(num_parcelas=1, valor_total=500)
-		pag = frappe.get_doc("Pagamento", get_acordo_pagamentos(acordo.name)[0].name)
+		pag = frappe.get_doc("Legal Payment", get_acordo_pagamentos(acordo.name)[0].name)
 		pag.status = "Recebido"
 		pag.data_recebimento = today()
 		pag.valor_recebido = pag.valor
@@ -28,8 +28,8 @@ class TestPagamento(FrappeTestCase):
 
 	def test_titulo_composto(self):
 		acordo = create_test_acordo(num_parcelas=1, valor_total=500)
-		pag = frappe.get_doc("Pagamento", get_acordo_pagamentos(acordo.name)[0].name)
-		cliente_nome = frappe.db.get_value("Cliente", pag.cliente, "nome")
+		pag = frappe.get_doc("Legal Payment", get_acordo_pagamentos(acordo.name)[0].name)
+		cliente_nome = frappe.db.get_value("Client", pag.client, "nome")
 		self.assertIn(pag.name, pag.title)
 		self.assertIn(cliente_nome, pag.title)
 
@@ -37,16 +37,16 @@ class TestPagamento(FrappeTestCase):
 		acordo = create_test_acordo(num_parcelas=1, valor_total=500)
 		pag_name = get_acordo_pagamentos(acordo.name)[0].name
 		frappe.db.set_value(
-			"Pagamento",
+			"Legal Payment",
 			pag_name,
 			{"data_vencimento": add_days(today(), -5), "status": "Pendente"},
 		)
 		verificar_parcelas_vencidas()
-		self.assertEqual(frappe.db.get_value("Pagamento", pag_name, "status"), "Vencido")
+		self.assertEqual(frappe.db.get_value("Legal Payment", pag_name, "status"), "Vencido")
 
 	def test_cancelado_imutavel(self):
 		acordo = create_test_acordo(num_parcelas=1, valor_total=500)
-		pag = frappe.get_doc("Pagamento", get_acordo_pagamentos(acordo.name)[0].name)
+		pag = frappe.get_doc("Legal Payment", get_acordo_pagamentos(acordo.name)[0].name)
 		pag.status = "Cancelado"
 		pag.save(ignore_permissions=True)
 		pag.reload()
@@ -55,14 +55,14 @@ class TestPagamento(FrappeTestCase):
 			pag.save(ignore_permissions=True)
 
 	def test_honorarios_exige_acordo(self):
-		servico = create_test_acordo(num_parcelas=0, valor_total=0).servico
-		cliente = frappe.db.get_value("Servico", servico, "cliente")
+		servico = create_test_acordo(num_parcelas=0, valor_total=0).legal_case
+		cliente = frappe.db.get_value("Legal Case", servico, "client")
 		with self.assertRaises(ValidationError):
 			frappe.get_doc(
 				{
-					"doctype": "Pagamento",
-					"servico": servico,
-					"cliente": cliente,
+					"doctype": "Legal Payment",
+					"legal_case": servico,
+					"client": cliente,
 					"valor": 100,
 					"data_vencimento": today(),
 					"status": "Pendente",
@@ -71,14 +71,14 @@ class TestPagamento(FrappeTestCase):
 			).insert(ignore_permissions=True)
 
 	def test_atos_exige_registro(self):
-		servico = create_test_acordo(num_parcelas=0, valor_total=0).servico
-		cliente = frappe.db.get_value("Servico", servico, "cliente")
+		servico = create_test_acordo(num_parcelas=0, valor_total=0).legal_case
+		cliente = frappe.db.get_value("Legal Case", servico, "client")
 		with self.assertRaises(ValidationError):
 			frappe.get_doc(
 				{
-					"doctype": "Pagamento",
-					"servico": servico,
-					"cliente": cliente,
+					"doctype": "Legal Payment",
+					"legal_case": servico,
+					"client": cliente,
 					"valor": 100,
 					"data_vencimento": today(),
 					"status": "Pendente",
@@ -88,13 +88,13 @@ class TestPagamento(FrappeTestCase):
 
 	def test_receber_atualiza_parcela(self):
 		acordo = create_test_acordo(num_parcelas=1, valor_total=800)
-		pag = frappe.get_doc("Pagamento", get_acordo_pagamentos(acordo.name)[0].name)
+		pag = frappe.get_doc("Legal Payment", get_acordo_pagamentos(acordo.name)[0].name)
 		pag.status = "Recebido"
 		pag.data_recebimento = today()
 		pag.valor_recebido = pag.valor
 		pag.save(ignore_permissions=True)
 		parcela = frappe.get_all(
-			"Parcela de Honorarios",
+			"Fee Installment",
 			filters={"parent": acordo.name},
 			fields=["status"],
 		)[0]
@@ -102,14 +102,14 @@ class TestPagamento(FrappeTestCase):
 
 	def test_valor_negativo_falha(self):
 		acordo = create_test_acordo(num_parcelas=1, valor_total=100)
-		pag = frappe.get_doc("Pagamento", get_acordo_pagamentos(acordo.name)[0].name)
+		pag = frappe.get_doc("Legal Payment", get_acordo_pagamentos(acordo.name)[0].name)
 		with self.assertRaises(ValidationError):
 			pag.valor = -1
 			pag.save(ignore_permissions=True)
 
 	def test_trash_pagamento_recebido_bloqueado(self):
 		acordo = create_test_acordo(num_parcelas=1, valor_total=100)
-		pag = frappe.get_doc("Pagamento", get_acordo_pagamentos(acordo.name)[0].name)
+		pag = frappe.get_doc("Legal Payment", get_acordo_pagamentos(acordo.name)[0].name)
 		pag.status = "Recebido"
 		pag.data_recebimento = today()
 		pag.valor_recebido = pag.valor
@@ -117,10 +117,10 @@ class TestPagamento(FrappeTestCase):
 		with self.assertRaises(ValidationError):
 			pag.delete(ignore_permissions=True)
 
-	def test_pagamento_atos_via_registro(self):
+	def test_legal_payment_atos_via_registro(self):
 		registro = create_test_registro_atos()
 		from advocacia.advocacia.financeiro import gerar_pagamento_atos
 
 		result = gerar_pagamento_atos(registro.name)
-		self.assertTrue(result.get("pagamento"))
-		self.assertTrue(frappe.db.exists("Pagamento", result["pagamento"]))
+		self.assertTrue(result.get("payment"))
+		self.assertTrue(frappe.db.exists("Legal Payment", result["payment"]))

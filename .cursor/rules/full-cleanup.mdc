@@ -1,0 +1,17 @@
+---
+description: Full cleanup constraints — rename + fixes
+globs:
+  - "apps/advocacia/**"
+alwaysApply: true
+---
+
+# REGRAS INVIOLÁVEIS
+
+1. **ENGENHARIA READ-ONLY**: NUNCA modificar nada em `apps/engenharia/`.
+2. **Sem Server/Client Script no banco**: Toda lógica em controllers + JS físicos.
+3. **Sem `frappe.db.commit()`** em handlers/whitelisted/doc_events/schedulers.
+4. **Sem `ignore_permissions=True`** sem comentário justificativo.
+5. **Sem N+1**: get_doc/get_value em loop proibido.
+6. **Labels PT**: Labels UI e mensagens `_()` permanecem em português. Só nomes internos (DocType, fieldname, pasta, classe) migram para EN.
+7. **Testes**: Cada fase termina com `bench --site advocacia.local run-tests --app advocacia`.
+8. **Commits**: Conventional Commits, um por fase.

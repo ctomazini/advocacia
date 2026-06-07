@@ -6,7 +6,7 @@ from frappe.utils import today
 from advocacia.advocacia.painel_api import get_painel_data
 from advocacia.advocacia.setup.permissions import setup_permissions
 from advocacia.advocacia.setup.roles import create_roles
-from advocacia.advocacia.tests.test_setup import create_test_acordo, create_test_servico, create_test_tarefa
+from advocacia.advocacia.tests.test_setup import create_test_acordo, create_test_legal_case, create_test_legal_task
 
 
 def _create_user_with_role(role: str) -> str:
@@ -43,13 +43,13 @@ class TestAdvocaciaPermissions(FrappeTestCase):
 
 	def test_user_cannot_create_pagamento(self):
 		user = _create_user_with_role("Advocacia User")
-		servico = create_test_servico()
+		servico = create_test_legal_case()
 		frappe.set_user(user)
-		doc = frappe.new_doc("Pagamento")
+		doc = frappe.new_doc("Legal Payment")
 		doc.update(
 			{
-				"servico": servico.name,
-				"cliente": servico.cliente,
+				"legal_case": servico.name,
+				"client": servico.client,
 				"valor": 100,
 				"data_vencimento": today(),
 				"tipo_origem": "Honorários (Parcela)",
@@ -60,15 +60,15 @@ class TestAdvocaciaPermissions(FrappeTestCase):
 
 	def test_manager_can_create_pagamento(self):
 		user = _create_user_with_role("Advocacia Manager")
-		servico = create_test_servico()
+		servico = create_test_legal_case()
 		acordo = create_test_acordo(servico=servico.name, num_parcelas=0, parcelas=[])
 		frappe.set_user(user)
-		doc = frappe.new_doc("Pagamento")
+		doc = frappe.new_doc("Legal Payment")
 		doc.update(
 			{
-				"servico": servico.name,
-				"cliente": servico.cliente,
-				"acordo": acordo.name,
+				"legal_case": servico.name,
+				"client": servico.client,
+				"fee_agreement": acordo.name,
 				"valor": 100,
 				"data_vencimento": today(),
 				"tipo_origem": "Honorários (Parcela)",
@@ -81,7 +81,7 @@ class TestAdvocaciaPermissions(FrappeTestCase):
 	def test_user_can_create_tarefa(self):
 		user = _create_user_with_role("Advocacia User")
 		frappe.set_user(user)
-		doc = create_test_tarefa()
+		doc = create_test_legal_task()
 		self.assertTrue(doc.name)
 
 	def test_painel_strips_financial_for_user(self):

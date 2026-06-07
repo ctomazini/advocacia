@@ -51,23 +51,23 @@ def _gerar_cnj_valido():
 
 def _parcela_row(vencimento, valor_total, idx=1):
 	return {
-		"doctype": "Parcela de Honorarios",
+		"doctype": "Fee Installment",
 		"vencimento": vencimento,
 		"valor_total": flt(valor_total),
 		"valor_advogada": 0,
 		"valor_cliente": 0,
-		"valor_sucumbência": 0,
+		"contingency_amount": 0,
 		"status": "Pendente",
-		"descrição": f"Parcela {idx}",
+		"description": f"Parcela {idx}",
 	}
 
 
-def create_test_cliente(tipo_pessoa="Pessoa Física", nome=None, cpf=None, cnpj=None, **kwargs):
-	"""Cria Cliente de teste. Retorna doc inserido."""
+def create_test_client(tipo_pessoa="Pessoa Física", nome=None, cpf=None, cnpj=None, **kwargs):
+	"""Cria Client de teste. Retorna doc inserido."""
 	if not nome:
-		nome = _uid("Cliente Teste")
+		nome = _uid("Client Teste")
 	data = {
-		"doctype": "Cliente",
+		"doctype": "Client",
 		"tipo_pessoa": tipo_pessoa,
 		"nome": nome,
 	}
@@ -81,13 +81,13 @@ def create_test_cliente(tipo_pessoa="Pessoa Física", nome=None, cpf=None, cnpj=
 	return doc
 
 
-def create_test_servico(cliente=None, tipo="Consultoria", numero_processo=None, **kwargs):
-	"""Cria Servico de teste. Retorna doc inserido."""
+def create_test_legal_case(cliente=None, tipo="Consultoria", numero_processo=None, **kwargs):
+	"""Cria Legal Case de teste. Retorna doc inserido."""
 	if not cliente:
-		cliente = create_test_cliente().name
+		cliente = create_test_client().name
 	data = {
-		"doctype": "Servico",
-		"cliente": cliente,
+		"doctype": "Legal Case",
+		"client": cliente,
 		"tipo": tipo,
 		"status": "Em andamento",
 	}
@@ -114,9 +114,9 @@ def create_test_acordo(
 ):
 	"""Cria Acordo com parcelas na child table parcelas."""
 	if not servico:
-		servico_doc = create_test_servico()
+		servico_doc = create_test_legal_case()
 		servico = servico_doc.name
-	cliente = frappe.db.get_value("Servico", servico, "cliente")
+	cliente = frappe.db.get_value("Legal Case", servico, "client")
 
 	if parcelas is None and num_parcelas:
 		valor_parcela = flt(valor_total) / num_parcelas
@@ -127,22 +127,22 @@ def create_test_acordo(
 
 	doc = frappe.get_doc(
 		{
-			"doctype": "Acordo de Honorarios Processuais",
-			"servico": servico,
-			"cliente": cliente,
+			"doctype": "Fee Agreement",
+			"legal_case": servico,
+			"client": cliente,
 			"modo_honorarios": modo,
-			"tipo_de_cobrança": tipo_cobranca,
+			"billing_type": tipo_cobranca,
 			"valor_total_do_acordo": valor_total,
-			"número_de_parcelas": num_parcelas,
+			"installment_count": num_parcelas,
 			"data_primeira_parcela": today(),
-			"parcelas": parcelas or [],
+			"fee_installments": parcelas or [],
 		}
 	)
 	doc.insert(ignore_permissions=True)
 	return doc
 
 
-def create_test_pagamento(
+def create_test_legal_payment(
 	servico=None,
 	cliente=None,
 	valor=1000,
@@ -152,34 +152,34 @@ def create_test_pagamento(
 	tipo_origem="Honorários (Parcela)",
 	**kwargs,
 ):
-	"""Cria Pagamento de honorários vinculado a acordo (via sync se necessário)."""
+	"""Cria Legal Payment de honorários vinculado a acordo (via sync se necessário)."""
 	if acordo:
-		servico = servico or frappe.db.get_value("Acordo de Honorarios Processuais", acordo, "servico")
-		cliente = cliente or frappe.db.get_value("Acordo de Honorarios Processuais", acordo, "cliente")
+		servico = servico or frappe.db.get_value("Fee Agreement", acordo, "legal_case")
+		cliente = cliente or frappe.db.get_value("Fee Agreement", acordo, "client")
 	elif not servico:
 		acordo_doc = create_test_acordo(num_parcelas=1, valor_total=valor)
 		acordo = acordo_doc.name
-		servico = acordo_doc.servico
-		cliente = acordo_doc.cliente
-		pagamentos = frappe.get_all("Pagamento", filters={"acordo": acordo}, pluck="name")
+		servico = acordo_doc.legal_case
+		cliente = acordo_doc.client
+		pagamentos = frappe.get_all("Legal Payment", filters={"fee_agreement": acordo}, pluck="name")
 		if pagamentos:
-			doc = frappe.get_doc("Pagamento", pagamentos[0])
+			doc = frappe.get_doc("Legal Payment", pagamentos[0])
 			if status != "Pendente":
 				doc.status = status
 				doc.save(ignore_permissions=True)
 			return doc
 	else:
-		cliente = cliente or frappe.db.get_value("Servico", servico, "cliente")
+		cliente = cliente or frappe.db.get_value("Legal Case", servico, "client")
 
 	data = {
-		"doctype": "Pagamento",
-		"servico": servico,
-		"cliente": cliente,
+		"doctype": "Legal Payment",
+		"legal_case": servico,
+		"client": cliente,
 		"valor": valor,
 		"data_vencimento": data_vencimento or today(),
 		"status": status,
 		"tipo_origem": tipo_origem,
-		"acordo": acordo,
+		"fee_agreement": acordo,
 	}
 	data.update(kwargs)
 	doc = frappe.get_doc(data)
@@ -187,12 +187,12 @@ def create_test_pagamento(
 	return doc
 
 
-def create_test_audiencia(servico=None, data_hora=None, tipo="Conciliação", **kwargs):
+def create_test_hearing(servico=None, data_hora=None, tipo="Conciliação", **kwargs):
 	if not servico:
-		servico = create_test_servico().name
+		servico = create_test_legal_case().name
 	data = {
-		"doctype": "Audiencia",
-		"servico": servico,
+		"doctype": "Hearing",
+		"legal_case": servico,
 		"data_hora": data_hora or now_datetime(),
 		"tipo": tipo,
 		"modalidade": "Presencial",
@@ -205,10 +205,10 @@ def create_test_audiencia(servico=None, data_hora=None, tipo="Conciliação", **
 
 def create_test_prazo(servico=None, data_prazo=None, descricao=None, **kwargs):
 	if not servico:
-		servico = create_test_servico().name
+		servico = create_test_legal_case().name
 	data = {
-		"doctype": "Controle de Prazos",
-		"servico": servico,
+		"doctype": "Deadline",
+		"legal_case": servico,
 		"data_prazo": data_prazo or add_days(today(), 7),
 		"descricao": descricao or _uid("Prazo Teste"),
 		"prioridade": "Média",
@@ -221,7 +221,7 @@ def create_test_prazo(servico=None, data_prazo=None, descricao=None, **kwargs):
 
 def create_test_despesa(descricao=None, categoria="Aluguel", valor=2500, data_vencimento=None, recorrente=0, **kwargs):
 	data = {
-		"doctype": "Despesa do Escritorio",
+		"doctype": "Office Expense",
 		"descricao": descricao or _uid("Despesa Teste"),
 		"categoria": categoria,
 		"valor": valor,
@@ -237,7 +237,7 @@ def create_test_despesa(descricao=None, categoria="Aluguel", valor=2500, data_ve
 
 def create_test_registro_atos(servico=None, atos=None):
 	if not servico:
-		servico = create_test_servico().name
+		servico = create_test_legal_case().name
 	if atos is None:
 		atos = [
 			{
@@ -255,21 +255,21 @@ def create_test_registro_atos(servico=None, atos=None):
 		]
 	doc = frappe.get_doc(
 		{
-			"doctype": "Registro de Atos",
-			"servico": servico,
-			"atos": atos,
+			"doctype": "Service Record",
+			"legal_case": servico,
+			"acts": atos,
 		}
 	)
 	doc.insert(ignore_permissions=True)
 	return doc
 
 
-def create_test_tarefa(titulo=None, servico=None, **kwargs):
+def create_test_legal_task(titulo=None, servico=None, **kwargs):
 	data = {
-		"doctype": "Tarefa",
-		"titulo": titulo or _uid("Tarefa Teste"),
+		"doctype": "Legal Task",
+		"titulo": titulo or _uid("Legal Task Teste"),
 		"status": "Pendente",
-		"servico": servico,
+		"legal_case": servico,
 	}
 	data.update(kwargs)
 	doc = frappe.get_doc(data)
@@ -279,19 +279,19 @@ def create_test_tarefa(titulo=None, servico=None, **kwargs):
 
 def get_acordo_pagamentos(acordo_name):
 	return frappe.get_all(
-		"Pagamento",
-		filters={"acordo": acordo_name, "tipo_origem": "Honorários (Parcela)"},
+		"Legal Payment",
+		filters={"fee_agreement": acordo_name, "tipo_origem": "Honorários (Parcela)"},
 		fields=["name", "status", "parcela_origem_id", "valor"],
 		order_by="creation asc",
 	)
 
 
-def create_test_custa_processual(servico=None, descricao=None, tipo="Taxa Judicial", valor=500, **kwargs):
+def create_test_court_cost(servico=None, descricao=None, tipo="Taxa Judicial", valor=500, **kwargs):
 	if not servico:
-		servico = create_test_servico().name
+		servico = create_test_legal_case().name
 	data = {
-		"doctype": "Custa Processual",
-		"servico": servico,
+		"doctype": "Court Cost",
+		"legal_case": servico,
 		"descricao": descricao or _uid("Custa Teste"),
 		"tipo": tipo,
 		"valor": valor,
@@ -302,12 +302,12 @@ def create_test_custa_processual(servico=None, descricao=None, tipo="Taxa Judici
 	return doc
 
 
-def create_test_comunicacao(cliente=None, assunto=None, tipo="Telefone", **kwargs):
+def create_test_case_communication(cliente=None, assunto=None, tipo="Telefone", **kwargs):
 	if not cliente:
-		cliente = create_test_cliente().name
+		cliente = create_test_client().name
 	data = {
-		"doctype": "Comunicacao",
-		"cliente": cliente,
+		"doctype": "Case Communication",
+		"client": cliente,
 		"assunto": assunto or _uid("Comunicação Teste"),
 		"tipo": tipo,
 		"data": now_datetime(),
@@ -320,10 +320,10 @@ def create_test_comunicacao(cliente=None, assunto=None, tipo="Telefone", **kwarg
 
 def create_test_registro_horas(servico=None, atividade=None, duracao_minutos=60, **kwargs):
 	if not servico:
-		servico = create_test_servico().name
+		servico = create_test_legal_case().name
 	data = {
-		"doctype": "Registro de Horas",
-		"servico": servico,
+		"doctype": "Time Entry",
+		"legal_case": servico,
 		"data": today(),
 		"atividade": atividade or _uid("Atividade Teste"),
 		"duracao_minutos": duracao_minutos,

@@ -56,7 +56,7 @@ frappe.provide("advocacia.painel.timeline");
 	                ? __("Audiência")
 	                : it.tipo === "prazo"
 	                  ? __("Prazo")
-	                  : __("Tarefa");
+	                  : __("Legal Task");
 	        var tipo_icon =
 	            it.tipo === "audiencia" ? "milestone" : it.tipo === "prazo" ? "time" : "checklist";
 	        var pill_map = {
@@ -109,7 +109,7 @@ frappe.provide("advocacia.painel.timeline");
 	            time: a.hora || (a.tipo === "prazo" ? __("Prazo") : __("Hoje")),
 	            title: a.titulo,
 	            sub:
-	                ((a.cliente_nome || a.cliente) ? (a.cliente_nome || a.cliente) + " · " : "") +
+	                ((a.client_nome || a.client) ? (a.client_nome || a.client) + " · " : "") +
 	                (a.tipo === "prazo"
 	                    ? a.dias === 0
 	                        ? __("Vence hoje")
@@ -126,8 +126,8 @@ frappe.provide("advocacia.painel.timeline");
 	            sort: 2,
 	            time: a.hora || __("—"),
 	            title: a.tipo || __("Audiência"),
-	            sub: ((a.cliente_nome || a.cliente) || "") + (a.vara_label ? " · " + a.vara_label : ""),
-	            doctype: "Audiencia",
+	            sub: ((a.client_nome || a.client) || "") + (a.court_branch_link_label ? " · " + a.court_branch_link_label : ""),
+	            doctype: "Hearing",
 	            docname: a.name,
 	            pill: "blue",
 	        });
@@ -138,8 +138,8 @@ frappe.provide("advocacia.painel.timeline");
 	            sort: p.dias_restantes <= 0 ? 0 : 1,
 	            time: U.fmt_date_iso(p.data_prazo),
 	            title: p.descricao || p.name,
-	            sub: p.cliente_nome || "",
-	            doctype: "Controle de Prazos",
+	            sub: p.client_nome || "",
+	            doctype: "Deadline",
 	            docname: p.name,
 	            pill: p.dias_restantes <= 0 ? "red" : "orange",
 	        });
@@ -189,7 +189,7 @@ frappe.provide("advocacia.painel.timeline");
 	        '<div class="painel-section-head-actions">' +
 	        U.render_list_limit_controls("comunicacoes", list_limit) +
 	        meta_html +
-	        '<span class="painel-section-link" data-route-list="Comunicacao">' +
+	        '<span class="painel-section-link" data-route-list="Case Communication">' +
 	        __("Ver todas") +
 	        "</span></div></div>";
 
@@ -212,12 +212,12 @@ frappe.provide("advocacia.painel.timeline");
 	        h +=
 	            '<div class="painel-com-item" data-comunicacao="' +
 	            frappe.utils.escape_html(c.name || "") +
-	            '" data-dt="Comunicacao" data-dn="' +
+	            '" data-dt="Case Communication" data-dn="' +
 	            frappe.utils.escape_html(c.name || "") +
 	            '">' +
 	            '<div class="painel-com-main">' +
 	            '<div class="painel-com-cliente">' +
-	            frappe.utils.escape_html(c.cliente_nome || c.cliente || __("Sem cliente")) +
+	            frappe.utils.escape_html(c.client_nome || c.client || __("Sem cliente")) +
 	            "</div>" +
 	            '<div class="painel-com-assunto">' +
 	            frappe.utils.escape_html(c.assunto || c.name) +
@@ -247,7 +247,7 @@ frappe.provide("advocacia.painel.timeline");
 	        '<p class="painel-section-sub">' +
 	        __("Interações recentes com clientes") +
 	        "</p></div>" +
-	        '<span class="painel-section-link" data-route-list="Comunicacao">' +
+	        '<span class="painel-section-link" data-route-list="Case Communication">' +
 	        __("Ver todas") +
 	        "</span></div>";
 
@@ -276,7 +276,7 @@ frappe.provide("advocacia.painel.timeline");
 	            "</div>" +
 	            '<div class="painel-op-sub">' +
 	            frappe.utils.escape_html(c.tipo || "") +
-	            ((c.cliente_nome || c.cliente) ? " · " + frappe.utils.escape_html(c.cliente_nome || c.cliente) : "") +
+	            ((c.client_nome || c.client) ? " · " + frappe.utils.escape_html(c.client_nome || c.client) : "") +
 	            "</div></div>" +
 	            '<div class="painel-schedule-side">' +
 	            (c.data
@@ -303,7 +303,7 @@ frappe.provide("advocacia.painel.timeline");
 	            return (
 	                '<div class="' +
 	                card_cls +
-	                '" data-dt="Controle de Prazos" data-dn="' +
+	                '" data-dt="Deadline" data-dn="' +
 	                frappe.utils.escape_html(p.name) +
 	                '">' +
 	                '<div class="painel-schedule-when">' +
@@ -323,8 +323,8 @@ frappe.provide("advocacia.painel.timeline");
 	                frappe.utils.escape_html(p.descricao || p.name) +
 	                "</div>" +
 	                '<div class="painel-schedule-sub">' +
-	                frappe.utils.escape_html(p.cliente_nome || "—") +
-	                (p.servico_titulo ? " · " + frappe.utils.escape_html(p.servico_titulo) : "") +
+	                frappe.utils.escape_html(p.client_nome || "—") +
+	                (p.legal_case_titulo ? " · " + frappe.utils.escape_html(p.legal_case_titulo) : "") +
 	                "</div></div>" +
 	                '<div class="painel-schedule-meta">' +
 	                U.status_pill(p.prioridade || "Normal") +
@@ -351,7 +351,7 @@ frappe.provide("advocacia.painel.timeline");
 	            return (
 	                '<div class="' +
 	                card_cls +
-	                '" data-dt="Tarefa" data-dn="' +
+	                '" data-dt="Legal Task" data-dn="' +
 	                frappe.utils.escape_html(t.name) +
 	                '">' +
 	                '<div class="painel-schedule-when">' +
@@ -374,7 +374,7 @@ frappe.provide("advocacia.painel.timeline");
 	                "</div>" +
 	                '<div class="painel-schedule-sub">' +
 	                frappe.utils.escape_html(t.responsavel_nome || "—") +
-	                (t.cliente_nome ? " · " + frappe.utils.escape_html(t.cliente_nome) : "") +
+	                (t.client_nome ? " · " + frappe.utils.escape_html(t.client_nome) : "") +
 	                "</div></div>" +
 	                '<div class="painel-schedule-meta">' +
 	                U.status_pill(t.status) +
@@ -386,7 +386,7 @@ frappe.provide("advocacia.painel.timeline");
 
 	AP.render_operacao_dia = function(d) {
 	    var timeline = T.build_timeline_items(d);
-	    var criticas = F.build_parcelas_criticas(d.parcelas, 5);
+	    var criticas = F.build_parcelas_criticas(d.fee_installments, 5);
 	    var h =
 	        '<section class="painel-section painel-section--primary"><div class="painel-section-head">' +
 	        "<div><h2 class='painel-section-title'>" +

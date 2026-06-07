@@ -1,0 +1,298 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:PAG-{YYYY}-{####}",
+ "naming_rule": "Expression",
+ "creation": "2026-05-29 12:00:00.000000",
+ "custom": 0,
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "sec_relacionamentos",
+  "title",
+  "servico",
+  "cliente",
+  "col_rel_1",
+  "tipo_origem",
+  "acordo",
+  "registro_atos",
+  "numero_parcela",
+  "descricao",
+  "sec_origem",
+  "parcela_origem_id",
+  "sincronizado_em",
+  "manual_override",
+  "sec_financeiro",
+  "valor",
+  "valor_recebido",
+  "col_fin_1",
+  "data_vencimento",
+  "data_recebimento",
+  "status",
+  "sec_controle",
+  "observacoes",
+  "comprovante"
+ ],
+ "fields": [
+  {
+   "fieldname": "sec_relacionamentos",
+   "fieldtype": "Section Break",
+   "label": "Relacionamentos",
+   "idx": 1
+  },
+  {
+   "default": "Honorários (Parcela)",
+   "fieldname": "tipo_origem",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Origem",
+   "options": "Honorários (Parcela)\nAtos Advocatícios",
+   "description": "Honorários (Parcela) ou Atos Advocatícios.",
+   "idx": 2
+  },
+  {
+   "fieldname": "fee_agreement",
+   "fieldtype": "Link",
+   "in_list_view": 0,
+   "in_standard_filter": 1,
+   "label": "Acordo",
+   "mandatory_depends_on": "eval:doc.tipo_origem=='Honorários (Parcela)'",
+   "options": "Fee Agreement",
+   "search_index": 1,
+   "description": "Acordo de honorários que originou este pagamento (parcelas).",
+   "idx": 3
+  },
+  {
+   "depends_on": "eval:doc.tipo_origem=='Atos Advocatícios'",
+   "fieldname": "service_record",
+   "fieldtype": "Link",
+   "label": "Service Record",
+   "mandatory_depends_on": "eval:doc.tipo_origem=='Atos Advocatícios'",
+   "options": "Service Record",
+   "read_only": 1,
+   "description": "Registro de atos vinculado (cobrança de atos).",
+   "idx": 4
+  },
+  {
+   "fieldname": "legal_case",
+   "fieldtype": "Link",
+   "in_list_view": 0,
+   "in_standard_filter": 1,
+   "label": "Serviço",
+   "options": "Legal Case",
+   "reqd": 1,
+   "search_index": 1,
+   "description": "Serviço ou processo relacionado.",
+   "idx": 5
+  },
+  {
+   "fieldname": "client",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Client",
+   "options": "Client",
+   "read_only": 1,
+   "fetch_from": "servico.cliente",
+   "reqd": 1,
+   "search_index": 1,
+   "description": "Preenchido automaticamente a partir do serviço ou acordo.",
+   "idx": 6
+  },
+  {
+   "fieldname": "col_rel_1",
+   "fieldtype": "Column Break",
+   "idx": 7
+  },
+  {
+   "fieldname": "numero_parcela",
+   "fieldtype": "Int",
+   "in_list_view": 0,
+   "label": "Nº Parcela",
+   "description": "Número sequencial da parcela no acordo.",
+   "idx": 8
+  },
+  {
+   "bold": 1,
+   "fieldname": "descricao",
+   "fieldtype": "Small Text",
+   "in_list_view": 0,
+   "label": "Descrição",
+   "description": "Descrição exibida na parcela e nos relatórios.",
+   "idx": 9
+  },
+  {
+   "fieldname": "sec_origem",
+   "fieldtype": "Section Break",
+   "label": "Origem / Sincronização",
+   "idx": 10
+  },
+  {
+   "fieldname": "parcela_origem_id",
+   "fieldtype": "Data",
+   "label": "ID Origem",
+   "read_only": 1,
+   "unique": 1,
+   "description": "Identificador interno para sincronização com parcelas do acordo.",
+   "idx": 11
+  },
+  {
+   "fieldname": "sincronizado_em",
+   "fieldtype": "Datetime",
+   "label": "Sincronizado em",
+   "read_only": 1,
+   "description": "Data e hora da última sincronização automática.",
+   "idx": 12
+  },
+  {
+   "default": "0",
+   "fieldname": "manual_override",
+   "depends_on": "eval:doc.tipo_origem=='Honorários (Parcela)'",
+   "fieldtype": "Check",
+   "label": "Edição manual (não sincronizar)",
+   "description": "Quando marcado, o sistema não sobrescreve este pagamento na sincronização.",
+   "idx": 13
+  },
+  {
+   "fieldname": "sec_financeiro",
+   "fieldtype": "Section Break",
+   "label": "Financeiro",
+   "idx": 14
+  },
+  {
+   "fieldname": "valor",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Valor",
+   "reqd": 1,
+   "description": "Valor previsto da parcela ou cobrança.",
+   "idx": 15
+  },
+  {
+   "fieldname": "valor_recebido",
+   "fieldtype": "Currency",
+   "label": "Valor Recebido",
+   "description": "Valor efetivamente recebido.",
+   "idx": 16
+  },
+  {
+   "fieldname": "col_fin_1",
+   "fieldtype": "Column Break",
+   "idx": 17
+  },
+  {
+   "fieldname": "data_vencimento",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Vencimento",
+   "reqd": 1,
+   "search_index": 1,
+   "description": "Data de vencimento.",
+   "idx": 18
+  },
+  {
+   "fieldname": "data_recebimento",
+   "fieldtype": "Date",
+   "label": "Data de Recebimento",
+   "description": "Data em que o pagamento foi recebido.",
+   "in_standard_filter": 1,
+   "idx": 19
+  },
+  {
+   "default": "Pendente",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 0,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Pendente\nVencido\nRecebido\nCancelado\nRenegociado\nRepassado",
+   "reqd": 1,
+   "search_index": 1,
+   "description": "Pendente, Vencido, Recebido, Repassado, Cancelado ou Renegociado.",
+   "idx": 20
+  },
+  {
+   "fieldname": "sec_controle",
+   "fieldtype": "Section Break",
+   "label": "Controle",
+   "idx": 21
+  },
+  {
+   "fieldname": "observacoes",
+   "fieldtype": "Small Text",
+   "label": "Observações",
+   "description": "Observações internas sobre o pagamento.",
+   "idx": 22
+  },
+  {
+   "fieldname": "comprovante",
+   "fieldtype": "Attach",
+   "label": "Comprovante",
+   "description": "Comprovante de recebimento anexado.",
+   "idx": 23
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "label": "Título",
+   "hidden": 0,
+   "read_only": 0,
+   "allow_in_quick_entry": 1,
+   "idx": 24,
+   "in_list_view": 0,
+   "description": "Título automático com ID e descritor."
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-05-29 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Advocacia",
+ "name": "Legal Payment",
+ "search_fields": "descricao,cliente,status,data_vencimento",
+ "naming_series_options": "PAY-.YYYY.-",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "role": "Advocacia Manager",
+   "write": 1,
+   "idx": 1
+  },
+  {
+   "create": 1,
+   "delete": 0,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "role": "Advocacia User",
+   "write": 1,
+   "idx": 2
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "write": 1,
+   "idx": 3
+  }
+ ],
+ "sort_field": "data_vencimento",
+ "sort_order": "ASC",
+ "states": [],
+ "title_field": "title",
+ "track_changes": 1,
+ "show_title_field_in_link": 1
+}

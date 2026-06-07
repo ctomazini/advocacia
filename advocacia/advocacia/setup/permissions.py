@@ -87,47 +87,47 @@ USER_FINANCIAL_PERMLEVEL = {
 
 FINANCIAL = frozenset(
 	{
-		"Acordo de Honorarios Processuais",
-		"Pagamento",
-		"Custa Processual",
-		"Despesa do Escritorio",
+		"Fee Agreement",
+		"Legal Payment",
+		"Court Cost",
+		"Office Expense",
 	}
 )
 
 CATALOG = frozenset(
 	{
-		"Comarca",
-		"Vara",
-		"Tribunal",
-		"Fase Processual",
-		"Kit de Documentos",
-		"Template Documento",
-		"Configuracao do Escritorio",
+		"Jurisdiction",
+		"Court Branch",
+		"Court",
+		"Case Phase",
+		"Document Kit",
+		"Document Template",
+		"Office Settings",
 	}
 )
 
 OPERATIONAL = frozenset(
 	{
-		"Servico",
-		"Cliente",
-		"Audiencia",
-		"Comunicacao",
-		"Controle de Prazos",
-		"Registro de Atos",
-		"Registro de Horas",
-		"Tarefa",
+		"Legal Case",
+		"Client",
+		"Hearing",
+		"Case Communication",
+		"Deadline",
+		"Service Record",
+		"Time Entry",
+		"Legal Task",
 	}
 )
 
 MANAGED_DOCTYPES = FINANCIAL | CATALOG | OPERATIONAL
 
 FINANCIAL_FIELD_PERMLEVEL = {
-	"Acordo de Honorarios Processuais": (
+	"Fee Agreement": (
 		"valor_total_do_acordo",
 		"valor_fixo_de_honorarios",
 		"valor_da_parcela",
 	),
-	"Pagamento": ("valor", "valor_recebido"),
+	"Legal Payment": ("valor", "valor_recebido"),
 }
 
 

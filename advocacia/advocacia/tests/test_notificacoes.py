@@ -19,9 +19,9 @@ class TestNotificacoes(FrappeTestCase):
 		self.assertTrue(doc.enabled)
 
 	def test_fixture_audiencia_amanha_existe(self):
-		if not frappe.db.exists("Notification", "Advocacia - Audiencia amanha"):
-			self.skipTest("Fixture Notification Advocacia - Audiencia amanha não instalada")
-		doc = frappe.get_doc("Notification", "Advocacia - Audiencia amanha")
+		if not frappe.db.exists("Notification", "Advocacia - Hearing amanha"):
+			self.skipTest("Fixture Notification Advocacia - Hearing amanha não instalada")
+		doc = frappe.get_doc("Notification", "Advocacia - Hearing amanha")
 		self.assertTrue(doc.enabled)
 
 	@patch("frappe.sendmail")

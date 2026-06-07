@@ -86,16 +86,16 @@ frappe.provide("advocacia.painel.kpis");
 	        {
 	            tone: "yellow",
 	            icon: "list-todo",
-	            count: centro.tarefas_atrasadas || 0,
-	            label: __("Tarefas atrasadas"),
+	            count: centro.legal_tasks_atrasadas || 0,
+	            label: __("Legal Tasks atrasadas"),
 	            route: "tarefas_atrasadas",
 	        },
 	        {
 	            tone: "red",
 	            icon: "circle-dollar-sign",
-	            count: (centro.parcelas_vencidas && centro.parcelas_vencidas.count) || 0,
+	            count: (centro.fee_installments_vencidas && centro.fee_installments_vencidas.count) || 0,
 	            label: __("Parcelas vencidas"),
-	            meta: U.fmt_currency((centro.parcelas_vencidas && centro.parcelas_vencidas.valor) || 0, true),
+	            meta: U.fmt_currency((centro.fee_installments_vencidas && centro.fee_installments_vencidas.valor) || 0, true),
 	            route: "parcelas_vencidas",
 	        },
 	    ];
@@ -104,9 +104,9 @@ frappe.provide("advocacia.painel.kpis");
 	        {
 	            tone: "orange",
 	            icon: "wallet",
-	            count: (centro.pagamentos_periodo && centro.pagamentos_periodo.count) || 0,
+	            count: (centro.payments_periodo && centro.payments_periodo.count) || 0,
 	            label: U.painel_periodo_a_receber_label(periodo_dias),
-	            meta: U.fmt_currency((centro.pagamentos_periodo && centro.pagamentos_periodo.valor) || 0, true),
+	            meta: U.fmt_currency((centro.payments_periodo && centro.payments_periodo.valor) || 0, true),
 	            route: "pagamentos_periodo",
 	        },
 	        {
@@ -158,8 +158,8 @@ frappe.provide("advocacia.painel.kpis");
 	        {
 	            tone: "yellow",
 	            icon: "checklist",
-	            count: centro.tarefas_pendentes || kpis.tarefas_pendentes || 0,
-	            label: __("Tarefas abertas"),
+	            count: centro.legal_tasks_pendentes || kpis.legal_tasks_pendentes || 0,
+	            label: __("Legal Tasks abertas"),
 	            route: "tarefas_pendentes",
 	        },
 	        {
@@ -187,7 +187,7 @@ frappe.provide("advocacia.painel.kpis");
 	            tone: "gray",
 	            icon: "users",
 	            count: centro.total_clientes || kpis.total_clientes || 0,
-	            label: __("Clientes"),
+	            label: __("Clients"),
 	            route: "clientes",
 	        },
 	        {
@@ -200,7 +200,7 @@ frappe.provide("advocacia.painel.kpis");
 	        {
 	            tone: "blue",
 	            icon: "briefcase",
-	            count: centro.servicos_ativos || kpis.servicos_ativos || 0,
+	            count: centro.legal_cases_ativos || kpis.legal_cases_ativos || 0,
 	            label: __("Processos"),
 	            route: "processos_ativos",
 	        },
@@ -271,11 +271,11 @@ frappe.provide("advocacia.painel.kpis");
 	    fin = fin || {};
 	    var vencidos =
 	        (centro.prazos_vencidos || 0) +
-	        ((centro.parcelas_vencidas && centro.parcelas_vencidas.count) || 0) +
-	        (centro.tarefas_atrasadas || 0);
-	    var pendentes = centro.tarefas_pendentes || kpis.tarefas_pendentes || 0;
+	        ((centro.fee_installments_vencidas && centro.fee_installments_vencidas.count) || 0) +
+	        (centro.legal_tasks_atrasadas || 0);
+	    var pendentes = centro.legal_tasks_pendentes || kpis.legal_tasks_pendentes || 0;
 	    var previstos =
-	        (centro.pagamentos_periodo && centro.pagamentos_periodo.count) ||
+	        (centro.payments_periodo && centro.payments_periodo.count) ||
 	        (fin.previsto_periodo && fin.previsto_periodo.count) ||
 	        0;
 	    var honorarios = centro.honorarios_ativos || kpis.honorarios_ativos || 0;
@@ -283,7 +283,7 @@ frappe.provide("advocacia.painel.kpis");
 	        (centro.prazos_proximos_3d || 0) + (centro.prazos_urgentes || kpis.prazos_urgentes || 0);
 	    var penal = Math.min(
 	        85,
-	        vencidos * 4 + atencao * 1.5 + (centro.tarefas_atrasadas || 0) * 2
+	        vencidos * 4 + atencao * 1.5 + (centro.legal_tasks_atrasadas || 0) * 2
 	    );
 	    var score = Math.round(Math.max(0, Math.min(100, 100 - penal)));
 	    var label =
@@ -377,8 +377,8 @@ frappe.provide("advocacia.painel.kpis");
 	        {
 	            key: "vencidas",
 	            label: __("Parcelas vencidas"),
-	            value: U.fmt_currency(k.parcelas_vencidas.valor),
-	            meta: __("{0} parcela(s)", [k.parcelas_vencidas.count]),
+	            value: U.fmt_currency(k.fee_installments_vencidas.valor),
+	            meta: __("{0} parcela(s)", [k.fee_installments_vencidas.count]),
 	            urgent: true,
 	        },
 	        {
@@ -411,7 +411,7 @@ frappe.provide("advocacia.painel.kpis");
 	        {
 	            key: "servicos",
 	            label: __("Serviços ativos"),
-	            value: String(k.servicos_ativos),
+	            value: String(k.legal_cases_ativos),
 	            meta: __("{0} clientes", [k.total_clientes]),
 	        },
 	    ];
@@ -455,7 +455,7 @@ frappe.provide("advocacia.painel.kpis");
 	    var row1 = [
 	        { label: __("Audiências da semana"), value: String(k.audiencias_semana || 0), route: "audiencias_semana" },
 	        { label: __("Prazos críticos"), value: String(k.prazos_urgentes || 0), urgent: k.prazos_urgentes > 0, route: "prazos_criticos" },
-	        { label: __("Tarefas pendentes"), value: String(k.tarefas_pendentes || 0), route: "tarefas_pendentes" },
+	        { label: __("Legal Tasks pendentes"), value: String(k.legal_tasks_pendentes || 0), route: "tarefas_pendentes" },
 	        {
 	            label: __("Recebimentos do período"),
 	            value: U.fmt_currency((k.recebido_periodo && k.recebido_periodo.valor) || 0),
@@ -467,11 +467,11 @@ frappe.provide("advocacia.painel.kpis");
 	        { label: __("Receita do mês"), value: U.fmt_currency((k.recebido_mes && k.recebido_mes.valor) || 0), positive: true, route: "receita_mes" },
 	        { label: __("Honorários ativos"), value: String(k.honorarios_ativos || 0), route: "honorarios_ativos" },
 	        { label: __("Horas registradas"), value: (horas || 0).toFixed(1) + " h", route: "horas" },
-	        { label: __("Clientes ativos"), value: String(k.total_clientes || 0), route: "clientes" },
+	        { label: __("Clients ativos"), value: String(k.total_clientes || 0), route: "clientes" },
 	    ];
 	    var row3 = [
 	        { label: __("Taxa de recebimento"), value: (fin.taxa_recebimento || k.taxa_recebimento || 0) + "%", route: "taxa_recebimento" },
-	        { label: __("Processos ativos"), value: String(k.servicos_ativos || 0), route: "processos_ativos" },
+	        { label: __("Processos ativos"), value: String(k.legal_cases_ativos || 0), route: "processos_ativos" },
 	        {
 	            label: __("Custas abertas"),
 	            value: String(k.custas_abertas || (custas_list && custas_list.length) || 0),

@@ -23,16 +23,16 @@ def _build_alertas(hoje, periodo_fim):
 	amanha = add_days(hoje, 1)
 
 	prazos_criticos = frappe.get_all(
-		"Controle de Prazos",
+		"Deadline",
 		filters={
 			"status": "Pendente",
 			"data_prazo": ["between", [hoje, amanha]],
 		},
-		fields=["name", "descricao", "data_prazo", "cliente", "servico", "prioridade"],
+		fields=["name", "descricao", "data_prazo", "client", "legal_case", "prioridade"],
 		order_by="data_prazo asc",
 		limit_page_length=20,
 	)
-	cliente_nome_map = _cliente_nome_lookup([p.cliente for p in prazos_criticos if p.cliente])
+	cliente_nome_map = _cliente_nome_lookup([p.client for p in prazos_criticos if p.client])
 	for p in prazos_criticos:
 		dias = date_diff(p.data_prazo, hoje)
 		alertas.append(
@@ -41,22 +41,22 @@ def _build_alertas(hoje, periodo_fim):
 				"nivel": "red" if dias <= 0 else "yellow",
 				"titulo": p.descricao or p.name,
 				"data": p.data_prazo,
-				"cliente": p.cliente or "",
-				"cliente_nome": cliente_nome_map.get(p.cliente, p.cliente or ""),
+				"client": p.client or "",
+				"cliente_nome": cliente_nome_map.get(p.client, p.client or ""),
 				"dias": dias,
-				"doctype": "Controle de Prazos",
+				"doctype": "Deadline",
 				"docname": p.name,
 			}
 		)
 
 	audiencias_hoje = frappe.get_all(
-		"Audiencia",
+		"Hearing",
 		filters={"data_hora": ["between", [f"{hoje} 00:00:00", f"{hoje} 23:59:59"]]},
-		fields=["name", "cliente", "data_hora", "tipo", "local_vara", "modalidade"],
+		fields=["name", "client", "data_hora", "tipo", "court_branch", "modalidade"],
 		order_by="data_hora asc",
 		limit_page_length=20,
 	)
-	cliente_nome_aud = _cliente_nome_lookup([a.cliente for a in audiencias_hoje if a.cliente])
+	cliente_nome_aud = _cliente_nome_lookup([a.client for a in audiencias_hoje if a.client])
 	for a in audiencias_hoje:
 		alertas.append(
 			{
@@ -65,11 +65,11 @@ def _build_alertas(hoje, periodo_fim):
 				"titulo": a.tipo or _("Audiência"),
 				"data": str(a.data_hora)[:10] if a.data_hora else hoje,
 				"hora": str(a.data_hora)[11:16] if a.data_hora else "",
-				"cliente": a.cliente or "",
-				"cliente_nome": cliente_nome_aud.get(a.cliente, a.cliente or ""),
-				"vara": _vara_label(a.local_vara),
+				"client": a.client or "",
+				"cliente_nome": cliente_nome_aud.get(a.client, a.client or ""),
+				"court_branch_link": _vara_label(a.court_branch),
 				"modalidade": a.modalidade or "",
-				"doctype": "Audiencia",
+				"doctype": "Hearing",
 				"docname": a.name,
 			}
 		)
@@ -97,15 +97,15 @@ def _build_centro_atencao(hoje, amanha, kpis, financeiro, tarefas):
 	}
 def _get_audiencias(hoje, periodo_fim, limit):
 	rows = frappe.get_all(
-		"Audiencia",
+		"Hearing",
 		filters={"data_hora": ["between", [f"{hoje} 00:00:00", f"{periodo_fim} 23:59:59"]]},
 		fields=[
 			"name",
-			"servico",
-			"cliente",
+			"legal_case",
+			"client",
 			"data_hora",
 			"tipo",
-			"local_vara",
+			"court_branch",
 			"modalidade",
 			"link_virtual",
 		],
@@ -113,12 +113,12 @@ def _get_audiencias(hoje, periodo_fim, limit):
 		limit_page_length=limit,
 	)
 	servico_map = _servico_lookup(
-		[a.servico for a in rows if a.get("servico")],
-		["cliente", "title"],
+		[a.legal_case for a in rows if a.get("legal_case")],
+		["client", "title"],
 	)
-	cliente_por_servico = {name: sv.cliente for name, sv in servico_map.items()}
+	cliente_por_servico = {name: sv.client for name, sv in servico_map.items()}
 	cliente_nome_map = _cliente_nome_lookup(
-		[a.cliente for a in rows if a.cliente] + [sv.cliente for sv in servico_map.values() if sv.cliente]
+		[a.client for a in rows if a.client] + [sv.client for sv in servico_map.values() if sv.client]
 	)
 	for a in rows:
 		data_hora = a.get("data_hora")
@@ -130,42 +130,42 @@ def _get_audiencias(hoje, periodo_fim, limit):
 			a["data"] = None
 			a["hora"] = ""
 			a["dias_restantes"] = 0
-		a["vara_label"] = _vara_label(a.get("local_vara"))
-		if a.get("servico") and not a.get("cliente"):
-			a["cliente"] = cliente_por_servico.get(a.servico) or ""
-		a["cliente_nome"] = cliente_nome_map.get(a.get("cliente"), a.get("cliente") or "")
-		sv = servico_map.get(a.get("servico")) if a.get("servico") else None
+		a["vara_label"] = _vara_label(a.get("court_branch"))
+		if a.get("legal_case") and not a.get("client"):
+			a["client"] = cliente_por_servico.get(a.legal_case) or ""
+		a["cliente_nome"] = cliente_nome_map.get(a.get("client"), a.get("client") or "")
+		sv = servico_map.get(a.get("legal_case")) if a.get("legal_case") else None
 		a["servico_titulo"] = (sv.title if sv else "") or ""
 	return rows
 def _get_prazos(hoje, periodo_fim, limit):
 	rows = frappe.get_all(
-		"Controle de Prazos",
+		"Deadline",
 		filters={
 			"status": "Pendente",
 			"data_prazo": ["<=", periodo_fim],
 		},
-		fields=["name", "descricao", "data_prazo", "prioridade", "servico", "cliente"],
+		fields=["name", "descricao", "data_prazo", "prioridade", "legal_case", "client"],
 		order_by="data_prazo asc",
 		limit_page_length=limit * 3,
 	)
 	prioridade_ordem = {"Alta": 0, "Média": 1, "Media": 1, "Baixa": 2, "Normal": 3}
 	servico_map = _servico_lookup(
-		[p.servico for p in rows if p.servico], ["cliente", "title", "numero_processo"]
+		[p.legal_case for p in rows if p.legal_case], ["client", "title", "numero_processo"]
 	)
 	cliente_nome_map = _cliente_nome_lookup(
-		[p.cliente for p in rows if p.cliente]
-		+ [sv.cliente for sv in servico_map.values() if sv.cliente]
+		[p.client for p in rows if p.client]
+		+ [sv.client for sv in servico_map.values() if sv.client]
 	)
 	for p in rows:
 		p["dias_restantes"] = date_diff(p.data_prazo, hoje) if p.data_prazo else 0
-		p["cliente_nome"] = cliente_nome_map.get(p.cliente, p.cliente or "")
+		p["cliente_nome"] = cliente_nome_map.get(p.client, p.client or "")
 		p["servico_titulo"] = ""
 		p["numero_processo"] = ""
-		if p.servico:
-			sv = servico_map.get(p.servico)
+		if p.legal_case:
+			sv = servico_map.get(p.legal_case)
 			if sv:
 				if not p["cliente_nome"]:
-					p["cliente_nome"] = cliente_nome_map.get(sv.cliente, sv.cliente or "")
+					p["cliente_nome"] = cliente_nome_map.get(sv.client, sv.client or "")
 				p["servico_titulo"] = sv.title or ""
 				p["numero_processo"] = sv.numero_processo or ""
 	rows.sort(

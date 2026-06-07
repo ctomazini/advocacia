@@ -27,13 +27,13 @@ LEGACY_PLACEHOLDERS = [
 	"cidade",
 	"estado",
 	"cep",
-	"servico",
+	"legal_case",
 	"tipo_servico",
 	"titulo_servico",
 	"numero_processo",
 	"area",
-	"vara",
-	"comarca",
+	"court_branch_link",
+	"jurisdiction",
 	"parte_contraria",
 	"valor_causa",
 	"data_abertura",
@@ -53,7 +53,7 @@ PLACEHOLDER_REFERENCIA = [
 		],
 	},
 	{
-		"grupo": "Cliente",
+		"grupo": "Client",
 		"items": [
 			{"placeholder": "cliente_nome", "label": "Nome / Razão Social", "alias": "nome"},
 			{"placeholder": "cliente_tipo_pessoa", "label": "Tipo de Pessoa"},
@@ -108,10 +108,10 @@ PLACEHOLDER_REFERENCIA = [
 				"alias": "numero_processo",
 			},
 			{"placeholder": "servico_area", "label": "Área", "alias": "area"},
-			{"placeholder": "servico_vara", "label": "Vara", "alias": "vara"},
-			{"placeholder": "servico_comarca", "label": "Comarca", "alias": "comarca"},
-			{"placeholder": "servico_tribunal", "label": "Tribunal"},
-			{"placeholder": "servico_fase_processual", "label": "Fase Processual"},
+			{"placeholder": "servico_vara", "label": "Court Branch", "alias": "court_branch_link"},
+			{"placeholder": "servico_comarca", "label": "Jurisdiction", "alias": "jurisdiction"},
+			{"placeholder": "servico_tribunal", "label": "Court"},
+			{"placeholder": "servico_fase_processual", "label": "Case Phase"},
 			{
 				"placeholder": "servico_parte_contraria",
 				"label": "Parte Contrária",
@@ -143,7 +143,7 @@ PLACEHOLDER_REFERENCIA = [
 			{"placeholder": "acordo_data_primeira_parcela", "label": "Data Primeira Parcela"},
 			{"placeholder": "acordo_valor_da_parcela", "label": "Valor da Parcela"},
 			{"placeholder": "acordo_total_advogada", "label": "Total Advogada"},
-			{"placeholder": "acordo_total_cliente", "label": "Total Cliente"},
+			{"placeholder": "acordo_total_cliente", "label": "Total Client"},
 		],
 	},
 	{
@@ -255,31 +255,31 @@ def _link_label(doctype, name):
 
 
 def _get_endereco_principal(cliente):
-	if not cliente.enderecos:
+	if not cliente.addresses:
 		return None
-	principal = next((row for row in cliente.enderecos if row.principal), None)
-	return principal or cliente.enderecos[0]
+	principal = next((row for row in cliente.addresses if row.principal), None)
+	return principal or cliente.addresses[0]
 
 
 def _get_contato_principal(cliente):
-	if not cliente.contatos:
+	if not cliente.contacts:
 		return None
 	principal = next(
-		(row for row in cliente.contatos if (row.tipo or "").lower() == "principal"),
+		(row for row in cliente.contacts if (row.tipo or "").lower() == "principal"),
 		None,
 	)
-	return principal or cliente.contatos[0]
+	return principal or cliente.contacts[0]
 
 
 def _get_acordo(servico_name):
 	acordo_name = frappe.db.get_value(
-		"Acordo de Honorarios Processuais",
-		{"servico": servico_name, "docstatus": ["!=", 2]},
+		"Fee Agreement",
+		{"legal_case": servico_name, "docstatus": ["!=", 2]},
 		"name",
 	)
 	if not acordo_name:
 		return None
-	return frappe.get_doc("Acordo de Honorarios Processuais", acordo_name)
+	return frappe.get_doc("Fee Agreement", acordo_name)
 
 
 def _montar_endereco_completo(addr):
@@ -308,7 +308,7 @@ def _montar_endereco_completo(addr):
 
 def _get_escritorio_context():
 	"""Lê dados do escritório do Single DocType (somente banco, nunca hardcoded)."""
-	cfg = frappe.get_single("Configuracao do Escritorio")
+	cfg = frappe.get_single("Office Settings")
 	cnpj_raw = cfg.cnpj or ""
 	cnpj_fmt = _mascarar_cnpj(cnpj_raw) if _only_digits(cnpj_raw) else cnpj_raw
 	return {
@@ -322,11 +322,11 @@ def _get_escritorio_context():
 
 
 def _build_context(servico_name):
-	if not frappe.has_permission("Servico", "read"):
+	if not frappe.has_permission("Legal Case", "read"):
 		frappe.throw(_("Sem permissão"), frappe.PermissionError)
 
-	servico = frappe.get_doc("Servico", servico_name)
-	cliente = frappe.get_doc("Cliente", servico.cliente)
+	servico = frappe.get_doc("Legal Case", servico_name)
+	cliente = frappe.get_doc("Client", servico.client)
 	addr = _get_endereco_principal(cliente)
 	contato = _get_contato_principal(cliente)
 	acordo = _get_acordo(servico.name)
@@ -376,10 +376,10 @@ def _build_context(servico_name):
 			"servico_status": servico.status or "",
 			"servico_numero_processo": _mascarar_cnj(servico.numero_processo),
 			"servico_area": servico.area or "",
-			"servico_vara": _link_label("Vara", servico.vara),
-			"servico_comarca": _link_label("Comarca", servico.comarca),
-			"servico_tribunal": _link_label("Tribunal", servico.tribunal),
-			"servico_fase_processual": _link_label("Fase Processual", servico.fase_processual),
+			"servico_vara": _link_label("Court Branch", servico.court_branch_link),
+			"servico_comarca": _link_label("Jurisdiction", servico.jurisdiction),
+			"servico_tribunal": _link_label("Court", servico.court),
+			"servico_fase_processual": _link_label("Case Phase", servico.case_phase),
 			"servico_parte_contraria": servico.parte_contraria or "",
 			"servico_valor_causa": _formatar_moeda(servico.valor_causa),
 			"servico_data_abertura": _formatar_data(servico.data_abertura),
@@ -412,7 +412,7 @@ def _build_context(servico_name):
 				"acordo_percentual_advogada": _formatar_percentual(acordo.percentual_advogada),
 				"acordo_valor_fixo_de_honorarios": _formatar_moeda(acordo.valor_fixo_de_honorarios),
 				"acordo_valor_advogada": _formatar_moeda(acordo.valor_advogada),
-				"acordo_numero_de_parcelas": cint(acordo.get("número_de_parcelas") or 0) or "",
+				"acordo_numero_de_parcelas": cint(acordo.get("installment_count") or 0) or "",
 				"acordo_data_primeira_parcela": _formatar_data(acordo.data_primeira_parcela),
 				"acordo_valor_da_parcela": _formatar_moeda(acordo.valor_da_parcela),
 				"acordo_total_advogada": _formatar_moeda(acordo.total_advogada),
@@ -422,13 +422,13 @@ def _build_context(servico_name):
 
 	context.update(
 		{
-			"servico": servico.name,
+			"legal_case": servico.name,
 			"tipo_servico": context["servico_tipo"],
 			"titulo_servico": context["servico_titulo"],
 			"numero_processo": context["servico_numero_processo"],
 			"area": context["servico_area"],
-			"vara": context["servico_vara"],
-			"comarca": context["servico_comarca"],
+			"court_branch_link": context["servico_vara"],
+			"jurisdiction": context["servico_comarca"],
 			"parte_contraria": context["servico_parte_contraria"],
 			"valor_causa": context["servico_valor_causa"],
 			"data_abertura": context["servico_data_abertura"],
@@ -489,7 +489,7 @@ def _render_and_attach(servico_name, template_doc, context):
 			"doctype": "File",
 			"file_name": nome_arquivo,
 			"content": buffer.read(),
-			"attached_to_doctype": "Servico",
+			"attached_to_doctype": "Legal Case",
 			"attached_to_name": servico_name,
 			"is_private": 1,
 		}
@@ -508,8 +508,8 @@ def _parse_template_names(template_names):
 
 
 @frappe.whitelist()
-def gerar_documentos_em_lote(servico_name: str, template_names) -> dict:
-	frappe.has_permission("Servico", "read", throw=True)
+def gerar_documentos_em_lote(servico_name: str, template_names: str | list) -> dict:
+	frappe.has_permission("Legal Case", "read", throw=True)
 
 	nomes = _parse_template_names(template_names)
 	if not nomes:
@@ -521,7 +521,7 @@ def gerar_documentos_em_lote(servico_name: str, template_names) -> dict:
 
 	for template_name in nomes:
 		try:
-			template_doc = frappe.get_doc("Template Documento", template_name)
+			template_doc = frappe.get_doc("Document Template", template_name)
 			if not template_doc.habilitado:
 				raise frappe.ValidationError(_("Template desabilitado: {0}").format(template_name))
 			result = _render_and_attach(servico_name, template_doc, context)
@@ -552,9 +552,9 @@ def gerar_documentos_em_lote(servico_name: str, template_names) -> dict:
 
 @frappe.whitelist()
 def get_templates_disponiveis() -> list[dict]:
-	frappe.has_permission("Template Documento", "read", throw=True)
+	frappe.has_permission("Document Template", "read", throw=True)
 	return frappe.get_all(
-		"Template Documento",
+		"Document Template",
 		fields=["name", "titulo", "tipo_documento", "descricao"],
 		filters={"habilitado": 1},
 		order_by="titulo",
@@ -564,10 +564,10 @@ def get_templates_disponiveis() -> list[dict]:
 
 @frappe.whitelist()
 def get_kits_disponiveis() -> list[dict]:
-	frappe.has_permission("Kit de Documentos", "read", throw=True)
+	frappe.has_permission("Document Kit", "read", throw=True)
 
 	kits = frappe.get_all(
-		"Kit de Documentos",
+		"Document Kit",
 		fields=["name", "titulo", "descricao"],
 		filters={"habilitado": 1},
 		order_by="titulo",
@@ -578,7 +578,7 @@ def get_kits_disponiveis() -> list[dict]:
 
 	kit_names = [kit.name for kit in kits]
 	item_rows = frappe.get_all(
-		"Kit Documento Item",
+		"Document Kit Item",
 		filters={"parent": ["in", kit_names]},
 		fields=["parent", "template", "ordem"],
 		order_by="parent asc, ordem asc, idx asc",
@@ -597,5 +597,5 @@ def get_kits_disponiveis() -> list[dict]:
 @frappe.whitelist()
 def get_placeholders_referencia() -> dict:
 	"""Referência organizada de placeholders para UI e templates."""
-	frappe.has_permission("Template Documento", "read", throw=True)
+	frappe.has_permission("Document Template", "read", throw=True)
 	return PLACEHOLDER_REFERENCIA

@@ -69,11 +69,11 @@ def _get_pagamentos(filters, period_start, period_end):
 		"status": "Recebido",
 		"data_recebimento": ["between", [period_start, period_end]],
 	}
-	if filters.get("cliente"):
-		query_filters["cliente"] = filters.cliente
+	if filters.get("client"):
+		query_filters["client"] = filters.client
 
 	return frappe.get_all(
-		"Pagamento",
+		"Legal Payment",
 		filters=query_filters,
 		fields=["name", "descricao", "data_recebimento", "valor", "valor_recebido"],
 		order_by="data_recebimento asc",
@@ -86,7 +86,7 @@ def _get_despesas(filters, period_start, period_end):
 		return []
 
 	return frappe.get_all(
-		"Despesa do Escritorio",
+		"Office Expense",
 		filters={
 			"status": "Pago",
 			"data_pagamento": ["between", [period_start, period_end]],
@@ -98,20 +98,20 @@ def _get_despesas(filters, period_start, period_end):
 
 
 def _get_custas(filters, period_start, period_end):
-	if not frappe.db.table_exists("Custa Processual"):
+	if not frappe.db.table_exists("Court Cost"):
 		return []
 
 	custa_filters = {
 		"status": "Pago",
 		"data_pagamento": ["between", [period_start, period_end]],
 	}
-	if filters.get("cliente"):
-		custa_filters["cliente"] = filters.cliente
+	if filters.get("client"):
+		custa_filters["client"] = filters.client
 
 	return frappe.get_all(
-		"Custa Processual",
+		"Court Cost",
 		filters=custa_filters,
-		fields=["name", "descricao", "tipo", "servico", "data_pagamento", "valor"],
+		fields=["name", "descricao", "tipo", "legal_case", "data_pagamento", "valor"],
 		order_by="data_pagamento asc",
 		limit_page_length=0,
 	)
@@ -156,8 +156,8 @@ def _get_data(filters):
 				"data": pag.data_recebimento,
 				"tipo": _("Entrada"),
 				"descricao": pag.descricao or pag.name,
-				"origem": "Pagamento",
-				"origem_doctype": "Pagamento",
+				"origem": "Legal Payment",
+				"origem_doctype": "Legal Payment",
 				"documento": pag.name,
 				"valor_entrada": valor,
 				"valor_saida": 0,
@@ -173,8 +173,8 @@ def _get_data(filters):
 				"data": desp.data_pagamento,
 				"tipo": _("Saída"),
 				"descricao": descricao,
-				"origem": "Despesa do Escritorio",
-				"origem_doctype": "Despesa do Escritorio",
+				"origem": "Office Expense",
+				"origem_doctype": "Office Expense",
 				"documento": desp.name,
 				"valor_entrada": 0,
 				"valor_saida": flt(desp.valor),
@@ -185,15 +185,15 @@ def _get_data(filters):
 		descricao = custa.descricao or custa.name
 		if custa.tipo:
 			descricao = f"{descricao} ({custa.tipo})"
-		if custa.servico:
-			descricao = f"{descricao} - {custa.servico}"
+		if custa.legal_case:
+			descricao = f"{descricao} - {custa.legal_case}"
 		transactions.append(
 			{
 				"data": custa.data_pagamento,
 				"tipo": _("Saída"),
 				"descricao": descricao,
-				"origem": "Custa Processual",
-				"origem_doctype": "Custa Processual",
+				"origem": "Court Cost",
+				"origem_doctype": "Court Cost",
 				"documento": custa.name,
 				"valor_entrada": 0,
 				"valor_saida": flt(custa.valor),

@@ -10,12 +10,12 @@ def notificar_prazos_diario():
 	hoje = frappe.utils.today()
 
 	prazos = frappe.get_all(
-		"Controle de Prazos",
+		"Deadline",
 		filters={"status": "Pendente"},
 		fields=[
 			"name",
-			"servico",
-			"cliente",
+			"legal_case",
+			"client",
 			"data_prazo",
 			"descricao",
 			"prioridade",
@@ -56,11 +56,11 @@ def notificar_prazos_diario():
 	if vencidos:
 		html += "<h4 style='color:red'>{0}</h4><ul>".format(_("Prazos Vencidos"))
 		for p in vencidos:
-			html += "<li><b>{0}</b> - venceu ha {1} dia(s) - Servico: {2} - Cliente: {3}</li>".format(
+			html += "<li><b>{0}</b> - venceu ha {1} dia(s) - Legal Case: {2} - Client: {3}</li>".format(
 				p.descricao or p.name,
 				abs(p["dias_restantes"]),
-				p.servico or "N/A",
-				p.cliente or "N/A",
+				p.legal_case or "N/A",
+				p.client or "N/A",
 			)
 		html += "</ul>"
 
@@ -73,12 +73,12 @@ def notificar_prazos_diario():
 				label = "AMANHA"
 			else:
 				label = "em {0} dias".format(p["dias_restantes"])
-			html += "<li><b>{0}</b> - vence {1} ({2}) - Servico: {3} - Cliente: {4}</li>".format(
+			html += "<li><b>{0}</b> - vence {1} ({2}) - Legal Case: {3} - Client: {4}</li>".format(
 				p.descricao or p.name,
 				label,
 				frappe.utils.formatdate(p.data_prazo, "dd/MM/yyyy"),
-				p.servico or "N/A",
-				p.cliente or "N/A",
+				p.legal_case or "N/A",
+				p.client or "N/A",
 			)
 		html += "</ul>"
 

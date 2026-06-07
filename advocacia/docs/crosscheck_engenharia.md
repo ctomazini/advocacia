@@ -40,10 +40,10 @@
 | **3. Roles e permissões** | `setup/roles.py` + `setup/permissions.py`; dashboard filtra Manager | ✅ `permissions.py` + `strip_financial_payload` + `test_permissions.py` | Paridade OK | — |
 | **3.2 Whitelist audit** | 25 endpoints; 21 com `has_permission`; 19 com type hints | 21 endpoints; 14 com `has_permission`; 0 type hints | Fechar gaps: `painel_api`, timers, parcelas, `tarefa.concluir` | Médio |
 | **4. Dashboard / Painel** | Backend modular (12 arquivos); frontend modular (~999 linhas JS) | Backend modular (7 arquivos); frontend modular `public/js/painel/` (~2.500 linhas) | Paridade estrutural OK; soft refresh jun/2026 | — |
-| **4.2 KPIs** | Obras, protocolos, margem, comissões, reembolsáveis | Clientes, serviços, audiências, honorários, custas, taxa recebimento | Manter KPIs de domínio; opcional: tiles de atenção/saúde como engenharia | Médio |
-| **5. Calendar sync** | `Deadline` + `Permit` → `Event` | `Audiencia` + `Controle de Prazos` → `Event` | Paridade OK; testes em ambos (`test_calendar_sync.py`) | — |
+| **4.2 KPIs** | Obras, protocolos, margem, comissões, reembolsáveis | Clients, serviços, audiências, honorários, custas, taxa recebimento | Manter KPIs de domínio; opcional: tiles de atenção/saúde como engenharia | Médio |
+| **5. Calendar sync** | `Deadline` + `Permit` → `Event` | `Hearing` + `Deadline` → `Event` | Paridade OK; testes em ambos (`test_calendar_sync.py`) | — |
 | **6. Testes** | 192 métodos; `test_permissions`, `test_agent_api` | **230** métodos; `test_permissions`, `test_painel_api` | Adicionar `test_agent_api.py` jurídico | Médio |
-| **7. Connections / Links** | Hub `Construction Project`; 12 satélites | Hub `Servico`; 9 satélites; lista filtrada (`list_nav.js`) | Engenharia pode portar `list_nav` | Médio |
+| **7. Connections / Links** | Hub `Construction Project`; 12 satélites | Hub `Legal Case`; 9 satélites; lista filtrada (`list_nav.js`) | Engenharia pode portar `list_nav` | Médio |
 | **8. Field descriptions** | 346/352 (98,3%) | 218/232 (94%) | Paridade aceitável | — |
 | **9. Hooks e scheduler** | 7 `doc_events`; scheduler daily (1 job) | 6 `doc_events`; scheduler daily (5) + weekly (1) | Advocacia mais completo em notificações; sem duplicatas de handler | Quick win (documentar) |
 | **10. Geração de documentos** | `documents.py` (492 linhas); kits + templates | `documentos.py` (601 linhas); kits + templates | Paridade; engenharia tem placeholders de obra | — |
@@ -73,32 +73,32 @@ Todos em português, módulo `Advocacia`, `custom: 0`:
 
 | DocType | Tipo |
 | --- | --- |
-| Acordo de Honorarios Processuais | transacional |
-| Ato Advocaticio | child |
-| Audiencia | transacional |
-| Cliente | cadastro |
-| Comarca | cadastro rígido |
-| Comunicacao | transacional |
-| Configuracao do Escritorio | settings |
-| Contato Cliente | child |
-| Controle de Prazos | transacional |
-| Custa Processual | transacional |
-| Despesa do Escritorio | transacional |
-| Endereco Cliente | child |
-| Fase Processual | cadastro |
-| Kit de Documentos | cadastro |
-| Kit Documento Item | child |
-| Pagamento | transacional |
-| Parcela de Honorarios | child |
-| Registro de Atos | transacional |
-| Registro de Horas | transacional |
-| Servico | hub |
-| Tarefa | transacional |
-| Template Documento | cadastro |
-| Tribunal | cadastro |
-| Vara | cadastro |
+| Fee Agreement | transacional |
+| Legal Act Item | child |
+| Hearing | transacional |
+| Client | cadastro |
+| Jurisdiction | cadastro rígido |
+| Case Communication | transacional |
+| Office Settings | settings |
+| Client Contact | child |
+| Deadline | transacional |
+| Court Cost | transacional |
+| Office Expense | transacional |
+| Client Address | child |
+| Case Phase | cadastro |
+| Document Kit | cadastro |
+| Document Kit Item | child |
+| Legal Payment | transacional |
+| Fee Installment | child |
+| Service Record | transacional |
+| Time Entry | transacional |
+| Legal Case | hub |
+| Legal Task | transacional |
+| Document Template | cadastro |
+| Court | cadastro |
+| Court Branch | cadastro |
 
-**Fieldnames:** 232 campos úteis, 148 fieldnames distintos. Padrão dominante PT: `cliente` (10×), `servico` (9×), `descricao`/`descrição`, `valor`, `data_*`, `status`. Engenharia usa espelho EN (`customer`, `project`, `description`, `amount`).
+**Fieldnames:** 232 campos úteis, 148 fieldnames distintos. Padrão dominante PT: `cliente` (10×), `servico` (9×), `descricao`/`description`, `valor`, `data_*`, `status`. Engenharia usa espelho EN (`customer`, `project`, `description`, `amount`).
 
 #### 1.3 `custom: 0` explícito
 
@@ -129,9 +129,9 @@ Ambos seguem `{ID} — {descritor}` com separador `" — "`:
 
 | | Advocacia (`titulos.py`) | Engenharia (`titles.py`) |
 | --- | --- | --- |
-| Descritor padrão | Nome do `Cliente` | Nome do `Customer` |
+| Descritor padrão | Nome do `Client` | Nome do `Customer` |
 | Fallback | `descricao` ou DocType | `description` ou lógica por DocType |
-| Flag especial | `Despesa do Escritorio`: `usar_descricao=True` | Vários DocTypes com `_resolve_descriptor` customizado |
+| Flag especial | `Office Expense`: `usar_descricao=True` | Vários DocTypes com `_resolve_descriptor` customizado |
 | Pós-insert | `aplicar_titulo_pos_insert` | `apply_title_post_insert` |
 | Validate | `recompor_titulo_se_vazio` | `recompose_title` |
 | Backfill | `backfill_titulos_vazios()` com `commit()` | Não exposto |
@@ -140,30 +140,30 @@ Ambos seguem `{ID} — {descritor}` com separador `" — "`:
 
 | DocType | naming_rule | autoname | title_field | show_in_link | search_fields |
 | --- | --- | --- | --- | ---: | --- |
-| Acordo de Honorarios Processuais | Expression | `format:ACOR-{YYYY}-{####}` | title | 1 | title,cliente,status |
-| Ato Advocaticio | — | — | — | 0 | — |
-| Audiencia | Expression | `format:AUD-{YYYY}-{####}` | title | 1 | title,cliente,status_aud |
-| Cliente | Expression | `format:CLI-{YYYY}-{####}` | nome | 1 | nome,cpf,cnpj |
-| Comarca | — | field:comarca_name | comarca_name | 1 | comarca_name,uf |
-| Comunicacao | Expression | `format:COM-{YYYY}-{####}` | title | 1 | assunto,cliente,tipo |
-| Configuracao do Escritorio | — | — | — | 1 | — |
-| Contato Cliente | — | — | — | 0 | — |
-| Controle de Prazos | Expression | `format:PRAZO-{YYYY}-{####}` | title | 1 | descricao,cliente,status |
-| Custa Processual | Expression | `format:CUST-{YYYY}-{####}` | title | 1 | descricao,cliente,status |
-| Despesa do Escritorio | Expression | `format:DESP-{YYYY}-{####}` | title | 1 | descricao,categoria,status |
-| Endereco Cliente | — | — | — | 0 | — |
-| Fase Processual | — | field:phase_name | phase_name | 1 | phase_name |
-| Kit de Documentos | By fieldname | field:titulo | titulo | 1 | titulo |
-| Kit Documento Item | — | — | — | 0 | — |
-| Pagamento | Expression | `format:PAG-{YYYY}-{####}` | title | 1 | descricao,cliente,status,data_vencimento |
-| Parcela de Honorarios | — | — | — | 0 | — |
-| Registro de Atos | Expression | `format:ATOS-{YYYY}-{####}` | title | 1 | title,cliente,status |
-| Registro de Horas | Expression | `format:HRS-{YYYY}-{####}` | title | 1 | atividade,cliente,data |
-| Servico | Expression | `format:SERV-{YYYY}-{####}` | title | 1 | title,cliente,numero_processo,status |
-| Tarefa | Expression | `format:TAR-{YYYY}-{####}` | title | 1 | titulo,cliente,status |
-| Template Documento | By fieldname | field:titulo | titulo | 1 | titulo,tipo_documento |
-| Tribunal | — | field:tribunal_name | tribunal_name | 1 | tribunal_name,abbreviation |
-| Vara | — | field:vara_name | vara_name | 1 | vara_name,comarca |
+| Fee Agreement | Expression | `format:ACOR-{YYYY}-{####}` | title | 1 | title,cliente,status |
+| Legal Act Item | — | — | — | 0 | — |
+| Hearing | Expression | `format:AUD-{YYYY}-{####}` | title | 1 | title,cliente,status_aud |
+| Client | Expression | `format:CLI-{YYYY}-{####}` | nome | 1 | nome,cpf,cnpj |
+| Jurisdiction | — | field:jurisdiction_name | jurisdiction_name | 1 | jurisdiction_name,uf |
+| Case Communication | Expression | `format:COM-{YYYY}-{####}` | title | 1 | assunto,cliente,tipo |
+| Office Settings | — | — | — | 1 | — |
+| Client Contact | — | — | — | 0 | — |
+| Deadline | Expression | `format:PRAZO-{YYYY}-{####}` | title | 1 | descricao,cliente,status |
+| Court Cost | Expression | `format:CUST-{YYYY}-{####}` | title | 1 | descricao,cliente,status |
+| Office Expense | Expression | `format:DESP-{YYYY}-{####}` | title | 1 | descricao,categoria,status |
+| Client Address | — | — | — | 0 | — |
+| Case Phase | — | field:case_phase_name | case_phase_name | 1 | case_phase_name |
+| Document Kit | By fieldname | field:titulo | titulo | 1 | titulo |
+| Document Kit Item | — | — | — | 0 | — |
+| Legal Payment | Expression | `format:PAG-{YYYY}-{####}` | title | 1 | descricao,cliente,status,data_vencimento |
+| Fee Installment | — | — | — | 0 | — |
+| Service Record | Expression | `format:ATOS-{YYYY}-{####}` | title | 1 | title,cliente,status |
+| Time Entry | Expression | `format:HRS-{YYYY}-{####}` | title | 1 | atividade,cliente,data |
+| Legal Case | Expression | `format:SERV-{YYYY}-{####}` | title | 1 | title,cliente,numero_processo,status |
+| Legal Task | Expression | `format:TAR-{YYYY}-{####}` | title | 1 | titulo,cliente,status |
+| Document Template | By fieldname | field:titulo | titulo | 1 | titulo,tipo_documento |
+| Court | — | field:court_name | court_name | 1 | court_name,abbreviation |
+| Court Branch | — | field:court_branch_name | court_branch_name | 1 | court_branch_name,comarca |
 
 **List views:** 12 transacionais com `hide_name_column: true` (engenharia: 13).
 
@@ -178,7 +178,7 @@ Ambos seguem `{ID} — {descritor}` com separador `" — "`:
 | Roles | `Engenharia User`, `Engenharia Manager` — seed em `setup/roles.py` + fixture | `Advocacia User`, `Advocacia Manager` — só `setup/install.py` |
 | Permissões programáticas | `setup/permissions.py` (~190 linhas): FINANCIAL / CATALOG / OPERATIONAL split | **Ausente** — permissões só via DocType JSON padrão |
 | permlevel financeiro | Campos `permlevel: 1` em `Construction Project` + Custom DocPerm Manager-only | Apenas `permlevel: 0` explícito nos JSONs auditados |
-| Dashboard role filter | `user_is_engenharia_manager()` oculta KPIs/listas financeiras | `get()` exige `Servico` read; **financeiro exposto a User** |
+| Dashboard role filter | `user_is_engenharia_manager()` oculta KPIs/listas financeiras | `get()` exige `Legal Case` read; **financeiro exposto a User** |
 | Notificações | Templates engenharia | Filtra destinatários por role `Advocacia Manager` em `notificacoes.py` |
 
 #### 3.2 Audit `@frappe.whitelist()`
@@ -194,9 +194,9 @@ Ambos seguem `{ID} — {descritor}` com separador `" — "`:
 | Arquivo | Função |
 | --- | --- |
 | `painel_api.py` | `get_painel_data`, `marcar_parcela_recebida` |
-| `doctype/parcela_de_honorarios/parcela_de_honorarios.py` | `registrar_recebimento`, `registrar_repasse` |
-| `doctype/tarefa/tarefa.py` | `concluir` |
-| `doctype/registro_de_horas/registro_de_horas.py` | `iniciar_timer`, `parar_timer` |
+| `doctype/fee_installment/fee_installment.py` | `registrar_recebimento`, `registrar_repasse` |
+| `doctype/legal_task/legal_task.py` | `concluir` |
+| `doctype/time_entry/time_entry.py` | `iniciar_timer`, `parar_timer` |
 
 *Nota:* `painel/__init__.py` valida permissão internamente; a facade `painel_api.py` não — diverge do padrão engenharia (`dashboard_api.py` valida na facade).
 
@@ -243,7 +243,7 @@ Ambos seguem `{ID} — {descritor}` com separador `" — "`:
 
 | | Advocacia (`calendar_sync.py`) | Engenharia (`calendar_sync.py`) |
 | --- | --- | --- |
-| Origem | `Audiencia`, `Controle de Prazos` | `Deadline`, `Permit` |
+| Origem | `Hearing`, `Deadline` | `Deadline`, `Permit` |
 | Destino | `Event` + `custom_source_*` | Idem |
 | Cancelamento | Status cancelado/concluído → cancela Event | Idem |
 | Hooks | `doc_events` em `hooks.py` (4 entradas) | 4 entradas |
@@ -271,21 +271,21 @@ Paridade estrutural — domínios diferentes, implementação equivalente.
 
 ### 7. Connections / Links
 
-#### Hub advocacia — `Servico`
+#### Hub advocacia — `Legal Case`
 
 Links de saída: `cliente`, `fase_processual`, `vara`, `tribunal`, `comarca`
 
 Satélites com `servico`:
 
-- Acordo de Honorarios Processuais
-- Audiencia
-- Comunicacao
-- Controle de Prazos
-- Custa Processual
-- Pagamento
-- Registro de Atos
-- Registro de Horas
-- Tarefa
+- Fee Agreement
+- Hearing
+- Case Communication
+- Deadline
+- Court Cost
+- Legal Payment
+- Service Record
+- Time Entry
+- Legal Task
 
 #### Hub engenharia — `Construction Project`
 
@@ -293,7 +293,7 @@ Links de saída: `customer`
 
 Satélites com `project` (13): Commission, Communication Log, Construction Measurement, Deadline, Engineering Contract, Payment, Permit, Project Item, Project Stage, Reimbursable Expense, Task, Time Log, Work Cost
 
-**Despesa do Escritorio** (advocacia) e cadastros jurídicos (Comarca, Vara, Tribunal) não orbitam `Servico` — equivalente intencional a cadastros globais / fluxos paralelos.
+**Office Expense** (advocacia) e cadastros jurídicos (Jurisdiction, Court Branch, Court) não orbitam `Legal Case` — equivalente intencional a cadastros globais / fluxos paralelos.
 
 ---
 
@@ -316,11 +316,11 @@ Engenharia mantém dicionário central em `engenharia/scripts/add_field_descript
 
 | DocType | Eventos |
 | --- | --- |
-| Acordo de Honorarios Processuais | on_update |
-| Parcela de Honorarios | on_update |
-| Pagamento | on_update, on_trash |
-| Audiencia | after_insert, on_update |
-| Controle de Prazos | after_insert, on_update |
+| Fee Agreement | on_update |
+| Fee Installment | on_update |
+| Legal Payment | on_update, on_trash |
+| Hearing | after_insert, on_update |
+| Deadline | after_insert, on_update |
 
 **Engenharia:**
 
@@ -359,8 +359,8 @@ Nenhum `commit()` em schedulers/tasks/APIs em ambos — conforme disciplina §9.
 | Módulo | `documentos.py` (601 linhas) | `documents.py` (492 linhas) |
 | Engine | docxtpl | docxtpl |
 | Whitelist | 4 endpoints; todos com `has_permission` | 4 endpoints; todos com `has_permission` |
-| DocTypes | Template Documento, Kit de Documentos | Document Template, Document Kit |
-| Testes | `test_documentos.py`, `test_kit_de_documentos.py` | `test_documents.py`, `test_document_kit.py` |
+| DocTypes | Document Template, Document Kit | Document Template, Document Kit |
+| Testes | `test_documentos.py`, `test_document_kit.py` | `test_documents.py`, `test_document_kit.py` |
 
 Engenharia adiciona placeholders de obra (specs, contrato, customer). Advocacia cobre placeholders jurídicos (serviço, cliente, processo).
 
@@ -418,17 +418,17 @@ Equivalente jurídico sugerido: `get_active_servicos`, `get_servico_summary` (ho
 
 ### Médio (1–4h cada)
 
-1. **Field descriptions:** adaptar `add_field_descriptions.py` para DocTypes PT (priorizar Servico, Cliente, Pagamento, Acordo).
+1. **Field descriptions:** adaptar `add_field_descriptions.py` para DocTypes PT (priorizar Legal Case, Client, Legal Payment, Acordo).
 2. **Whitelist gaps:** `has_permission` em parcelas, tarefa, timers; type hints nos whitelists de `financeiro.py` e `documentos.py`.
 3. **KPI tiles:** portar `attention.py` / `health.py` do engenharia como `centro_atencao` enriquecido no painel (sem mudar domínio jurídico).
-4. **`test_permissions.py`:** validar Advocacia User vs Manager em Pagamento e painel.
+4. **`test_permissions.py`:** validar Advocacia User vs Manager em Legal Payment e painel.
 5. **Sincronizar navegação:** decidir se engenharia ganha `list_nav.js` ou advocacia migra para padrão `quick_actions` — documentar decisão.
 6. **`REGRAS_ADVOCACIA.md`:** extrair de CODEBASE + auditorias as regras fechadas (PT congelado, um handler/doc_event, etc.).
 
 ### Longo (1+ dia)
 
 1. **Modularizar `painel.js`:** extrair para `public/js/painel/` (kpis, financeiro, timeline, hero, list_nav) — espelhar engenharia.
-2. **`setup/permissions.py`:** Custom DocPerm Manager/User; permlevel em campos financeiros de Acordo/Pagamento; filtrar payload financeiro do painel.
+2. **`setup/permissions.py`:** Custom DocPerm Manager/User; permlevel em campos financeiros de Acordo/Legal Payment; filtrar payload financeiro do painel.
 3. **`agent_api.py` jurídico:** endpoints agregados + testes + doc de audit IA.
 4. **Dashboard role parity completa:** ocultar valores de honorários/custas para Advocacia User em backend **e** frontend.
 
@@ -442,15 +442,15 @@ Estes itens são **específicos de domínio de obra** ou decisões greenfield �
 | --- | --- |
 | DocTypes / fieldnames em inglês | Advocacia PT congelado por compatibilidade de dados e UX |
 | `Construction Project`, `Work Cost`, `Permit`, `Commission`, `Project Item`, `Construction Measurement` | Domínio civil; equivalentes jurídicos já existem |
-| `Project Stage` + Kanban "Engenharia Obras" | Gestão de etapa física de obra — usar `Fase Processual` / Tarefa |
+| `Project Stage` + Kanban "Engenharia Obras" | Gestão de etapa física de obra — usar `Case Phase` / Legal Task |
 | `Reimbursable Expense` vs `Work Cost` split | Modelo financeiro de obra; advocacia usa Despesa/Custa/Atos |
 | `Contract Amendment` + botão "Aplicar Aditivo" | Aditivo de contrato de **obra** — honorários usam Acordo + parcelas |
 | `agent_api.get_costs_by_category` | Agregação de custo por fornecedor/categoria de obra |
 | `project_rollup.py` / `project_progress.py` | Rollup de specs, medições, avanço físico |
 | `importable_doctypes` | Export/import CSV de obras — sem equivalente jurídico definido |
-| Print Format fixtures (Contrato de Obra, Orçamento) | Templates jurídicos já em Template Documento |
+| Print Format fixtures (Contrato de Obra, Orçamento) | Templates jurídicos já em Document Template |
 | `Technical Item` / EAV de especificações | Placeholders técnicos de engenharia (ART, área, etc.) |
-| Renomear `Servico` → hub EN | Quebra URLs, reports, fixtures e dados existentes |
+| Renomear `Legal Case` → hub EN | Quebra URLs, reports, fixtures e dados existentes |
 | Política "um DocType por commit" retroativa | Brownfield — aplicar só a **novos** DocTypes |
 | `setup/seed.py` idempotente em produção | Advocacia já tem seed_demo dev-only — manter separação |
 

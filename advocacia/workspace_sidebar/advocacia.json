@@ -36,7 +36,7 @@
    "indent": 0,
    "keep_closed": 0,
    "label": "Prazos",
-   "link_to": "Controle de Prazos",
+   "link_to": "Deadline",
    "link_type": "DocType",
    "show_arrow": 0,
    "type": "Link"
@@ -48,7 +48,7 @@
    "indent": 0,
    "keep_closed": 0,
    "label": "Audiências",
-   "link_to": "Audiencia",
+   "link_to": "Hearing",
    "link_type": "DocType",
    "show_arrow": 0,
    "type": "Link"
@@ -59,8 +59,8 @@
    "icon": "list-todo",
    "indent": 0,
    "keep_closed": 0,
-   "label": "Tarefas",
-   "link_to": "Tarefa",
+   "label": "Legal Tasks",
+   "link_to": "Legal Task",
    "link_type": "DocType",
    "show_arrow": 0,
    "type": "Link"
@@ -72,7 +72,7 @@
    "indent": 0,
    "keep_closed": 0,
    "label": "Comunicações",
-   "link_to": "Comunicacao",
+   "link_to": "Case Communication",
    "link_type": "DocType",
    "show_arrow": 0,
    "type": "Link"
@@ -95,7 +95,7 @@
    "indent": 0,
    "keep_closed": 0,
    "label": "Serviços",
-   "link_to": "Servico",
+   "link_to": "Legal Case",
    "link_type": "DocType",
    "show_arrow": 0,
    "type": "Link"
@@ -106,8 +106,8 @@
    "icon": "users",
    "indent": 0,
    "keep_closed": 0,
-   "label": "Clientes",
-   "link_to": "Cliente",
+   "label": "Clients",
+   "link_to": "Client",
    "link_type": "DocType",
    "show_arrow": 0,
    "type": "Link"
@@ -118,8 +118,8 @@
    "icon": "clock",
    "indent": 0,
    "keep_closed": 0,
-   "label": "Registro de Horas",
-   "link_to": "Registro de Horas",
+   "label": "Time Entry",
+   "link_to": "Time Entry",
    "link_type": "DocType",
    "show_arrow": 0,
    "type": "Link"
@@ -130,8 +130,8 @@
    "icon": "clipboard",
    "indent": 0,
    "keep_closed": 0,
-   "label": "Registro de Atos",
-   "link_to": "Registro de Atos",
+   "label": "Service Record",
+   "link_to": "Service Record",
    "link_type": "DocType",
    "show_arrow": 0,
    "type": "Link"
@@ -143,7 +143,7 @@
    "indent": 0,
    "keep_closed": 0,
    "label": "Custas Processuais",
-   "link_to": "Custa Processual",
+   "link_to": "Court Cost",
    "link_type": "DocType",
    "show_arrow": 0,
    "type": "Link"
@@ -165,8 +165,8 @@
    "icon": "wallet",
    "indent": 0,
    "keep_closed": 0,
-   "label": "Pagamentos",
-   "link_to": "Pagamento",
+   "label": "Legal Payments",
+   "link_to": "Legal Payment",
    "link_type": "DocType",
    "show_arrow": 0,
    "type": "Link"
@@ -178,7 +178,7 @@
    "indent": 0,
    "keep_closed": 0,
    "label": "Honorários",
-   "link_to": "Acordo de Honorarios Processuais",
+   "link_to": "Fee Agreement",
    "link_type": "DocType",
    "show_arrow": 0,
    "type": "Link"
@@ -190,7 +190,7 @@
    "indent": 0,
    "keep_closed": 0,
    "label": "Despesas",
-   "link_to": "Despesa do Escritorio",
+   "link_to": "Office Expense",
    "link_type": "DocType",
    "show_arrow": 0,
    "type": "Link"
@@ -202,7 +202,7 @@
    "indent": 0,
    "keep_closed": 0,
    "label": "Documentos",
-   "link_to": "Template Documento",
+   "link_to": "Document Template",
    "link_type": "DocType",
    "show_arrow": 0,
    "type": "Link"
@@ -214,7 +214,7 @@
    "indent": 0,
    "keep_closed": 0,
    "label": "Kits de Documentos",
-   "link_to": "Kit de Documentos",
+   "link_to": "Document Kit",
    "link_type": "DocType",
    "show_arrow": 0,
    "type": "Link"
@@ -284,7 +284,7 @@
    "icon": "users",
    "indent": 0,
    "keep_closed": 0,
-   "label": "Honorários por Cliente",
+   "label": "Honorários por Client",
    "link_to": "honorarios_por_cliente",
    "link_type": "Report",
    "show_arrow": 0,
@@ -319,8 +319,8 @@
    "icon": "map-pin",
    "indent": 0,
    "keep_closed": 0,
-   "label": "Comarca",
-   "link_to": "Comarca",
+   "label": "Jurisdiction",
+   "link_to": "Jurisdiction",
    "link_type": "DocType",
    "show_arrow": 0,
    "type": "Link"
@@ -331,8 +331,8 @@
    "icon": "scale",
    "indent": 0,
    "keep_closed": 0,
-   "label": "Vara",
-   "link_to": "Vara",
+   "label": "Court Branch",
+   "link_to": "Court Branch",
    "link_type": "DocType",
    "show_arrow": 0,
    "type": "Link"
@@ -343,8 +343,8 @@
    "icon": "landmark",
    "indent": 0,
    "keep_closed": 0,
-   "label": "Tribunal",
-   "link_to": "Tribunal",
+   "label": "Court",
+   "link_to": "Court",
    "link_type": "DocType",
    "show_arrow": 0,
    "type": "Link"
@@ -355,8 +355,8 @@
    "icon": "git-branch",
    "indent": 0,
    "keep_closed": 0,
-   "label": "Fase Processual",
-   "link_to": "Fase Processual",
+   "label": "Case Phase",
+   "link_to": "Case Phase",
    "link_type": "DocType",
    "show_arrow": 0,
    "type": "Link"
@@ -368,7 +368,7 @@
    "indent": 0,
    "keep_closed": 0,
    "label": "Escritório",
-   "link_to": "Configuracao do Escritorio",
+   "link_to": "Office Settings",
    "link_type": "DocType",
    "show_arrow": 0,
    "type": "Link"

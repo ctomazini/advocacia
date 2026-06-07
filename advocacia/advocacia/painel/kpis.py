@@ -14,13 +14,13 @@ from frappe.utils import (
 def _build_kpis(hoje, periodo_fim, mes_inicio, mes_fim):
 	amanha = add_days(hoje, 1)
 	vencidos = frappe.get_all(
-		"Pagamento",
+		"Legal Payment",
 		filters={"status": "Vencido"},
 		fields=["valor"],
 		limit_page_length=500,
 	)
 	proximos_periodo = frappe.get_all(
-		"Pagamento",
+		"Legal Payment",
 		filters={
 			"status": "Pendente",
 			"data_vencimento": ["between", [hoje, periodo_fim]],
@@ -29,7 +29,7 @@ def _build_kpis(hoje, periodo_fim, mes_inicio, mes_fim):
 		limit_page_length=500,
 	)
 	recebidos_mes = frappe.get_all(
-		"Pagamento",
+		"Legal Payment",
 		filters={
 			"status": ["in", ["Recebido", "Repassado"]],
 			"data_recebimento": ["between", [mes_inicio, mes_fim]],
@@ -38,7 +38,7 @@ def _build_kpis(hoje, periodo_fim, mes_inicio, mes_fim):
 		limit_page_length=500,
 	)
 	recebidos_periodo = frappe.get_all(
-		"Pagamento",
+		"Legal Payment",
 		filters={
 			"status": ["in", ["Recebido", "Repassado"]],
 			"data_recebimento": ["between", [hoje, periodo_fim]],
@@ -47,7 +47,7 @@ def _build_kpis(hoje, periodo_fim, mes_inicio, mes_fim):
 		limit_page_length=500,
 	)
 	recebidos_hoje = frappe.get_all(
-		"Pagamento",
+		"Legal Payment",
 		filters={
 			"status": ["in", ["Recebido", "Repassado"]],
 			"data_recebimento": hoje,
@@ -56,7 +56,7 @@ def _build_kpis(hoje, periodo_fim, mes_inicio, mes_fim):
 		limit_page_length=500,
 	)
 	previsto_mes = frappe.get_all(
-		"Pagamento",
+		"Legal Payment",
 		filters={
 			"status": "Pendente",
 			"data_vencimento": ["between", [mes_inicio, mes_fim]],
@@ -66,21 +66,21 @@ def _build_kpis(hoje, periodo_fim, mes_inicio, mes_fim):
 	)
 
 	tarefas_pendentes = frappe.db.count(
-		"Tarefa", {"status": ["in", ["Pendente", "Em Andamento"]]}
+		"Legal Task", {"status": ["in", ["Pendente", "Em Andamento"]]}
 	)
 	tarefas_atrasadas = frappe.db.count(
-		"Tarefa",
+		"Legal Task",
 		{
 			"status": ["in", ["Pendente", "Em Andamento"]],
 			"data_limite": ["<", hoje],
 		},
 	)
 	prazos_vencidos = frappe.db.count(
-		"Controle de Prazos",
+		"Deadline",
 		{"status": "Pendente", "data_prazo": ["<", hoje]},
 	)
 	honorarios_ativos = frappe.db.count(
-		"Acordo de Honorarios Processuais", {"status": "Vigente"}
+		"Fee Agreement", {"status": "Vigente"}
 	)
 	custas_abertas = _count_custas_abertas()
 
@@ -93,8 +93,8 @@ def _build_kpis(hoje, periodo_fim, mes_inicio, mes_fim):
 	taxa_recebimento = round((recebido_mes_valor / base_taxa) * 100, 1) if base_taxa else 100
 
 	return {
-		"total_clientes": frappe.db.count("Cliente"),
-		"servicos_ativos": frappe.db.count("Servico", {"status": "Em andamento"}),
+		"total_clientes": frappe.db.count("Client"),
+		"servicos_ativos": frappe.db.count("Legal Case", {"status": "Em andamento"}),
 		"parcelas_vencidas": {
 			"count": len(vencidos),
 			"valor": vencido_valor,
@@ -120,11 +120,11 @@ def _build_kpis(hoje, periodo_fim, mes_inicio, mes_fim):
 			"valor": sum(flt(p.valor) for p in previsto_mes),
 		},
 		"audiencias_hoje": frappe.db.count(
-			"Audiencia",
+			"Hearing",
 			{"data_hora": ["between", [f"{hoje} 00:00:00", f"{hoje} 23:59:59"]]},
 		),
 		"audiencias_amanha": frappe.db.count(
-			"Audiencia",
+			"Hearing",
 			{
 				"data_hora": [
 					"between",
@@ -133,11 +133,11 @@ def _build_kpis(hoje, periodo_fim, mes_inicio, mes_fim):
 			},
 		),
 		"audiencias_semana": frappe.db.count(
-			"Audiencia",
+			"Hearing",
 			{"data_hora": ["between", [f"{hoje} 00:00:00", f"{periodo_fim} 23:59:59"]]},
 		),
 		"prazos_urgentes": frappe.db.count(
-			"Controle de Prazos",
+			"Deadline",
 			{
 				"status": "Pendente",
 				"data_prazo": ["<=", add_days(hoje, 3)],
@@ -145,7 +145,7 @@ def _build_kpis(hoje, periodo_fim, mes_inicio, mes_fim):
 		),
 		"prazos_vencidos": prazos_vencidos,
 		"prazos_criticos": frappe.db.count(
-			"Controle de Prazos",
+			"Deadline",
 			{
 				"status": "Pendente",
 				"data_prazo": ["between", [hoje, add_days(hoje, 3)]],
@@ -173,9 +173,9 @@ def _build_resumo(hoje, kpis, financeiro, periodo_dias=7):
 		else "normal",
 	}
 def _count_custas_abertas():
-	if not frappe.db.table_exists("Custa Processual"):
+	if not frappe.db.table_exists("Court Cost"):
 		return 0
 	return frappe.db.count(
-		"Custa Processual",
+		"Court Cost",
 		{"status": ["in", ["Pendente", "Pago"]], "repassar_cliente": 1},
 	)

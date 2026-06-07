@@ -2,15 +2,15 @@ import frappe
 
 
 ISTABLE_DOCTYPES = [
-    "Parcela de Honorarios",
-    "Ato Advocaticio",
-    "Contato Cliente",
-    "Endereco Cliente",
-    "Kit Documento Item",
+    "Fee Installment",
+    "Legal Act Item",
+    "Client Contact",
+    "Client Address",
+    "Document Kit Item",
 ]
 
 PARENT_DOCTYPES_AFTER_ISTABLE = [
-    "Kit de Documentos",
+    "Document Kit",
 ]
 
 

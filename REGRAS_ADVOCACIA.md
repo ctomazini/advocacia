@@ -14,14 +14,14 @@
 | DocTypes | 24, todos `custom: 0`, módulo `Advocacia` |
 | Nomes DocType | **Português congelado** — não renomear |
 | Fieldnames | `snake_case`; labels UI em português |
-| Hub | `Servico` — 9 satélites com campo `servico` |
+| Hub | `Legal Case` — 9 satélites com campo `servico` |
 | Testes | 230 (`run-tests --app advocacia`) |
 
 ---
 
 ## 2. Dados e validações
 
-**Links obrigatórios (nunca texto livre):** Comarca, Vara, Tribunal, Fase Processual, Cliente, Servico.
+**Links obrigatórios (nunca texto livre):** Jurisdiction, Court Branch, Court, Case Phase, Client, Legal Case.
 
 **Armazenamento:** CPF/CNPJ/CNJ/telefone → só dígitos; e-mail → `.lower()`.
 
@@ -57,7 +57,7 @@
 | Backend | `advocacia/painel/` — orquestrador `get()` |
 | Facade | Único `xcall`: `painel_api.get_painel_data` |
 | Frontend | `public/js/painel/` (7 módulos) + shell `page/painel/painel.js` |
-| Permissão | `Servico` read na entrada |
+| Permissão | `Legal Case` read na entrada |
 | Financeiro | `strip_financial_payload` para **Advocacia User** |
 | Commit | Nunca no `get()` |
 | Soft refresh | Período e `list_limits` recarregam payload sem reload da page |
@@ -78,9 +78,9 @@
 
 ## 5. Financeiro e calendar
 
-**Sync** (`financeiro.py`): Acordo → Pagamento idempotente via `parcela_origem_id`; flag `in_pagamento_sync`; `manual_override` respeitado; um handler `on_update` por DocType.
+**Sync** (`financeiro.py`): Acordo → Legal Payment idempotente via `parcela_origem_id`; flag `in_pagamento_sync`; `manual_override` respeitado; um handler `on_update` por DocType.
 
-**Calendar** (`calendar_sync.py`): Audiencia + Controle de Prazos → Event; `custom_source_*`; `ignore_permissions` comentado.
+**Calendar** (`calendar_sync.py`): Hearing + Deadline → Event; `custom_source_*`; `ignore_permissions` comentado.
 
 **Roles:** Advocacia User (operacional, sem financeiro no painel) · Advocacia Manager (full).
 
@@ -152,7 +152,7 @@ python advocacia/advocacia/tests/e2e/playwright_flow.py
 | `advocacia/docs/audit_dashboard.md` | Painel modular backend/frontend |
 | `advocacia/docs/audit_data_integrity.md` | CPF/CNPJ/CNJ/telefone, sync |
 | `advocacia/docs/audit_google_calendar.md` | Event + Google |
-| `advocacia/docs/audit_links.md` | Hub Servico e satélites |
+| `advocacia/docs/audit_links.md` | Hub Legal Case e satélites |
 | `advocacia/docs/audit_usability.md` | Máscaras, 218/232 descriptions |
 | `advocacia/docs/audit_ai_readiness.md` | `agent_api.py` pós-deploy |
 | `CODEBASE.md` | Inventário técnico |

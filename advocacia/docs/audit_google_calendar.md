@@ -10,12 +10,12 @@
 
 | DocType | Eventos `hooks.py` | Função | Destino |
 |---|---|---|---|
-| **Audiencia** | `after_insert`, `on_update` | `sync_audiencia_to_event` | `Event` nativo Frappe |
-| **Controle de Prazos** | `after_insert`, `on_update` | `sync_prazo_to_event` | `Event` nativo Frappe |
+| **Hearing** | `after_insert`, `on_update` | `sync_audiencia_to_event` | `Event` nativo Frappe |
+| **Deadline** | `after_insert`, `on_update` | `sync_prazo_to_event` | `Event` nativo Frappe |
 
-**Não sincronizam:** Tarefa, Comunicacao, Pagamento, Registro de Horas.
+**Não sincronizam:** Legal Task, Case Communication, Legal Payment, Time Entry.
 
-### Mapeamento Audiencia → Event
+### Mapeamento Hearing → Event
 
 | Campo Event | Origem |
 |---|---|
@@ -23,13 +23,13 @@
 | `starts_on` | `data_hora` |
 | `ends_on` | `starts_on + 2 horas` |
 | `event_type` | `Public` |
-| `description` | Comarca, vara, modalidade, observações |
-| `custom_source_doctype` | `"Audiencia"` |
+| `description` | Jurisdiction, vara, modalidade, remarks |
+| `custom_source_doctype` | `"Hearing"` |
 | `custom_source_name` | `doc.name` |
 
 **Cancelamento:** se `status_aud == "Cancelada"` → Event `status = Closed`.
 
-### Mapeamento Controle de Prazos → Event
+### Mapeamento Deadline → Event
 
 | Campo Event | Origem |
 |---|---|
@@ -38,7 +38,7 @@
 | `all_day` | `1` |
 | `color` | `red` (Alta), `orange` (Média), `blue` (demais) |
 | `description` | Serviço, cliente, prioridade, status |
-| `custom_source_doctype` | `"Controle de Prazos"` |
+| `custom_source_doctype` | `"Deadline"` |
 | `custom_source_name` | `doc.name` |
 
 **Cancelamento:** se `status == "Concluído"` → Event `status = Closed`.
@@ -68,9 +68,9 @@ Justificativa documentada inline — padrão §9 do `REGRAS_ADVOCACIA.md`.
 
 | Cenário | Coberto |
 |---|---|
-| Audiencia cria Event | ✅ |
-| Audiencia atualiza Event existente | ✅ |
-| Audiencia cancelada fecha Event | ✅ |
+| Hearing cria Event | ✅ |
+| Hearing atualiza Event existente | ✅ |
+| Hearing cancelada fecha Event | ✅ |
 | Prazo cria Event all_day | ✅ |
 | Prazo concluído fecha Event | ✅ |
 | Cor por prioridade | ✅ |
@@ -93,7 +93,7 @@ Justificativa documentada inline — padrão §9 do `REGRAS_ADVOCACIA.md`.
 ### Fluxo recomendado para produção
 
 ```
-Audiencia / Controle de Prazos
+Hearing / Deadline
         ↓ calendar_sync.py
     Event (Frappe desk)
         ↓ Google Calendar settings (por usuário)
@@ -120,7 +120,7 @@ Prazos e audiências aparecem no calendário **indiretamente** via Event — nã
 
 | Abordagem | Prós | Contras | Esforço |
 |---|---|---|---|
-| **A) Event + Google Calendar nativo** | Zero código extra; OAuth pronto | Usuário configura sync; Tarefas fora | 🟢 Baixo |
+| **A) Event + Google Calendar nativo** | Zero código extra; OAuth pronto | Usuário configura sync; Legal Tasks fora | 🟢 Baixo |
 | **B) CalDAV** | Padrão aberto | Frappe sem CalDAV built-in | 🔴 Alto |
 | **C) API `google-api-python-client` custom** | Controle total | Duplica OAuth Frappe | 🟡 Médio-alto |
 | **D) Webhook outbound** | Integrações externas | Infra adicional | 🟡 Médio |
@@ -133,12 +133,12 @@ Prazos e audiências aparecem no calendário **indiretamente** via Event — nã
 
 | Gap | Severidade | Esforço estimado |
 |---|---|---|
-| Tarefa → Event | 🟡 | 1 dia dev |
+| Legal Task → Event | 🟡 | 1 dia dev |
 | Sync seletivo por serviço/cliente | 🔴 | Não implementado |
 | Notificação push Google | 🟢 | Depende do sync nativo Frappe |
 | Documentação admin OAuth | 🟡 | 2–4h docs |
 
-### Extensão sugerida: Tarefa → Event
+### Extensão sugerida: Legal Task → Event
 
 Espelhar `sync_prazo_to_event`:
 - `starts_on` = `data_limite`
@@ -151,10 +151,10 @@ Espelhar `sync_prazo_to_event`:
 
 - [ ] `bench --site <site> migrate` — Custom Fields em Event
 - [ ] Criar Google Calendar DocType por advogado/usuário
-- [ ] Testar: criar Audiencia → ver Event no desk
+- [ ] Testar: criar Hearing → ver Event no desk
 - [ ] Testar: conectar Google → evento aparece no app Google Calendar
 - [ ] `run-tests --app advocacia` — `test_calendar_sync.py` verde
 
 ---
 
-*Paridade estrutural com app `engenharia` (Deadline/Permit → Event). Domínio jurídico: Audiencia + Controle de Prazos.*
+*Paridade estrutural com app `engenharia` (Deadline/Permit → Event). Domínio jurídico: Hearing + Deadline.*

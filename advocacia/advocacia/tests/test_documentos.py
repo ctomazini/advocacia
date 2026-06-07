@@ -13,11 +13,11 @@ from advocacia.advocacia.documentos import (
 	get_placeholders_referencia,
 	get_templates_disponiveis,
 )
-from advocacia.advocacia.tests.test_setup import create_test_servico
+from advocacia.advocacia.tests.test_setup import create_test_legal_case
 
 
 def _ensure_test_escritorio_config(advogada="Advogada Teste"):
-	cfg = frappe.get_single("Configuracao do Escritorio")
+	cfg = frappe.get_single("Office Settings")
 	cfg.razao_social = "Escritorio Teste Advocacia"
 	cfg.cnpj = "11222333000181"
 	cfg.oab = "OAB/RS 00.000"
@@ -45,7 +45,7 @@ class TestDocumentos(FrappeTestCase):
 		self.assertIsInstance(result, list)
 		grupos = [bloco["grupo"] for bloco in result]
 		self.assertIn("Escritório", grupos)
-		self.assertIn("Cliente", grupos)
+		self.assertIn("Client", grupos)
 		self.assertIn("Serviço", grupos)
 
 	def test_data_extenso_marco_com_cedilha(self):
@@ -53,7 +53,7 @@ class TestDocumentos(FrappeTestCase):
 
 	def test_build_context_escritorio_e_cliente(self):
 		_ensure_test_escritorio_config()
-		servico = create_test_servico()
+		servico = create_test_legal_case()
 		context = _build_context(servico.name)
 		self.assertEqual(context["escritorio_advogada"], "Advogada Teste")
 		self.assertEqual(context["escritorio_razao_social"], "Escritorio Teste Advocacia")
@@ -68,7 +68,7 @@ class TestDocumentos(FrappeTestCase):
 		except ImportError:
 			self.skipTest("python-docx não instalado")
 
-		servico = create_test_servico()
+		servico = create_test_legal_case()
 		template_names = []
 
 		for idx in range(2):
@@ -93,7 +93,7 @@ class TestDocumentos(FrappeTestCase):
 
 				template = frappe.get_doc(
 					{
-						"doctype": "Template Documento",
+						"doctype": "Document Template",
 						"titulo": f"Template Lote {idx} {frappe.generate_hash(length=4)}",
 						"tipo_documento": "Contrato",
 						"arquivo": file_doc.file_url,

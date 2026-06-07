@@ -13,7 +13,7 @@ def get_painel_data(
 	list_limits: dict | str | None = None,
 ) -> dict:
 	"""Return dashboard payload for the current user."""
-	frappe.has_permission("Servico", "read", throw=True)
+	frappe.has_permission("Legal Case", "read", throw=True)
 	return _get_painel_data(
 		limit_start=limit_start,
 		limit_page_length=limit_page_length,
@@ -25,6 +25,6 @@ def get_painel_data(
 
 @frappe.whitelist()
 def marcar_parcela_recebida(parcela_name: str) -> dict:
-	"""Mark a Pagamento (or legacy parcel row) as received."""
-	frappe.has_permission("Pagamento", "write", throw=True)
+	"""Mark a Legal Payment (or legacy parcel row) as received."""
+	frappe.has_permission("Legal Payment", "write", throw=True)
 	return _painel_financeiro.marcar_parcela(parcela_name)

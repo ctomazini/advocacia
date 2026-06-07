@@ -10,24 +10,24 @@ def verificar_parcelas_vencidas():
 	from advocacia.advocacia.financeiro import sync_parcela_from_pagamento
 
 	pagamentos = frappe.get_all(
-		"Pagamento",
+		"Legal Payment",
 		filters={"data_vencimento": ["<", hoje], "status": "Pendente", "manual_override": 0},
 		fields=["name", "parcela_origem_id"],
 		limit_page_length=0,  # processa todos — scheduler batch
 	)
 	for row in pagamentos:
-		frappe.db.set_value("Pagamento", row.name, "status", "Vencido", update_modified=False)
-		pag = frappe.get_doc("Pagamento", row.name)
+		frappe.db.set_value("Legal Payment", row.name, "status", "Vencido", update_modified=False)
+		pag = frappe.get_doc("Legal Payment", row.name)
 		sync_parcela_from_pagamento(pag)
 
 	parcelas = frappe.get_all(
-		"Parcela de Honorarios",
+		"Fee Installment",
 		filters={"vencimento": ["<", hoje], "status": "Pendente"},
 		pluck="name",
 		limit_page_length=0,  # processa todos — scheduler batch
 	)
 	for name in parcelas:
-		frappe.db.set_value("Parcela de Honorarios", name, "status", "Vencido", update_modified=False)
+		frappe.db.set_value("Fee Installment", name, "status", "Vencido", update_modified=False)
 
 	frappe.logger().info(
 		"Vencidos atualizados: {0} pagamentos, {1} parcelas".format(len(pagamentos), len(parcelas))
@@ -37,13 +37,13 @@ def verificar_parcelas_vencidas():
 def verificar_despesas_vencidas():
 	"""Marca despesas pendentes como atrasadas se vencimento passou."""
 	despesas = frappe.get_all(
-		"Despesa do Escritorio",
+		"Office Expense",
 		filters={"status": "Pendente", "data_vencimento": ("<", today())},
 		pluck="name",
 		limit_page_length=0,  # processa todos — scheduler batch
 	)
 	for name in despesas:
-		frappe.db.set_value("Despesa do Escritorio", name, "status", "Atrasado", update_modified=False)
+		frappe.db.set_value("Office Expense", name, "status", "Atrasado", update_modified=False)
 
 	if despesas:
 		frappe.logger().info("Despesas marcadas como atrasadas: {0}".format(len(despesas)))
@@ -53,15 +53,15 @@ def notificar_parcelas_vencidas():
 	"""Notifica pagamentos vencidos ha 3 dias (camada operacional)."""
 	data_alvo = add_days(today(), -3)
 	pagamentos = frappe.get_all(
-		"Pagamento",
+		"Legal Payment",
 		filters={"status": "Vencido", "data_vencimento": data_alvo},
-		fields=["name", "acordo", "cliente", "data_vencimento", "owner", "tipo_origem", "registro_atos"],
+		fields=["name", "fee_agreement", "client", "data_vencimento", "owner", "tipo_origem", "service_record"],
 		limit_page_length=500,
 	)
 	count = 0
 	for p in pagamentos:
-		subject = _("Pagamento vencido: {0}").format(p.name)
-		if _notification_already_sent("Pagamento", p.name, subject):
+		subject = _("Legal Payment vencido: {0}").format(p.name)
+		if _notification_already_sent("Legal Payment", p.name, subject):
 			continue
 		message = _(
 			"O pagamento {0} (vencimento {1}) esta vencido ha 3 dias. Origem: {2}."
@@ -72,7 +72,7 @@ def notificar_parcelas_vencidas():
 		)
 		_send_system_notification(
 			users=_pagamento_recipients(p),
-			doctype="Pagamento",
+			doctype="Legal Payment",
 			docname=p.name,
 			subject=subject,
 			message=message,
@@ -86,38 +86,38 @@ def notificar_audiencias_hoje():
 	"""Notifica o responsavel sobre audiencias agendadas para hoje."""
 	hoje = today()
 	audiencias = frappe.get_all(
-		"Audiencia",
+		"Hearing",
 		filters={"data_hora": ["between", [hoje + " 00:00:00", hoje + " 23:59:59"]]},
 		fields=[
 			"name",
-			"cliente",
+			"client",
 			"tipo",
 			"modalidade",
 			"data_hora",
-			"local_vara",
+			"court_branch",
 			"owner",
 		],
 		limit_page_length=500,
 	)
 	count = 0
 	for aud in audiencias:
-		subject = _("Audiencia hoje: {0} - {1}").format(
-			aud.cliente or aud.name,
+		subject = _("Hearing hoje: {0} - {1}").format(
+			aud.client or aud.name,
 			aud.tipo or "",
 		)
-		if _notification_already_sent("Audiencia", aud.name, subject):
+		if _notification_already_sent("Hearing", aud.name, subject):
 			continue
 		message = _(
-			"Audiencia {0} ({1}) hoje as {2}. Vara: {3}."
+			"Hearing {0} ({1}) hoje as {2}. Court Branch: {3}."
 		).format(
 			aud.tipo or "",
 			aud.modalidade or "",
 			frappe.utils.format_datetime(aud.data_hora) if aud.data_hora else "",
-			aud.local_vara or _("N/A"),
+			aud.court_branch or _("N/A"),
 		)
 		_send_system_notification(
 			users=[aud.owner] if aud.owner else [],
-			doctype="Audiencia",
+			doctype="Hearing",
 			docname=aud.name,
 			subject=subject,
 			message=message,
@@ -135,7 +135,7 @@ def on_parcela_update(doc, method=None):
 
 	if doc.status != "Recebido":
 		return
-	if doc.parenttype != "Acordo de Honorarios Processuais" or not doc.parent:
+	if doc.parenttype != "Fee Agreement" or not doc.parent:
 		return
 	_marcar_acordo_quitado_se_completo(doc.parent)
 
@@ -153,16 +153,16 @@ def on_pagamento_update(doc, method=None):
 
 	if doc.status not in ("Recebido", "Repassado"):
 		return
-	if not doc.acordo:
+	if not doc.fee_agreement:
 		return
-	_marcar_acordo_quitado_se_completo(doc.acordo, usar_pagamentos=True)
+	_marcar_acordo_quitado_se_completo(doc.fee_agreement, usar_pagamentos=True)
 
 
 def _marcar_acordo_quitado_se_completo(acordo_name, usar_pagamentos=False):
 	if usar_pagamentos:
 		pagamentos = frappe.get_all(
-			"Pagamento",
-			filters={"acordo": acordo_name, "status": ["not in", ["Cancelado"]]},
+			"Legal Payment",
+			filters={"fee_agreement": acordo_name, "status": ["not in", ["Cancelado"]]},
 			fields=["status"],
 			limit_page_length=500,
 		)
@@ -170,10 +170,10 @@ def _marcar_acordo_quitado_se_completo(acordo_name, usar_pagamentos=False):
 			return
 	else:
 		parcelas = frappe.get_all(
-			"Parcela de Honorarios",
+			"Fee Installment",
 			filters={
 				"parent": acordo_name,
-				"parenttype": "Acordo de Honorarios Processuais",
+				"parenttype": "Fee Agreement",
 			},
 			fields=["status"],
 			limit_page_length=500,
@@ -181,12 +181,12 @@ def _marcar_acordo_quitado_se_completo(acordo_name, usar_pagamentos=False):
 		if not parcelas or not all(p.status == "Recebido" for p in parcelas):
 			return
 
-	acordo_status = frappe.db.get_value("Acordo de Honorarios Processuais", acordo_name, "status")
+	acordo_status = frappe.db.get_value("Fee Agreement", acordo_name, "status")
 	if acordo_status == "Quitado":
 		return
 
 	frappe.db.set_value(
-		"Acordo de Honorarios Processuais",
+		"Fee Agreement",
 		acordo_name,
 		"status",
 		"Quitado",
@@ -199,15 +199,15 @@ def _pagamento_recipients(pagamento):
 	users = []
 	if pagamento.owner:
 		users.append(pagamento.owner)
-	if pagamento.acordo:
+	if pagamento.fee_agreement:
 		acordo_owner = frappe.db.get_value(
-			"Acordo de Honorarios Processuais", pagamento.acordo, "owner"
+			"Fee Agreement", pagamento.fee_agreement, "owner"
 		)
 		if acordo_owner and acordo_owner not in users:
 			users.append(acordo_owner)
-	elif getattr(pagamento, "registro_atos", None):
+	elif getattr(pagamento, "service_record", None):
 		registro_owner = frappe.db.get_value(
-			"Registro de Atos", pagamento.registro_atos, "owner"
+			"Service Record", pagamento.service_record, "owner"
 		)
 		if registro_owner and registro_owner not in users:
 			users.append(registro_owner)
@@ -215,10 +215,10 @@ def _pagamento_recipients(pagamento):
 
 
 def _pagamento_origem_label(pagamento):
-	if pagamento.acordo:
-		return pagamento.acordo
-	if getattr(pagamento, "registro_atos", None):
-		return _("Atos: {0}").format(pagamento.registro_atos)
+	if pagamento.fee_agreement:
+		return pagamento.fee_agreement
+	if getattr(pagamento, "service_record", None):
+		return _("Atos: {0}").format(pagamento.service_record)
 	return _("N/A")
 
 
@@ -255,7 +255,7 @@ def verificar_status_servicos():
 	hoje = today()
 
 	servicos = frappe.get_all(
-		"Servico",
+		"Legal Case",
 		filters={"status": "Em andamento"},
 		fields=["name"],
 		limit_page_length=0,  # processa todos — scheduler batch
@@ -265,9 +265,9 @@ def verificar_status_servicos():
 
 	servico_names = [s.name for s in servicos]
 	acordos = frappe.get_all(
-		"Acordo de Honorarios Processuais",
-		filters={"servico": ["in", servico_names], "status": "Vigente"},
-		fields=["name", "servico"],
+		"Fee Agreement",
+		filters={"legal_case": ["in", servico_names], "status": "Vigente"},
+		fields=["name", "legal_case"],
 		limit_page_length=0,  # processa todos — scheduler batch
 	)
 	acordo_names = [ac.name for ac in acordos]
@@ -275,7 +275,7 @@ def verificar_status_servicos():
 
 	if acordo_names:
 		parcelas_abertas = frappe.get_all(
-			"Parcela de Honorarios",
+			"Fee Installment",
 			filters={
 				"parent": ["in", acordo_names],
 				"status": ["in", ["Pendente", "Vencido"]],
@@ -285,38 +285,38 @@ def verificar_status_servicos():
 			limit_page_length=0,  # processa todos — scheduler batch
 		)
 		pagamentos_abertos = frappe.get_all(
-			"Pagamento",
+			"Legal Payment",
 			filters={
-				"acordo": ["in", acordo_names],
+				"fee_agreement": ["in", acordo_names],
 				"status": ["in", ["Pendente", "Vencido"]],
 			},
-			fields=["acordo"],
-			pluck="acordo",
+			fields=["fee_agreement"],
+			pluck="fee_agreement",
 			limit_page_length=0,  # processa todos — scheduler batch
 		)
 		acordos_com_pendencia = set(parcelas_abertas) | set(pagamentos_abertos)
 		for ac in acordos:
 			if ac.name in acordos_com_pendencia:
-				servicos_com_parcela_aberta.add(ac.servico)
+				servicos_com_parcela_aberta.add(ac.legal_case)
 
 	servicos_com_prazo = set(
 		frappe.get_all(
-			"Controle de Prazos",
-			filters={"servico": ["in", servico_names], "status": "Pendente"},
-			fields=["servico"],
-			pluck="servico",
+			"Deadline",
+			filters={"legal_case": ["in", servico_names], "status": "Pendente"},
+			fields=["legal_case"],
+			pluck="legal_case",
 			limit_page_length=0,  # processa todos — scheduler batch
 		)
 	)
 	servicos_com_audiencia = set(
 		frappe.get_all(
-			"Audiencia",
+			"Hearing",
 			filters={
-				"servico": ["in", servico_names],
+				"legal_case": ["in", servico_names],
 				"data_hora": [">=", f"{hoje} 00:00:00"],
 			},
-			fields=["servico"],
-			pluck="servico",
+			fields=["legal_case"],
+			pluck="legal_case",
 			limit_page_length=0,  # processa todos — scheduler batch
 		)
 	)
@@ -330,5 +330,5 @@ def verificar_status_servicos():
 		if nome in servicos_com_audiencia:
 			continue
 
-		frappe.db.set_value("Servico", nome, "status", "Arquivado")
-		frappe.logger().info("Servico {0} arquivado automaticamente".format(nome))
+		frappe.db.set_value("Legal Case", nome, "status", "Arquivado")
+		frappe.logger().info("Legal Case {0} arquivado automaticamente".format(nome))

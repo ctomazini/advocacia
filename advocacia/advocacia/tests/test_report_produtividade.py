@@ -5,9 +5,9 @@ from advocacia.advocacia.report.horas_por_servico.horas_por_servico import execu
 from advocacia.advocacia.report.produtividade.produtividade import execute as prod_execute
 from advocacia.advocacia.tests.test_setup import (
 	create_test_acordo,
-	create_test_custa_processual,
+	create_test_court_cost,
 	create_test_registro_horas,
-	create_test_servico,
+	create_test_legal_case,
 )
 
 
@@ -21,9 +21,9 @@ class TestReportProdutividade(FrappeTestCase):
 		self.assertIsInstance(data, list)
 
 	def test_produtividade_com_dados(self):
-		servico = create_test_servico(area="Cível", status="Encerrado")
+		servico = create_test_legal_case(area="Cível", status="Encerrado")
 		create_test_acordo(servico=servico.name, valor_total=10000)
-		create_test_custa_processual(servico=servico.name, valor=500, status="Pago", data_pagamento=frappe.utils.today())
+		create_test_court_cost(servico=servico.name, valor=500, status="Pago", data_pagamento=frappe.utils.today())
 		create_test_registro_horas(servico=servico.name, duracao_minutos=120)
 
 		columns, data, _msg, _chart = prod_execute({"periodo": "Tudo", "incluir_horas": 1})
@@ -34,11 +34,11 @@ class TestReportProdutividade(FrappeTestCase):
 		self.assertGreaterEqual(civil.get("horas_registradas", 0), 2)
 
 	def test_horas_por_servico_executa(self):
-		servico = create_test_servico()
+		servico = create_test_legal_case()
 		create_test_registro_horas(servico=servico.name, duracao_minutos=60, cobravel=1)
 		create_test_registro_horas(servico=servico.name, duracao_minutos=30, cobravel=0)
 
-		columns, data = horas_execute({"servico": servico.name})
+		columns, data = horas_execute({"legal_case": servico.name})
 		self.assertEqual(len(data), 1)
 		self.assertEqual(data[0]["total_horas"], 1.5)
 		self.assertEqual(data[0]["horas_cobraveis"], 1.0)

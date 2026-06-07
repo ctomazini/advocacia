@@ -162,7 +162,7 @@ frappe.provide("advocacia.painel.financeiro");
 	                frappe.utils.escape_html(p.parent || "") +
 	                '">' +
 	                '<div class="painel-op-body"><div class="painel-op-title">' +
-	                frappe.utils.escape_html(p.cliente_nome || "—") +
+	                frappe.utils.escape_html(p.client_nome || "—") +
 	                '</div><div class="painel-op-sub">' +
 	                U.fmt_currency(p.valor_total) +
 	                " · " +
@@ -216,9 +216,9 @@ frappe.provide("advocacia.painel.financeiro");
 	        __("Pendentes e vencidos") +
 	        "</p></div>" +
 	        '<div class="painel-section-head-actions">' +
-	        U.render_list_limit_controls("parcelas", list_limit) +
+	        U.render_list_limit_controls("fee_installments", list_limit) +
 	        meta_html +
-	        '<span class="painel-section-link" data-route-list="Pagamento">' +
+	        '<span class="painel-section-link" data-route-list="Legal Payment">' +
 	        __("Ver todos") +
 	        "</span></div></div>";
 	    if (!parcelas || !parcelas.length) {
@@ -255,9 +255,9 @@ frappe.provide("advocacia.painel.financeiro");
 	            frappe.utils.escape_html(p.parent || "") +
 	            '">' +
 	            '<div class="painel-parcela-main"><div class="painel-op-title">' +
-	            frappe.utils.escape_html(p.cliente_nome || "—") +
+	            frappe.utils.escape_html(p.client_nome || "—") +
 	            '</div><div class="painel-op-sub">' +
-	            frappe.utils.escape_html(p.servico_titulo || p.servico_tipo || "") +
+	            frappe.utils.escape_html(p.legal_case_titulo || p.legal_case_tipo || "") +
 	            (p.numero_processo ? " · " + frappe.utils.escape_html(p.numero_processo) : "") +
 	            "</div>" +
 	            '<div class="painel-muted">' +
@@ -294,7 +294,7 @@ frappe.provide("advocacia.painel.financeiro");
 	        '<div class="painel-section-head-actions">' +
 	        U.render_list_limit_controls("despesas", list_limit) +
 	        meta_html +
-	        '<span class="painel-section-link" data-route-list="Despesa do Escritorio">' +
+	        '<span class="painel-section-link" data-route-list="Office Expense">' +
 	        __("Ver todas") +
 	        "</span></div></div>";
 
@@ -360,7 +360,7 @@ frappe.provide("advocacia.painel.financeiro");
 	        '<div class="painel-section-head-actions">' +
 	        U.render_list_limit_controls("custas", list_limit) +
 	        meta_html +
-	        '<span class="painel-section-link" data-route-list="Custa Processual">' +
+	        '<span class="painel-section-link" data-route-list="Court Cost">' +
 	        __("Ver todas") +
 	        "</span></div></div>";
 
@@ -389,7 +389,7 @@ frappe.provide("advocacia.painel.financeiro");
 	            "</div>" +
 	            '<div class="painel-op-sub">' +
 	            frappe.utils.escape_html(c.tipo || "") +
-	            (c.servico_titulo ? " · " + frappe.utils.escape_html(c.servico_titulo) : "") +
+	            (c.legal_case_titulo ? " · " + frappe.utils.escape_html(c.legal_case_titulo) : "") +
 	            "</div>" +
 	            '<span class="indicator-pill blue">' + __("Aguardando repasse") + "</span>" +
 	            "</div>" +
@@ -414,7 +414,7 @@ frappe.provide("advocacia.painel.financeiro");
 	        '<p class="painel-section-sub">' +
 	        __("Registradas {0}", [U.painel_periodo_enunciado(periodo_dias)]) +
 	        "</p></div>" +
-	        '<span class="painel-section-link" data-route-list="Registro de Horas">' +
+	        '<span class="painel-section-link" data-route-list="Time Entry">' +
 	        __("Ver todas") +
 	        "</span></div>" +
 	        '<div class="painel-panel painel-horas-panel">' +

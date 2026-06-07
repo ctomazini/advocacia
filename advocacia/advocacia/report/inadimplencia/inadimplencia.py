@@ -18,10 +18,10 @@ def execute(filters=None):
 def _get_columns():
 	return [
 		{
-			"fieldname": "cliente",
-			"label": _("Cliente"),
+			"fieldname": "client",
+			"label": _("Client"),
 			"fieldtype": "Link",
-			"options": "Cliente",
+			"options": "Client",
 			"width": 180,
 		},
 		{
@@ -78,19 +78,19 @@ def _get_data(filters):
 		"status": "Vencido",
 		"data_vencimento": ["between", [de_data, ate_data]] if de_data else ["<=", ate_data],
 	}
-	if filters.get("cliente"):
-		query_filters["cliente"] = filters.cliente
+	if filters.get("client"):
+		query_filters["client"] = filters.client
 
 	pagamentos = frappe.get_all(
-		"Pagamento",
+		"Legal Payment",
 		filters=query_filters,
-		fields=["cliente", "servico", "valor", "data_vencimento"],
+		fields=["client", "legal_case", "valor", "data_vencimento"],
 		limit_page_length=0,
 	)
 
 	grouped = defaultdict(list)
 	for row in pagamentos:
-		grouped[row.cliente].append(row)
+		grouped[row.client].append(row)
 
 	rows = []
 	total_geral = 0.0
@@ -101,11 +101,11 @@ def _get_data(filters):
 		dias_list = [max(date_diff(hoje, getdate(p.data_vencimento)), 0) for p in items]
 		total_vencido = sum(flt(p.valor) for p in items)
 		tel, email = _get_cliente_contato(cliente)
-		servicos = _format_servicos({p.servico for p in items if p.servico})
+		servicos = _format_servicos({p.legal_case for p in items if p.legal_case})
 
 		rows.append(
 			{
-				"cliente": cliente,
+				"client": cliente,
 				"total_vencido": total_vencido,
 				"qtd_parcelas": len(items),
 				"dias_atraso_max": max(dias_list) if dias_list else 0,
@@ -124,7 +124,7 @@ def _get_data(filters):
 	chart_labels = []
 	chart_values = []
 	for row in rows[:10]:
-		chart_labels.append(frappe.db.get_value("Cliente", row["cliente"], "nome") or row["cliente"])
+		chart_labels.append(frappe.db.get_value("Client", row["client"], "nome") or row["client"])
 		chart_values.append(flt(row["total_vencido"]))
 
 	chart = {
@@ -163,8 +163,8 @@ def _get_data(filters):
 
 def _get_cliente_contato(cliente):
 	contatos = frappe.get_all(
-		"Contato Cliente",
-		filters={"parent": cliente, "parenttype": "Cliente"},
+		"Client Contact",
+		filters={"parent": cliente, "parenttype": "Client"},
 		fields=["celular", "telefone", "email"],
 		order_by="idx asc",
 	)
@@ -183,6 +183,6 @@ def _get_cliente_contato(cliente):
 def _format_servicos(servico_ids):
 	labels = []
 	for sid in sorted(servico_ids):
-		title = frappe.db.get_value("Servico", sid, "title") or sid
+		title = frappe.db.get_value("Legal Case", sid, "title") or sid
 		labels.append(title)
 	return ", ".join(labels)

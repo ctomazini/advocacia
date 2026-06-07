@@ -1,12 +1,12 @@
 import frappe
 
 DOCTYPE_LABELS = {
-	"Acordo de Honorarios Processuais": "Honorários",
-	"Controle de Prazos": "Prazos",
-	"Template Documento": "Documentos",
-	"Kit de Documentos": "Kits de Documentos",
-	"Configuracao do Escritorio": "Configuração do Escritório",
-	"Registro de Atos": "Registro de Atos",
+	"Fee Agreement": "Honorários",
+	"Deadline": "Prazos",
+	"Document Template": "Documentos",
+	"Document Kit": "Kits de Documentos",
+	"Office Settings": "Configuração do Escritório",
+	"Service Record": "Service Record",
 }
 
 

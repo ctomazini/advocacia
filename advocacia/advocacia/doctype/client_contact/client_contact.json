@@ -1,0 +1,62 @@
+{
+ "doctype": "DocType",
+ "name": "Client Contact",
+ "module": "Advocacia",
+ "custom": 0,
+ "istable": 1,
+ "fields": [
+  {
+   "fieldname": "nome",
+   "label": "Nome",
+   "fieldtype": "Data",
+   "reqd": 1,
+   "in_list_view": 1,
+   "bold": 1,
+   "description": "Nome da pessoa de contato.",
+   "idx": 1
+  },
+  {
+   "fieldname": "tipo",
+   "label": "Tipo",
+   "fieldtype": "Select",
+   "options": "Principal\nConjuge\nResponsável\nOutro",
+   "in_list_view": 1,
+   "description": "Relação com o cliente: Principal, Cônjuge, Responsável ou Outro.",
+   "in_standard_filter": 1,
+   "idx": 2
+  },
+  {
+   "fieldname": "telefone",
+   "label": "Telefone",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "description": "Telefone fixo com DDD (10 dígitos).",
+   "idx": 3
+  },
+  {
+   "fieldname": "celular",
+   "label": "Celular",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "description": "Celular com DDD (11 dígitos).",
+   "idx": 4
+  },
+  {
+   "fieldname": "email",
+   "label": "E-mail",
+   "fieldtype": "Data",
+   "options": "Email",
+   "in_list_view": 1,
+   "description": "E-mail de contato. Armazenado em minúsculas.",
+   "idx": 5
+  },
+  {
+   "fieldname": "observacao",
+   "label": "Observação",
+   "fieldtype": "Small Text",
+   "description": "Observações sobre este contato.",
+   "idx": 6
+  }
+ ],
+ "permissions": []
+}

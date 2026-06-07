@@ -25,16 +25,16 @@ O app está **operacional para humanos** e **parcialmente pronto para agentes** 
 
 | Função | Módulo | Permission | Uso por agente |
 |---|---|---|---|
-| `get_painel_data` | painel_api.py | Servico read | Snapshot operacional do escritório |
-| `servico_query` | servico.py | Servico read | Autocomplete processos |
-| `get_resumo_audiencia` | audiencia.py | Audiencia read | Detalhe audiência |
-| `get_resumo_prazo` | controle_de_prazos.py | Controle de Prazos read | Detalhe prazo |
-| `generate_document` | documentos.py | Servico read | Gerar docx |
-| `get_timer_ativo_usuario` | registro_de_horas.py | Registro de Horas read | Timer ativo |
+| `get_painel_data` | painel_api.py | Legal Case read | Snapshot operacional do escritório |
+| `servico_query` | servico.py | Legal Case read | Autocomplete processos |
+| `get_resumo_audiencia` | audiencia.py | Hearing read | Detalhe audiência |
+| `get_resumo_prazo` | controle_de_prazos.py | Deadline read | Detalhe prazo |
+| `generate_document` | documentos.py | Legal Case read | Gerar docx |
+| `get_timer_ativo_usuario` | registro_de_horas.py | Time Entry read | Timer ativo |
 
 ### REST CRUD (Frappe nativo)
 
-DocTypes expõem CRUD com DocPerm. **Advocacia User** não cria `Pagamento` — agente com credencial User herda essa restrição.
+DocTypes expõem CRUD com DocPerm. **Advocacia User** não cria `Legal Payment` — agente com credencial User herda essa restrição.
 
 ---
 
@@ -45,11 +45,11 @@ Facade pattern igual ao painel — único path de `xcall`.
 
 | Função proposta | Parâmetros | Permission | Retorno |
 |---|---|---|---|
-| `get_active_servicos` | `status=None`, `limit=20` | Servico read | Lista `{name, title, cliente, status, fase}` |
-| `get_servico_summary` | `servico` | Servico read | Resumo: prazos abertos, próxima audiência, tarefas pendentes |
+| `get_active_servicos` | `status=None`, `limit=20` | Legal Case read | Lista `{name, title, cliente, status, fase}` |
+| `get_servico_summary` | `servico` | Legal Case read | Resumo: prazos abertos, próxima audiência, tarefas pendentes |
 | `get_servico_financial_summary` | `servico` | **Manager only** | Honorários, parcelas vencidas, custas — ou 403 para User |
-| `get_deadlines_due` | `days=7`, `servico=None` | Controle de Prazos read | Prazos no período |
-| `get_upcoming_audiencias` | `days=7`, `servico=None` | Audiencia read | Audiências no período |
+| `get_deadlines_due` | `days=7`, `servico=None` | Deadline read | Prazos no período |
+| `get_upcoming_audiencias` | `days=7`, `servico=None` | Hearing read | Audiências no período |
 
 ### Regras de desenho
 
@@ -66,13 +66,13 @@ Facade pattern igual ao painel — único path de `xcall`.
 
 | Operação | Possível hoje? | Gap |
 |---|---|---|
-| Listar processos ativos | 🟡 REST GET Servico | Sem agregação; precisa filtros manuais |
+| Listar processos ativos | 🟡 REST GET Legal Case | Sem agregação; precisa filtros manuais |
 | Resumo de um processo | 🟡 Múltiplos GETs | Sem endpoint único |
-| Prazos da semana | 🟡 REST GET Controle de Prazos | Sem whitelist dedicado |
-| Honorários pendentes | 🟡 Manager REST Pagamento | User bloqueado — correto |
+| Prazos da semana | 🟡 REST GET Deadline | Sem whitelist dedicado |
+| Honorários pendentes | 🟡 Manager REST Legal Payment | User bloqueado — correto |
 | Gerar petição/docx | ✅ `documentos.generate_document` | — |
 | Criar prazo | ✅ REST POST | Agente precisa write + validação datas |
-| Marcar parcela recebida | ✅ `painel_api.marcar_parcela_recebida` | Requer Manager/write Pagamento |
+| Marcar parcela recebida | ✅ `painel_api.marcar_parcela_recebida` | Requer Manager/write Legal Payment |
 | Consultar carteira | 🟡 Report `carteira_ativa` | Sem API JSON dedicada |
 | Timer horas | ✅ whitelisted | — |
 
@@ -148,7 +148,7 @@ Estimativa: 8–12 métodos. Suite total passaria de 230 para ~242.
 
 ### Fase 3 — Write controlado (futuro)
 
-1. Endpoints para criar Prazo/Tarefa com validação server-side.
+1. Endpoints para criar Prazo/Legal Task com validação server-side.
 2. Confirmação em duas etapas para ações financeiras.
 3. Audit trail via `track_changes` nos DocTypes.
 

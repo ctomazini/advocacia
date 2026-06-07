@@ -1,16 +1,16 @@
 frappe.query_reports["horas_por_servico"] = {
 	filters: [
 		{
-			fieldname: "servico",
+			fieldname: "legal_case",
 			label: __("Serviço"),
 			fieldtype: "Link",
-			options: "Servico",
+			options: "Legal Case",
 		},
 		{
-			fieldname: "cliente",
-			label: __("Cliente"),
+			fieldname: "client",
+			label: __("Client"),
 			fieldtype: "Link",
-			options: "Cliente",
+			options: "Client",
 		},
 	],
 };

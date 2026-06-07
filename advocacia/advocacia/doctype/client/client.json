@@ -1,0 +1,299 @@
+{
+ "doctype": "DocType",
+ "name": "Client",
+ "module": "Advocacia",
+ "custom": 0,
+ "is_submittable": 0,
+ "istable": 0,
+ "quick_entry": 1,
+ "track_changes": 1,
+ "autoname": "format:CLI-{YYYY}-{####}",
+ "naming_rule": "Expression",
+ "title_field": "nome",
+ "search_fields": "nome,cpf,cnpj",
+ "fields": [
+  {
+   "fieldname": "tipo_pessoa",
+   "label": "Tipo de Pessoa",
+   "fieldtype": "Select",
+   "options": "Pessoa Física\nPessoa Jurídica",
+   "reqd": 1,
+   "allow_in_quick_entry": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "bold": 1,
+   "description": "Pessoa Física ou Pessoa Jurídica. Define quais documentos são obrigatórios.",
+   "idx": 1
+  },
+  {
+   "fieldname": "nome",
+   "label": "Nome / Razão Social",
+   "fieldtype": "Data",
+   "reqd": 1,
+   "allow_in_quick_entry": 1,
+   "in_list_view": 0,
+   "in_global_search": 1,
+   "bold": 1,
+   "description": "Nome completo (PF) ou razão social (PJ). Aparece como título do registro.",
+   "idx": 2
+  },
+  {
+   "fieldname": "nome_fantasia",
+   "label": "Nome Fantasia",
+   "fieldtype": "Data",
+   "depends_on": "eval:doc.tipo_pessoa=='Pessoa Jurídica'",
+   "description": "Nome fantasia da empresa (apenas pessoa jurídica).",
+   "idx": 3
+  },
+  {
+   "fieldname": "col_break_1",
+   "fieldtype": "Column Break",
+   "idx": 4
+  },
+  {
+   "fieldname": "cpf",
+   "label": "CPF",
+   "fieldtype": "Data",
+   "depends_on": "eval:doc.tipo_pessoa=='Pessoa Física'",
+   "mandatory_depends_on": "eval:doc.tipo_pessoa=='Pessoa Física'",
+   "allow_in_quick_entry": 1,
+   "unique": 1,
+   "in_list_view": 0,
+   "description": "CPF do cliente. Apenas dígitos, validado automaticamente.",
+   "idx": 5
+  },
+  {
+   "fieldname": "rg",
+   "label": "RG",
+   "fieldtype": "Data",
+   "depends_on": "eval:doc.tipo_pessoa=='Pessoa Física'",
+   "description": "Documento de identidade (pessoa física).",
+   "idx": 6
+  },
+  {
+   "fieldname": "cnpj",
+   "label": "CNPJ",
+   "fieldtype": "Data",
+   "depends_on": "eval:doc.tipo_pessoa=='Pessoa Jurídica'",
+   "mandatory_depends_on": "eval:doc.tipo_pessoa=='Pessoa Jurídica'",
+   "allow_in_quick_entry": 1,
+   "unique": 1,
+   "in_list_view": 0,
+   "description": "CNPJ do cliente. Apenas dígitos, validado automaticamente.",
+   "idx": 7
+  },
+  {
+   "fieldname": "sec_pf",
+   "label": "Dados Pessoais",
+   "fieldtype": "Section Break",
+   "depends_on": "eval:doc.tipo_pessoa=='Pessoa Física'",
+   "idx": 8
+  },
+  {
+   "fieldname": "nacionalidade",
+   "label": "Nacionalidade",
+   "fieldtype": "Data",
+   "default": "Brasileira",
+   "description": "Nacionalidade do cliente (pessoa física).",
+   "idx": 9
+  },
+  {
+   "fieldname": "estado_civil",
+   "label": "Estado Civil",
+   "fieldtype": "Select",
+   "options": "\nSolteiro(a)\nCasado(a)\nDivorciado(a)\nViúvo(a)\nUnião Estável",
+   "description": "Estado civil (pessoa física).",
+   "in_standard_filter": 1,
+   "idx": 10
+  },
+  {
+   "fieldname": "profissao",
+   "label": "Profissão",
+   "fieldtype": "Data",
+   "description": "Profissão declarada (pessoa física).",
+   "idx": 11
+  },
+  {
+   "fieldname": "sec_pj",
+   "label": "Dados da Empresa",
+   "fieldtype": "Section Break",
+   "depends_on": "eval:doc.tipo_pessoa=='Pessoa Jurídica'",
+   "idx": 12
+  },
+  {
+   "fieldname": "representante",
+   "label": "Representante Legal",
+   "fieldtype": "Data",
+   "bold": 1,
+   "description": "Nome do representante legal (pessoa jurídica).",
+   "idx": 13
+  },
+  {
+   "fieldname": "cpf_representante",
+   "label": "CPF do Representante",
+   "fieldtype": "Data",
+   "description": "CPF do representante legal, com validação automática.",
+   "idx": 14
+  },
+  {
+   "fieldname": "col_break_pj",
+   "fieldtype": "Column Break",
+   "idx": 15
+  },
+  {
+   "fieldname": "cargo_representante",
+   "label": "Cargo",
+   "fieldtype": "Data",
+   "description": "Cargo do representante legal na empresa.",
+   "idx": 16
+  },
+  {
+   "fieldname": "nacionalidade_pj",
+   "label": "Nacionalidade do Representante",
+   "fieldtype": "Data",
+   "default": "Brasileira",
+   "description": "Nacionalidade do representante legal.",
+   "idx": 17
+  },
+  {
+   "fieldname": "sec_contatos",
+   "label": "Contatos",
+   "fieldtype": "Section Break",
+   "idx": 18
+  },
+  {
+   "fieldname": "contacts",
+   "label": "Contatos",
+   "fieldtype": "Table",
+   "options": "Client Contact",
+   "description": "Telefones e e-mails de contato do cliente.",
+   "idx": 19
+  },
+  {
+   "fieldname": "sec_enderecos",
+   "label": "Endereços",
+   "fieldtype": "Section Break",
+   "idx": 20
+  },
+  {
+   "fieldname": "addresses",
+   "label": "Endereços",
+   "fieldtype": "Table",
+   "options": "Client Address",
+   "description": "Endereços do cliente. Marque um como principal para documentos.",
+   "idx": 21
+  },
+  {
+   "fieldname": "sec_obs",
+   "label": "Observações",
+   "fieldtype": "Section Break",
+   "collapsible": 1,
+   "idx": 22
+  },
+  {
+   "fieldname": "observacoes",
+   "label": "Observações",
+   "fieldtype": "Text Editor",
+   "description": "Anotações internas sobre o cliente.",
+   "idx": 23
+  }
+ ],
+ "links": [
+  {
+   "link_doctype": "Legal Case",
+   "link_fieldname": "client",
+   "group": "Jurídico",
+   "idx": 1
+  },
+  {
+   "link_doctype": "Hearing",
+   "link_fieldname": "client",
+   "group": "Jurídico",
+   "idx": 2
+  },
+  {
+   "link_doctype": "Deadline",
+   "link_fieldname": "client",
+   "group": "Jurídico",
+   "idx": 3
+  },
+  {
+   "link_doctype": "Legal Task",
+   "link_fieldname": "client",
+   "group": "Jurídico",
+   "idx": 4
+  },
+  {
+   "link_doctype": "Case Communication",
+   "link_fieldname": "client",
+   "group": "Jurídico",
+   "idx": 5
+  },
+  {
+   "link_doctype": "Service Record",
+   "link_fieldname": "client",
+   "group": "Jurídico",
+   "idx": 6
+  },
+  {
+   "link_doctype": "Time Entry",
+   "link_fieldname": "client",
+   "group": "Jurídico",
+   "idx": 7
+  },
+  {
+   "link_doctype": "Fee Agreement",
+   "link_fieldname": "client",
+   "group": "Financeiro",
+   "idx": 8
+  },
+  {
+   "link_doctype": "Legal Payment",
+   "link_fieldname": "client",
+   "group": "Financeiro",
+   "idx": 9
+  },
+  {
+   "link_doctype": "Court Cost",
+   "link_fieldname": "client",
+   "group": "Financeiro",
+   "idx": 10
+  }
+ ],
+ "permissions": [
+  {
+   "role": "Advocacia Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "idx": 1
+  },
+  {
+   "role": "Advocacia User",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 0,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "idx": 2
+  },
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "idx": 3
+  }
+ ],
+ "show_title_field_in_link": 1
+}

@@ -2,9 +2,9 @@ frappe.provide("advocacia.timer_global");
 
 (function () {
 	var WIDGET_ID = "advocacia-timer-global";
-	var DOCTYPE = "Registro de Horas";
+	var DOCTYPE = "Time Entry";
 	var SYNC_MS = 45000;
-	var API = "advocacia.advocacia.doctype.registro_de_horas.registro_de_horas.get_timer_ativo_usuario";
+	var API = "advocacia.advocacia.doctype.time_entry.time_entry.get_timer_ativo_usuario";
 
 	var state = null;
 	var tickInterval = null;
@@ -199,7 +199,7 @@ frappe.provide("advocacia.timer_global");
 			},
 			error: function (err) {
 				if (isPermissionError(err)) {
-					disableSync("sem permissão para Registro de Horas");
+					disableSync("sem permissão para Time Entry");
 					return;
 				}
 			},

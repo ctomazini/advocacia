@@ -48,9 +48,9 @@ frappe.provide("advocacia.painel.hero");
 	            )
 	        );
 	    }
-	    if (resumo.parcelas_vencidas) {
+	    if (resumo.fee_installments_vencidas) {
 	        chunks.push(
-	            part(__("{0} parcela(s) vencida(s) aguardam recebimento", [resumo.parcelas_vencidas]))
+	            part(__("{0} parcela(s) vencida(s) aguardam recebimento", [resumo.fee_installments_vencidas]))
 	        );
 	    }
 	    if (resumo.prazos_urgentes) {
@@ -103,12 +103,12 @@ frappe.provide("advocacia.painel.hero");
 	        "</span>";
 	    pulse_stats +=
 	        '<span class="painel-hero-stat"><strong>' +
-	        (kpis.tarefas_pendentes || 0) +
+	        (kpis.legal_tasks_pendentes || 0) +
 	        "</strong> " +
 	        __("tarefa(s) aberta(s)") +
 	        "</span>" +
 	        '<span class="painel-hero-stat"><strong>' +
-	        (resumo.parcelas_vencidas || 0) +
+	        (resumo.fee_installments_vencidas || 0) +
 	        "</strong> " +
 	        __("parcela(s) vencida(s)") +
 	        "</span>" +
@@ -144,17 +144,17 @@ frappe.provide("advocacia.painel.hero");
 
 	AP.render_acoes_rapidas = function() {
 	    var actions = [
-	        { label: __("Cliente"), icon: "user-plus", dt: "Cliente" },
-	        { label: __("Serviço"), icon: "folder-plus", dt: "Servico" },
-	        { label: __("Audiência"), icon: "calendar-plus-2", dt: "Audiencia" },
-	        { label: __("Prazo"), icon: "clock-plus", dt: "Controle de Prazos" },
-	        { label: __("Comunicação"), icon: "message-square-plus", dt: "Comunicacao" },
-	        { label: __("Tarefa"), icon: "list-plus", dt: "Tarefa" },
-	        { label: __("Honorário"), icon: "file-plus", dt: "Acordo de Honorarios Processuais" },
-	        { label: __("Pagamento"), icon: "circle-dollar-sign", dt: "Pagamento" },
-	        { label: __("Custa"), icon: "receipt", dt: "Custa Processual" },
-	        { label: __("Horas"), icon: "clock", dt: "Registro de Horas" },
-	        { label: __("Despesa"), icon: "wallet", dt: "Despesa do Escritorio" },
+	        { label: __("Client"), icon: "user-plus", dt: "Client" },
+	        { label: __("Serviço"), icon: "folder-plus", dt: "Legal Case" },
+	        { label: __("Audiência"), icon: "calendar-plus-2", dt: "Hearing" },
+	        { label: __("Prazo"), icon: "clock-plus", dt: "Deadline" },
+	        { label: __("Comunicação"), icon: "message-square-plus", dt: "Case Communication" },
+	        { label: __("Legal Task"), icon: "list-plus", dt: "Legal Task" },
+	        { label: __("Honorário"), icon: "file-plus", dt: "Fee Agreement" },
+	        { label: __("Legal Payment"), icon: "circle-dollar-sign", dt: "Legal Payment" },
+	        { label: __("Custa"), icon: "receipt", dt: "Court Cost" },
+	        { label: __("Horas"), icon: "clock", dt: "Time Entry" },
+	        { label: __("Despesa"), icon: "wallet", dt: "Office Expense" },
 	    ];
 	    var h =
 	        '<div class="painel-actions-wrap">' +

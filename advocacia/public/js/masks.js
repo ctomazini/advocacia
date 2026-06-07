@@ -132,7 +132,7 @@ const AdvocaciaMasks = {
 		}
 	},
 
-	setupClienteForm(frm) {
+	setupClientForm(frm) {
 		if (!window.AdvocaciaMasks) return;
 
 		if (frm.doc.tipo_pessoa === "Pessoa Física") {
@@ -154,7 +154,7 @@ const AdvocaciaMasks = {
 		});
 	},
 
-	setupServicoProcessoMask(frm) {
+	setupLegal CaseProcessoMask(frm) {
 		const field = frm.fields_dict && frm.fields_dict.numero_processo;
 		if (!field || !field.$input) return;
 

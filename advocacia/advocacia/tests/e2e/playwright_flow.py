@@ -44,23 +44,23 @@ REPORT_PATH = os.environ.get(
 )
 
 DOCTYPES_ORDER = [
-	"Comarca",
-	"Tribunal",
-	"Vara",
-	"Fase Processual",
-	"Cliente",
-	"Servico",
-	"Acordo de Honorarios Processuais",
-	"Registro de Atos",
-	"Audiencia",
-	"Controle de Prazos",
-	"Tarefa",
-	"Comunicacao",
-	"Registro de Horas",
-	"Custa Processual",
-	"Despesa do Escritorio",
-	"Template Documento",
-	"Kit de Documentos",
+	"Jurisdiction",
+	"Court",
+	"Court Branch",
+	"Case Phase",
+	"Client",
+	"Legal Case",
+	"Fee Agreement",
+	"Service Record",
+	"Hearing",
+	"Deadline",
+	"Legal Task",
+	"Case Communication",
+	"Time Entry",
+	"Court Cost",
+	"Office Expense",
+	"Document Template",
+	"Document Kit",
 ]
 
 
@@ -246,11 +246,11 @@ def main() -> int:
 	cpf_masked = format_cpf(_gerar_cpf_valido())
 
 	names = {
-		"comarca": f"Comarca E2E {RUN_ID}",
-		"tribunal": f"Tribunal E2E {RUN_ID}",
-		"vara": f"Vara E2E {RUN_ID}",
+		"jurisdiction": f"Jurisdiction E2E {RUN_ID}",
+		"court": f"Court E2E {RUN_ID}",
+		"court_branch_link": f"Court Branch E2E {RUN_ID}",
 		"fase": f"Fase E2E {RUN_ID}",
-		"cliente": f"Cliente {MARKER} {RUN_ID}",
+		"client": f"Client {MARKER} {RUN_ID}",
 	}
 
 	with sync_playwright() as p:
@@ -269,80 +269,80 @@ def main() -> int:
 
 		print("\n--- Cadastro auxiliar ---")
 
-		run_step("Comarca", lambda: (
-			open_new(page, "Comarca"),
-			fill_input(page, "comarca_name", names["comarca"]),
+		run_step("Jurisdiction", lambda: (
+			open_new(page, "Jurisdiction"),
+			fill_input(page, "jurisdiction_name", names["jurisdiction"]),
 			fill_select(page, "uf", "SP"),
 			fill_input(page, "city", "Sao Paulo"),
 			save_form(page),
 		)[-1])
 
-		run_step("Tribunal", lambda: (
-			open_new(page, "Tribunal"),
-			fill_input(page, "tribunal_name", names["tribunal"]),
+		run_step("Court", lambda: (
+			open_new(page, "Court"),
+			fill_input(page, "court_name", names["court"]),
 			fill_input(page, "abbreviation", f"T{RUN_ID[-4:]}"),
 			fill_select(page, "jurisdiction", "Estadual"),
 			save_form(page),
 		)[-1])
 
-		run_step("Vara", lambda: (
-			open_new(page, "Vara"),
-			fill_input(page, "vara_name", names["vara"]),
-			fill_link(page, "comarca", names["comarca"]),
+		run_step("Court Branch", lambda: (
+			open_new(page, "Court Branch"),
+			fill_input(page, "court_branch_name", names["court_branch_link"]),
+			fill_link(page, "jurisdiction", names["jurisdiction"]),
 			fill_select(page, "tipo", "Cível"),
 			save_form(page),
 		)[-1])
 
-		run_step("Fase Processual", lambda: (
-			open_new(page, "Fase Processual"),
-			fill_input(page, "phase_name", names["fase"]),
+		run_step("Case Phase", lambda: (
+			open_new(page, "Case Phase"),
+			fill_input(page, "case_phase_name", names["fase"]),
 			fill_input(page, "sort_order", "99"),
 			save_form(page),
 		)[-1])
 
 		print("\n--- Fluxo principal ---")
 
-		run_step("Cliente", lambda: (
-			open_new(page, "Cliente"),
+		run_step("Client", lambda: (
+			open_new(page, "Client"),
 			fill_select(page, "tipo_pessoa", "Pessoa Física"),
-			fill_input(page, "nome", names["cliente"]),
+			fill_input(page, "nome", names["client"]),
 			fill_input(page, "cpf", cpf_masked),
 			fill_input(page, "email", f"e2e{RUN_ID}@exemplo.com"),
 			save_form(page),
 		)[-1])
 
-		cliente_name = report.created.get("Cliente", names["cliente"])
+		cliente_name = report.created.get("Client", names["client"])
 
-		run_step("Servico", lambda: (
-			open_new(page, "Servico"),
-			fill_link(page, "cliente", cliente_name),
+		run_step("Legal Case", lambda: (
+			open_new(page, "Legal Case"),
+			fill_link(page, "client", cliente_name),
 			fill_select(page, "tipo", "Consultoria"),
 			fill_textarea(page, "observacoes", f"{MARKER} servico {RUN_ID}"),
 			save_form(page),
 		)[-1])
 
-		servico_name = report.created.get("Servico", "")
+		servico_name = report.created.get("Legal Case", "")
 
-		run_step("Acordo de Honorarios Processuais", lambda: (
-			open_new(page, "Acordo de Honorarios Processuais"),
-			fill_link(page, "servico", servico_name),
+		run_step("Fee Agreement", lambda: (
+			open_new(page, "Fee Agreement"),
+			fill_link(page, "legal_case", servico_name),
 			fill_select(page, "modo_honorarios", "Honorários Diretos"),
-			fill_select(page, "tipo_de_cobrança", "Valor fixo"),
+			fill_select(page, "billing_type", "Valor fixo"),
 			fill_input(page, "valor_total_do_acordo", "5000"),
-			fill_textarea(page, "observações", f"{MARKER} acordo {RUN_ID}"),
+			fill_textarea(page, "remarks", f"{MARKER} acordo {RUN_ID}"),
 			save_form(page),
 		)[-1])
 
-		run_step("Registro de Atos", lambda: (
-			open_new(page, "Registro de Atos"),
-			fill_link(page, "servico", servico_name),
+		run_step("Service Record", lambda: (
+			open_new(page, "Service Record"),
+			fill_link(page, "legal_case", servico_name),
 			fill_textarea(page, "observacoes", f"{MARKER} atos {RUN_ID}"),
 			save_form(page),
 		)[-1])
 
-		run_step("Audiencia", lambda: (
-			open_new(page, "Audiencia"),
-			fill_link(page, "servico", servico_name),
+		run_step("Hearing", lambda: (
+			open_new(page, "Hearing"),
+			fill_link(page, "legal_case", servico_name),
 			page.locator('.frappe-control[data-fieldname="data_hora"] input:visible').first.fill(
 				f"{today()} 14:00:00"
 			),
@@ -352,9 +352,9 @@ def main() -> int:
 			save_form(page),
 		)[-1])
 
-		run_step("Controle de Prazos", lambda: (
-			open_new(page, "Controle de Prazos"),
-			fill_link(page, "servico", servico_name),
+		run_step("Deadline", lambda: (
+			open_new(page, "Deadline"),
+			fill_link(page, "legal_case", servico_name),
 			fill_input(page, "descricao", f"{MARKER} prazo {RUN_ID}"),
 			page.locator('.frappe-control[data-fieldname="data_prazo"] input:visible').first.fill(
 				add_days(today(), 7)
@@ -363,9 +363,9 @@ def main() -> int:
 			save_form(page),
 		)[-1])
 
-		run_step("Tarefa", lambda: (
-			open_new(page, "Tarefa"),
-			fill_link(page, "servico", servico_name),
+		run_step("Legal Task", lambda: (
+			open_new(page, "Legal Task"),
+			fill_link(page, "legal_case", servico_name),
 			fill_input(page, "titulo", f"{MARKER} tarefa {RUN_ID}"),
 			page.locator('.frappe-control[data-fieldname="data_limite"] input:visible').first.fill(
 				add_days(today(), 3)
@@ -373,26 +373,26 @@ def main() -> int:
 			save_form(page),
 		)[-1])
 
-		run_step("Comunicacao", lambda: (
-			open_new(page, "Comunicacao"),
-			fill_link(page, "servico", servico_name),
+		run_step("Case Communication", lambda: (
+			open_new(page, "Case Communication"),
+			fill_link(page, "legal_case", servico_name),
 			fill_input(page, "assunto", f"{MARKER} comunicacao {RUN_ID}"),
 			fill_select(page, "tipo", "Email"),
 			save_form(page),
 		)[-1])
 
-		run_step("Registro de Horas", lambda: (
-			open_new(page, "Registro de Horas"),
-			fill_link(page, "servico", servico_name),
+		run_step("Time Entry", lambda: (
+			open_new(page, "Time Entry"),
+			fill_link(page, "legal_case", servico_name),
 			page.locator('.frappe-control[data-fieldname="data"] input:visible').first.fill(today()),
 			fill_input(page, "duracao_minutos", "60"),
 			fill_input(page, "atividade", f"{MARKER} horas {RUN_ID}"),
 			save_form(page),
 		)[-1])
 
-		run_step("Custa Processual", lambda: (
-			open_new(page, "Custa Processual"),
-			fill_link(page, "servico", servico_name),
+		run_step("Court Cost", lambda: (
+			open_new(page, "Court Cost"),
+			fill_link(page, "legal_case", servico_name),
 			fill_input(page, "descricao", f"{MARKER} custa {RUN_ID}"),
 			fill_input(page, "valor", "150"),
 			page.locator('.frappe-control[data-fieldname="data_pagamento"] input:visible').first.fill(
@@ -401,8 +401,8 @@ def main() -> int:
 			save_form(page),
 		)[-1])
 
-		run_step("Despesa do Escritorio", lambda: (
-			open_new(page, "Despesa do Escritorio"),
+		run_step("Office Expense", lambda: (
+			open_new(page, "Office Expense"),
 			fill_input(page, "descricao", f"{MARKER} despesa {RUN_ID}"),
 			fill_input(page, "valor", "200"),
 			page.locator('.frappe-control[data-fieldname="data_vencimento"] input:visible').first.fill(
@@ -412,15 +412,15 @@ def main() -> int:
 		)[-1])
 
 		# Exigem anexo — falha esperada sem upload de arquivo
-		run_step("Template Documento", lambda: (
-			open_new(page, "Template Documento"),
+		run_step("Document Template", lambda: (
+			open_new(page, "Document Template"),
 			fill_input(page, "titulo", f"{MARKER} template {RUN_ID}"),
 			fill_select(page, "tipo_documento", "Contrato"),
 			save_form(page),
 		)[-1])
 
-		run_step("Kit de Documentos", lambda: (
-			open_new(page, "Kit de Documentos"),
+		run_step("Document Kit", lambda: (
+			open_new(page, "Document Kit"),
 			fill_input(page, "titulo", f"{MARKER} kit {RUN_ID}"),
 			save_form(page),
 		)[-1])
@@ -430,10 +430,10 @@ def main() -> int:
 				page.goto(f"{BASE_URL}/app/servico/{servico_name}", wait_until="domcontentloaded")
 				wait_form_ready(page)
 				page.wait_for_selector(".form-dashboard", timeout=15000)
-				report.add(StepResult("Connections (Servico)", "ok", docname=servico_name))
-				print("	 OK	 Connections (Servico): dashboard visível")
+				report.add(StepResult("Connections (Legal Case)", "ok", docname=servico_name))
+				print("	 OK	 Connections (Legal Case): dashboard visível")
 			except Exception as exc:
-				report.add(StepResult("Connections (Servico)", "fail", detail=str(exc)[:200]))
+				report.add(StepResult("Connections (Legal Case)", "fail", detail=str(exc)[:200]))
 				print(f"  FAIL Connections: {exc}")
 
 		browser.close()

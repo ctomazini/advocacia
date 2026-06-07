@@ -25,7 +25,7 @@ Relatórios de conformidade gerados na fase 2. Atualizar quando o código mudar.
 | [audit_dashboard.md](./audit_dashboard.md) | Painel backend/frontend modular, soft refresh |
 | [audit_data_integrity.md](./audit_data_integrity.md) | CPF/CNPJ/CNJ, sync financeiro |
 | [audit_google_calendar.md](./audit_google_calendar.md) | Audiência/Prazo → Event → Google |
-| [audit_links.md](./audit_links.md) | Hub Servico, Connections, navegação filtrada |
+| [audit_links.md](./audit_links.md) | Hub Legal Case, Connections, navegação filtrada |
 | [audit_usability.md](./audit_usability.md) | Máscaras, filtros de lista, sidebar, tooltips |
 | [audit_ai_readiness.md](./audit_ai_readiness.md) | Roadmap `agent_api.py` (pós-deploy) |
 

@@ -86,7 +86,7 @@ def _get_data(filters):
 		servico_filters["area"] = filters.area
 
 	servicos = frappe.get_all(
-		"Servico",
+		"Legal Case",
 		filters=servico_filters,
 		fields=["name", "area", "status", "data_abertura", "modified"],
 		limit_page_length=0,
@@ -186,39 +186,39 @@ def _get_data(filters):
 def _sum_honorarios_by_servico():
 	result = defaultdict(float)
 	for row in frappe.get_all(
-		"Acordo de Honorarios Processuais",
-		fields=["servico", "valor_total_do_acordo"],
+		"Fee Agreement",
+		fields=["legal_case", "valor_total_do_acordo"],
 		limit_page_length=0,
 	):
-		if row.servico:
-			result[row.servico] += flt(row.valor_total_do_acordo)
+		if row.legal_case:
+			result[row.legal_case] += flt(row.valor_total_do_acordo)
 	return result
 
 
 def _sum_custas_by_servico():
-	if not frappe.db.table_exists("Custa Processual"):
+	if not frappe.db.table_exists("Court Cost"):
 		return defaultdict(float)
 	result = defaultdict(float)
 	for row in frappe.get_all(
-		"Custa Processual",
+		"Court Cost",
 		filters={"status": ["in", ["Pago", "Repassado"]]},
-		fields=["servico", "valor"],
+		fields=["legal_case", "valor"],
 		limit_page_length=0,
 	):
-		if row.servico:
-			result[row.servico] += flt(row.valor)
+		if row.legal_case:
+			result[row.legal_case] += flt(row.valor)
 	return result
 
 
 def _sum_horas_by_servico():
-	if not frappe.db.table_exists("Registro de Horas"):
+	if not frappe.db.table_exists("Time Entry"):
 		return defaultdict(float)
 	result = defaultdict(float)
 	for row in frappe.get_all(
-		"Registro de Horas",
-		fields=["servico", "duracao_horas"],
+		"Time Entry",
+		fields=["legal_case", "duracao_horas"],
 		limit_page_length=0,
 	):
-		if row.servico:
-			result[row.servico] += flt(row.duracao_horas)
+		if row.legal_case:
+			result[row.legal_case] += flt(row.duracao_horas)
 	return result

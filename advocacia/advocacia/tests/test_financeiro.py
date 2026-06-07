@@ -26,16 +26,16 @@ class TestFinanceiro(FrappeTestCase):
 	def test_resync_atualiza_valor_parcela(self):
 		acordo = create_test_acordo(num_parcelas=1, valor_total=1000)
 		pag_name = get_acordo_pagamentos(acordo.name)[0].name
-		acordo_doc = frappe.get_doc("Acordo de Honorarios Processuais", acordo.name)
-		acordo_doc.parcelas[0].valor_total = 1500
+		acordo_doc = frappe.get_doc("Fee Agreement", acordo.name)
+		acordo_doc.fee_installments[0].valor_total = 1500
 		acordo_doc.valor_total_do_acordo = 1500
 		acordo_doc.save(ignore_permissions=True)
 		resync_pagamentos_acordo(acordo.name)
-		self.assertEqual(flt(frappe.db.get_value("Pagamento", pag_name, "valor")), 1500)
+		self.assertEqual(flt(frappe.db.get_value("Legal Payment", pag_name, "valor")), 1500)
 
 	def test_acordo_sem_parcelas_sem_pagamento(self):
 		acordo = create_test_acordo(num_parcelas=0, valor_total=0, parcelas=[])
-		acordo.número_de_parcelas = 0
+		acordo.installment_count = 0
 		acordo.save(ignore_permissions=True)
 		pags = get_acordo_pagamentos(acordo.name)
 		self.assertEqual(len(pags), 0)
@@ -45,7 +45,7 @@ class TestFinanceiro(FrappeTestCase):
 		from advocacia.advocacia.financeiro import gerar_pagamento_atos
 
 		result = gerar_pagamento_atos(registro.name)
-		pag = frappe.get_doc("Pagamento", result["pagamento"])
+		pag = frappe.get_doc("Legal Payment", result["payment"])
 		self.assertEqual(flt(pag.valor), 4500)
 
 	def test_bulk_delete_pagamentos_pendentes(self):
@@ -56,7 +56,7 @@ class TestFinanceiro(FrappeTestCase):
 
 	def test_bulk_delete_ignora_recebido(self):
 		acordo = create_test_acordo(num_parcelas=1, valor_total=500)
-		pag = frappe.get_doc("Pagamento", get_acordo_pagamentos(acordo.name)[0].name)
+		pag = frappe.get_doc("Legal Payment", get_acordo_pagamentos(acordo.name)[0].name)
 		pag.status = "Recebido"
 		pag.data_recebimento = today()
 		pag.valor_recebido = pag.valor
@@ -72,6 +72,6 @@ class TestFinanceiro(FrappeTestCase):
 		)
 
 		result = gerar_pagamento_atos(registro.name)
-		cancelar_cobranca_pagamento_atos(result["pagamento"])
-		pag = frappe.get_doc("Pagamento", result["pagamento"])
+		cancelar_cobranca_pagamento_atos(result["payment"])
+		pag = frappe.get_doc("Legal Payment", result["payment"])
 		self.assertEqual(pag.status, "Cancelado")

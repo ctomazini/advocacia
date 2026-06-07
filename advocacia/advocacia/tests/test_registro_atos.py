@@ -7,7 +7,7 @@ from advocacia.advocacia.financeiro import (
 	cancelar_cobranca_pagamento_atos,
 	gerar_pagamento_atos,
 )
-from advocacia.advocacia.tests.test_setup import create_test_registro_atos, create_test_servico
+from advocacia.advocacia.tests.test_setup import create_test_registro_atos, create_test_legal_case
 
 
 class TestRegistroAtos(FrappeTestCase):
@@ -23,9 +23,9 @@ class TestRegistroAtos(FrappeTestCase):
 	def test_gerar_cobranca_cria_pagamento(self):
 		registro = create_test_registro_atos()
 		result = gerar_pagamento_atos(registro.name)
-		pagamento_name = result.get("pagamento")
+		pagamento_name = result.get("payment")
 		self.assertTrue(pagamento_name)
-		pag = frappe.get_doc("Pagamento", pagamento_name)
+		pag = frappe.get_doc("Legal Payment", pagamento_name)
 		self.assertEqual(pag.tipo_origem, "Atos Advocatícios")
 		self.assertEqual(flt(pag.valor), 4500)
 
@@ -33,8 +33,8 @@ class TestRegistroAtos(FrappeTestCase):
 		registro = create_test_registro_atos()
 		result = gerar_pagamento_atos(registro.name)
 		registro.reload()
-		self.assertTrue(all(a.status == "Cobrado" for a in registro.atos))
-		self.assertTrue(all(a.pagamento == result["pagamento"] for a in registro.atos))
+		self.assertTrue(all(a.status == "Cobrado" for a in registro.acts))
+		self.assertTrue(all(a.payment == result["payment"] for a in registro.acts))
 		self.assertEqual(registro.status, "Cobrado")
 
 	def test_cobranca_parcial(self):
@@ -67,22 +67,22 @@ class TestRegistroAtos(FrappeTestCase):
 	def test_cancelar_cobranca_libera_atos(self):
 		registro = create_test_registro_atos()
 		result = gerar_pagamento_atos(registro.name)
-		cancelar_cobranca_pagamento_atos(result["pagamento"])
+		cancelar_cobranca_pagamento_atos(result["payment"])
 		registro.reload()
-		self.assertTrue(all(a.status == "Pendente" for a in registro.atos))
+		self.assertTrue(all(a.status == "Pendente" for a in registro.acts))
 
-	def test_cliente_preenchido_via_servico(self):
-		servico = create_test_servico()
+	def test_client_preenchido_via_servico(self):
+		servico = create_test_legal_case()
 		registro = create_test_registro_atos(servico=servico.name)
-		self.assertEqual(registro.cliente, servico.cliente)
+		self.assertEqual(registro.client, servico.client)
 
 	def test_ato_sem_data_falha(self):
-		servico = create_test_servico().name
+		servico = create_test_legal_case().name
 		with self.assertRaises((ValidationError, frappe.exceptions.MandatoryError)):
 			frappe.get_doc(
 				{
-					"doctype": "Registro de Atos",
-					"servico": servico,
-					"atos": [{"tipo": "Inicial", "valor": 100}],
+					"doctype": "Service Record",
+					"legal_case": servico,
+					"acts": [{"tipo": "Inicial", "valor": 100}],
 				}
 			).insert(ignore_permissions=True)

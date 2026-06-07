@@ -30,7 +30,7 @@ frappe.query_reports["produtividade"] = {
 		},
 		{
 			fieldname: "incluir_horas",
-			label: __("Incluir Registro de Horas"),
+			label: __("Incluir Time Entry"),
 			fieldtype: "Check",
 			default: 1,
 		},

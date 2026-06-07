@@ -5,12 +5,12 @@ from frappe.tests.utils import FrappeTestCase
 from advocacia.advocacia.tests.test_setup import _uid
 
 
-class TestVara(FrappeTestCase):
+class TestCourtBranch(FrappeTestCase):
 	def setUp(self):
-		self.comarca = frappe.get_doc(
+		self.jurisdiction = frappe.get_doc(
 			{
-				"doctype": "Comarca",
-				"comarca_name": _uid("Comarca Vara"),
+				"doctype": "Jurisdiction",
+				"jurisdiction_name": _uid("Jurisdiction Court Branch"),
 				"uf": "RS",
 			}
 		).insert(ignore_permissions=True)
@@ -19,63 +19,63 @@ class TestVara(FrappeTestCase):
 		frappe.db.rollback()
 
 	def test_create(self):
-		nome = _uid("1ª Vara Cível")
+		nome = _uid("1ª Court Branch Cível")
 		doc = frappe.get_doc(
 			{
-				"doctype": "Vara",
-				"vara_name": nome,
-				"comarca": self.comarca.name,
+				"doctype": "Court Branch",
+				"court_branch_name": nome,
+				"jurisdiction": self.jurisdiction.name,
 				"court_type": "Cível",
 			}
 		).insert(ignore_permissions=True)
-		self.assertTrue(frappe.db.exists("Vara", doc.name))
-		self.assertEqual(doc.comarca, self.comarca.name)
+		self.assertTrue(frappe.db.exists("Court Branch", doc.name))
+		self.assertEqual(doc.jurisdiction, self.jurisdiction.name)
 
 	def test_read_and_update(self):
-		nome = _uid("Vara Update")
+		nome = _uid("Court Branch Update")
 		doc = frappe.get_doc(
 			{
-				"doctype": "Vara",
-				"vara_name": nome,
-				"comarca": self.comarca.name,
+				"doctype": "Court Branch",
+				"court_branch_name": nome,
+				"jurisdiction": self.jurisdiction.name,
 				"court_type": "Criminal",
 			}
 		).insert(ignore_permissions=True)
-		loaded = frappe.get_doc("Vara", doc.name)
+		loaded = frappe.get_doc("Court Branch", doc.name)
 		self.assertEqual(loaded.court_type, "Criminal")
 
 		loaded.court_type = "Família"
 		loaded.save(ignore_permissions=True)
-		self.assertEqual(frappe.db.get_value("Vara", doc.name, "court_type"), "Família")
+		self.assertEqual(frappe.db.get_value("Court Branch", doc.name, "court_type"), "Família")
 
-	def test_required_vara_name_falha(self):
+	def test_required_court_branch_name_falha(self):
 		with self.assertRaises(ValidationError):
 			frappe.get_doc(
-				{"doctype": "Vara", "comarca": self.comarca.name, "court_type": "Cível"}
+				{"doctype": "Court Branch", "jurisdiction": self.jurisdiction.name, "court_type": "Cível"}
 			).insert(ignore_permissions=True)
 
 	def test_required_comarca_falha(self):
 		with self.assertRaises(ValidationError):
 			frappe.get_doc(
-				{"doctype": "Vara", "vara_name": _uid("Sem Comarca"), "court_type": "Cível"}
+				{"doctype": "Court Branch", "court_branch_name": _uid("Sem Jurisdiction"), "court_type": "Cível"}
 			).insert(ignore_permissions=True)
 
-	def test_vara_name_duplicado_falha(self):
-		nome = _uid("Vara Dup")
+	def test_court_branch_name_duplicado_falha(self):
+		nome = _uid("Court Branch Dup")
 		frappe.get_doc(
 			{
-				"doctype": "Vara",
-				"vara_name": nome,
-				"comarca": self.comarca.name,
+				"doctype": "Court Branch",
+				"court_branch_name": nome,
+				"jurisdiction": self.jurisdiction.name,
 				"court_type": "Cível",
 			}
 		).insert(ignore_permissions=True)
 		with self.assertRaises((DuplicateEntryError, frappe.UniqueValidationError)):
 			frappe.get_doc(
 				{
-					"doctype": "Vara",
-					"vara_name": nome,
-					"comarca": self.comarca.name,
+					"doctype": "Court Branch",
+					"court_branch_name": nome,
+					"jurisdiction": self.jurisdiction.name,
 					"court_type": "Trabalho",
 				}
 			).insert(ignore_permissions=True)

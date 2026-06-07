@@ -22,7 +22,7 @@ def get(
 	list_limit=5,
 	list_limits=None,
 ):
-	if not frappe.has_permission("Servico", "read"):
+	if not frappe.has_permission("Legal Case", "read"):
 		frappe.throw(_("Sem permissão"), frappe.PermissionError)
 
 	limit_start = cint(limit_start)
@@ -43,7 +43,7 @@ def get(
 	)
 	resumo = painel_kpis._build_resumo(hoje, kpis, financeiro, periodo_dias)
 	alertas = painel_prazos._build_alertas(hoje, periodo_fim)
-	parcelas_cap = _list_cap(list_limits, "parcelas")
+	parcelas_cap = _list_cap(list_limits, "fee_installments")
 	despesas_cap = _list_cap(list_limits, "despesas")
 	custas_cap = _list_cap(list_limits, "custas")
 	comunicacoes_cap = _list_cap(list_limits, "comunicacoes")
@@ -80,7 +80,7 @@ def get(
 	list_meta = {
 		"timeline": {"showing": len(timeline), "total": len(timeline_full)},
 		"comunicacoes": {"showing": len(comunicacoes_pendentes), "total": len(comunicacoes_all)},
-		"parcelas": {"showing": len(parcelas), "total": len(parcelas_all)},
+		"fee_installments": {"showing": len(parcelas), "total": len(parcelas_all)},
 		"despesas": {"showing": len(despesas_pendentes), "total": len(despesas_all)},
 		"custas": {"showing": len(custas_pendentes_repasse), "total": len(custas_all)},
 	}
@@ -97,7 +97,7 @@ def get(
 			"alertas": alertas,
 			"centro_atencao": centro_atencao,
 			"timeline": timeline,
-			"parcelas": parcelas,
+			"fee_installments": parcelas,
 			"despesas_pendentes": despesas_pendentes,
 			"total_despesas_mes": total_despesas_mes,
 			"custas_pendentes_repasse": custas_pendentes_repasse,

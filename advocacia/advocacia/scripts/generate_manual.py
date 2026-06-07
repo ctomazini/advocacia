@@ -7,51 +7,51 @@ import os
 from pathlib import Path
 
 DOCTYPE_ORDER = [
-	("Cadastros Básicos", ["Cliente", "Comarca", "Vara", "Tribunal", "Fase Processual"]),
-	("Serviço Jurídico (Hub Central)", ["Servico"]),
+	("Cadastros Básicos", ["Client", "Jurisdiction", "Court Branch", "Court", "Case Phase"]),
+	("Serviço Jurídico (Hub Central)", ["Legal Case"]),
 	(
 		"Financeiro",
-		["Acordo de Honorarios Processuais", "Pagamento", "Custa Processual", "Despesa do Escritorio"],
+		["Fee Agreement", "Legal Payment", "Court Cost", "Office Expense"],
 	),
 	(
 		"Acompanhamento Processual",
-		["Audiencia", "Controle de Prazos", "Tarefa", "Comunicacao"],
+		["Hearing", "Deadline", "Legal Task", "Case Communication"],
 	),
-	("Registro de Atividades", ["Registro de Atos", "Registro de Horas"]),
-	("Documentos", ["Template Documento", "Kit de Documentos"]),
-	("Configuração", ["Configuracao do Escritorio"]),
+	("Registro de Atividades", ["Service Record", "Time Entry"]),
+	("Documentos", ["Document Template", "Document Kit"]),
+	("Configuração", ["Office Settings"]),
 ]
 
 DOCTYPE_DESCRIPTIONS = {
-	"Cliente": (
+	"Client": (
 		"Cadastro completo do cliente do escritório. Centraliza dados pessoais, "
 		"documentação, endereços e contatos. Todo serviço jurídico está vinculado a um cliente."
 	),
-	"Servico": (
+	"Legal Case": (
 		"O **Serviço** é o DocType central (hub) do sistema. Representa um processo "
 		"judicial ou consultoria jurídica. Audiências, prazos, pagamentos e atos orbitam um Serviço."
 	),
-	"Acordo de Honorarios Processuais": (
+	"Fee Agreement": (
 		"Define honorários contratados com o cliente, parcelas e vencimentos. "
-		"O sistema sincroniza parcelas com registros de Pagamento."
+		"O sistema sincroniza parcelas com registros de Legal Payment."
 	),
-	"Pagamento": (
+	"Legal Payment": (
 		"Registro operacional de recebimento. Diferente da Parcela (contratual), "
 		"registra o dinheiro que efetivamente entrou no escritório."
 	),
-	"Audiencia": (
+	"Hearing": (
 		"Audiências judiciais vinculadas a um serviço. Sincroniza com o calendário Frappe (Google Calendar)."
 	),
-	"Controle de Prazos": (
+	"Deadline": (
 		"Prazos processuais com data fatal. Notificações automáticas para prazos urgentes (≤3 dias)."
 	),
-	"Comarca": "Divisão judiciária geográfica. Cadastro rígido para consistência.",
-	"Vara": "Unidade judicial dentro de uma comarca.",
-	"Tribunal": "Tribunal de justiça competente (ex.: TJRS, TRF4).",
-	"Fase Processual": "Fase do processo no fluxo (Distribuído, Sentenciado, etc.).",
-	"Template Documento": "Modelo .docx com placeholders para geração automática.",
-	"Kit de Documentos": "Conjunto de templates para geração em lote.",
-	"Configuracao do Escritorio": "Dados institucionais do escritório (OAB, CNPJ, endereço).",
+	"Jurisdiction": "Divisão judiciária geográfica. Cadastro rígido para consistência.",
+	"Court Branch": "Unidade judicial dentro de uma comarca.",
+	"Court": "Court de justiça competente (ex.: TJRS, TRF4).",
+	"Case Phase": "Fase do processo no fluxo (Distribuído, Sentenciado, etc.).",
+	"Document Template": "Modelo .docx com placeholders para geração automática.",
+	"Document Kit": "Conjunto de templates para geração em lote.",
+	"Office Settings": "Dados institucionais do escritório (OAB, CNPJ, endereço).",
 }
 
 SKIP_TYPES = {"Section Break", "Column Break", "Tab Break", "HTML", "Fold", "Button"}
@@ -177,13 +177,13 @@ def generate():
 			"## Fluxos Comuns",
 			"",
 			"### Novo Processo",
-			"1. Cadastre o **Cliente**",
+			"1. Cadastre o **Client**",
 			"2. Crie um **Serviço** com vara, comarca e tribunal",
 			"3. Defina **Acordo de Honorários** com parcelas",
 			"4. Cadastre **Audiências** e **Prazos**",
 			"",
 			"### Recebimento",
-			"1. Registre **Pagamento** quando o cliente pagar",
+			"1. Registre **Legal Payment** quando o cliente pagar",
 			"2. O painel atualiza KPIs financeiros",
 			"",
 			"---",

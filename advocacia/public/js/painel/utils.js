@@ -5,7 +5,7 @@ frappe.provide("advocacia.painel.utils");
 	var PAINEL_LIST_LIMIT_KEYS = [
 	    "timeline",
 	    "comunicacoes",
-	    "parcelas",
+	    "fee_installments",
 	    "despesas",
 	    "custas",
 	];

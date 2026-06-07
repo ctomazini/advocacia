@@ -39,7 +39,7 @@ xcall → advocacia.advocacia.painel_api.get_painel_data
 | `kpis.py` | 181 | KPIs agregados, resumo operacional |
 | `financeiro.py` | 274 | Parcelas, despesas, custas, fluxo, `marcar_parcela` |
 | `prazos.py` | 177 | Audiências, prazos, alertas, centro de atenção |
-| `timeline.py` | 249 | Tarefas, comunicações, horas, timeline |
+| `timeline.py` | 249 | Legal Tasks, comunicações, horas, timeline |
 | `painel_api.py` | 30 | Facade whitelisted (único path de `xcall`) |
 
 **Total backend painel:** ~1.167 linhas.
@@ -97,10 +97,10 @@ xcall → advocacia.advocacia.painel_api.get_painel_data
 
 ```python
 # painel_api.py
-frappe.has_permission("Servico", "read", throw=True)
+frappe.has_permission("Legal Case", "read", throw=True)
 
 # painel/__init__.py
-if not frappe.has_permission("Servico", "read"):
+if not frappe.has_permission("Legal Case", "read"):
     frappe.throw(...)
 
 # _helpers.strip_financial_payload
@@ -115,14 +115,14 @@ user_is_advocacia_manager() → Advocacia Manager
 
 | Origem | DocType(s) | Limit |
 |---|---|---|
-| KPIs | Servico, Cliente, Pagamento, Audiencia, Controle de Prazos | `LIST_LIMIT_MAX=100` |
-| Financeiro | Pagamento, Despesa do Escritorio, Custa Processual | 100 + list_cap |
-| Prazos | Audiencia, Controle de Prazos | 100 |
-| Timeline | Tarefa, Comunicacao, Registro de Horas | 100 |
+| KPIs | Legal Case, Client, Legal Payment, Hearing, Deadline | `LIST_LIMIT_MAX=100` |
+| Financeiro | Legal Payment, Office Expense, Court Cost | 100 + list_cap |
+| Prazos | Hearing, Deadline | 100 |
+| Timeline | Legal Task, Case Communication, Time Entry | 100 |
 
 **N+1:** evitado via `_servico_lookup`, `_cliente_nome_lookup`, `_user_nome_lookup` — uma query em lote por lookup.
 
-**Nomes legíveis:** satélites exibem `title` do Serviço/Cliente, não IDs crus.
+**Nomes legíveis:** satélites exibem `title` do Serviço/Client, não IDs crus.
 
 ---
 

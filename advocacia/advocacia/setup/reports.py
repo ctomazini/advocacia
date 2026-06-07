@@ -6,7 +6,7 @@ import frappe
 LEGACY_REPORT_NAMES = (
 	"Inadimplência",
 	"Fluxo de Caixa Projetado",
-	"Honorários por Cliente",
+	"Honorários por Client",
 	"Carteira Ativa",
 )
 

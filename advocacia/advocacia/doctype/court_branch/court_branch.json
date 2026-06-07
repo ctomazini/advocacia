@@ -1,0 +1,87 @@
+{
+ "doctype": "DocType",
+ "name": "Court Branch",
+ "module": "Advocacia",
+ "custom": 0,
+ "istable": 0,
+ "track_changes": 1,
+ "autoname": "field:court_branch_name",
+ "naming_rule": "By fieldname",
+ "title_field": "court_branch_name",
+ "search_fields": "court_branch_name,comarca",
+ "fields": [
+  {
+   "fieldname": "court_branch_name",
+   "label": "Nome da Court Branch",
+   "fieldtype": "Data",
+   "reqd": 1,
+   "unique": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "allow_in_quick_entry": 1,
+   "description": "Nome único da vara. Usado como identificador do registro.",
+   "idx": 1
+  },
+  {
+   "fieldname": "jurisdiction",
+   "label": "Jurisdiction",
+   "fieldtype": "Link",
+   "options": "Jurisdiction",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "allow_in_quick_entry": 1,
+   "description": "Jurisdiction à qual esta vara pertence.",
+   "idx": 2
+  },
+  {
+   "fieldname": "court_type",
+   "label": "Tipo",
+   "fieldtype": "Select",
+   "options": "Cível\nCriminal\nFamília\nTrabalho\nFederal\nJuizado Especial\nFazenda Pública",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "description": "Tipo: Cível, Criminal, Família, Trabalho, Federal ou Juizado Especial.",
+   "idx": 3
+  }
+ ],
+ "permissions": [
+  {
+   "role": "Advocacia Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "idx": 1
+  },
+  {
+   "role": "Advocacia User",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 0,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "idx": 2
+  },
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "idx": 3
+  }
+ ],
+ "sort_field": "court_branch_name",
+ "sort_order": "ASC",
+ "quick_entry": 1,
+ "show_title_field_in_link": 1
+}

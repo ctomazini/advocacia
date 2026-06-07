@@ -1,0 +1,245 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-05-31 12:00:00",
+ "custom": 0,
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "informacoes_section",
+  "title",
+  "servico",
+  "cliente",
+  "tipo",
+  "column_break_info",
+  "descricao",
+  "status",
+  "valores_section",
+  "valor",
+  "data_pagamento",
+  "column_break_val",
+  "repassar_cliente",
+  "data_repasse",
+  "forma_pagamento",
+  "anexos_section",
+  "comprovante",
+  "observacoes_section",
+  "observacoes"
+ ],
+ "fields": [
+  {
+   "fieldname": "informacoes_section",
+   "fieldtype": "Section Break",
+   "label": "Informações",
+   "idx": 1
+  },
+  {
+   "fieldname": "legal_case",
+   "fieldtype": "Link",
+   "options": "Legal Case",
+   "label": "Serviço",
+   "reqd": 1,
+   "allow_in_quick_entry": 1,
+   "in_list_view": 1,
+   "description": "Serviço ou processo vinculado à custa.",
+   "in_standard_filter": 1,
+   "idx": 2
+  },
+  {
+   "fieldname": "client",
+   "fieldtype": "Link",
+   "options": "Client",
+   "label": "Client",
+   "read_only": 1,
+   "fetch_from": "servico.cliente",
+   "in_list_view": 0,
+   "description": "Selecione o registro vinculado. Preenchido ou calculado automaticamente pelo sistema.",
+   "idx": 3
+  },
+  {
+   "fieldname": "tipo",
+   "fieldtype": "Select",
+   "label": "Tipo",
+   "reqd": 1,
+   "allow_in_quick_entry": 1,
+   "in_list_view": 0,
+   "options": "Taxa Judicial\nPerícia\nCertidão\nDeslocamento\nCópia/Impressão\nCorreios\nCartório\nDiligência\nOutros",
+   "description": "Taxa Judicial, Emolumento, Despesa Cartorial, etc.",
+   "in_standard_filter": 1,
+   "idx": 4
+  },
+  {
+   "fieldname": "column_break_info",
+   "fieldtype": "Column Break",
+   "idx": 5
+  },
+  {
+   "fieldname": "descricao",
+   "fieldtype": "Data",
+   "label": "Descrição",
+   "reqd": 1,
+   "allow_in_quick_entry": 1,
+   "in_list_view": 1,
+   "description": "Descrição da custa ou taxa.",
+   "idx": 6
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "default": "Pendente",
+   "in_list_view": 0,
+   "in_standard_filter": 1,
+   "options": "Pendente\nPago\nRepassado\nCancelado",
+   "description": "Pendente, Pago, Repassado ou Cancelado.",
+   "idx": 7
+  },
+  {
+   "fieldname": "valores_section",
+   "fieldtype": "Section Break",
+   "label": "Valores",
+   "idx": 8
+  },
+  {
+   "fieldname": "valor",
+   "fieldtype": "Currency",
+   "label": "Valor",
+   "reqd": 1,
+   "allow_in_quick_entry": 1,
+   "in_list_view": 1,
+   "description": "Valor da custa em reais.",
+   "idx": 9
+  },
+  {
+   "fieldname": "data_pagamento",
+   "fieldtype": "Date",
+   "label": "Data de Legal Payment",
+   "description": "Data em que a custa foi paga.",
+   "in_standard_filter": 1,
+   "idx": 10
+  },
+  {
+   "fieldname": "column_break_val",
+   "fieldtype": "Column Break",
+   "idx": 11
+  },
+  {
+   "fieldname": "repassar_cliente",
+   "fieldtype": "Check",
+   "label": "Repassar ao Client",
+   "default": "1",
+   "description": "Marque se o valor deve ser repassado ao cliente.",
+   "idx": 12
+  },
+  {
+   "fieldname": "data_repasse",
+   "fieldtype": "Date",
+   "label": "Data de Repasse",
+   "depends_on": "eval:doc.repassar_cliente==1",
+   "description": "Data do repasse ao cliente.",
+   "in_standard_filter": 1,
+   "idx": 13
+  },
+  {
+   "fieldname": "forma_pagamento",
+   "fieldtype": "Select",
+   "label": "Forma de Legal Payment",
+   "options": "PIX\nTED\nBoleto\nDinheiro\nCartão",
+   "description": "Forma de pagamento: PIX, TED, Dinheiro, etc.",
+   "in_standard_filter": 1,
+   "idx": 14
+  },
+  {
+   "fieldname": "anexos_section",
+   "fieldtype": "Section Break",
+   "label": "Comprovante",
+   "collapsible": 1,
+   "idx": 15
+  },
+  {
+   "fieldname": "comprovante",
+   "fieldtype": "Attach",
+   "label": "Comprovante",
+   "description": "Comprovante de pagamento anexado.",
+   "idx": 16
+  },
+  {
+   "fieldname": "observacoes_section",
+   "fieldtype": "Section Break",
+   "label": "Observações",
+   "collapsible": 1,
+   "idx": 17
+  },
+  {
+   "fieldname": "observacoes",
+   "fieldtype": "Small Text",
+   "label": "Observações",
+   "description": "Observações sobre a custa.",
+   "idx": 18
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "label": "Título",
+   "hidden": 0,
+   "read_only": 0,
+   "allow_in_quick_entry": 1,
+   "idx": 19,
+   "in_list_view": 0,
+   "description": "Título automático no formato ID — descritor."
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 0,
+ "is_tree": 0,
+ "issingle": 0,
+ "istable": 0,
+ "links": [],
+ "modified": "2026-05-31 12:00:00",
+ "modified_by": "Administrator",
+ "module": "Advocacia",
+ "name": "Court Cost",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "Advocacia Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "idx": 1
+  },
+  {
+   "role": "Advocacia User",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 0,
+   "report": 1,
+   "export": 1,
+   "idx": 2
+  },
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "idx": 3
+  }
+ ],
+ "states": [],
+ "autoname": "format:CUST-{YYYY}-{####}",
+ "naming_rule": "Expression",
+ "title_field": "title",
+ "search_fields": "descricao,cliente,status",
+ "sort_field": "data_pagamento",
+ "sort_order": "DESC",
+ "quick_entry": 1,
+ "track_changes": 1,
+ "show_title_field_in_link": 1
+}

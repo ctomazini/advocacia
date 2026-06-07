@@ -4,10 +4,10 @@ from advocacia.advocacia.financeiro import TIPO_HONORARIOS
 
 
 def execute():
-	"""Preenche tipo_origem em Pagamentos existentes (pré P9b)."""
+	"""Preenche tipo_origem em Legal Payments existentes (pré P9b)."""
 	frappe.db.sql(
 		"""
-		UPDATE `tabPagamento`
+		UPDATE `tabLegal Payment`
 		SET tipo_origem = %s
 		WHERE IFNULL(tipo_origem, '') = ''
 		""",

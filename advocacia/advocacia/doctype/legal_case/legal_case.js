@@ -1,0 +1,288 @@
+frappe.ui.form.on("Legal Case", {
+	refresh: function (frm) {
+		aplicar_mascara_processo_servico(frm);
+
+		if (frm.is_new()) return;
+
+		frm.add_custom_button("+ Honorários", function () {
+			frappe.new_doc("Fee Agreement", {
+				servico: frm.doc.name,
+				cliente: frm.doc.client,
+			});
+		}, "Criar");
+
+		frm.add_custom_button("+ Prazo", function () {
+			frappe.new_doc("Deadline", {
+				servico: frm.doc.name,
+			});
+		}, "Criar");
+
+		frm.add_custom_button("+ Audiência", function () {
+			frappe.new_doc("Hearing", {
+				servico: frm.doc.name,
+			});
+		}, "Criar");
+
+		frm.add_custom_button(__("Gerar Documentos"), function () {
+			abrir_dialog_gerar_documentos(frm);
+		}, __("Documentos"));
+	},
+	tipo: function (frm) {
+		aplicar_mascara_processo_servico(frm);
+	},
+	numeracao_legada: function (frm) {
+		aplicar_mascara_processo_servico(frm);
+	},
+	numero_processo: function (frm) {
+		if (window.AdvocaciaMasks) {
+			AdvocaciaMasks.formatFormField(
+				frm,
+				"numero_processo",
+				AdvocaciaMasks.applyCNJ
+			);
+		}
+	},
+});
+
+function aplicar_mascara_processo_servico(frm) {
+	if (window.AdvocaciaMasks) {
+		AdvocaciaMasks.setupLegal CaseProcessoMask(frm);
+	}
+}
+
+function abrir_dialog_gerar_documentos(frm) {
+	frappe.call({
+		method: "advocacia.advocacia.documentos.get_templates_disponiveis",
+		callback(r_templates) {
+			const templates = r_templates.message || [];
+			if (!templates.length) {
+				frappe.msgprint(
+					__(
+						"Nenhum template cadastrado. Vá em Document Template para cadastrar."
+					)
+				);
+				return;
+			}
+
+			frappe.call({
+				method: "advocacia.advocacia.documentos.get_kits_disponiveis",
+				callback(r_kits) {
+					montar_dialog_gerar_documentos(frm, templates, r_kits.message || []);
+				},
+			});
+		},
+	});
+}
+
+function montar_dialog_gerar_documentos(frm, templates, kits) {
+	const agrupados = {};
+	templates.forEach((tpl) => {
+		const tipo = tpl.tipo_documento || __("Outro");
+		if (!agrupados[tipo]) {
+			agrupados[tipo] = [];
+		}
+		agrupados[tipo].push(tpl);
+	});
+
+	let checklist_html = '<div class="adv-doc-bulk-list" style="max-height:320px;overflow-y:auto;">';
+	checklist_html +=
+		'<p class="text-muted small">' +
+		__("Selecione os templates ou use um kit para pré-marcar.") +
+		"</p>";
+	checklist_html +=
+		'<p><label class="checkbox"><input type="checkbox" class="adv-doc-select-all"> ' +
+		__("Selecionar todos") +
+		"</label></p>";
+
+	Object.keys(agrupados)
+		.sort()
+		.forEach((tipo) => {
+			checklist_html +=
+				'<div style="margin-top:10px;font-weight:600;">' +
+				frappe.utils.escape_html(tipo) +
+				"</div>";
+			agrupados[tipo].forEach((tpl) => {
+				checklist_html +=
+					'<p style="margin:4px 0 4px 12px;">' +
+					'<label class="checkbox">' +
+					'<input type="checkbox" class="adv-doc-template" data-template="' +
+					frappe.utils.escape_html(tpl.name) +
+					'"> ' +
+					frappe.utils.escape_html(tpl.titulo) +
+					"</label></p>";
+			});
+		});
+	checklist_html += "</div>";
+
+	const dialog = new frappe.ui.Dialog({
+		title: __("Gerar Documentos"),
+		fields: [
+			{
+				fieldname: "kit",
+				fieldtype: "Select",
+				label: __("Kit (opcional)"),
+				options: ["", ...kits.map((k) => k.name)],
+				description: __("Pré-seleciona os templates de um kit"),
+			},
+			{
+				fieldname: "templates_html",
+				fieldtype: "HTML",
+				options: checklist_html,
+			},
+		],
+		primary_action_label: __("Gerar documentos"),
+		primary_action() {
+			const selecionados = [];
+			dialog.$wrapper.find(".adv-doc-template:checked").each(function () {
+				selecionados.push($(this).attr("data-template"));
+			});
+			if (!selecionados.length) {
+				frappe.msgprint(__("Selecione ao menos um template."));
+				return;
+			}
+			dialog.hide();
+			gerar_documentos_em_lote(frm, selecionados);
+		},
+	});
+
+	dialog.show();
+
+	if (dialog.fields_dict.kit && kits.length) {
+		dialog.fields_dict.kit.df.options = ["", ...kits.map((k) => k.name)];
+		dialog.fields_dict.kit.refresh();
+		dialog.fields_dict.kit.$input.on("change", function () {
+			const kit_name = dialog.get_value("kit");
+			dialog.$wrapper.find(".adv-doc-template").prop("checked", false);
+			if (!kit_name) {
+				atualizar_label_botao_bulk(dialog);
+				return;
+			}
+			const kit = kits.find((k) => k.name === kit_name);
+			if (!kit || !kit.templates) {
+				return;
+			}
+			kit.templates.forEach((template_name) => {
+				dialog.$wrapper
+					.find('.adv-doc-template[data-template="' + template_name + '"]')
+					.prop("checked", true);
+			});
+			atualizar_label_botao_bulk(dialog);
+		});
+	} else if (dialog.fields_dict.kit) {
+		dialog.toggle_display("kit", false);
+	}
+
+	dialog.$wrapper.find(".adv-doc-select-all").on("change", function () {
+		const checked = $(this).is(":checked");
+		dialog.$wrapper.find(".adv-doc-template").prop("checked", checked);
+		atualizar_label_botao_bulk(dialog);
+	});
+
+	dialog.$wrapper.on("change", ".adv-doc-template", function () {
+		atualizar_label_botao_bulk(dialog);
+	});
+
+	atualizar_label_botao_bulk(dialog);
+}
+
+function atualizar_label_botao_bulk(dialog) {
+	const total = dialog.$wrapper.find(".adv-doc-template:checked").length;
+	dialog.set_primary_action(
+		total
+			? __("Gerar {0} documento(s)", [total])
+			: __("Gerar documentos")
+	);
+}
+
+function gerar_documentos_em_lote(frm, template_names) {
+	frappe.call({
+		method: "advocacia.advocacia.documentos.gerar_documentos_em_lote",
+		args: {
+			servico_name: frm.doc.name,
+			template_names: template_names,
+		},
+		freeze: true,
+		freeze_message: __("Gerando documentos..."),
+		callback(r) {
+			if (!r.message || !r.message.data) {
+				return;
+			}
+			const data = r.message.data;
+			let html = "";
+
+			if (data.gerados && data.gerados.length) {
+				html += "<p><strong>" + __("Documentos gerados:") + "</strong></p><ul>";
+				data.gerados.forEach((item) => {
+					html +=
+						"<li>" +
+						frappe.utils.escape_html(item.titulo || item.template) +
+						' — <a href="' +
+						item.file_url +
+						'" target="_blank">' +
+						frappe.utils.escape_html(item.file_name) +
+						"</a></li>";
+				});
+				html += "</ul>";
+			}
+
+			if (data.falhas && data.falhas.length) {
+				html += "<p><strong>" + __("Falhas:") + "</strong></p><ul>";
+				data.falhas.forEach((item) => {
+					html +=
+						"<li>" +
+						frappe.utils.escape_html(item.template) +
+						": " +
+						frappe.utils.escape_html(item.erro) +
+						"</li>";
+				});
+				html += "</ul>";
+			}
+
+			frappe.msgprint({
+				title: __("Geração em lote"),
+				message: html || __("Nenhum documento gerado."),
+				indicator: data.falhas && data.falhas.length ? "orange" : "green",
+				wide: true,
+			});
+			frm.reload_doc();
+		},
+	});
+}
+
+function servico_quick_entry_pseudo_form(dialog) {
+	return {
+		fields_dict: dialog.fields_dict,
+		doc: dialog.doc,
+		set_value: function (fieldname, value) {
+			dialog.doc[fieldname] = value;
+			if (dialog.fields_dict[fieldname]) {
+				dialog.fields_dict[fieldname].set_value(value);
+			}
+		},
+	};
+}
+
+function setup_servico_quick_entry_masks(dialog) {
+	if (!window.AdvocaciaMasks) return;
+	const pseudo = servico_quick_entry_pseudo_form(dialog);
+	AdvocaciaMasks.setupLegal CaseProcessoMask(pseudo);
+
+	["tipo", "numeracao_legada", "numero_processo"].forEach(function (fieldname) {
+		const field = dialog.fields_dict[fieldname];
+		if (!field || !field.$input) return;
+		field.$input.off("change.legal_case_qe").on("change.legal_case_qe", function () {
+			setTimeout(function () {
+				AdvocaciaMasks.setupLegal CaseProcessoMask(servico_quick_entry_pseudo_form(dialog));
+			}, 50);
+		});
+	});
+}
+
+frappe.ui.form.Legal CaseQuickEntryForm = class Legal CaseQuickEntryForm extends (
+	frappe.ui.form.QuickEntryForm
+) {
+	render_dialog() {
+		super.render_dialog();
+		setup_servico_quick_entry_masks(this);
+	}
+};

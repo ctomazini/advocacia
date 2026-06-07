@@ -21,7 +21,7 @@ class TestSeedDemo(IntegrationTestCase):
 		count = seed_demo_data()
 		self.assertGreater(count, 0)
 		clientes = frappe.get_all(
-			"Cliente",
+			"Client",
 			filters={"nome": ["like", f"%{DEMO_MARKER}%"]},
 		)
 		self.assertGreater(len(clientes), 0)
@@ -38,7 +38,7 @@ class TestSeedDemo(IntegrationTestCase):
 		removed = clear_demo_data()
 		frappe.db.commit()
 		self.assertGreater(removed, 0)
-		remaining = frappe.db.count("Cliente", {"nome": ["like", f"%{DEMO_MARKER}%"]})
+		remaining = frappe.db.count("Client", {"nome": ["like", f"%{DEMO_MARKER}%"]})
 		self.assertEqual(remaining, 0)
 
 	def test_guard_blocks_production(self):

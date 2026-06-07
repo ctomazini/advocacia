@@ -3,7 +3,7 @@ from frappe.exceptions import MandatoryError, ValidationError
 from frappe.tests.utils import FrappeTestCase
 from frappe.utils import add_to_date, now_datetime
 
-from advocacia.advocacia.tests.test_setup import create_test_registro_horas, create_test_servico
+from advocacia.advocacia.tests.test_setup import create_test_registro_horas, create_test_legal_case
 
 
 class TestRegistroHoras(FrappeTestCase):
@@ -18,8 +18,8 @@ class TestRegistroHoras(FrappeTestCase):
 	def test_create_sem_duracao_para_iniciar_timer(self):
 		reg = frappe.get_doc(
 			{
-				"doctype": "Registro de Horas",
-				"servico": create_test_servico().name,
+				"doctype": "Time Entry",
+				"legal_case": create_test_legal_case().name,
 				"data": frappe.utils.today(),
 				"atividade": "Atendimento inicial",
 			}
@@ -31,8 +31,8 @@ class TestRegistroHoras(FrappeTestCase):
 		self.assertEqual(reg.timer_ativo, 1)
 
 	def test_titulo_composto(self):
-		servico = create_test_servico()
-		cliente_nome = frappe.db.get_value("Cliente", servico.cliente, "nome")
+		servico = create_test_legal_case()
+		cliente_nome = frappe.db.get_value("Client", servico.client, "nome")
 		reg = create_test_registro_horas(servico=servico.name, atividade="Reunião")
 		self.assertIn(reg.name, reg.title)
 		self.assertIn(cliente_nome, reg.title)
@@ -40,8 +40,8 @@ class TestRegistroHoras(FrappeTestCase):
 	def test_calculo_duracao_inicio_fim(self):
 		reg = frappe.get_doc(
 			{
-				"doctype": "Registro de Horas",
-				"servico": create_test_servico().name,
+				"doctype": "Time Entry",
+				"legal_case": create_test_legal_case().name,
 				"data": frappe.utils.today(),
 				"atividade": "Pesquisa",
 				"hora_inicio": "09:00:00",
@@ -56,17 +56,17 @@ class TestRegistroHoras(FrappeTestCase):
 		reg = create_test_registro_horas(duracao_minutos=90)
 		self.assertEqual(reg.duracao_horas, 1.5)
 
-	def test_cliente_via_servico(self):
-		servico = create_test_servico()
-		cliente = frappe.db.get_value("Servico", servico.name, "cliente")
+	def test_client_via_servico(self):
+		servico = create_test_legal_case()
+		cliente = frappe.db.get_value("Legal Case", servico.name, "client")
 		reg = create_test_registro_horas(servico=servico.name)
-		self.assertEqual(reg.cliente, cliente)
+		self.assertEqual(reg.client, cliente)
 
 	def test_sem_servico_falha(self):
 		with self.assertRaises(MandatoryError):
 			frappe.get_doc(
 				{
-					"doctype": "Registro de Horas",
+					"doctype": "Time Entry",
 					"data": frappe.utils.today(),
 					"atividade": "Teste",
 					"duracao_minutos": 30,
@@ -77,8 +77,8 @@ class TestRegistroHoras(FrappeTestCase):
 		with self.assertRaises(MandatoryError):
 			frappe.get_doc(
 				{
-					"doctype": "Registro de Horas",
-					"servico": create_test_servico().name,
+					"doctype": "Time Entry",
+					"legal_case": create_test_legal_case().name,
 					"data": frappe.utils.today(),
 					"duracao_minutos": 30,
 				}
@@ -96,7 +96,7 @@ class TestRegistroHoras(FrappeTestCase):
 		reg = create_test_registro_horas(duracao_minutos=30)
 		reg.iniciar_timer()
 		frappe.db.set_value(
-			"Registro de Horas",
+			"Time Entry",
 			reg.name,
 			"timer_inicio",
 			add_to_date(now_datetime(), minutes=-10),
@@ -130,17 +130,17 @@ class TestRegistroHoras(FrappeTestCase):
 			reg.save()
 
 	def test_get_timer_ativo_usuario(self):
-		from advocacia.advocacia.doctype.registro_de_horas.registro_de_horas import (
+		from advocacia.advocacia.doctype.time_entry.time_entry import (
 			get_timer_ativo_usuario,
 		)
 
 		for reg_name in frappe.get_all(
-			"Registro de Horas",
+			"Time Entry",
 			filters={"timer_ativo": 1, "owner": frappe.session.user},
 			pluck="name",
 		):
 			frappe.db.set_value(
-				"Registro de Horas",
+				"Time Entry",
 				reg_name,
 				{"timer_ativo": 0, "timer_inicio": None},
 				update_modified=False,
@@ -160,7 +160,7 @@ class TestRegistroHoras(FrappeTestCase):
 		self.assertIsNone(get_timer_ativo_usuario())
 
 	def test_get_timer_ativo_usuario_sem_permissao_retorna_none(self):
-		from advocacia.advocacia.doctype.registro_de_horas.registro_de_horas import (
+		from advocacia.advocacia.doctype.time_entry.time_entry import (
 			get_timer_ativo_usuario,
 		)
 

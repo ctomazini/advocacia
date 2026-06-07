@@ -3,26 +3,26 @@ from frappe.exceptions import MandatoryError, ValidationError
 from frappe.tests.utils import FrappeTestCase
 from frappe.utils import add_days, now_datetime, today
 
-from advocacia.advocacia.doctype.audiencia.audiencia import get_events
-from advocacia.advocacia.tests.test_setup import create_test_audiencia, create_test_servico
+from advocacia.advocacia.doctype.hearing.hearing import get_events
+from advocacia.advocacia.tests.test_setup import create_test_hearing, create_test_legal_case
 
 
-class TestAudiencia(FrappeTestCase):
+class TestHearing(FrappeTestCase):
 	def tearDown(self):
 		frappe.db.rollback()
 
-	def test_audiencia_presencial_salva(self):
-		aud = create_test_audiencia()
+	def test_hearing_presencial_salva(self):
+		aud = create_test_hearing()
 		self.assertEqual(aud.modalidade, "Presencial")
 		self.assertEqual(aud.status_aud or "Agendada", "Agendada")
 
-	def test_cliente_via_servico(self):
-		servico = create_test_servico()
-		aud = create_test_audiencia(servico=servico.name)
-		self.assertEqual(aud.cliente, servico.cliente)
+	def test_client_via_servico(self):
+		servico = create_test_legal_case()
+		aud = create_test_hearing(servico=servico.name)
+		self.assertEqual(aud.client, servico.client)
 
 	def test_get_events_no_periodo(self):
-		aud = create_test_audiencia(data_hora=now_datetime())
+		aud = create_test_hearing(data_hora=now_datetime())
 		start = add_days(today(), -1)
 		end = add_days(today(), 1)
 		events = get_events(start, end)
@@ -33,25 +33,25 @@ class TestAudiencia(FrappeTestCase):
 		with self.assertRaises((MandatoryError, ValidationError)):
 			frappe.get_doc(
 				{
-					"doctype": "Audiencia",
+					"doctype": "Hearing",
 					"data_hora": now_datetime(),
 					"tipo": "Conciliação",
 				}
 			).insert(ignore_permissions=True)
 
 	def test_status_realizada(self):
-		aud = create_test_audiencia()
+		aud = create_test_hearing()
 		aud.status_aud = "Realizada"
 		aud.save(ignore_permissions=True)
 		self.assertEqual(aud.status_aud, "Realizada")
 
-	def test_audiencia_virtual(self):
-		aud = create_test_audiencia(modalidade="Virtual", link_virtual="https://meet.example.com/x")
+	def test_hearing_virtual(self):
+		aud = create_test_hearing(modalidade="Virtual", link_virtual="https://meet.example.com/x")
 		self.assertEqual(aud.modalidade, "Virtual")
 
 	def test_titulo_composto(self):
-		servico = create_test_servico()
-		cliente_nome = frappe.db.get_value("Cliente", servico.cliente, "nome")
-		aud = create_test_audiencia(servico=servico.name, tipo="Instrução")
+		servico = create_test_legal_case()
+		cliente_nome = frappe.db.get_value("Client", servico.client, "nome")
+		aud = create_test_hearing(servico=servico.name, tipo="Instrução")
 		self.assertIn(aud.name, aud.title)
 		self.assertIn(cliente_nome, aud.title)

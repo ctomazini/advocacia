@@ -3,7 +3,7 @@ from frappe.tests.utils import FrappeTestCase
 from frappe.utils import today
 
 from advocacia.advocacia.report.fluxo_de_caixa.fluxo_de_caixa import execute
-from advocacia.advocacia.tests.test_setup import create_test_pagamento
+from advocacia.advocacia.tests.test_setup import create_test_legal_payment
 
 
 class TestReportFluxoDeCaixa(FrappeTestCase):
@@ -11,9 +11,9 @@ class TestReportFluxoDeCaixa(FrappeTestCase):
 		frappe.db.rollback()
 
 	def test_execute_retorna_entrada_recebida(self):
-		pag = create_test_pagamento(valor=2500, status="Recebido")
+		pag = create_test_legal_payment(valor=2500, status="Recebido")
 		frappe.db.set_value(
-			"Pagamento",
+			"Legal Payment",
 			pag.name,
 			{"data_recebimento": today(), "valor_recebido": 2500},
 			update_modified=False,

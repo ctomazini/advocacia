@@ -15,7 +15,7 @@ LIST_LIMIT_MAX = 100
 DEFAULT_LIST_LIMIT_KEYS = (
 	"timeline",
 	"comunicacoes",
-	"parcelas",
+	"fee_installments",
 	"despesas",
 	"custas",
 )
@@ -28,7 +28,7 @@ def _nomes_lookup(doctype, names, campo_nome):
 	return {row.name: row.get(campo_nome) or row.name for row in rows}
 
 def _cliente_nome_lookup(cliente_names):
-	return _nomes_lookup("Cliente", cliente_names, "nome")
+	return _nomes_lookup("Client", cliente_names, "nome")
 def _effective_list_cap(list_limit):
 	if not list_limit:
 		return LIST_LIMIT_MAX
@@ -76,7 +76,7 @@ def _servico_lookup(servico_names, extra_fields):
 	if not names:
 		return {}
 	fields = ["name"] + [f for f in extra_fields if f != "name"]
-	rows = frappe.get_all("Servico", filters={"name": ["in", names]}, fields=fields)
+	rows = frappe.get_all("Legal Case", filters={"name": ["in", names]}, fields=fields)
 	return {row.name: row for row in rows}
 def _user_nome_lookup(user_names):
 	names = list({name for name in user_names if name})
@@ -117,7 +117,7 @@ def strip_financial_payload(data: dict) -> dict:
 
 	for key in (
 		"financeiro",
-		"parcelas",
+		"fee_installments",
 		"despesas_pendentes",
 		"total_despesas_mes",
 		"custas_pendentes_repasse",
@@ -137,7 +137,7 @@ def strip_financial_payload(data: dict) -> dict:
 
 	list_meta = data.get("list_meta")
 	if isinstance(list_meta, dict):
-		for key in ("parcelas", "despesas", "custas"):
+		for key in ("fee_installments", "despesas", "custas"):
 			list_meta.pop(key, None)
 
 	return data

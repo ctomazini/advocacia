@@ -5,19 +5,19 @@ from frappe.utils import add_days, today
 from advocacia.advocacia.report.honorarios_por_cliente.honorarios_por_cliente import execute
 from advocacia.advocacia.tests.test_setup import (
 	create_test_acordo,
-	create_test_cliente,
-	create_test_servico,
+	create_test_client,
+	create_test_legal_case,
 	get_acordo_pagamentos,
 )
 
 
-class TestReportHonorariosPorCliente(FrappeTestCase):
+class TestReportHonorariosPorClient(FrappeTestCase):
 	def tearDown(self):
 		frappe.db.rollback()
 
 	def test_execute_agrega_por_cliente(self):
-		cliente = create_test_cliente()
-		servico = create_test_servico(cliente=cliente.name)
+		cliente = create_test_client()
+		servico = create_test_legal_case(cliente=cliente.name)
 		acordo = create_test_acordo(
 			servico=servico.name, valor_total=5000, num_parcelas=2
 		)
@@ -25,13 +25,13 @@ class TestReportHonorariosPorCliente(FrappeTestCase):
 		pendente = pagamentos[0]
 		recebido = pagamentos[1]
 		frappe.db.set_value(
-			"Pagamento",
+			"Legal Payment",
 			pendente.name,
 			{"status": "Pendente", "data_vencimento": add_days(today(), 10), "valor": 3000},
 			update_modified=False,
 		)
 		frappe.db.set_value(
-			"Pagamento",
+			"Legal Payment",
 			recebido.name,
 			{
 				"status": "Recebido",
@@ -45,14 +45,14 @@ class TestReportHonorariosPorCliente(FrappeTestCase):
 
 		columns, data, _msg, _chart, _summary = execute(
 			{
-				"cliente": cliente.name,
+				"client": cliente.name,
 				"de_data": add_days(today(), -30),
 				"ate_data": add_days(today(), 30),
 			}
 		)
 		self.assertTrue(columns)
 		self.assertGreaterEqual(len(data), 1)
-		row = next((r for r in data if r.get("cliente") == cliente.name), None)
+		row = next((r for r in data if r.get("client") == cliente.name), None)
 		self.assertIsNotNone(row)
 		self.assertGreaterEqual(row.get("total_contratado", 0), 5000)
 

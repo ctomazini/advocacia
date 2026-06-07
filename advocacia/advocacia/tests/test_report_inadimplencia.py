@@ -5,8 +5,8 @@ from frappe.utils import add_days, today
 from advocacia.advocacia.report.inadimplencia.inadimplencia import execute
 from advocacia.advocacia.tests.test_setup import (
 	create_test_acordo,
-	create_test_cliente,
-	create_test_servico,
+	create_test_client,
+	create_test_legal_case,
 	get_acordo_pagamentos,
 )
 
@@ -16,12 +16,12 @@ class TestReportInadimplencia(FrappeTestCase):
 		frappe.db.rollback()
 
 	def test_execute_retorna_colunas_e_dados(self):
-		cliente = create_test_cliente()
-		servico = create_test_servico(cliente=cliente.name)
+		cliente = create_test_client()
+		servico = create_test_legal_case(cliente=cliente.name)
 		acordo = create_test_acordo(servico=servico.name, valor_total=1500, num_parcelas=1)
 		pag = get_acordo_pagamentos(acordo.name)[0]
 		frappe.db.set_value(
-			"Pagamento",
+			"Legal Payment",
 			pag.name,
 			{
 				"status": "Vencido",
@@ -35,13 +35,13 @@ class TestReportInadimplencia(FrappeTestCase):
 			{
 				"de_data": add_days(today(), -30),
 				"ate_data": today(),
-				"cliente": cliente.name,
+				"client": cliente.name,
 			}
 		)
 		self.assertTrue(columns)
 		self.assertIsInstance(data, list)
 		self.assertGreaterEqual(len(data), 1)
-		row = next((r for r in data if r.get("cliente") == cliente.name), None)
+		row = next((r for r in data if r.get("client") == cliente.name), None)
 		self.assertIsNotNone(row)
 		self.assertGreaterEqual(row.get("total_vencido", 0), 1500)
 		self.assertGreaterEqual(row.get("qtd_parcelas", 0), 1)

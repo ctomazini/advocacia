@@ -10,13 +10,13 @@
 | Item | Status | Detalhes |
 |---|---|---|
 | DocTypes `custom: 0` | 🟢 OK | 24/24 JSONs declaram `"custom": 0`, módulo `Advocacia`. |
-| DocType names PT congelados | 🟢 OK | Brownfield — nomes em português não renomeados (ex.: `Servico`, `Acordo de Honorarios Processuais`). |
+| DocType names PT congelados | 🟢 OK | Brownfield — nomes em português não renomeados (ex.: `Legal Case`, `Fee Agreement`). |
 | Fieldnames `snake_case` | 🟢 OK | Maioria em PT/EN misto funcional (`cliente`, `servico`, `data_vencimento`). Labels UI em português. |
 | Zero Server/Client Script no banco | 🟢 OK | Lógica em controllers Python; fixtures exportam Workspace, Notification, Custom Field em `Event`. |
 | naming + autoname + title + search | 🟢 OK | Transacionais: `format:PREFIX-{YYYY}-{####}` + `title_field: title` + `show_title_field_in_link: 1`. |
-| Links tipados (não Data) | 🟢 OK | Comarca, Vara, Tribunal, Fase Processual, Cliente, Serviço — todos `Link`. |
+| Links tipados (não Data) | 🟢 OK | Jurisdiction, Court Branch, Court, Case Phase, Client, Serviço — todos `Link`. |
 | Ciclo de vida controller | 🟢 OK | `validate()` + `after_insert()` com `titulos.py` nos transacionais principais. |
-| Auto-título via titulos.py | 🟢 OK | Formato `{ID} — {descritor}`; `Despesa do Escritorio` usa `descricao` como descritor. |
+| Auto-título via titulos.py | 🟢 OK | Formato `{ID} — {descritor}`; `Office Expense` usa `descricao` como descritor. |
 | Zero `frappe.db.commit()` fora setup | 🟢 OK | Apenas em `setup/*`, `patches/*`, `titulos.backfill_titulos_vazios()`, `seed_demo.py` (dev). **Nota:** `resync_pagamentos_acordo(..., commit=True)` é whitelisted — ver segurança. |
 | `ignore_permissions` com comentário | 🟢 OK | Bloco em `financeiro.py`; comentários em `calendar_sync.py`, `documentos.py`, `setup/*`. Testes usam sem comentário (aceitável). |
 | Zero `except Exception: pass` | 🟢 OK | Erros logados ou re-lançados; scheduler trata item a item em `tasks.py`. |
@@ -46,26 +46,26 @@
 
 | DocType / Módulo | Tem teste? | Nº testes* | Funcionalidades testadas | SEM teste |
 |---|---|---|---|---|
-| Servico | Sim | 10 | CRUD, CNJ, validações, query | permlevel UI |
-| Cliente | Sim | 13 | CPF/CNPJ, contatos, endereços | — |
-| Acordo de Honorarios Processuais | Sim | 10 | Parcelas, modos, sync | apply UI flow |
-| Pagamento | Sim | 10 | Status, sync, bulk rules | — |
-| Registro de Atos | Sim | 8 | Atos, cobrança | — |
-| Registro de Horas | Sim | 15 | Timer, duração, permissões | — |
-| Audiencia | Sim | 7 | CRUD, status | — |
-| Controle de Prazos | Sim | 7 | Datas, prioridade | — |
-| Tarefa | Sim | 5 | CRUD, concluir | — |
-| Comunicacao | Sim | 7 | CRUD, tarefa auto | — |
-| Custa Processual | Sim | 7 | Repasse, status | — |
-| Despesa do Escritorio | Sim | 11 | Categorias, vencimento | — |
-| Kit de Documentos | Sim | 6 | Itens, templates | — |
-| Cadastros (Comarca, Vara, Tribunal, Fase) | Sim | 4–5 cada | CRUD, unique | — |
-| Configuracao do Escritorio | Sim | 6 | CNPJ escritório | — |
+| Legal Case | Sim | 10 | CRUD, CNJ, validações, query | permlevel UI |
+| Client | Sim | 13 | CPF/CNPJ, contatos, endereços | — |
+| Fee Agreement | Sim | 10 | Parcelas, modos, sync | apply UI flow |
+| Legal Payment | Sim | 10 | Status, sync, bulk rules | — |
+| Service Record | Sim | 8 | Atos, cobrança | — |
+| Time Entry | Sim | 15 | Timer, duração, permissões | — |
+| Hearing | Sim | 7 | CRUD, status | — |
+| Deadline | Sim | 7 | Datas, prioridade | — |
+| Legal Task | Sim | 5 | CRUD, concluir | — |
+| Case Communication | Sim | 7 | CRUD, tarefa auto | — |
+| Court Cost | Sim | 7 | Repasse, status | — |
+| Office Expense | Sim | 11 | Categorias, vencimento | — |
+| Document Kit | Sim | 6 | Itens, templates | — |
+| Cadastros (Jurisdiction, Court Branch, Court, Fase) | Sim | 4–5 cada | CRUD, unique | — |
+| Office Settings | Sim | 6 | CNPJ escritório | — |
 | **Child tables** (5) | Parcial | via pai | Contato, Endereco, Parcela, Ato, Kit Item | CRUD isolado |
 | **Painel** | Sim | 9 | Payload, limits, permissões | E2E browser |
 | **Permissions** | Sim | 6 | User vs Manager, painel redaction | — |
 | **Financeiro** | Sim | 7 | Sync acordo, atos, flags | resync commit |
-| **Calendar sync** | Sim | 6 | Audiencia/Prazo → Event | Google OAuth E2E |
+| **Calendar sync** | Sim | 6 | Hearing/Prazo → Event | Google OAuth E2E |
 | **Documentos** | Sim | 6 | docxtpl, kits | — |
 | **Notificações/Scheduler** | Sim | 14 | Daily jobs, prazos | — |
 | **Reports** (6) | Sim | 12 | Smoke por report | edge cases |
@@ -90,26 +90,26 @@
 
 | Endpoint | Módulo | Permission check? | Observação |
 |---|---|---|---|
-| `get_painel_data` | painel_api.py | ✅ | `Servico` read + `throw=True` |
-| `marcar_parcela_recebida` | painel_api.py | ✅ | `Pagamento` write |
+| `get_painel_data` | painel_api.py | ✅ | `Legal Case` read + `throw=True` |
+| `marcar_parcela_recebida` | painel_api.py | ✅ | `Legal Payment` write |
 | `resync_pagamentos_acordo` | financeiro.py | ✅ | Acordo write |
 | `bulk_delete_pagamentos` | financeiro.py | ✅ | Payment delete |
 | `gerar_pagamento_atos` | financeiro.py | 🟡 | Delega — check no callee |
-| `sincronizar_pagamento_atos` | financeiro.py | ✅ | Registro de Atos write |
+| `sincronizar_pagamento_atos` | financeiro.py | ✅ | Service Record write |
 | `marcar_recebido` / `cancelar` | financeiro.py | ✅ | Payment write |
-| `generate_document` etc. | documentos.py | ✅ | Servico/Template read |
-| `servico_query` | servico.py | ✅ | Servico read |
-| `get_resumo_audiencia` | audiencia.py | ✅ | Audiencia read |
-| `get_resumo_prazo` | controle_de_prazos.py | ✅ | Controle de Prazos read |
+| `generate_document` etc. | documentos.py | ✅ | Legal Case/Template read |
+| `servico_query` | servico.py | ✅ | Legal Case read |
+| `get_resumo_audiencia` | audiencia.py | ✅ | Hearing read |
+| `get_resumo_prazo` | controle_de_prazos.py | ✅ | Deadline read |
 | `iniciar_timer` / `parar_timer` | registro_de_horas.py | ✅ | write no doc |
 | `get_timer_ativo_usuario` | registro_de_horas.py | ✅ | read (retorna None se negado) |
-| `concluir` | tarefa.py | ✅ | Tarefa write |
+| `concluir` | tarefa.py | ✅ | Legal Task write |
 | `marcar_recebida` / `estornar` | parcela_de_honorarios.py | ✅ | Acordo write |
 | `criar_despesa_rapida` | despesa_do_escritorio.py | ✅ | create |
 
 **Painel financeiro:** `strip_financial_payload()` omite `financeiro`, `parcelas`, KPIs financeiros para **Advocacia User** — ✅ `test_permissions.py`.
 
-**Roles:** `Advocacia User` (operacional, sem delete Pagamento) · `Advocacia Manager` (full financeiro).
+**Roles:** `Advocacia User` (operacional, sem delete Legal Payment) · `Advocacia Manager` (full financeiro).
 
 ---
 

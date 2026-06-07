@@ -21,24 +21,24 @@ Acesse `/app/painel` para KPIs, listas rápidas (prazos, audiências, tarefas) e
 
 ### Listas e filtros
 
-Nas telas de lista (Clientes, Serviços, Pagamentos, etc.):
+Nas telas de lista (Clients, Serviços, Legal Payments, etc.):
 
 - **Desktop:** a barra de filtros fica sempre visível abaixo do título.
 - **Mobile:** use o botão **⇅** (Filtros) para abrir ou fechar os filtros.
-- Campos com filtro rápido incluem Cliente, Serviço, Status, datas e cadastros auxiliares (Comarca, Vara, etc.).
+- Campos com filtro rápido incluem Client, Serviço, Status, datas e cadastros auxiliares (Jurisdiction, Court Branch, etc.).
 
 ### Connections (vínculos no formulário)
 
-Ao abrir um Cliente, Serviço ou outro documento, o bloco **Connections** mostra documentos relacionados.
+Ao abrir um Client, Serviço ou outro documento, o bloco **Connections** mostra documentos relacionados.
 
-- Clique no **número** ou no **nome do tipo** (ex.: Pagamentos) para abrir a lista **já filtrada** por aquele registro.
-- Exemplo: no Serviço da cliente Carla Mendes, clicar em Pagamentos abre só os pagamentos daquele serviço.
+- Clique no **número** ou no **nome do tipo** (ex.: Legal Payments) para abrir a lista **já filtrada** por aquele registro.
+- Exemplo: no Serviço da cliente Carla Mendes, clicar em Legal Payments abre só os pagamentos daquele serviço.
 
 ---
 
 ## Cadastros Básicos
 
-### Cliente
+### Client
 
 Cadastro completo do cliente do escritório. Centraliza dados pessoais, documentação, endereços e contatos. Todo serviço jurídico está vinculado a um cliente.
 
@@ -67,15 +67,15 @@ Cadastro completo do cliente do escritório. Centraliza dados pessoais, document
 
 ---
 
-### Comarca
+### Jurisdiction
 
 Divisão judiciária geográfica. Cadastro rígido para consistência.
 
-**Código automático:** `field:comarca_name`
+**Código automático:** `field:jurisdiction_name`
 
 | Campo | Tipo | Obrigatório | Descrição |
 |-------|------|:-----------:|-----------|
-| Nome da Comarca | Data | ✅ | Nome único da comarca. Usado como identificador do registro. |
+| Nome da Jurisdiction | Data | ✅ | Nome único da comarca. Usado como identificador do registro. |
 | UF | Select | ✅ | Unidade federativa (UF) da comarca. |
 | Cidade | Data |  | Cidade sede da comarca. |
 
@@ -83,31 +83,31 @@ Divisão judiciária geográfica. Cadastro rígido para consistência.
 
 ---
 
-### Vara
+### Court Branch
 
 Unidade judicial dentro de uma comarca.
 
-**Código automático:** `field:vara_name`
+**Código automático:** `field:court_branch_name`
 
 | Campo | Tipo | Obrigatório | Descrição |
 |-------|------|:-----------:|-----------|
-| Nome da Vara | Data | ✅ | Nome único da vara. Usado como identificador do registro. |
-| Comarca | Link | ✅ | Comarca à qual esta vara pertence. |
+| Nome da Court Branch | Data | ✅ | Nome único da vara. Usado como identificador do registro. |
+| Jurisdiction | Link | ✅ | Jurisdiction à qual esta vara pertence. |
 | Tipo | Select |  | Tipo: Cível, Criminal, Família, Trabalho, Federal ou Juizado Especial. |
 
 **Permissões:** Advocacia Manager (completo); Advocacia User conforme DocType.
 
 ---
 
-### Tribunal
+### Court
 
-Tribunal de justiça competente (ex.: TJRS, TRF4).
+Court de justiça competente (ex.: TJRS, TRF4).
 
-**Código automático:** `field:tribunal_name`
+**Código automático:** `field:court_name`
 
 | Campo | Tipo | Obrigatório | Descrição |
 |-------|------|:-----------:|-----------|
-| Nome do Tribunal | Data | ✅ | Nome único do tribunal. |
+| Nome do Court | Data | ✅ | Nome único do tribunal. |
 | Sigla | Data | ✅ | Sigla oficial (ex.: TJRS, TRT4). |
 | Esfera | Select | ✅ | Esfera: Estadual, Federal, Trabalho, Superior ou Militar. |
 
@@ -115,11 +115,11 @@ Tribunal de justiça competente (ex.: TJRS, TRF4).
 
 ---
 
-### Fase Processual
+### Case Phase
 
 Fase do processo no fluxo (Distribuído, Sentenciado, etc.).
 
-**Código automático:** `field:phase_name`
+**Código automático:** `field:case_phase_name`
 
 | Campo | Tipo | Obrigatório | Descrição |
 |-------|------|:-----------:|-----------|
@@ -132,7 +132,7 @@ Fase do processo no fluxo (Distribuído, Sentenciado, etc.).
 
 ## Serviço Jurídico (Hub Central)
 
-### Servico
+### Legal Case
 
 O **Serviço** é o DocType central (hub) do sistema. Representa um processo judicial ou consultoria jurídica. Audiências, prazos, pagamentos e atos orbitam um Serviço.
 
@@ -140,18 +140,18 @@ O **Serviço** é o DocType central (hub) do sistema. Representa um processo jud
 
 | Campo | Tipo | Obrigatório | Descrição |
 |-------|------|:-----------:|-----------|
-| Cliente | Link | ✅ | Cliente titular deste serviço ou processo. |
+| Client | Link | ✅ | Client titular deste serviço ou processo. |
 | Tipo | Select | ✅ | Consultoria ou Processo Judicial. Define campos e validações do formulário. |
 | Título | Data |  | Título automático no formato ID — cliente. Atualizado ao salvar. |
 | Status | Select |  | Em andamento, Arquivado, Suspenso ou Encerrado. |
-| Fase Processual | Link |  | Fase atual do processo conforme cadastro rígido de Fases Processuais. |
+| Case Phase | Link |  | Fase atual do processo conforme cadastro rígido de Fases Processuais. |
 | Data de Abertura | Date |  | Data de abertura do serviço ou distribuição do processo. |
 | Número do Processo | Data |  | Número CNJ do processo (validado automaticamente). Obrigatório para Processo Judicial. |
 | Numeração legada (pré-CNJ) | Check |  | Número antigo ou interno, se diferente do CNJ. |
 | Área | Select |  | Área do direito: Cível, Criminal, Trabalhista, etc. |
-| Vara | Link |  | Vara judicial vinculada (cadastro rígido). |
-| Tribunal | Link |  | Tribunal competente (cadastro rígido). |
-| Comarca | Link |  | Comarca onde o processo tramita (cadastro rígido). |
+| Court Branch | Link |  | Court Branch judicial vinculada (cadastro rígido). |
+| Court | Link |  | Court competente (cadastro rígido). |
+| Jurisdiction | Link |  | Jurisdiction onde o processo tramita (cadastro rígido). |
 | Parte Contrária | Data |  | Nome da parte adversa, quando aplicável. |
 | Valor da Causa | Currency |  | Valor atribuído à causa na petição inicial. |
 | Observações | Text Editor |  | Anotações internas sobre o serviço ou processo. |
@@ -162,16 +162,16 @@ O **Serviço** é o DocType central (hub) do sistema. Representa um processo jud
 
 ## Financeiro
 
-### Acordo de Honorarios Processuais
+### Fee Agreement
 
-Define honorários contratados com o cliente, parcelas e vencimentos. O sistema sincroniza parcelas com registros de Pagamento.
+Define honorários contratados com o cliente, parcelas e vencimentos. O sistema sincroniza parcelas com registros de Legal Payment.
 
 **Código automático:** `format:ACOR-{YYYY}-{####}`
 
 | Campo | Tipo | Obrigatório | Descrição |
 |-------|------|:-----------:|-----------|
 | Serviço | Link | ✅ | Serviço ou processo vinculado ao acordo. |
-| Cliente | Link |  | Preenchido automaticamente a partir do serviço. |
+| Client | Link |  | Preenchido automaticamente a partir do serviço. |
 | Modo | Select | ✅ | Honorários Diretos ou Repasse de Sucumbência. |
 | Status | Select |  | Vigente, Quitado ou Cancelado. |
 | Valor Total do Acordo | Currency |  | Valor total acordado entre as partes. |
@@ -179,8 +179,8 @@ Define honorários contratados com o cliente, parcelas e vencimentos. O sistema 
 | Valor Fixo de Honorários | Currency |  | Valor fixo de honorários (modo misto). |
 | Valor Advogada | Currency |  | Parcela destinada à advogada. |
 | Tipo de cobrança | Select | ✅ | Forma de cálculo: valor fixo, percentual ou misto. |
-| Percentual Cliente | Percent |  | Percentual do cliente sobre o total. |
-| Valor Cliente | Currency |  | Parcela destinada ao cliente (repasse). |
+| Percentual Client | Percent |  | Percentual do cliente sobre o total. |
+| Valor Client | Currency |  | Parcela destinada ao cliente (repasse). |
 | Tipo de cálculo | Select |  | Forma de cálculo da sucumbência: percentual ou valor fixo. |
 | Percentual Sucumbência (%) | Percent |  | Percentual sobre a sucumbência. |
 | Honorários de Sucumbência | Currency |  | Valor de honorários de sucumbência. |
@@ -190,7 +190,7 @@ Define honorários contratados com o cliente, parcelas e vencimentos. O sistema 
 | Valor da Parcela | Currency |  | Valor médio por parcela (referência). |
 |  | Table |  | Parcelas do acordo. Ao salvar, o sistema gera ou atualiza os pagamentos. |
 | Total Advogada | Currency |  | Soma das parcelas da advogada. Calculado automaticamente. |
-| Total Cliente | Currency |  | Soma das parcelas do cliente. Calculado automaticamente. |
+| Total Client | Currency |  | Soma das parcelas do cliente. Calculado automaticamente. |
 | Observações | Text Editor |  | Observações contratuais e anotações internas. |
 | Título | Data |  | Título automático no formato ID — cliente. |
 
@@ -198,7 +198,7 @@ Define honorários contratados com o cliente, parcelas e vencimentos. O sistema 
 
 ---
 
-### Pagamento
+### Legal Payment
 
 Registro operacional de recebimento. Diferente da Parcela (contratual), registra o dinheiro que efetivamente entrou no escritório.
 
@@ -208,9 +208,9 @@ Registro operacional de recebimento. Diferente da Parcela (contratual), registra
 |-------|------|:-----------:|-----------|
 | Origem | Select |  | Honorários (Parcela) ou Atos Advocatícios. |
 | Acordo | Link |  | Acordo de honorários que originou este pagamento (parcelas). |
-| Registro de Atos | Link |  | Registro de atos vinculado (cobrança de atos). |
+| Service Record | Link |  | Registro de atos vinculado (cobrança de atos). |
 | Serviço | Link | ✅ | Serviço ou processo relacionado. |
-| Cliente | Link | ✅ | Preenchido automaticamente a partir do serviço ou acordo. |
+| Client | Link | ✅ | Preenchido automaticamente a partir do serviço ou acordo. |
 | Nº Parcela | Int |  | Número sequencial da parcela no acordo. |
 | Descrição | Small Text |  | Descrição exibida na parcela e nos relatórios. |
 | ID Origem | Data |  | Identificador interno para sincronização com parcelas do acordo. |
@@ -229,22 +229,22 @@ Registro operacional de recebimento. Diferente da Parcela (contratual), registra
 
 ---
 
-### Custa Processual
+### Court Cost
 
 **Código automático:** `format:CUST-{YYYY}-{####}`
 
 | Campo | Tipo | Obrigatório | Descrição |
 |-------|------|:-----------:|-----------|
 | Serviço | Link | ✅ | Serviço ou processo vinculado à custa. |
-| Cliente | Link |  | Selecione o registro vinculado. Preenchido ou calculado automaticamente pelo sistema. |
+| Client | Link |  | Selecione o registro vinculado. Preenchido ou calculado automaticamente pelo sistema. |
 | Tipo | Select | ✅ | Taxa Judicial, Emolumento, Despesa Cartorial, etc. |
 | Descrição | Data | ✅ | Descrição da custa ou taxa. |
 | Status | Select |  | Pendente, Pago, Repassado ou Cancelado. |
 | Valor | Currency | ✅ | Valor da custa em reais. |
-| Data de Pagamento | Date |  | Data em que a custa foi paga. |
-| Repassar ao Cliente | Check |  | Marque se o valor deve ser repassado ao cliente. |
+| Data de Legal Payment | Date |  | Data em que a custa foi paga. |
+| Repassar ao Client | Check |  | Marque se o valor deve ser repassado ao cliente. |
 | Data de Repasse | Date |  | Data do repasse ao cliente. |
-| Forma de Pagamento | Select |  | Forma de pagamento: PIX, TED, Dinheiro, etc. |
+| Forma de Legal Payment | Select |  | Forma de pagamento: PIX, TED, Dinheiro, etc. |
 | Comprovante | Attach |  | Comprovante de pagamento anexado. |
 | Observações | Small Text |  | Observações sobre a custa. |
 | Título | Data |  | Título automático no formato ID — descritor. |
@@ -253,7 +253,7 @@ Registro operacional de recebimento. Diferente da Parcela (contratual), registra
 
 ---
 
-### Despesa do Escritorio
+### Office Expense
 
 **Código automático:** `format:DESP-{YYYY}-{####}`
 
@@ -264,8 +264,8 @@ Registro operacional de recebimento. Diferente da Parcela (contratual), registra
 | Valor | Currency | ✅ | Valor da despesa em reais. |
 | Status | Select |  | Pendente, Pago ou Atrasado. |
 | Data de Vencimento | Date |  | Data de vencimento. |
-| Data de Pagamento | Date |  | Data em que a despesa foi paga. |
-| Forma de Pagamento | Select |  | Forma de pagamento: PIX, TED, Boleto, etc. |
+| Data de Legal Payment | Date |  | Data em que a despesa foi paga. |
+| Forma de Legal Payment | Select |  | Forma de pagamento: PIX, TED, Boleto, etc. |
 | Despesa Recorrente | Check |  | Marque se a despesa se repete periodicamente. |
 | Frequência | Select |  | Frequência da recorrência: Mensal, Anual, etc. |
 | Próximo Vencimento | Date |  | Próximo vencimento calculado (despesas recorrentes). |
@@ -279,7 +279,7 @@ Registro operacional de recebimento. Diferente da Parcela (contratual), registra
 
 ## Acompanhamento Processual
 
-### Audiencia
+### Hearing
 
 Audiências judiciais vinculadas a um serviço. Sincroniza com o calendário Frappe (Google Calendar).
 
@@ -288,13 +288,13 @@ Audiências judiciais vinculadas a um serviço. Sincroniza com o calendário Fra
 | Campo | Tipo | Obrigatório | Descrição |
 |-------|------|:-----------:|-----------|
 | Serviço | Link | ✅ | Serviço ou processo vinculado à audiência. |
-| Cliente | Link |  | Preenchido automaticamente a partir do serviço. |
+| Client | Link |  | Preenchido automaticamente a partir do serviço. |
 | Data e Hora | Datetime | ✅ | Data e hora da audiência. |
 | Status | Select |  | Agendada, Realizada, Adiada ou Cancelada. |
 | Tipo | Select | ✅ | Tipo de audiência: Conciliação, Instrução, etc. |
 | Modalidade | Select |  | Presencial, Virtual ou Híbrida. |
 | Link da Audiência Virtual | Data |  | Link de acesso para audiência virtual ou híbrida. |
-| Vara | Link |  | Vara ou local da audiência (cadastro rígido). |
+| Court Branch | Link |  | Court Branch ou local da audiência (cadastro rígido). |
 | Resultado | Select |  | Resultado ou desfecho da audiência. |
 | Observações | Text Editor |  | Anotações sobre a audiência. |
 | Título | Data |  | Título automático no formato ID — descritor. |
@@ -303,7 +303,7 @@ Audiências judiciais vinculadas a um serviço. Sincroniza com o calendário Fra
 
 ---
 
-### Controle de Prazos
+### Deadline
 
 Prazos processuais com data fatal. Notificações automáticas para prazos urgentes (≤3 dias).
 
@@ -312,7 +312,7 @@ Prazos processuais com data fatal. Notificações automáticas para prazos urgen
 | Campo | Tipo | Obrigatório | Descrição |
 |-------|------|:-----------:|-----------|
 | Serviço | Link | ✅ | Serviço ou processo vinculado ao prazo. |
-| Cliente | Link |  | Preenchido automaticamente a partir do serviço. |
+| Client | Link |  | Preenchido automaticamente a partir do serviço. |
 | Data do Prazo | Date | ✅ | Data fatal do prazo processual. |
 | Status | Select |  | Pendente, Concluído ou Vencido. Vencido é atualizado automaticamente. |
 | Descrição | Small Text | ✅ | Descrição do compromisso ou prazo (ex.: contestação, recurso). |
@@ -326,15 +326,15 @@ Prazos processuais com data fatal. Notificações automáticas para prazos urgen
 
 ---
 
-### Tarefa
+### Legal Task
 
 **Código automático:** `format:TAR-{YYYY}-{####}`
 
 | Campo | Tipo | Obrigatório | Descrição |
 |-------|------|:-----------:|-----------|
 | Serviço | Link |  | Serviço relacionado (opcional). |
-| Cliente | Link |  | Preenchido automaticamente a partir do serviço. |
-| Descrição da Tarefa | Data | ✅ | Descrição curta da tarefa. |
+| Client | Link |  | Preenchido automaticamente a partir do serviço. |
+| Descrição da Legal Task | Data | ✅ | Descrição curta da tarefa. |
 | Status | Select |  | Pendente, Em Andamento, Concluída ou Cancelada. |
 | Prioridade | Select |  | Baixa, Média ou Alta. |
 | Data Limite | Date |  | Prazo para conclusão da tarefa (opcional). |
@@ -347,21 +347,21 @@ Prazos processuais com data fatal. Notificações automáticas para prazos urgen
 
 ---
 
-### Comunicacao
+### Case Communication
 
 **Código automático:** `format:COM-{YYYY}-{####}`
 
 | Campo | Tipo | Obrigatório | Descrição |
 |-------|------|:-----------:|-----------|
 | Serviço | Link |  | Serviço relacionado à comunicação (opcional). |
-| Cliente | Link | ✅ | Cliente envolvido na comunicação. |
+| Client | Link | ✅ | Client envolvido na comunicação. |
 | Data | Datetime | ✅ | Data e hora da comunicação. |
 | Tipo | Select | ✅ | Canal: Telefone, WhatsApp, E-mail, Reunião, etc. |
 | Assunto | Data | ✅ | Assunto principal da comunicação. |
 | Resumo | Text Editor |  | Resumo do que foi tratado. |
 | Próximos Passos | Small Text |  | Próximos passos combinados (opcional). |
-| Gerar Tarefa | Check |  | Marque para criar tarefa automaticamente a partir deste registro. |
-| Tarefa Gerada | Link |  | Tarefa gerada a partir desta comunicação. |
+| Gerar Legal Task | Check |  | Marque para criar tarefa automaticamente a partir deste registro. |
+| Legal Task Gerada | Link |  | Legal Task gerada a partir desta comunicação. |
 | Título | Data |  | Título automático no formato ID — descritor. |
 
 **Permissões:** Advocacia Manager (completo); Advocacia User conforme DocType.
@@ -370,14 +370,14 @@ Prazos processuais com data fatal. Notificações automáticas para prazos urgen
 
 ## Registro de Atividades
 
-### Registro de Atos
+### Service Record
 
 **Código automático:** `format:ATOS-{YYYY}-{####}`
 
 | Campo | Tipo | Obrigatório | Descrição |
 |-------|------|:-----------:|-----------|
 | Serviço | Link | ✅ | Serviço ou processo vinculado aos atos. |
-| Cliente | Link |  | Preenchido automaticamente a partir do serviço. |
+| Client | Link |  | Preenchido automaticamente a partir do serviço. |
 | Status | Select |  | Em aberto, Parcialmente cobrado ou Cobrado. |
 | Data de Abertura | Date |  | Data de abertura do registro de atos. |
 |  | Table |  | Atos advocatícios acumulados para cobrança. |
@@ -385,7 +385,7 @@ Prazos processuais com data fatal. Notificações automáticas para prazos urgen
 | Total Cobrado | Currency |  | Soma dos atos já cobrados. Calculado automaticamente. |
 | Total Geral | Currency |  | Total geral dos atos. Calculado automaticamente. |
 | Vencimento da Cobrança | Date |  | Vencimento sugerido ao gerar cobrança dos atos pendentes. |
-| Último Pagamento | Link |  | Último pagamento de atos vinculado a este registro. |
+| Último Legal Payment | Link |  | Último pagamento de atos vinculado a este registro. |
 | Observações | Text Editor |  | Observações sobre o registro de atos. |
 | Título | Data |  | Título automático no formato ID — descritor. |
 
@@ -393,14 +393,14 @@ Prazos processuais com data fatal. Notificações automáticas para prazos urgen
 
 ---
 
-### Registro de Horas
+### Time Entry
 
 **Código automático:** `format:HRS-{YYYY}-{####}`
 
 | Campo | Tipo | Obrigatório | Descrição |
 |-------|------|:-----------:|-----------|
 | Serviço | Link | ✅ | Serviço onde a atividade foi realizada. |
-| Cliente | Link |  | Preenchido automaticamente a partir do serviço. |
+| Client | Link |  | Preenchido automaticamente a partir do serviço. |
 | Data | Date | ✅ | Data da atividade. |
 | Responsável | Link |  | Profissional que registrou a atividade. |
 | Hora Início | Time |  | Hora de início (timer). |
@@ -419,7 +419,7 @@ Prazos processuais com data fatal. Notificações automáticas para prazos urgen
 
 ## Documentos
 
-### Template Documento
+### Document Template
 
 Modelo .docx com placeholders para geração automática.
 
@@ -437,7 +437,7 @@ Modelo .docx com placeholders para geração automática.
 
 ---
 
-### Kit de Documentos
+### Document Kit
 
 Conjunto de templates para geração em lote.
 
@@ -456,7 +456,7 @@ Conjunto de templates para geração em lote.
 
 ## Configuração
 
-### Configuracao do Escritorio
+### Office Settings
 
 Dados institucionais do escritório (OAB, CNPJ, endereço).
 
@@ -476,13 +476,13 @@ Dados institucionais do escritório (OAB, CNPJ, endereço).
 ## Fluxos Comuns
 
 ### Novo Processo
-1. Cadastre o **Cliente**
+1. Cadastre o **Client**
 2. Crie um **Serviço** com vara, comarca e tribunal
 3. Defina **Acordo de Honorários** com parcelas
 4. Cadastre **Audiências** e **Prazos**
 
 ### Recebimento
-1. Registre **Pagamento** quando o cliente pagar
+1. Registre **Legal Payment** quando o cliente pagar
 2. O painel atualiza KPIs financeiros
 
 ---

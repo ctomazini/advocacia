@@ -20,10 +20,10 @@ from advocacia.advocacia.painel._helpers import (
 PAGAMENTO_FIELDS = [
 	"name",
 	"tipo_origem",
-	"acordo",
-	"registro_atos",
-	"cliente",
-	"servico",
+	"fee_agreement",
+	"service_record",
+	"client",
+	"legal_case",
 	"valor",
 	"data_vencimento",
 	"status",
@@ -32,7 +32,7 @@ PAGAMENTO_FIELDS = [
 ]
 def _build_financeiro(hoje, periodo_fim, mes_inicio, mes_fim, kpis, periodo_dias=7):
 	previsto_periodo_rows = frappe.get_all(
-		"Pagamento",
+		"Legal Payment",
 		filters={
 			"status": "Pendente",
 			"data_vencimento": ["between", [hoje, periodo_fim]],
@@ -74,30 +74,30 @@ def _build_financeiro(hoje, periodo_fim, mes_inicio, mes_fim, kpis, periodo_dias
 	}
 def _enriquecer_pagamentos(pagamentos, hoje):
 	cache_servico = _servico_lookup(
-		[p.get("servico") for p in pagamentos if p.get("servico")],
-		["title", "tipo", "numero_processo", "cliente"],
+		[p.get("legal_case") for p in pagamentos if p.get("legal_case")],
+		["title", "tipo", "numero_processo", "client"],
 	)
 	cliente_links = set()
 	for p in pagamentos:
-		if p.get("cliente"):
-			cliente_links.add(p.get("cliente"))
-		servico = p.get("servico")
+		if p.get("client"):
+			cliente_links.add(p.get("client"))
+		servico = p.get("legal_case")
 		if servico:
-			sv_cliente = (cache_servico.get(servico) or {}).get("cliente")
+			sv_cliente = (cache_servico.get(servico) or {}).get("client")
 			if sv_cliente:
 				cliente_links.add(sv_cliente)
 	cliente_nomes = _cliente_nome_lookup(cliente_links)
 
 	for p in pagamentos:
-		p["parent"] = p.get("acordo") or p.get("registro_atos")
+		p["parent"] = p.get("fee_agreement") or p.get("service_record")
 		p["valor_total"] = p.get("valor")
 		p["vencimento"] = p.get("data_vencimento")
 		p["origem_label"] = _pagamento_origem_label(p)
 
-		cliente_link = p.get("cliente")
+		cliente_link = p.get("client")
 		p["cliente_nome"] = cliente_nomes.get(cliente_link, cliente_link or "")
 
-		servico = p.get("servico")
+		servico = p.get("legal_case")
 		p["servico_ref"] = servico or ""
 		p["servico_titulo"] = ""
 		p["servico_tipo"] = ""
@@ -107,8 +107,8 @@ def _enriquecer_pagamentos(pagamentos, hoje):
 			p["servico_titulo"] = sv.get("title") or ""
 			p["servico_tipo"] = sv.get("tipo") or ""
 			p["numero_processo"] = sv.get("numero_processo") or ""
-			if not p.get("cliente") and sv.get("cliente"):
-				p["cliente_nome"] = cliente_nomes.get(sv.get("cliente"), sv.get("cliente"))
+			if not p.get("client") and sv.get("client"):
+				p["cliente_nome"] = cliente_nomes.get(sv.get("client"), sv.get("client"))
 
 		vencimento = p.get("data_vencimento")
 		if vencimento:
@@ -120,34 +120,34 @@ def _enriquecer_pagamentos(pagamentos, hoje):
 
 	return pagamentos
 def _get_custas_pendentes_repasse(limit=LIST_LIMIT_MAX):
-	if not frappe.has_permission("Custa Processual", "read"):
+	if not frappe.has_permission("Court Cost", "read"):
 		return []
-	if not frappe.db.table_exists("Custa Processual"):
+	if not frappe.db.table_exists("Court Cost"):
 		return []
 	rows = frappe.get_all(
-		"Custa Processual",
+		"Court Cost",
 		filters={"repassar_cliente": 1, "status": "Pago"},
-		fields=["name", "descricao", "tipo", "valor", "servico", "cliente", "data_pagamento"],
+		fields=["name", "descricao", "tipo", "valor", "legal_case", "client", "data_pagamento"],
 		order_by="data_pagamento ASC",
 		limit=min(cint(limit or LIST_LIMIT_MAX), LIST_LIMIT_MAX),
 	)
-	servico_map = _servico_lookup([c.servico for c in rows if c.servico], ["cliente", "title"])
+	servico_map = _servico_lookup([c.legal_case for c in rows if c.legal_case], ["client", "title"])
 	cliente_nome_map = _cliente_nome_lookup(
-		[c.cliente for c in rows if c.cliente]
-		+ [sv.cliente for sv in servico_map.values() if sv.cliente]
+		[c.client for c in rows if c.client]
+		+ [sv.client for sv in servico_map.values() if sv.client]
 	)
 	for c in rows:
-		c["cliente_nome"] = cliente_nome_map.get(c.cliente, c.cliente or "")
-		sv = servico_map.get(c.servico) if c.servico else None
+		c["cliente_nome"] = cliente_nome_map.get(c.client, c.client or "")
+		sv = servico_map.get(c.legal_case) if c.legal_case else None
 		c["servico_titulo"] = (sv.title if sv else "") or ""
-		if not c["cliente_nome"] and sv and sv.cliente:
-			c["cliente_nome"] = cliente_nome_map.get(sv.cliente, sv.cliente)
+		if not c["cliente_nome"] and sv and sv.client:
+			c["cliente_nome"] = cliente_nome_map.get(sv.client, sv.client)
 	return rows
 def _get_despesas_pendentes(limit=LIST_LIMIT_MAX):
-	if not frappe.has_permission("Despesa do Escritorio", "read"):
+	if not frappe.has_permission("Office Expense", "read"):
 		return []
 	return frappe.get_all(
-		"Despesa do Escritorio",
+		"Office Expense",
 		filters={"status": ["in", ["Pendente", "Atrasado"]]},
 		fields=["name", "descricao", "categoria", "valor", "data_vencimento", "status"],
 		order_by="data_vencimento ASC",
@@ -157,14 +157,14 @@ def _get_pagamentos_operacao(hoje, periodo_fim, limit_start, limit_page_length):
 	"""Operação: vencidos + pendentes no período."""
 	limit_page_length = min(cint(limit_page_length or LIST_LIMIT_MAX), LIST_LIMIT_MAX)
 	vencidos = frappe.get_all(
-		"Pagamento",
+		"Legal Payment",
 		filters={"status": "Vencido"},
 		fields=PAGAMENTO_FIELDS,
 		order_by="data_vencimento asc",
 		limit_page_length=limit_page_length,
 	)
 	proximos = frappe.get_all(
-		"Pagamento",
+		"Legal Payment",
 		filters={
 			"status": "Pendente",
 			"data_vencimento": ["between", [hoje, periodo_fim]],
@@ -177,14 +177,14 @@ def _get_pagamentos_operacao(hoje, periodo_fim, limit_start, limit_page_length):
 	rows = vencidos + proximos
 	return _enriquecer_pagamentos(rows[:limit_page_length], hoje)
 def _get_total_custas_mes(mes_inicio, mes_fim):
-	if not frappe.has_permission("Custa Processual", "read"):
+	if not frappe.has_permission("Court Cost", "read"):
 		return 0
-	if not frappe.db.table_exists("Custa Processual"):
+	if not frappe.db.table_exists("Court Cost"):
 		return 0
 	result = frappe.db.sql(
 		"""
 		SELECT COALESCE(SUM(valor), 0) as total
-		FROM `tabCusta Processual`
+		FROM `tabCourt Cost`
 		WHERE data_pagamento BETWEEN %s AND %s
 		AND status IN ('Pago', 'Repassado')
 		""",
@@ -193,12 +193,12 @@ def _get_total_custas_mes(mes_inicio, mes_fim):
 	)
 	return flt(result[0].total if result else 0)
 def _get_total_despesas_mes(mes_inicio, mes_fim):
-	if not frappe.has_permission("Despesa do Escritorio", "read"):
+	if not frappe.has_permission("Office Expense", "read"):
 		return 0
 	result = frappe.db.sql(
 		"""
 		SELECT COALESCE(SUM(valor), 0) as total
-		FROM `tabDespesa do Escritorio`
+		FROM `tabOffice Expense`
 		WHERE data_vencimento BETWEEN %s AND %s
 		AND status != 'Cancelado'
 		""",
@@ -209,11 +209,11 @@ def _get_total_despesas_mes(mes_inicio, mes_fim):
 def _marcar_pagamento_recebido(pagamento_name):
 	from advocacia.advocacia.financeiro import sync_parcela_from_pagamento
 
-	doc = frappe.get_doc("Pagamento", pagamento_name)
+	doc = frappe.get_doc("Legal Payment", pagamento_name)
 	if doc.status == "Cancelado":
-		frappe.throw(_("Pagamento cancelado não pode ser alterado."))
+		frappe.throw(_("Legal Payment cancelado não pode ser alterado."))
 	if doc.status in ("Recebido", "Repassado"):
-		frappe.throw(_("Pagamento já está {0}").format(doc.status))
+		frappe.throw(_("Legal Payment já está {0}").format(doc.status))
 
 	doc.status = "Recebido"
 	doc.data_recebimento = today()
@@ -221,10 +221,10 @@ def _marcar_pagamento_recebido(pagamento_name):
 	doc.save(ignore_permissions=False)
 	sync_parcela_from_pagamento(doc)
 
-	return {"ok": True, "name": doc.name, "parent": doc.acordo}
+	return {"ok": True, "name": doc.name, "parent": doc.fee_agreement}
 def _marcar_parcela_legado_recebida(parcela_name):
-	"""Fallback para parcelas ainda sem Pagamento vinculado."""
-	doc = frappe.get_doc("Parcela de Honorarios", parcela_name)
+	"""Fallback para parcelas ainda sem Legal Payment vinculado."""
+	doc = frappe.get_doc("Fee Installment", parcela_name)
 	if doc.status in ("Recebido", "Repassado"):
 		frappe.throw(_("Parcela já está {0}").format(doc.status))
 
@@ -232,27 +232,27 @@ def _marcar_parcela_legado_recebida(parcela_name):
 	doc.data_recebimento = today()
 	doc.save(ignore_permissions=False)
 	if doc.parent:
-		acordo = frappe.get_doc("Acordo de Honorarios Processuais", doc.parent)
+		acordo = frappe.get_doc("Fee Agreement", doc.parent)
 		from advocacia.advocacia.financeiro import sincronizar_pagamentos_do_acordo
 
 		sincronizar_pagamentos_do_acordo(acordo)
 
 	return {"ok": True, "name": doc.name, "parent": doc.parent}
 def _pagamento_origem_label(pagamento):
-	if pagamento.get("acordo"):
+	if pagamento.get("fee_agreement"):
 		return (
-			frappe.db.get_value("Acordo de Honorarios Processuais", pagamento.acordo, "title")
-			or pagamento.acordo
+			frappe.db.get_value("Fee Agreement", pagamento.fee_agreement, "title")
+			or pagamento.fee_agreement
 		)
-	if pagamento.get("registro_atos"):
-		registro_title = frappe.db.get_value("Registro de Atos", pagamento.registro_atos, "title")
-		return _("Atos: {0}").format(registro_title or pagamento.registro_atos)
+	if pagamento.get("service_record"):
+		registro_title = frappe.db.get_value("Service Record", pagamento.service_record, "title")
+		return _("Atos: {0}").format(registro_title or pagamento.service_record)
 	return pagamento.get("tipo_origem") or ""
 def _vara_label(vara_link):
 	if not vara_link:
 		return ""
 	try:
-		return frappe.db.get_value("Vara", vara_link, "vara_name") or vara_link
+		return frappe.db.get_value("Court Branch", vara_link, "court_branch_name") or vara_link
 	except frappe.DoesNotExistError:
 		return vara_link
 	except Exception:
@@ -262,13 +262,13 @@ def _vara_label(vara_link):
 		)
 		return vara_link
 def marcar_parcela(parcela_name: str) -> dict:
-	"""Marca Pagamento como Recebido (compat: parametro parcela_name = name do Pagamento)."""
-	frappe.has_permission("Pagamento", "write", throw=True)
+	"""Marca Legal Payment como Recebido (compat: parametro parcela_name = name do Legal Payment)."""
+	frappe.has_permission("Legal Payment", "write", throw=True)
 
-	if frappe.db.exists("Pagamento", parcela_name):
+	if frappe.db.exists("Legal Payment", parcela_name):
 		return _marcar_pagamento_recebido(parcela_name)
 
-	if frappe.db.exists("Parcela de Honorarios", parcela_name):
+	if frappe.db.exists("Fee Installment", parcela_name):
 		return _marcar_parcela_legado_recebida(parcela_name)
 
 	frappe.throw(_("Registro financeiro não encontrado."))
