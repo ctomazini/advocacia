@@ -20,7 +20,8 @@
    "fieldtype": "Select",
    "options": "Principal\nConjuge\nResponsável\nOutro",
    "in_list_view": 1,
-   "description": "Relação com o cliente: Principal, Cônjuge, Responsável ou Outro."
+   "description": "Relação com o cliente: Principal, Cônjuge, Responsável ou Outro.",
+   "in_standard_filter": 1
   },
   {
    "fieldname": "telefone",

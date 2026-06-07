@@ -113,7 +113,13 @@
    "email": 1
   }
  ],
- "links": [],
+ "links": [
+  {
+   "group": "Financeiro",
+   "link_doctype": "Pagamento",
+   "link_fieldname": "registro_atos"
+  }
+ ],
  "fields": [
   {
    "name": "hatd55f2ji",
@@ -526,7 +532,7 @@
    "ignore_xss_filter": 0,
    "print_hide_if_no_value": 0,
    "allow_bulk_edit": 0,
-   "in_standard_filter": 0,
+   "in_standard_filter": 1,
    "in_preview": 0,
    "read_only": 0,
    "precision": "",
@@ -1210,7 +1216,8 @@
    "label": "Vencimento da Cobrança",
    "fieldtype": "Date",
    "description": "Data de vencimento sugerida ao gerar cobrança dos atos pendentes (padrão: 30 dias).",
-   "doctype": "DocField"
+   "doctype": "DocField",
+   "in_standard_filter": 1
   },
   {
    "idx": 17,

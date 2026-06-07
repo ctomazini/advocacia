@@ -113,7 +113,13 @@
    "email": 1
   }
  ],
- "links": [],
+ "links": [
+  {
+   "group": "Financeiro",
+   "link_doctype": "Pagamento",
+   "link_fieldname": "acordo"
+  }
+ ],
  "fields": [
   {
    "name": "gj8h4rsv9r",
@@ -238,7 +244,7 @@
    "ignore_xss_filter": 0,
    "print_hide_if_no_value": 0,
    "allow_bulk_edit": 0,
-   "in_standard_filter": 0,
+   "in_standard_filter": 1,
    "in_preview": 0,
    "read_only": 0,
    "precision": "",
@@ -467,7 +473,7 @@
    "ignore_xss_filter": 0,
    "print_hide_if_no_value": 0,
    "allow_bulk_edit": 0,
-   "in_standard_filter": 0,
+   "in_standard_filter": 1,
    "in_preview": 0,
    "read_only": 0,
    "precision": "",
@@ -971,7 +977,7 @@
    "ignore_xss_filter": 0,
    "print_hide_if_no_value": 0,
    "allow_bulk_edit": 0,
-   "in_standard_filter": 0,
+   "in_standard_filter": 1,
    "in_preview": 0,
    "read_only": 0,
    "precision": "",
@@ -1259,7 +1265,7 @@
    "ignore_xss_filter": 0,
    "print_hide_if_no_value": 0,
    "allow_bulk_edit": 0,
-   "in_standard_filter": 0,
+   "in_standard_filter": 1,
    "in_preview": 0,
    "read_only": 0,
    "precision": "",
@@ -1547,7 +1553,7 @@
    "ignore_xss_filter": 0,
    "print_hide_if_no_value": 0,
    "allow_bulk_edit": 0,
-   "in_standard_filter": 0,
+   "in_standard_filter": 1,
    "in_preview": 0,
    "read_only": 0,
    "precision": "",
@@ -1763,7 +1769,7 @@
    "ignore_xss_filter": 0,
    "print_hide_if_no_value": 0,
    "allow_bulk_edit": 0,
-   "in_standard_filter": 0,
+   "in_standard_filter": 1,
    "in_preview": 0,
    "read_only": 0,
    "precision": "",

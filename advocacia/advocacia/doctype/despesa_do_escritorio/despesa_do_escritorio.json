@@ -91,13 +91,15 @@
    "in_list_view": 1,
    "label": "Data de Vencimento",
    "allow_in_quick_entry": 1,
-   "description": "Data de vencimento."
+   "description": "Data de vencimento.",
+   "in_standard_filter": 1
   },
   {
    "fieldname": "data_pagamento",
    "fieldtype": "Date",
    "label": "Data de Pagamento",
-   "description": "Data em que a despesa foi paga."
+   "description": "Data em que a despesa foi paga.",
+   "in_standard_filter": 1
   },
   {
    "fieldname": "column_break_venc",
@@ -108,7 +110,8 @@
    "fieldtype": "Select",
    "label": "Forma de Pagamento",
    "options": "PIX\nTED\nBoleto\nDinheiro\nCartão\nDébito Automático",
-   "description": "Forma de pagamento: PIX, TED, Boleto, etc."
+   "description": "Forma de pagamento: PIX, TED, Boleto, etc.",
+   "in_standard_filter": 1
   },
   {
    "collapsible": 1,
@@ -129,7 +132,8 @@
    "fieldtype": "Select",
    "label": "Frequência",
    "options": "Mensal\nBimestral\nTrimestral\nSemestral\nAnual",
-   "description": "Frequência da recorrência: Mensal, Anual, etc."
+   "description": "Frequência da recorrência: Mensal, Anual, etc.",
+   "in_standard_filter": 1
   },
   {
    "fieldname": "column_break_rec",

@@ -135,7 +135,7 @@
    "ignore_xss_filter": 0,
    "print_hide_if_no_value": 0,
    "allow_bulk_edit": 0,
-   "in_standard_filter": 0,
+   "in_standard_filter": 1,
    "in_preview": 0,
    "read_only": 0,
    "precision": "",
@@ -611,21 +611,24 @@
    "fieldname": "data_recebimento",
    "label": "Data de Recebimento",
    "fieldtype": "Date",
-   "description": "Data em que a parcela foi recebida."
+   "description": "Data em que a parcela foi recebida.",
+   "in_standard_filter": 1
   },
   {
    "fieldname": "data_repasse",
    "label": "Data de Repasse ao Cliente",
    "fieldtype": "Date",
    "depends_on": "eval:doc.valor_cliente > 0",
-   "description": "Data do repasse ao cliente, quando aplicável."
+   "description": "Data do repasse ao cliente, quando aplicável.",
+   "in_standard_filter": 1
   },
   {
    "fieldname": "forma_recebimento",
    "label": "Forma de Recebimento",
    "fieldtype": "Select",
    "options": "\nPIX\nTED\nDinheiro\nCartão\nBoleto",
-   "description": "Forma de recebimento: PIX, TED, Dinheiro, etc."
+   "description": "Forma de recebimento: PIX, TED, Dinheiro, etc.",
+   "in_standard_filter": 1
   },
   {
    "fieldname": "observacao",

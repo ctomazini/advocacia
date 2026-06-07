@@ -215,6 +215,18 @@
    "link_doctype": "Registro de Horas",
    "link_fieldname": "servico",
    "doctype": "DocType Link"
+  },
+  {
+   "group": "Produtividade",
+   "link_doctype": "Tarefa",
+   "link_fieldname": "servico",
+   "doctype": "DocType Link"
+  },
+  {
+   "group": "Financeiro",
+   "link_doctype": "Pagamento",
+   "link_fieldname": "servico",
+   "doctype": "DocType Link"
   }
  ],
  "fields": [
@@ -663,7 +675,7 @@
    "hidden": 0,
    "reqd": 0,
    "in_list_view": 0,
-   "in_standard_filter": 0,
+   "in_standard_filter": 1,
    "insert_after": "status",
    "description": "Fase atual do processo conforme cadastro rígido de Fases Processuais."
   },
@@ -718,7 +730,7 @@
    "ignore_xss_filter": 0,
    "print_hide_if_no_value": 0,
    "allow_bulk_edit": 0,
-   "in_standard_filter": 0,
+   "in_standard_filter": 1,
    "in_preview": 0,
    "read_only": 0,
    "precision": "",
@@ -955,7 +967,7 @@
    "ignore_xss_filter": 0,
    "print_hide_if_no_value": 0,
    "allow_bulk_edit": 0,
-   "in_standard_filter": 0,
+   "in_standard_filter": 1,
    "in_preview": 0,
    "read_only": 0,
    "precision": "",
@@ -1099,7 +1111,7 @@
    "ignore_xss_filter": 0,
    "print_hide_if_no_value": 0,
    "allow_bulk_edit": 0,
-   "in_standard_filter": 0,
+   "in_standard_filter": 1,
    "in_preview": 0,
    "read_only": 0,
    "precision": "",
@@ -1133,7 +1145,7 @@
    "hidden": 0,
    "reqd": 0,
    "in_list_view": 0,
-   "in_standard_filter": 0,
+   "in_standard_filter": 1,
    "insert_after": "vara",
    "description": "Tribunal competente (cadastro rígido)."
   },
@@ -1188,7 +1200,7 @@
    "ignore_xss_filter": 0,
    "print_hide_if_no_value": 0,
    "allow_bulk_edit": 0,
-   "in_standard_filter": 0,
+   "in_standard_filter": 1,
    "in_preview": 0,
    "read_only": 0,
    "precision": "",

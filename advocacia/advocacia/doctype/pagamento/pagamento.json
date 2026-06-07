@@ -178,7 +178,8 @@
    "fieldname": "data_recebimento",
    "fieldtype": "Date",
    "label": "Data de Recebimento",
-   "description": "Data em que o pagamento foi recebido."
+   "description": "Data em que o pagamento foi recebido.",
+   "in_standard_filter": 1
   },
   {
    "default": "Pendente",

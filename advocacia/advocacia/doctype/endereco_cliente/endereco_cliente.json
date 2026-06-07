@@ -12,7 +12,8 @@
    "options": "Residencial\nComercial\nCorrespondência\nOutro",
    "in_list_view": 1,
    "default": "Residencial",
-   "description": "Finalidade: Residencial, Comercial, Correspondência ou Outro."
+   "description": "Finalidade: Residencial, Comercial, Correspondência ou Outro.",
+   "in_standard_filter": 1
   },
   {
    "fieldname": "cep",
@@ -60,7 +61,8 @@
    "fieldtype": "Select",
    "options": "\nAC\nAL\nAP\nAM\nBA\nCE\nDF\nES\nGO\nMA\nMT\nMS\nMG\nPA\nPB\nPR\nPE\nPI\nRJ\nRN\nRS\nRO\nRR\nSC\nSP\nSE\nTO",
    "in_list_view": 1,
-   "description": "Escolha a opção adequada ao registro."
+   "description": "Escolha a opção adequada ao registro.",
+   "in_standard_filter": 1
   },
   {
    "fieldname": "principal",

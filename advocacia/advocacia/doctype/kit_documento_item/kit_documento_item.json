@@ -18,7 +18,8 @@
    "label": "Template",
    "options": "Template Documento",
    "reqd": 1,
-   "description": "Modelo de documento incluído no kit."
+   "description": "Modelo de documento incluído no kit.",
+   "in_standard_filter": 1
   },
   {
    "fieldname": "ordem",

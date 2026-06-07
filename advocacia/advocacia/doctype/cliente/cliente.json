@@ -93,7 +93,8 @@
    "label": "Estado Civil",
    "fieldtype": "Select",
    "options": "\nSolteiro(a)\nCasado(a)\nDivorciado(a)\nViúvo(a)\nUnião Estável",
-   "description": "Estado civil (pessoa física)."
+   "description": "Estado civil (pessoa física).",
+   "in_standard_filter": 1
   },
   {
    "fieldname": "profissao",
@@ -191,7 +192,37 @@
    "group": "Jurídico"
   },
   {
+   "link_doctype": "Tarefa",
+   "link_fieldname": "cliente",
+   "group": "Jurídico"
+  },
+  {
+   "link_doctype": "Comunicacao",
+   "link_fieldname": "cliente",
+   "group": "Jurídico"
+  },
+  {
+   "link_doctype": "Registro de Atos",
+   "link_fieldname": "cliente",
+   "group": "Jurídico"
+  },
+  {
+   "link_doctype": "Registro de Horas",
+   "link_fieldname": "cliente",
+   "group": "Jurídico"
+  },
+  {
    "link_doctype": "Acordo de Honorarios Processuais",
+   "link_fieldname": "cliente",
+   "group": "Financeiro"
+  },
+  {
+   "link_doctype": "Pagamento",
+   "link_fieldname": "cliente",
+   "group": "Financeiro"
+  },
+  {
+   "link_doctype": "Custa Processual",
    "link_fieldname": "cliente",
    "group": "Financeiro"
   }

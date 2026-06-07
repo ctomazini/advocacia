@@ -40,7 +40,8 @@
    "reqd": 1,
    "allow_in_quick_entry": 1,
    "in_list_view": 1,
-   "description": "Serviço ou processo vinculado à custa."
+   "description": "Serviço ou processo vinculado à custa.",
+   "in_standard_filter": 1
   },
   {
    "fieldname": "cliente",
@@ -60,7 +61,8 @@
    "allow_in_quick_entry": 1,
    "in_list_view": 0,
    "options": "Taxa Judicial\nPerícia\nCertidão\nDeslocamento\nCópia/Impressão\nCorreios\nCartório\nDiligência\nOutros",
-   "description": "Taxa Judicial, Emolumento, Despesa Cartorial, etc."
+   "description": "Taxa Judicial, Emolumento, Despesa Cartorial, etc.",
+   "in_standard_filter": 1
   },
   {
    "fieldname": "column_break_info",
@@ -103,7 +105,8 @@
    "fieldname": "data_pagamento",
    "fieldtype": "Date",
    "label": "Data de Pagamento",
-   "description": "Data em que a custa foi paga."
+   "description": "Data em que a custa foi paga.",
+   "in_standard_filter": 1
   },
   {
    "fieldname": "column_break_val",
@@ -121,14 +124,16 @@
    "fieldtype": "Date",
    "label": "Data de Repasse",
    "depends_on": "eval:doc.repassar_cliente==1",
-   "description": "Data do repasse ao cliente."
+   "description": "Data do repasse ao cliente.",
+   "in_standard_filter": 1
   },
   {
    "fieldname": "forma_pagamento",
    "fieldtype": "Select",
    "label": "Forma de Pagamento",
    "options": "PIX\nTED\nBoleto\nDinheiro\nCartão",
-   "description": "Forma de pagamento: PIX, TED, Dinheiro, etc."
+   "description": "Forma de pagamento: PIX, TED, Dinheiro, etc.",
+   "in_standard_filter": 1
   },
   {
    "fieldname": "anexos_section",

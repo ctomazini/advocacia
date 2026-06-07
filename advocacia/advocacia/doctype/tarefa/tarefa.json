@@ -95,7 +95,8 @@
    "label": "Data Limite",
    "fieldtype": "Date",
    "in_list_view": 1,
-   "description": "Prazo para conclusão da tarefa (opcional)."
+   "description": "Prazo para conclusão da tarefa (opcional).",
+   "in_standard_filter": 1
   },
   {
    "fieldname": "sec_detalhes",
@@ -117,13 +118,15 @@
    "label": "Responsável",
    "fieldtype": "Link",
    "options": "User",
-   "description": "Usuário responsável pela execução."
+   "description": "Usuário responsável pela execução.",
+   "in_standard_filter": 1
   },
   {
    "fieldname": "data_conclusao",
    "label": "Data de Conclusão",
    "fieldtype": "Date",
-   "description": "Preenchida automaticamente ao concluir a tarefa."
+   "description": "Preenchida automaticamente ao concluir a tarefa.",
+   "in_standard_filter": 1
   },
   {
    "fieldname": "title",

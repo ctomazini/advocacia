@@ -43,7 +43,8 @@
    "reqd": 1,
    "allow_in_quick_entry": 1,
    "in_list_view": 1,
-   "description": "Serviço onde a atividade foi realizada."
+   "description": "Serviço onde a atividade foi realizada.",
+   "in_standard_filter": 1
   },
   {
    "fieldname": "cliente",
@@ -67,14 +68,16 @@
    "default": "Today",
    "allow_in_quick_entry": 1,
    "in_list_view": 1,
-   "description": "Data da atividade."
+   "description": "Data da atividade.",
+   "in_standard_filter": 1
   },
   {
    "fieldname": "responsavel",
    "fieldtype": "Link",
    "options": "User",
    "label": "Responsável",
-   "description": "Profissional que registrou a atividade."
+   "description": "Profissional que registrou a atividade.",
+   "in_standard_filter": 1
   },
   {
    "fieldname": "tempo_section",
@@ -131,7 +134,8 @@
    "fieldtype": "Select",
    "label": "Categoria",
    "options": "Estudo/Pesquisa\nRedação\nAudiência\nReunião\nDeslocamento\nAtendimento\nAdministrativo\nOutro",
-   "description": "Categoria da atividade: Reunião, Petição, Pesquisa, etc."
+   "description": "Categoria da atividade: Reunião, Petição, Pesquisa, etc.",
+   "in_standard_filter": 1
   },
   {
    "fieldname": "descricao",
