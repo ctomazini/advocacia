@@ -3,9 +3,9 @@ Demo data seeder for Advocacia app.
 Seeds realistic Brazilian legal data for testing. NOT for production.
 
 Usage:
-    bench --site advocacia.local seed-demo-advocacia
-    bench --site advocacia.local clear-demo-advocacia
-    bench --site advocacia.local execute advocacia.advocacia.setup.seed_demo.seed_demo_data
+	bench --site advocacia.local seed-demo-advocacia
+	bench --site advocacia.local clear-demo-advocacia
+	bench --site advocacia.local execute advocacia.advocacia.setup.seed_demo.seed_demo_data
 """
 
 from __future__ import annotations
@@ -23,7 +23,7 @@ from advocacia.advocacia.validators import _calcular_dv_cnj, _calcular_dv_cnpj, 
 
 DEMO_MARKER = "_DEMO_"
 
-CPF_ANA = "52998224725"  # reservado — não usar no seed (colide com testes/fixtures)
+CPF_ANA = "52998224725"	 # reservado — não usar no seed (colide com testes/fixtures)
 
 
 def _demo_cpf(seed: int) -> str:
@@ -220,7 +220,7 @@ def _demo_exists(doctype: str, filters: dict) -> bool:
 
 def _insert(doc_dict: dict) -> frappe.model.document.Document:
 	doc = frappe.get_doc(doc_dict)
-	doc.insert(ignore_permissions=True)  # setup: seed de demonstração em dev
+	doc.insert(ignore_permissions=True)	 # setup: seed de demonstração em dev
 	return doc
 
 
