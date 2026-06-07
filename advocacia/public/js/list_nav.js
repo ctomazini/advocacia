@@ -70,7 +70,7 @@ frappe.provide("advocacia.list_nav");
 			return;
 		}
 
-		var frm = cur_frm;
+		var frm = frappe.ui.form.get_open_form();
 		if (!frm || frm.doc.__islocal) {
 			return;
 		}
