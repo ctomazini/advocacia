@@ -1,0 +1,24 @@
+---
+description: Enforces read-only constraint on engenharia app and architectural rules for advocacia pre-deploy fixes
+globs:
+  - "apps/advocacia/**"
+alwaysApply: true
+---
+
+# REGRAS INVIOLÁVEIS
+
+1. **ENGENHARIA READ-ONLY**: NUNCA modificar NENHUM arquivo em `apps/engenharia/`. Nenhum. Zero. Se precisar referenciar, apenas LEIA.
+
+2. **DocType names PT CONGELADOS**: NUNCA renomear DocTypes. Os 24 nomes em português são definitivos.
+
+3. **Sem Server Script / Client Script no banco**: Toda lógica vive em controllers Python + JS físicos no app.
+
+4. **Sem `frappe.db.commit()`** em handlers, whitelisted, doc_events, schedulers. Exceção: setup/patches/seed com comentário.
+
+5. **Sem `ignore_permissions=True`** sem comentário justificativo na linha anterior.
+
+6. **Sem N+1**: get_doc/get_value em loop é proibido. Usar get_all com fields ou JOIN.
+
+7. **Testes**: Cada bloco termina com `bench --site advocacia.local run-tests --app advocacia`. Resultado deve ser verde antes de prosseguir.
+
+8. **Commits**: Conventional Commits, um por bloco. Formato: `fix: <escopo>` ou `refactor: <escopo>`.
