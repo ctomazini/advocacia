@@ -13,7 +13,16 @@
 | Sem `test_permissions.py` | ✅ 6 métodos |
 | Sem `list_filters` | ✅ `list_filters.js` + CSS responsivo |
 | Connections lista genérica | ✅ `list_nav.js` filtra por documento pai |
-| 222 testes | ✅ **241** testes (jun/2026) |
+| 222 testes | ✅ **255** testes (jun/2026) |
+| Sem `report_visuals.py` | ✅ `report_visuals.py` + 6 reports refatorados |
+| Sem formatters JS nos reports | ✅ `formatter()` nos 6 Script Reports |
+| Painel JS global (`app_include_js`) | ✅ Lazy-load via `frappe.require` só em `/app/painel` |
+| Sem `*_dashboard.py` | ✅ 9 dashboards + `test_doctype_dashboard.py` |
+| Sem print formats HTML | ✅ `print_formats/` + `setup/print_formats.py` |
+| Sem seed produção | ✅ `setup/seed.py` (Case Phase idempotente) |
+| Sem `importable_doctypes` | ✅ Hook + `allow_import` em 5 DocTypes |
+| Sem pacote E2E npm | ✅ `e2e/` (Playwright) |
+| Sem Ruff em `pyproject.toml` | ✅ `[tool.ruff]` espelhando engenharia |
 
 **Data original:** 2026-06-06  
 **Escopo:** comparação read-only de padrões entre os apps Frappe v16 `advocacia` (brownfield, PT) e `engenharia` (greenfield, EN).  
@@ -22,7 +31,7 @@
 - `/home/frappe/frappe-bench/apps/engenharia`
 
 **Execução de testes:**
-- `bench --site advocacia.local run-tests --app advocacia` → **241 testes, OK** (jun/2026)
+- `bench --site advocacia.local run-tests --app advocacia` → **255 testes, OK** (jun/2026)
 - `bench --site advocacia.local run-tests --app engenharia` → **falhou** (`DocType Document Kit not found` — app não instalado neste site)
 
 ---
@@ -42,7 +51,7 @@
 | **4. Dashboard / Painel** | Backend modular (12 arquivos); frontend modular (~999 linhas JS) | Backend modular (7 arquivos); frontend modular `public/js/painel/` (~2.500 linhas) | Paridade estrutural OK; soft refresh jun/2026 | — |
 | **4.2 KPIs** | Obras, protocolos, margem, comissões, reembolsáveis | Clients, serviços, audiências, honorários, custas, taxa recebimento | Manter KPIs de domínio; opcional: tiles de atenção/saúde como engenharia | Médio |
 | **5. Calendar sync** | `Deadline` + `Permit` → `Event` | `Hearing` + `Deadline` → `Event` | Paridade OK; testes em ambos (`test_calendar_sync.py`) | — |
-| **6. Testes** | 192 métodos; `test_permissions`, `test_agent_api` | **241** métodos; `test_permissions`, `test_painel_api`, `test_agent_api` | — | — |
+| **6. Testes** | 192 métodos; `test_permissions`, `test_agent_api` | **255** métodos; reports, dashboards, seed, print formats, CSV import | — | — |
 | **7. Connections / Links** | Hub `Construction Project`; 12 satélites | Hub `Legal Case`; 9 satélites; lista filtrada (`list_nav.js`) | Engenharia pode portar `list_nav` | Médio |
 | **8. Field descriptions** | 346/352 (98,3%) | 218/232 (94%) | Paridade aceitável | — |
 | **9. Hooks e scheduler** | 7 `doc_events`; scheduler daily (1 job) | 6 `doc_events`; scheduler daily (5) + weekly (1) | Advocacia mais completo em notificações; sem duplicatas de handler | Quick win (documentar) |

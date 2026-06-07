@@ -2,7 +2,7 @@
 
 > Gerado em **2026-06-07** — re-audit pós-UX (títulos, list views, sidebar, painel). Branch **`frappe-v16`**. Frappe puro, **sem ERPNext**.
 
-> **HEAD:** `02a393d 2026-06-07 17:22:44 +0000 refactor!: rename 24 DocTypes PT→EN and release v1.0.0`
+> **HEAD:** `3810cb0 2026-06-07 17:57:46 +0000 feat: office settings, IA, placeholders, painel/reports e docs v1.0.0`
 
 ---
 
@@ -17,9 +17,9 @@
 | Branch | frappe-v16 |
 | Remote | git@github.com:ctomazini/advocacia.git |
 | Site dev | advocacia.local (porta 8000) |
-| Linhas Python | ~13167 |
-| Linhas JavaScript | ~5669 |
-| Métodos de teste | 245 |
+| Linhas Python | ~13556 |
+| Linhas JavaScript | ~279000 |
+| Métodos de teste | 259 |
 | DocTypes | 24 (todos `custom: 0`) |
 | Script Reports | 6 |
 
@@ -42,6 +42,7 @@
 
 **Commits recentes:**
 ```text
+3810cb0 feat: office settings, IA, placeholders, painel/reports e docs v1.0.0
 02a393d refactor!: rename 24 DocTypes PT→EN and release v1.0.0
 083b027 docs: move audit-deploy-ready.md into advocacia/docs index folder
 b83371e chore: bump version to 0.7.1 and add deploy-ready audit report
@@ -53,7 +54,6 @@ a149418 fix: add explicit naming_rule to auxiliary DocTypes and Configuracao Sin
 0608589 fix: replace deprecated cur_frm in list_nav.js with Frappe v16 API
 5444bb0 chore: add advocacia-predeploy cursor rule for v0.7.1 fixes
 28467df docs: organize documentation for filters, connections and E2E
-cf33fc5 test: add Playwright E2E script for Advocacia UI flow
 ```
 
 ## 2. Árvore de Arquivos (anotada)
@@ -584,9 +584,9 @@ Status Legal Payment: Pendente, Vencido, Recebido, Cancelado, Renegociado, Repas
 
 ## 11. Testes
 
-- **245** métodos em **36** arquivos.
+- **259** métodos em **39** arquivos.
 - `bench --site advocacia.local run-tests --app advocacia`
-- Última run (site dev): **245** testes, **OK** (jun/2026).
+- Última run (site dev): **259** testes, **OK** (jun/2026).
 
 ## 12. Integrações
 

@@ -15,7 +15,7 @@
 | Nomes DocType | **Português congelado** — não renomear |
 | Fieldnames | `snake_case`; labels UI em português |
 | Hub | `Legal Case` — 9 satélites com campo `servico` |
-| Testes | 241 (`run-tests --app advocacia`) |
+| Testes | 255 (`run-tests --app advocacia`) |
 
 ---
 
@@ -56,7 +56,7 @@
 | --- | --- |
 | Backend | `advocacia/painel/` — orquestrador `get()` |
 | Facade | Único `xcall`: `painel_api.get_painel_data` |
-| Frontend | `public/js/painel/` (7 módulos) + shell `page/painel/painel.js` |
+| Frontend | `public/js/painel/` — carregado **somente** na Page via `frappe.require(PAINEL_ASSETS)` em `page/painel/painel.js` (não em `app_include_js`) |
 | Permissão | `Legal Case` read na entrada |
 | Financeiro | `strip_financial_payload` para **Advocacia User** |
 | Commit | Nunca no `get()` |
@@ -98,6 +98,37 @@ Setup: `setup/roles.py` + `setup/permissions.py` no `after_migrate`.
 
 ---
 
+## 6.1 Script Reports
+
+| Item | Regra |
+| --- | --- |
+| Cores / charts | `report_visuals.py` — sem hex inline nos `.py` |
+| KPIs | `currency_summary`, `int_summary`, `percent_summary` |
+| Grid | `formatter()` nos `.js` — classes Frappe (`indicator-pill`, `text-danger`, `bold`) |
+
+---
+
+## 6.2 Print Formats e seed produção
+
+| Item | Regra |
+| --- | --- |
+| HTML | `advocacia/print_formats/*.html` (Jinja) |
+| Sync | `setup/print_formats.ensure_advocacia_print_formats` no `after_migrate` |
+| Seed | `setup/seed.ensure_seed_data` — Case Phase universal, idempotente |
+| CSV import | `importable_doctypes` em `hooks.py` + `allow_import: 1` nos DocTypes listados |
+
+---
+
+## 6.3 Doctype dashboards
+
+| Item | Regra |
+| --- | --- |
+| Arquivo | `{doctype_snake}_dashboard.py` com `get_data()` |
+| Links | `internal_links` + `non_standard_fieldnames` quando o campo não segue convenção Frappe |
+| JSON | `links[]` no DocType hub/satélites — sem duplicar o mesmo DocType em grupos diferentes |
+
+---
+
 ## 7. Comandos bench
 
 ```bash
@@ -115,14 +146,16 @@ bench restart
 
 ## 7.1 E2E Playwright (opcional)
 
-Script manual: `advocacia/advocacia/tests/e2e/playwright_flow.py`  
-Marcador: `_PW_E2E_` — cleanup automático.  
-Documentação: `advocacia/docs/e2e_playwright.md`
+Pacote npm: `e2e/` (`npm test` após `npm install`).  
+Variáveis: `E2E_BASE_URL`, `E2E_SITE_HOST`, `E2E_USER`, `E2E_PASS`.  
+Marcador: `PLAYWRIGHT_<run_id>`.  
+Wrapper Python legado: `tests/e2e/playwright_flow.py` (preferir npm).
 
 ```bash
-export ADVOCACIA_E2E_PWD='...'
+cd e2e && npm install && npm run install:browsers
+export E2E_PASS='...'
 bench --site advocacia.local serve --port 8000 --noreload
-python advocacia/advocacia/tests/e2e/playwright_flow.py
+npm test
 ```
 
 ---
@@ -135,7 +168,7 @@ python advocacia/advocacia/tests/e2e/playwright_flow.py
 - [ ] Whitelist: `has_permission` + type hints
 - [ ] Queries com limit; sem N+1
 - [ ] `doc_events`: um handler por evento
-- [ ] `run-tests` verde (241)
+- [ ] `run-tests` verde (255)
 - [ ] Sem segredos/dados reais no diff
 - [ ] Conventional Commit (`feat:`, `fix:`, `refactor:`, `chore:`)
 - [ ] Snapshot Proxmox antes de mudança destrutiva em produção
