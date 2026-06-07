@@ -1,0 +1,106 @@
+{% set settings = frappe.get_doc("Office Settings") %}
+{% set client_name = frappe.db.get_value("Client", doc.client, "nome") or doc.client %}
+{% set case_title = frappe.db.get_value("Legal Case", doc.legal_case, "title") or doc.legal_case %}
+<style>
+	.adv-print { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 11pt; color: #222; line-height: 1.45; }
+	.adv-print h1 { font-size: 18pt; margin: 0 0 4px; font-weight: 600; }
+	.adv-print h2 { font-size: 12pt; margin: 20px 0 8px; padding-bottom: 4px; border-bottom: 1px solid #ccc; text-transform: uppercase; letter-spacing: 0.04em; }
+	.adv-print .header { display: table; width: 100%; margin-bottom: 24px; border-bottom: 2px solid #333; padding-bottom: 12px; }
+	.adv-print .header-logo { display: table-cell; width: 120px; vertical-align: middle; }
+	.adv-print .header-logo img { max-height: 70px; max-width: 110px; }
+	.adv-print .header-info { display: table-cell; vertical-align: middle; padding-left: 16px; }
+	.adv-print .header-meta { display: table-cell; vertical-align: middle; text-align: right; font-size: 10pt; color: #555; }
+	.adv-print .doc-title { text-align: center; margin: 16px 0 24px; }
+	.adv-print .doc-title h1 { font-size: 16pt; text-transform: uppercase; }
+	.adv-print .grid { display: table; width: 100%; margin-bottom: 8px; }
+	.adv-print .grid-row { display: table-row; }
+	.adv-print .grid-label { display: table-cell; width: 32%; padding: 4px 8px 4px 0; font-weight: 600; color: #444; vertical-align: top; }
+	.adv-print .grid-value { display: table-cell; padding: 4px 0; vertical-align: top; }
+	.adv-print .muted { color: #666; font-size: 10pt; }
+	.adv-print .amount-box { text-align: center; margin: 24px 0; padding: 16px; border: 2px solid #333; background: #f8f9fa; }
+	.adv-print .amount-value { font-size: 20pt; font-weight: 700; margin-top: 6px; }
+</style>
+
+<div class="adv-print">
+	<div class="header">
+		{% if settings.office_logo %}
+		<div class="header-logo">
+			<img src="{{ settings.office_logo }}" alt="Logo">
+		</div>
+		{% endif %}
+		<div class="header-info">
+			<h1>{{ settings.razao_social or "Escritório de Advocacia" }}</h1>
+			{% if settings.advogada %}
+			<div class="muted">{{ settings.advogada }}{% if settings.oab %} — OAB {{ settings.oab }}{% endif %}</div>
+			{% endif %}
+		</div>
+		<div class="header-meta">
+			<div><strong>Acordo:</strong> {{ doc.name }}</div>
+			<div><strong>Emissão:</strong> {{ frappe.utils.formatdate(frappe.utils.today()) }}</div>
+		</div>
+	</div>
+
+	<div class="doc-title">
+		<h1>Contrato de Honorários</h1>
+		<div class="muted">{{ doc.title or doc.name }}</div>
+	</div>
+
+	<h2>Partes e Serviço</h2>
+	<div class="grid">
+		<div class="grid-row">
+			<div class="grid-label">Cliente</div>
+			<div class="grid-value">{{ client_name }}</div>
+		</div>
+		<div class="grid-row">
+			<div class="grid-label">Serviço / Processo</div>
+			<div class="grid-value">{{ case_title }}</div>
+		</div>
+		<div class="grid-row">
+			<div class="grid-label">Status</div>
+			<div class="grid-value">{{ doc.status or "—" }}</div>
+		</div>
+		<div class="grid-row">
+			<div class="grid-label">Tipo de cobrança</div>
+			<div class="grid-value">{{ doc.billing_type or "—" }}</div>
+		</div>
+	</div>
+
+	<h2>Valores</h2>
+	<div class="amount-box">
+		<div class="muted">Valor total do acordo</div>
+		<div class="amount-value">{{ frappe.utils.fmt_money(doc.valor_total_do_acordo or 0) }}</div>
+	</div>
+	<div class="grid">
+		{% if doc.percentual_advogada %}
+		<div class="grid-row">
+			<div class="grid-label">Percentual advogada</div>
+			<div class="grid-value">{{ doc.percentual_advogada }}%</div>
+		</div>
+		{% endif %}
+		{% if doc.valor_advogada %}
+		<div class="grid-row">
+			<div class="grid-label">Valor advogada</div>
+			<div class="grid-value">{{ frappe.utils.fmt_money(doc.valor_advogada) }}</div>
+		</div>
+		{% endif %}
+		{% if doc.installment_count %}
+		<div class="grid-row">
+			<div class="grid-label">Parcelas</div>
+			<div class="grid-value">{{ doc.installment_count }}</div>
+		</div>
+		{% endif %}
+		{% if doc.valor_da_parcela %}
+		<div class="grid-row">
+			<div class="grid-label">Valor da parcela</div>
+			<div class="grid-value">{{ frappe.utils.fmt_money(doc.valor_da_parcela) }}</div>
+		</div>
+		{% endif %}
+	</div>
+
+	{% if doc.remarks %}
+	<h2>Observações</h2>
+	<p>{{ doc.remarks }}</p>
+	{% endif %}
+
+	<p class="muted" style="margin-top: 32px;">Documento gerado pelo sistema Advocacia. Assinaturas conforme acordo firmado entre as partes.</p>
+</div>

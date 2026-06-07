@@ -27,6 +27,20 @@ fixtures = [
         "dt": "Custom Field",
         "filters": [["dt", "=", "Event"], ["fieldname", "like", "custom_source%"]],
     },
+    {
+        "dt": "Print Format",
+        "filters": [
+            [
+                "name",
+                "in",
+                [
+                    "Advocacia - Recibo de Honorários",
+                    "Advocacia - Resumo do Processo",
+                    "Advocacia - Contrato de Honorários",
+                ],
+            ]
+        ],
+    },
 ]
 
 app_include_css = [

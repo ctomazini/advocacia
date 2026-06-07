@@ -1,0 +1,99 @@
+{% set settings = frappe.get_doc("Office Settings") %}
+{% set client_name = frappe.db.get_value("Client", doc.client, "nome") or doc.client %}
+<style>
+	.adv-print { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 11pt; color: #222; line-height: 1.45; }
+	.adv-print h1 { font-size: 18pt; margin: 0 0 4px; font-weight: 600; }
+	.adv-print h2 { font-size: 12pt; margin: 20px 0 8px; padding-bottom: 4px; border-bottom: 1px solid #ccc; text-transform: uppercase; letter-spacing: 0.04em; }
+	.adv-print .header { display: table; width: 100%; margin-bottom: 24px; border-bottom: 2px solid #333; padding-bottom: 12px; }
+	.adv-print .header-logo { display: table-cell; width: 120px; vertical-align: middle; }
+	.adv-print .header-logo img { max-height: 70px; max-width: 110px; }
+	.adv-print .header-info { display: table-cell; vertical-align: middle; padding-left: 16px; }
+	.adv-print .header-meta { display: table-cell; vertical-align: middle; text-align: right; font-size: 10pt; color: #555; }
+	.adv-print .doc-title { text-align: center; margin: 16px 0 24px; }
+	.adv-print .doc-title h1 { font-size: 16pt; text-transform: uppercase; }
+	.adv-print .grid { display: table; width: 100%; margin-bottom: 8px; }
+	.adv-print .grid-row { display: table-row; }
+	.adv-print .grid-label { display: table-cell; width: 32%; padding: 4px 8px 4px 0; font-weight: 600; color: #444; vertical-align: top; }
+	.adv-print .grid-value { display: table-cell; padding: 4px 0; vertical-align: top; }
+	.adv-print .muted { color: #666; font-size: 10pt; }
+	.adv-print .status-badge { display: inline-block; padding: 4px 12px; border-radius: 4px; font-size: 10pt; font-weight: 600; background: #eee; }
+</style>
+
+<div class="adv-print">
+	<div class="header">
+		{% if settings.office_logo %}
+		<div class="header-logo">
+			<img src="{{ settings.office_logo }}" alt="Logo">
+		</div>
+		{% endif %}
+		<div class="header-info">
+			<h1>{{ settings.razao_social or "Escritório de Advocacia" }}</h1>
+			{% if settings.oab %}
+			<div class="muted">OAB {{ settings.oab }}</div>
+			{% endif %}
+		</div>
+		<div class="header-meta">
+			<div><strong>Processo:</strong> {{ doc.name }}</div>
+			<div><strong>Emissão:</strong> {{ frappe.utils.formatdate(frappe.utils.today()) }}</div>
+		</div>
+	</div>
+
+	<div class="doc-title">
+		<h1>Resumo do Processo</h1>
+		<div class="muted">{{ doc.title or doc.name }}</div>
+		<div style="margin-top: 8px;"><span class="status-badge">{{ doc.status }}</span></div>
+	</div>
+
+	<h2>Identificação</h2>
+	<div class="grid">
+		<div class="grid-row">
+			<div class="grid-label">Cliente</div>
+			<div class="grid-value">{{ client_name }}</div>
+		</div>
+		<div class="grid-row">
+			<div class="grid-label">Tipo</div>
+			<div class="grid-value">{{ doc.tipo or "—" }}</div>
+		</div>
+		<div class="grid-row">
+			<div class="grid-label">Área</div>
+			<div class="grid-value">{{ doc.area or "—" }}</div>
+		</div>
+		<div class="grid-row">
+			<div class="grid-label">Fase</div>
+			<div class="grid-value">{{ doc.case_phase or "—" }}</div>
+		</div>
+		<div class="grid-row">
+			<div class="grid-label">Número CNJ</div>
+			<div class="grid-value">{{ doc.numero_processo or "—" }}</div>
+		</div>
+		<div class="grid-row">
+			<div class="grid-label">Tribunal</div>
+			<div class="grid-value">{{ doc.court or "—" }}</div>
+		</div>
+		<div class="grid-row">
+			<div class="grid-label">Comarca</div>
+			<div class="grid-value">{{ doc.jurisdiction or "—" }}</div>
+		</div>
+		<div class="grid-row">
+			<div class="grid-label">Vara</div>
+			<div class="grid-value">{{ doc.court_branch_link or "—" }}</div>
+		</div>
+		<div class="grid-row">
+			<div class="grid-label">Parte contrária</div>
+			<div class="grid-value">{{ doc.parte_contraria or "—" }}</div>
+		</div>
+		<div class="grid-row">
+			<div class="grid-label">Valor da causa</div>
+			<div class="grid-value">{% if doc.valor_causa %}{{ frappe.utils.fmt_money(doc.valor_causa) }}{% else %}—{% endif %}</div>
+		</div>
+		<div class="grid-row">
+			<div class="grid-label">Abertura</div>
+			<div class="grid-value">{{ frappe.utils.formatdate(doc.data_abertura) if doc.data_abertura else "—" }}</div>
+		</div>
+	</div>
+
+	{% if doc.observacoes %}
+	<h2>Observações</h2>
+	<p>{{ doc.observacoes }}</p>
+	{% endif %}
+</div>

@@ -1,0 +1,126 @@
+{% set settings = frappe.get_doc("Office Settings") %}
+{% set client_name = frappe.db.get_value("Client", doc.client, "nome") or doc.client %}
+{% set case_title = frappe.db.get_value("Legal Case", doc.legal_case, "title") or doc.legal_case %}
+{% set received = doc.status == "Recebido" %}
+{% set display_amount = doc.valor_recebido if received and doc.valor_recebido else doc.valor %}
+<style>
+	.adv-print { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 11pt; color: #222; line-height: 1.45; }
+	.adv-print h1 { font-size: 18pt; margin: 0 0 4px; font-weight: 600; }
+	.adv-print h2 { font-size: 12pt; margin: 20px 0 8px; padding-bottom: 4px; border-bottom: 1px solid #ccc; text-transform: uppercase; letter-spacing: 0.04em; }
+	.adv-print .header { display: table; width: 100%; margin-bottom: 24px; border-bottom: 2px solid #333; padding-bottom: 12px; }
+	.adv-print .header-logo { display: table-cell; width: 120px; vertical-align: middle; }
+	.adv-print .header-logo img { max-height: 70px; max-width: 110px; }
+	.adv-print .header-info { display: table-cell; vertical-align: middle; padding-left: 16px; }
+	.adv-print .header-meta { display: table-cell; vertical-align: middle; text-align: right; font-size: 10pt; color: #555; }
+	.adv-print .doc-title { text-align: center; margin: 16px 0 24px; }
+	.adv-print .doc-title h1 { font-size: 16pt; text-transform: uppercase; }
+	.adv-print .amount-box { text-align: center; margin: 24px 0; padding: 20px; border: 2px solid {% if received %}#2e7d32{% else %}#e65100{% endif %}; background: {% if received %}#f1f8e9{% else %}#fff3e0{% endif %}; }
+	.adv-print .amount-label { font-size: 10pt; text-transform: uppercase; letter-spacing: 0.08em; color: #555; }
+	.adv-print .amount-value { font-size: 22pt; font-weight: 700; margin-top: 6px; }
+	.adv-print .status-badge { display: inline-block; padding: 4px 12px; border-radius: 4px; font-size: 10pt; font-weight: 600; background: #eee; }
+	.adv-print .grid { display: table; width: 100%; margin-bottom: 8px; }
+	.adv-print .grid-row { display: table-row; }
+	.adv-print .grid-label { display: table-cell; width: 32%; padding: 4px 8px 4px 0; font-weight: 600; color: #444; vertical-align: top; }
+	.adv-print .grid-value { display: table-cell; padding: 4px 0; vertical-align: top; }
+	.adv-print .muted { color: #666; font-size: 10pt; }
+</style>
+
+<div class="adv-print">
+	<div class="header">
+		{% if settings.office_logo %}
+		<div class="header-logo">
+			<img src="{{ settings.office_logo }}" alt="Logo">
+		</div>
+		{% endif %}
+		<div class="header-info">
+			<h1>{{ settings.razao_social or "Escritório de Advocacia" }}</h1>
+			{% if settings.oab %}
+			<div class="muted">OAB {{ settings.oab }}</div>
+			{% endif %}
+		</div>
+		<div class="header-meta">
+			<div><strong>Recibo:</strong> {{ doc.name }}</div>
+			<div><strong>Emissão:</strong> {{ frappe.utils.formatdate(frappe.utils.today()) }}</div>
+		</div>
+	</div>
+
+	<div class="doc-title">
+		<h1>{% if received %}Recibo de Honorários{% else %}Comprovante de Cobrança{% endif %}</h1>
+		<div class="muted">{{ doc.title or doc.name }}</div>
+		<div style="margin-top: 8px;"><span class="status-badge">{{ doc.status }}</span></div>
+	</div>
+
+	<div class="amount-box">
+		<div class="amount-label">{% if received %}Valor recebido{% else %}Valor{% endif %}</div>
+		<div class="amount-value">{{ frappe.utils.fmt_money(display_amount) }}</div>
+	</div>
+
+	<h2>Dados do Pagamento</h2>
+	<div class="grid">
+		<div class="grid-row">
+			<div class="grid-label">Cliente</div>
+			<div class="grid-value">{{ client_name }}</div>
+		</div>
+		<div class="grid-row">
+			<div class="grid-label">Serviço / Processo</div>
+			<div class="grid-value">{{ case_title }}</div>
+		</div>
+		{% if doc.fee_agreement %}
+		<div class="grid-row">
+			<div class="grid-label">Acordo</div>
+			<div class="grid-value">{{ doc.fee_agreement }}</div>
+		</div>
+		{% endif %}
+		<div class="grid-row">
+			<div class="grid-label">Vencimento</div>
+			<div class="grid-value">{{ frappe.utils.formatdate(doc.data_vencimento) if doc.data_vencimento else "—" }}</div>
+		</div>
+		{% if doc.data_recebimento %}
+		<div class="grid-row">
+			<div class="grid-label">Recebimento</div>
+			<div class="grid-value">{{ frappe.utils.formatdate(doc.data_recebimento) }}</div>
+		</div>
+		{% endif %}
+		{% if doc.descricao %}
+		<div class="grid-row">
+			<div class="grid-label">Descrição</div>
+			<div class="grid-value">{{ doc.descricao }}</div>
+		</div>
+		{% endif %}
+	</div>
+
+	{% if settings.bank_name or settings.bank_pix %}
+	<h2>Dados Bancários</h2>
+	<div class="grid">
+		{% if settings.bank_name %}
+		<div class="grid-row">
+			<div class="grid-label">Banco</div>
+			<div class="grid-value">{{ settings.bank_name }}</div>
+		</div>
+		{% endif %}
+		{% if settings.bank_agency %}
+		<div class="grid-row">
+			<div class="grid-label">Agência</div>
+			<div class="grid-value">{{ settings.bank_agency }}</div>
+		</div>
+		{% endif %}
+		{% if settings.bank_account %}
+		<div class="grid-row">
+			<div class="grid-label">Conta</div>
+			<div class="grid-value">{{ settings.bank_account }}</div>
+		</div>
+		{% endif %}
+		{% if settings.bank_pix %}
+		<div class="grid-row">
+			<div class="grid-label">PIX</div>
+			<div class="grid-value">{{ settings.bank_pix }}</div>
+		</div>
+		{% endif %}
+	</div>
+	{% endif %}
+
+	{% if doc.observacoes %}
+	<h2>Observações</h2>
+	<p>{{ doc.observacoes }}</p>
+	{% endif %}
+</div>
