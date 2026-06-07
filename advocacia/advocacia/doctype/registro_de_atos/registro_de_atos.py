@@ -33,31 +33,48 @@ class RegistrodeAtos(Document):
 			old_doc = frappe.get_doc("Registro de Atos", self.name)
 			old_rows = {row.name: row for row in old_doc.atos or [] if row.name}
 
+		pagamento_refs = set()
+		pending_checks = []
+
 		for ato in self.atos or []:
 			if ato.status != "Pendente":
 				continue
 
-			cobranca_id = ato.cobranca_id
-			if not cobranca_id and ato.name:
+			pagamento_name = ato.pagamento
+			if not pagamento_name and ato.name:
 				prev = old_rows.get(ato.name)
 				if prev and prev.status == "Cobrado":
-					cobranca_id = prev.cobranca_id
+					pagamento_name = prev.pagamento
 
-			if not cobranca_id:
+			if not pagamento_name:
 				continue
 
-			if not frappe.db.exists("Pagamento", cobranca_id):
-				continue
+			pagamento_refs.add(pagamento_name)
+			pending_checks.append(pagamento_name)
 
-			pay_status = frappe.db.get_value("Pagamento", cobranca_id, "status")
-			if pay_status and pay_status != "Cancelado":
-				frappe.throw(
-					_(
-						"Não é permitido voltar o ato para Pendente enquanto o pagamento {0} estiver ativo. "
-						"Cancele o pagamento primeiro."
-					).format(cobranca_id),
-					title=_("Ato já faturado"),
-				)
+		if not pagamento_refs:
+			return
+
+		status_by_name = {
+			row.name: row.status
+			for row in frappe.get_all(
+				"Pagamento",
+				filters={"name": ["in", list(pagamento_refs)]},
+				fields=["name", "status"],
+			)
+		}
+
+		for pagamento_name in pending_checks:
+			pay_status = status_by_name.get(pagamento_name)
+			if not pay_status or pay_status == "Cancelado":
+				continue
+			frappe.throw(
+				_(
+					"Não é permitido voltar o ato para Pendente enquanto o pagamento {0} estiver ativo. "
+					"Cancele o pagamento primeiro."
+				).format(pagamento_name),
+				title=_("Ato já faturado"),
+			)
 
 	def _calcular_totais(self):
 		pendente = 0

@@ -61,6 +61,7 @@ doc_events = {
         "on_update": "advocacia.advocacia.tasks.on_parcela_update",
     },
     "Pagamento": {
+        # Handler único: tarefas + sync honorários/parcela (financeiro.processar_pagamento_on_update)
         "on_update": "advocacia.advocacia.financeiro.processar_pagamento_on_update",
         "on_trash": "advocacia.advocacia.financeiro.on_pagamento_trash",
     },
