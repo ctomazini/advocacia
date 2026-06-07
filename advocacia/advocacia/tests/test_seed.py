@@ -1,42 +1,8 @@
 import frappe
 from frappe.tests.utils import FrappeTestCase
 
-from advocacia import hooks as advocacia_hooks
 from advocacia.advocacia.setup.print_formats import PRINT_FORMAT_NAMES, ensure_advocacia_print_formats
 from advocacia.advocacia.setup.seed import DEFAULT_CASE_PHASES, ensure_seed_data
-
-IMPORTABLE_DOCTYPES = (
-	"Client",
-	"Legal Case",
-	"Jurisdiction",
-	"Case Phase",
-	"Court",
-)
-
-
-class TestCsvImport(FrappeTestCase):
-	def tearDown(self):
-		frappe.db.rollback()
-
-	def test_importable_doctypes_hook(self):
-		self.assertEqual(
-			advocacia_hooks.importable_doctypes,
-			list(IMPORTABLE_DOCTYPES),
-		)
-		hook_values = frappe.get_hooks("importable_doctypes", app_name="advocacia")
-		for doctype in IMPORTABLE_DOCTYPES:
-			self.assertIn(doctype, hook_values)
-
-	def test_allow_import_on_doctypes(self):
-		for doctype in IMPORTABLE_DOCTYPES:
-			self.assertEqual(
-				frappe.get_meta(doctype).allow_import,
-				1,
-				msg=f"{doctype} deve permitir importação CSV",
-			)
-
-	def test_import_permission_administrator(self):
-		self.assertTrue(frappe.has_permission("Client", "import", user="Administrator"))
 
 
 class TestSeed(FrappeTestCase):

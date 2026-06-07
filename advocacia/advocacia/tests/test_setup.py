@@ -3,6 +3,7 @@
 import random
 
 import frappe
+from frappe.tests.utils import FrappeTestCase
 from frappe.utils import add_days, add_months, flt, now_datetime, today
 
 from advocacia.advocacia.validators import _calcular_dv_cnpj, _calcular_dv_cpf, _calcular_dv_cnj
@@ -316,6 +317,18 @@ def create_test_case_communication(cliente=None, assunto=None, tipo="Telefone", 
 	doc = frappe.get_doc(data)
 	doc.insert(ignore_permissions=True)
 	return doc
+
+
+class TestSetupInfrastructure(FrappeTestCase):
+	def test_advocacia_roles_exist(self):
+		for role in ("Advocacia User", "Advocacia Manager"):
+			self.assertTrue(frappe.db.exists("Role", role), msg=f"Role {role} ausente")
+
+	def test_kanban_board_exists(self):
+		self.assertTrue(frappe.db.exists("Kanban Board", "Advocacia Tarefas"))
+		board = frappe.get_doc("Kanban Board", "Advocacia Tarefas")
+		self.assertEqual(board.reference_doctype, "Legal Task")
+		self.assertEqual(board.field_name, "status")
 
 
 def create_test_registro_horas(servico=None, atividade=None, duracao_minutos=60, **kwargs):
