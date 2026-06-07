@@ -11,7 +11,7 @@
 | Item | Valor |
 | --- | --- |
 | Nome | advocacia |
-| Versão | 0.6.0 (`pyproject.toml`) |
+| Versão | 0.7.0 (`pyproject.toml`) |
 | Framework | Frappe v16.19.0 |
 | Licença | MIT |
 | Branch | frappe-v16 |
@@ -19,7 +19,7 @@
 | Site dev | advocacia.local (porta 8000) |
 | Linhas Python | ~9967 |
 | Linhas JavaScript | ~6720 |
-| Métodos de teste | 221 |
+| Métodos de teste | 232 (228 + 4 seed-demo) |
 | DocTypes | 24 (todos `custom: 0`) |
 | Script Reports | 6 |
 

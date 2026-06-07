@@ -1,0 +1,33 @@
+---
+description: Fase 2 — Documentação, Manual e Seed-Demo
+globs: ["apps/advocacia/**"]
+alwaysApply: true
+---
+
+# ESCOPO
+- SOMENTE editar `apps/advocacia/`
+- LEITURA APENAS em `apps/engenharia/` (referência de estrutura)
+- NUNCA editar `apps/engenharia/`, `apps/frappe/`, `apps/erpnext/`
+
+# SEED-DEMO
+- Todo documento demo DEVE conter DEMO_MARKER ("_DEMO_") no name ou campo marcador
+- clear_demo_data() DEVE remover 100% dos docs demo
+- _guard_production() DEVE bloquear sites com "prod" ou "erp." no nome
+- Comandos: `bench --site SITE seed-demo-advocacia` / `clear-demo-advocacia`
+- Dados devem cobrir cenários do painel: parcelas vencidas, audiências hoje, prazos urgentes
+
+# MANUAL
+- FIELD_DESCRIPTIONS em `scripts/add_field_descriptions.py` é fonte para manual e tooltips
+- Descriptions em PT, contexto jurídico brasileiro
+- Script `scripts/generate_manual.py` re-executável via bench execute
+
+# AUDITORIAS
+- Cada `docs/audit_*.md` reflete o estado REAL do código
+- Atualizar auditorias quando o código mudar
+
+# TESTES
+- test_seed_demo.py: seed cria, é idempotente, clear remove tudo
+- Rodar `bench --site SITE run-tests --app advocacia` após cada bloco
+
+# COMMITS
+- Conventional Commits — um tema por commit

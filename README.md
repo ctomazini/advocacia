@@ -2,9 +2,9 @@
 
 Aplicativo Frappe v16 para gestão jurídica de escritórios de advocacia no Brasil: clientes, serviços/processos, honorários, pagamentos, atos, prazos, audiências, despesas operacionais, painel operacional e geração de documentos (.docx).
 
-**Versão:** 0.6.0 · **Branch:** `frappe-v16`
+**Versão:** 0.7.0 · **Branch:** `frappe-v16`
 
-Documentação técnica completa: [CODEBASE.md](./CODEBASE.md)
+Documentação técnica: [CODEBASE.md](./CODEBASE.md) · Regras de deploy: [REGRAS_ADVOCACIA.md](./REGRAS_ADVOCACIA.md) · Manual: [advocacia/docs/manual_usuario.md](./advocacia/docs/manual_usuario.md)
 
 ## Requisitos
 
@@ -32,7 +32,16 @@ bench --site seu-site.local set-config allow_tests true
 bench --site seu-site.local run-tests --app advocacia
 ```
 
-Suíte atual: **228 testes** (`FrappeTestCase`).
+Suíte atual: **228 testes** unitários + **4 testes** de seed-demo (`FrappeTestCase` / `IntegrationTestCase`).
+
+## Dados de demonstração (dev)
+
+```bash
+bench --site seu-site.local seed-demo-advocacia   # popula ~130 registros demo
+bench --site seu-site.local clear-demo-advocacia  # remove todos com _DEMO_
+```
+
+> Se o app **engenharia** estiver instalado no bench, use `seed-demo-advocacia` (o comando genérico `seed-demo` aponta para engenharia).
 
 ## Google Calendar (sincronização de agenda)
 
