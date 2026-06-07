@@ -116,7 +116,11 @@ def _sincronizar_pagamentos_do_acordo_impl(acordo, commit=False):
 
 def migrar_pagamentos_existentes():
 	"""Patch: gera Pagamentos para todos os acordos (idempotente)."""
-	acordos = frappe.get_all("Acordo de Honorarios Processuais", pluck="name")
+	acordos = frappe.get_all(
+		"Acordo de Honorarios Processuais",
+		pluck="name",
+		limit_page_length=0,  # patch — processa todos
+	)
 	total_criados = total_atualizados = 0
 	for acordo_name in acordos:
 		doc = frappe.get_doc("Acordo de Honorarios Processuais", acordo_name)
@@ -242,6 +246,7 @@ def _limpar_vinculo_pagamento_na_parcela(pagamento):
 		"Parcela de Honorarios",
 		filters={"pagamento": pagamento.name},
 		pluck="name",
+		limit_page_length=500,
 	)
 	for parcela_name in parcelas:
 		frappe.db.set_value(
@@ -310,6 +315,7 @@ def verificar_acordo_quitado(acordo_name):
 				"status": ["not in", ["Cancelado"]],
 			},
 			fields=["status"],
+			limit_page_length=500,
 		)
 		if not pagamentos or not all(
 			p.status in ("Recebido", "Repassado") for p in pagamentos
@@ -336,7 +342,7 @@ def resync_pagamentos_acordo(acordo_name: str) -> dict:
 	frappe.has_permission(
 		"Acordo de Honorarios Processuais", "write", doc=acordo, throw=True
 	)
-	sincronizar_pagamentos_do_acordo(acordo, commit=True)
+	sincronizar_pagamentos_do_acordo(acordo)
 	frappe.msgprint(
 		_("Pagamentos re-sincronizados com sucesso."),
 		title=_("Sincronização"),
@@ -346,7 +352,7 @@ def resync_pagamentos_acordo(acordo_name: str) -> dict:
 
 
 @frappe.whitelist()
-def bulk_delete_pagamentos(names) -> dict:
+def bulk_delete_pagamentos(names: str | list) -> dict:
 	"""Exclusão em massa síncrona com feedback (contorna fila padrão do Frappe para >10)."""
 	import json
 
@@ -398,6 +404,7 @@ def bulk_delete_pagamentos(names) -> dict:
 @frappe.whitelist()
 def gerar_pagamento_atos(registro_name: str, data_vencimento: str | None = None) -> dict:
 	"""Sincroniza atos pendentes com o Pagamento aberto do registro (idempotente)."""
+	frappe.has_permission("Registro de Atos", "write", doc=registro_name, throw=True)
 	return sincronizar_pagamento_atos(registro_name, data_vencimento)
 
 
@@ -762,6 +769,7 @@ def _cancelar_pagamentos_orfaos(acordo_name, active_origem_ids):
 		"Pagamento",
 		filters=filters,
 		fields=["name", "status", "data_recebimento", "parcela_origem_id"],
+		limit_page_length=500,
 	)
 	for row in orphans:
 		if row.status in ("Recebido", "Repassado") or row.data_recebimento:
