@@ -5,8 +5,7 @@ import frappe
 from frappe import _
 from frappe.utils import add_months, cint, flt, get_first_day, get_last_day, getdate, today
 
-
-MESES_PT = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"]
+from advocacia.advocacia.report_visuals import CASH_IN_OUT, bar_chart, currency_summary, month_label
 
 
 def execute(filters=None):
@@ -49,11 +48,6 @@ def _get_columns():
 			"width": 140,
 		},
 	]
-
-
-def _format_month_label(dt):
-	dt = getdate(dt)
-	return f"{MESES_PT[dt.month - 1]}/{dt.year}"
 
 
 def _get_period_bounds(filters):
@@ -121,28 +115,25 @@ def _build_chart(transactions, period_start, meses):
 	month_totals = {}
 	for i in range(meses):
 		month_start = get_first_day(add_months(period_start, i))
-		label = _format_month_label(month_start)
+		label = month_label(month_start)
 		month_totals[label] = {"entrada": 0.0, "saida": 0.0}
 
 	for row in transactions:
-		label = _format_month_label(row["data"])
+		label = month_label(row["data"])
 		if label not in month_totals:
 			month_totals[label] = {"entrada": 0.0, "saida": 0.0}
 		month_totals[label]["entrada"] += flt(row.get("valor_entrada"))
 		month_totals[label]["saida"] += flt(row.get("valor_saida"))
 
 	labels = list(month_totals.keys())
-	return {
-		"data": {
-			"labels": labels,
-			"datasets": [
-				{"name": _("Entradas"), "values": [month_totals[l]["entrada"] for l in labels]},
-				{"name": _("Saídas"), "values": [month_totals[l]["saida"] for l in labels]},
-			],
-		},
-		"type": "bar",
-		"colors": ["#28a745", "#dc3545"],
-	}
+	return bar_chart(
+		labels,
+		[
+			{"name": _("Entradas"), "values": [month_totals[l]["entrada"] for l in labels]},
+			{"name": _("Saídas"), "values": [month_totals[l]["saida"] for l in labels]},
+		],
+		CASH_IN_OUT,
+	)
 
 
 def _get_data(filters):
@@ -261,24 +252,9 @@ def _get_data(filters):
 	chart = _build_chart(transactions, period_start, meses) if transactions else None
 
 	report_summary = [
-		{
-			"value": total_entradas,
-			"label": _("Total Entradas"),
-			"datatype": "Currency",
-			"indicator": "Green",
-		},
-		{
-			"value": total_saidas,
-			"label": _("Total Saídas"),
-			"datatype": "Currency",
-			"indicator": "Red",
-		},
-		{
-			"value": saldo_liquido,
-			"label": _("Saldo Líquido"),
-			"datatype": "Currency",
-			"indicator": "Green" if saldo_liquido >= 0 else "Red",
-		},
+		currency_summary(total_entradas, _("Total Entradas"), "Green"),
+		currency_summary(total_saidas, _("Total Saídas"), "Red"),
+		currency_summary(saldo_liquido, _("Saldo Líquido"), "Green" if saldo_liquido >= 0 else "Red"),
 	]
 
 	return rows, chart, report_summary

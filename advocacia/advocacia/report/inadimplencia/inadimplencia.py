@@ -7,6 +7,8 @@ import frappe
 from frappe import _
 from frappe.utils import date_diff, flt, getdate, today
 
+from advocacia.advocacia.report_visuals import REPORT_COLORS, bar_chart, currency_summary, int_summary
+
 
 def execute(filters=None):
 	filters = frappe._dict(filters or {})
@@ -127,29 +129,16 @@ def _get_data(filters):
 		chart_labels.append(frappe.db.get_value("Client", row["client"], "nome") or row["client"])
 		chart_values.append(flt(row["total_vencido"]))
 
-	chart = {
-		"data": {
-			"labels": chart_labels,
-			"datasets": [{"name": _("Vencido (R$)"), "values": chart_values}],
-		},
-		"type": "bar",
-		"colors": ["#dc2626"],
-	}
+	chart = bar_chart(
+		chart_labels,
+		[{"name": _("Vencido (R$)"), "values": chart_values}],
+		[REPORT_COLORS["red"]],
+	)
 
 	media_atraso = round(soma_atraso / total_parcelas, 1) if total_parcelas else 0
 	report_summary = [
-		{
-			"value": total_geral,
-			"label": _("Total Vencido"),
-			"datatype": "Currency",
-			"indicator": "Red",
-		},
-		{
-			"value": total_parcelas,
-			"label": _("Parcelas Vencidas"),
-			"datatype": "Int",
-			"indicator": "Red",
-		},
+		currency_summary(total_geral, _("Total Vencido"), "Red"),
+		int_summary(total_parcelas, _("Parcelas Vencidas"), "Red"),
 		{
 			"value": media_atraso,
 			"label": _("Atraso Médio (dias)"),

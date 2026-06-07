@@ -7,6 +7,8 @@ import frappe
 from frappe import _
 from frappe.utils import add_months, flt, getdate, today
 
+from advocacia.advocacia.report_visuals import HOURS_CHART_COLORS, bar_chart, currency_summary, int_summary, percent_summary
+
 
 def execute(filters=None):
 	filters = frappe._dict(filters or {})
@@ -234,17 +236,14 @@ def _get_data(filters):
 
 	chart = None
 	if chart_labels:
-		chart = {
-			"data": {
-				"labels": chart_labels,
-				"datasets": [
-					{"name": _("Cobráveis"), "values": cobraveis_chart},
-					{"name": _("Não cobráveis"), "values": nao_cobraveis_chart},
-				],
-			},
-			"type": "bar",
-			"colors": ["#22c55e", "#94a3b8"],
-		}
+		chart = bar_chart(
+			chart_labels,
+			[
+				{"name": _("Cobráveis"), "values": cobraveis_chart},
+				{"name": _("Não cobráveis"), "values": nao_cobraveis_chart},
+			],
+			HOURS_CHART_COLORS,
+		)
 
 	pct_geral = (sum_cobravel / sum_total * 100) if sum_total else 0
 	report_summary = [
@@ -260,24 +259,9 @@ def _get_data(filters):
 			"datatype": "Float",
 			"indicator": "Green",
 		},
-		{
-			"value": pct_geral,
-			"label": _("% Cobrável"),
-			"datatype": "Percent",
-			"indicator": "Green" if pct_geral >= 70 else "Orange",
-		},
-		{
-			"value": len(by_servico),
-			"label": _("Serviços c/ horas"),
-			"datatype": "Int",
-			"indicator": "Blue",
-		},
-		{
-			"value": sum_honorarios / sum_total if sum_total else 0,
-			"label": _("Valor/Hora Médio"),
-			"datatype": "Currency",
-			"indicator": "Blue",
-		},
+		percent_summary(pct_geral, _("% Cobrável"), "Green" if pct_geral >= 70 else "Orange"),
+		int_summary(len(by_servico), _("Serviços c/ horas"), "Blue"),
+		currency_summary(sum_honorarios / sum_total if sum_total else 0, _("Valor/Hora Médio"), "Blue"),
 	]
 
 	return rows, chart, report_summary

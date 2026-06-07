@@ -7,6 +7,8 @@ import frappe
 from frappe import _
 from frappe.utils import flt, getdate
 
+from advocacia.advocacia.report_visuals import HONORARIOS_CHART_COLORS, currency_summary, donut_chart
+
 
 def execute(filters=None):
 	filters = frappe._dict(filters or {})
@@ -143,40 +145,17 @@ def _get_data(filters):
 
 	rows.sort(key=lambda r: flt(r["total_contratado"]), reverse=True)
 
-	chart = {
-		"data": {
-			"labels": [_("Recebido"), _("Pendente"), _("Vencido")],
-			"datasets": [{"values": [sum_recebido, sum_pendente, sum_vencido]}],
-		},
-		"type": "donut",
-		"colors": ["#22c55e", "#3b82f6", "#dc2626"],
-	}
+	chart = donut_chart(
+		[_("Recebido"), _("Pendente"), _("Vencido")],
+		[sum_recebido, sum_pendente, sum_vencido],
+		HONORARIOS_CHART_COLORS,
+	)
 
 	report_summary = [
-		{
-			"value": sum_contratado,
-			"label": _("Contratado"),
-			"datatype": "Currency",
-			"indicator": "Blue",
-		},
-		{
-			"value": sum_recebido,
-			"label": _("Recebido"),
-			"datatype": "Currency",
-			"indicator": "Green",
-		},
-		{
-			"value": sum_pendente,
-			"label": _("Pendente"),
-			"datatype": "Currency",
-			"indicator": "Orange",
-		},
-		{
-			"value": sum_vencido,
-			"label": _("Vencido"),
-			"datatype": "Currency",
-			"indicator": "Red",
-		},
+		currency_summary(sum_contratado, _("Contratado"), "Blue"),
+		currency_summary(sum_recebido, _("Recebido"), "Green"),
+		currency_summary(sum_pendente, _("Pendente"), "Orange"),
+		currency_summary(sum_vencido, _("Vencido"), "Red"),
 	]
 
 	return rows, chart, report_summary

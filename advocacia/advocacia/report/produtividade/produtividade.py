@@ -7,6 +7,8 @@ import frappe
 from frappe import _
 from frappe.utils import add_months, cint, date_diff, flt, getdate, today
 
+from advocacia.advocacia.report_visuals import PRODUCTIVITY_CHART_COLORS, bar_chart, currency_summary, int_summary
+
 
 def execute(filters=None):
 	filters = frappe._dict(filters or {})
@@ -196,43 +198,20 @@ def _get_data(filters):
 
 	chart = None
 	if chart_labels:
-		chart = {
-			"data": {
-				"labels": chart_labels,
-				"datasets": [
-					{"name": _("Honorários"), "values": honorarios_chart},
-					{"name": _("Custas"), "values": custas_chart},
-				],
-			},
-			"type": "bar",
-			"colors": ["#3b82f6", "#f97316"],
-		}
+		chart = bar_chart(
+			chart_labels,
+			[
+				{"name": _("Honorários"), "values": honorarios_chart},
+				{"name": _("Custas"), "values": custas_chart},
+			],
+			PRODUCTIVITY_CHART_COLORS,
+		)
 
 	report_summary = [
-		{
-			"value": sum_servicos,
-			"label": _("Serviços"),
-			"datatype": "Int",
-			"indicator": "Blue",
-		},
-		{
-			"value": sum_honorarios,
-			"label": _("Honorários"),
-			"datatype": "Currency",
-			"indicator": "Green",
-		},
-		{
-			"value": sum_custas,
-			"label": _("Custas"),
-			"datatype": "Currency",
-			"indicator": "Orange",
-		},
-		{
-			"value": sum_lucro,
-			"label": _("Lucro Líquido"),
-			"datatype": "Currency",
-			"indicator": "Green" if sum_lucro >= 0 else "Red",
-		},
+		int_summary(sum_servicos, _("Serviços"), "Blue"),
+		currency_summary(sum_honorarios, _("Honorários"), "Green"),
+		currency_summary(sum_custas, _("Custas"), "Orange"),
+		currency_summary(sum_lucro, _("Lucro Líquido"), "Green" if sum_lucro >= 0 else "Red"),
 	]
 	if cint(filters.get("incluir_horas", 1)):
 		report_summary.append(

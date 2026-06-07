@@ -7,6 +7,8 @@ import frappe
 from frappe import _
 from frappe.utils import date_diff, flt, getdate, now_datetime, today
 
+from advocacia.advocacia.report_visuals import FINANCIAL_SITUATION_COLORS, currency_summary, donut_chart, int_summary
+
 
 def execute(filters=None):
 	filters = frappe._dict(filters or {})
@@ -205,40 +207,17 @@ def _get_data(filters):
 		if r["prazo_dias"] == 9999:
 			r["prazo_dias"] = None
 
-	chart = {
-		"data": {
-			"labels": [_("Inadimplente"), _("Em dia"), _("Quitado")],
-			"datasets": [{"values": [count_inadimplente, count_em_dia, count_quitado]}],
-		},
-		"type": "donut",
-		"colors": ["#dc2626", "#eab308", "#22c55e"],
-	}
+	chart = donut_chart(
+		[_("Inadimplente"), _("Em dia"), _("Quitado")],
+		[count_inadimplente, count_em_dia, count_quitado],
+		FINANCIAL_SITUATION_COLORS,
+	)
 
 	report_summary = [
-		{
-			"value": len(rows),
-			"label": _("Serviços Ativos"),
-			"datatype": "Int",
-			"indicator": "Blue",
-		},
-		{
-			"value": total_valor_pendente,
-			"label": _("Pendente"),
-			"datatype": "Currency",
-			"indicator": "Orange",
-		},
-		{
-			"value": total_valor_vencido,
-			"label": _("Vencido"),
-			"datatype": "Currency",
-			"indicator": "Red",
-		},
-		{
-			"value": count_com_prazo_7d,
-			"label": _("Prazos em 7 dias"),
-			"datatype": "Int",
-			"indicator": "Orange",
-		},
+		int_summary(len(rows), _("Serviços Ativos"), "Blue"),
+		currency_summary(total_valor_pendente, _("Pendente"), "Orange"),
+		currency_summary(total_valor_vencido, _("Vencido"), "Red"),
+		int_summary(count_com_prazo_7d, _("Prazos em 7 dias"), "Orange"),
 	]
 
 	return rows, chart, report_summary
