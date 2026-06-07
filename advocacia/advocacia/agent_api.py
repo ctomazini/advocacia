@@ -44,16 +44,40 @@ def get_active_cases() -> list[dict]:
 
 	for case in cases:
 		case["client_name"] = client_names.get(case.client) or get_cliente_nome(case.client)
-		case["hearings"] = frappe.db.count("Hearing", {"legal_case": case.name})
-		case["deadlines"] = frappe.db.count(
-			"Deadline", {"legal_case": case.name, "status": "Pendente"}
-		)
-		case["tasks"] = frappe.db.count(
-			"Legal Task",
-			{"legal_case": case.name, "status": ["in", ["Pendente", "Em Andamento"]]},
-		)
+
+	case_names = [case.name for case in cases]
+	hearing_counts = _count_by_legal_case("Hearing", case_names)
+	deadline_counts = _count_by_legal_case(
+		"Deadline", case_names, {"status": "Pendente"}
+	)
+	task_counts = _count_by_legal_case(
+		"Legal Task",
+		case_names,
+		{"status": ["in", ["Pendente", "Em Andamento"]]},
+	)
+
+	for case in cases:
+		case["hearings"] = hearing_counts.get(case.name, 0)
+		case["deadlines"] = deadline_counts.get(case.name, 0)
+		case["tasks"] = task_counts.get(case.name, 0)
 
 	return cases
+
+
+def _count_by_legal_case(doctype, case_names, extra_filters=None):
+	if not case_names:
+		return {}
+	filters = {"legal_case": ["in", case_names]}
+	if extra_filters:
+		filters.update(extra_filters)
+	rows = frappe.get_all(
+		doctype,
+		filters=filters,
+		fields=["legal_case", {"COUNT": "name", "as": "cnt"}],
+		group_by="legal_case",
+		limit_page_length=500,
+	)
+	return {row.legal_case: row.cnt for row in rows}
 
 
 def _case_financial_summary(case_name: str) -> dict:
