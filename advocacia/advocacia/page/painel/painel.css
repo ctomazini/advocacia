@@ -28,9 +28,16 @@
 .painel-content {
     animation: painel-fade-in 0.45s ease-out;
 }
+.painel-content.painel-content--stable {
+    animation: none;
+}
 @keyframes painel-fade-in {
     from { opacity: 0; transform: translateY(6px); }
     to { opacity: 1; transform: translateY(0); }
+}
+.painel-section--height-lock {
+    overflow: hidden;
+    box-sizing: border-box;
 }
 .painel-hero {
     padding: 36px 0 28px;
@@ -681,6 +688,14 @@
     color: var(--text-muted);
     font-size: 13px;
     white-space: nowrap;
+}
+.page_content .painel-root {
+    position: relative;
+}
+.painel-section--updating {
+    opacity: 0.82;
+    pointer-events: none;
+    transition: opacity 0.12s ease;
 }
 .painel-skeleton-hero {
     height: 100px;

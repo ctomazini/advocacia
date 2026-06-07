@@ -95,14 +95,12 @@ frappe.provide("advocacia.painel.hero");
 	        "</strong> " +
 	        __("audiência(s) hoje") +
 	        "</span>";
-	    if (resumo.prazos_urgentes) {
-	        pulse_stats +=
-	            '<span class="painel-hero-stat"><strong>' +
-	            resumo.prazos_urgentes +
-	            "</strong> " +
-	            __("prazo(s) crítico(s)") +
-	            "</span>";
-	    }
+	    pulse_stats +=
+	        '<span class="painel-hero-stat"><strong>' +
+	        (resumo.prazos_urgentes || 0) +
+	        "</strong> " +
+	        __("prazo(s) crítico(s)") +
+	        "</span>";
 	    pulse_stats +=
 	        '<span class="painel-hero-stat"><strong>' +
 	        (kpis.tarefas_pendentes || 0) +
@@ -128,7 +126,7 @@ frappe.provide("advocacia.painel.hero");
 	        (urg === "alta" ? __("Atenção hoje") : __("Operação estável")) +
 	        "</span>";
 	    return (
-	        '<header class="painel-hero">' +
+	        '<header class="painel-hero" id="painel-hero">' +
 	        '<h1 class="painel-hero-greeting">' +
 	        H.painel_greeting() +
 	        "</h1>" +
@@ -186,7 +184,7 @@ frappe.provide("advocacia.painel.hero");
 	        { dias: 30, label: __("30 dias") },
 	    ];
 	    var h =
-	        '<div class="painel-periodo-bar">' +
+	        '<div class="painel-periodo-bar" id="painel-periodo-bar">' +
 	        '<div class="painel-filtro-group">' +
 	        '<span class="painel-periodo-label">' +
 	        U.painel_periodo_scope_label(periodo_atual) +
