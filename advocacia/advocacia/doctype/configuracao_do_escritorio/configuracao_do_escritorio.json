@@ -73,6 +73,8 @@
   }
  ],
  "issingle": 1,
+ "autoname": "Configuracao do Escritorio",
+ "naming_rule": "Expression",
  "links": [],
  "modified": "2026-05-31 12:00:00",
  "modified_by": "Administrator",

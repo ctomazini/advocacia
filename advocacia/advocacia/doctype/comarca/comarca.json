@@ -6,6 +6,7 @@
  "istable": 0,
  "track_changes": 1,
  "autoname": "field:comarca_name",
+ "naming_rule": "By fieldname",
  "title_field": "comarca_name",
  "search_fields": "comarca_name,uf",
  "fields": [
