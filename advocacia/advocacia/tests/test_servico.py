@@ -90,3 +90,52 @@ class TestServico(FrappeTestCase):
 		servico = create_test_servico(cliente=cliente.name)
 		self.assertIn(servico.name, servico.title)
 		self.assertIn(cliente.nome, servico.title)
+
+	def test_dashboard_links_filtram_por_servico(self):
+		meta = frappe.get_meta("Servico")
+		dashboard = meta.get_dashboard_data()
+		linked = {
+			row.link_doctype: row.link_fieldname
+			for row in (meta.links or [])
+			if row.link_doctype and row.link_fieldname and not row.is_child_table
+		}
+		expected = {
+			"Acordo de Honorarios Processuais": "servico",
+			"Registro de Atos": "servico",
+			"Audiencia": "servico",
+			"Controle de Prazos": "servico",
+			"Custa Processual": "servico",
+			"Comunicacao": "servico",
+			"Registro de Horas": "servico",
+			"Tarefa": "servico",
+			"Pagamento": "servico",
+		}
+		self.assertEqual(linked, expected)
+		self.assertEqual(dashboard.fieldname, "servico")
+		for doctype, fieldname in expected.items():
+			self.assertEqual(dashboard.non_standard_fieldnames.get(doctype), fieldname)
+
+	def test_get_open_count_registro_de_atos_por_servico(self):
+		from frappe.desk.notifications import get_open_count
+
+		servico = create_test_servico()
+		registro = frappe.get_doc(
+			{
+				"doctype": "Registro de Atos",
+				"servico": servico.name,
+				"cliente": servico.cliente,
+				"status": "Aberto",
+			}
+		).insert(ignore_permissions=True)
+
+		result = get_open_count("Servico", servico.name)
+		atos = next(
+			row
+			for row in result["count"]["external_links_found"]
+			if row["doctype"] == "Registro de Atos"
+		)
+		self.assertGreaterEqual(atos["count"], 1)
+		names = frappe.get_all(
+			"Registro de Atos", filters={"servico": servico.name}, pluck="name"
+		)
+		self.assertIn(registro.name, names)

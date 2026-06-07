@@ -1,152 +1,144 @@
 frappe.provide("advocacia.list_nav");
 
 (function () {
-	var pending = {
-		doctype: null,
-		mode: null,
-		filters: null,
-	};
-
-	var sidebar_clear_doctype = null;
-
-	function get_list_view(doctype) {
-		var key = "List/" + doctype + "/List";
-		return frappe.views.list_view && frappe.views.list_view[key];
-	}
-
-	function reset_saved_filters(listview) {
-		listview.filters = [];
-		if (listview.view_user_settings) {
-			listview.view_user_settings.filters = [];
-		}
-	}
-
-	function apply_filter_state(listview, filters) {
-		if (!listview || !listview.filter_area) {
-			return Promise.resolve(false);
-		}
-
-		listview.filters = (filters || []).slice();
-		reset_saved_filters(listview);
-
-		return listview.filter_area
-			.clear(false)
-			.then(function () {
-				if (listview.filters.length) {
-					return listview.filter_area.set(listview.filters);
-				}
-			})
-			.then(function () {
-				listview.refresh();
-				return true;
-			});
-	}
-
-	function consume_pending(listview) {
-		if (!pending.doctype || pending.doctype !== listview.doctype) {
-			return null;
-		}
-
-		var mode = pending.mode;
-		var filters = pending.filters || [];
-		pending.doctype = null;
-		pending.mode = null;
-		pending.filters = null;
-
-		return mode === "clear" ? [] : filters.slice();
+	function filters_to_route_options(filters) {
+		var opts = {};
+		(filters || []).forEach(function (filter) {
+			if (!filter || filter.length < 3) {
+				return;
+			}
+			var fieldname;
+			var operator;
+			var value;
+			if (filter.length >= 4) {
+				fieldname = filter[1];
+				operator = filter[2];
+				value = filter[3];
+			} else {
+				fieldname = filter[0];
+				operator = filter[1];
+				value = filter[2];
+			}
+			if (operator === "=" && !Array.isArray(value)) {
+				opts[fieldname] = value;
+			} else {
+				opts[fieldname] = [operator, value];
+			}
+		});
+		return opts;
 	}
 
 	advocacia.list_nav.goto = function (doctype, filters) {
-		filters = filters || [];
-		pending.doctype = doctype;
-		pending.mode = filters.length ? "set" : "clear";
-		pending.filters = filters.map(function (f) {
-			return [doctype, f[0], f[1], f[2]];
-		});
-		frappe.route_options = null;
-
-		var route = frappe.get_route() || [];
-		if (route[0] === "List" && route[1] === doctype) {
-			var listview = get_list_view(doctype);
-			if (listview) {
-				apply_filter_state(
-					listview,
-					pending.mode === "clear" ? [] : pending.filters.slice()
-				);
-				pending.doctype = null;
-				pending.mode = null;
-				pending.filters = null;
-				return;
-			}
+		if (!doctype) {
+			return;
 		}
-
-		frappe.set_route("List", doctype);
+		frappe.set_route("List", doctype, filters_to_route_options(filters || []));
 	};
 
-	function bind_page_change() {
-		$(document).on("page-change", function () {
-			var route = frappe.get_route() || [];
-			if (route[0] !== "List" || !route[1]) {
-				return;
-			}
-			if (pending.doctype === route[1]) {
-				return;
-			}
-			sidebar_clear_doctype = route[1];
-		});
-	}
-
-	function patch_list_view() {
-		if (!frappe.views || !frappe.views.ListView) {
+	function open_connection_list(frm, $link, show_open) {
+		if (!frm || frm.doc.__islocal || !$link || !$link.length) {
 			return false;
 		}
-		if (frappe.views.ListView.prototype.__advocacia_list_nav_patched) {
+
+		var doctype = $link.attr("data-doctype");
+		if (!doctype) {
+			return false;
+		}
+
+		var names = ($link.attr("data-names") || "").split(",").filter(Boolean);
+		if (names.length) {
+			frappe.set_route("List", doctype, { name: ["in", names] });
 			return true;
 		}
 
-		var _before_refresh = frappe.views.ListView.prototype.before_refresh;
+		var dashboard = frm.dashboard;
+		if (!dashboard || !dashboard.data || !dashboard.data.fieldname) {
+			return false;
+		}
 
-		frappe.views.ListView.prototype.before_refresh = function () {
-			var listview = this;
-			var nav_filters = consume_pending(listview);
+		if (show_open && frappe.ui.notifications) {
+			frappe.ui.notifications.show_open_count_list(doctype);
+		}
 
-			if (nav_filters !== null) {
-				frappe.route_options = null;
-				listview.filters = nav_filters.slice();
-				reset_saved_filters(listview);
-
-				if (listview.filter_area) {
-					return listview.filter_area.clear(false).then(function () {
-						if (listview.filters.length) {
-							return listview.filter_area.set(listview.filters);
-						}
-					});
-				}
-				return Promise.resolve();
-			}
-
-			if (sidebar_clear_doctype === listview.doctype) {
-				sidebar_clear_doctype = null;
-				reset_saved_filters(listview);
-
-				if (listview.filter_area) {
-					return listview.filter_area.clear(false);
-				}
-				return Promise.resolve();
-			}
-
-			return _before_refresh.call(listview);
-		};
-
-		frappe.views.ListView.prototype.__advocacia_list_nav_patched = true;
+		frappe.set_route("List", doctype, dashboard.get_document_filter(doctype));
 		return true;
 	}
 
-	function init() {
-		bind_page_change();
-		if (!patch_list_view()) {
-			$(document).one("app_ready", init);
+	function on_count_click(e) {
+		var count_el = e.target.closest(".form-dashboard .document-link .count");
+		if (!count_el) {
+			return;
 		}
+
+		var frm = cur_frm;
+		if (!frm || frm.doc.__islocal) {
+			return;
+		}
+
+		var $link = $(count_el).closest(".document-link");
+		if (!open_connection_list(frm, $link, false)) {
+			return;
+		}
+
+		e.preventDefault();
+		e.stopPropagation();
+		e.stopImmediatePropagation();
+	}
+
+	function patch_dashboard_open_list() {
+		if (!frappe.ui || !frappe.ui.form || !frappe.ui.form.Dashboard) {
+			return false;
+		}
+		if (frappe.ui.form.Dashboard.prototype.__advocacia_connection_patched) {
+			return true;
+		}
+
+		frappe.ui.form.Dashboard.prototype.open_document_list = function ($link, show_open) {
+			open_connection_list(this.frm, $link, show_open);
+		};
+
+		frappe.ui.form.Dashboard.prototype.__advocacia_connection_patched = true;
+		return true;
+	}
+
+	function patch_route_options_from_url() {
+		if (!frappe.router || frappe.router.__advocacia_route_options_patched) {
+			return !!frappe.router;
+		}
+
+		var _orig = frappe.router.set_route_options_from_url.bind(frappe.router);
+		frappe.router.set_route_options_from_url = function () {
+			_orig();
+			Object.keys(frappe.route_options || {}).forEach(function (key) {
+				var val = frappe.route_options[key];
+				if (typeof val !== "string") {
+					return;
+				}
+				try {
+					frappe.route_options[key] = JSON.parse(val);
+				} catch (e) {
+					/* valor simples na query string */
+				}
+			});
+		};
+
+		frappe.router.__advocacia_route_options_patched = true;
+		return true;
+	}
+
+	function ensure_patches(retries) {
+		retries = retries || 0;
+		var ok = patch_dashboard_open_list() && patch_route_options_from_url();
+		if (!ok && retries < 40) {
+			setTimeout(function () {
+				ensure_patches(retries + 1);
+			}, 250);
+		}
+	}
+
+	function init() {
+		document.addEventListener("click", on_count_click, true);
+		ensure_patches(0);
 	}
 
 	if (document.readyState === "loading") {
