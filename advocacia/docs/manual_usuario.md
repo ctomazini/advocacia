@@ -1,7 +1,7 @@
 # Manual do Usuário — Advocacia
 
-**Gerado em:** 2026-06-06
-**Versão do app:** 0.6.0
+**Gerado em:** 2026-06-06 · **Atualizado:** 2026-06-07  
+**Versão do app:** 0.7.0
 
 ---
 
@@ -14,6 +14,25 @@ O **Serviço** funciona como hub: audiências, prazos, pagamentos e atos orbitam
 ### Painel
 
 Acesse `/app/painel` para KPIs, listas rápidas (prazos, audiências, tarefas) e atalhos de criação.
+
+- **Período:** filtre por 1, 7, 15 ou 30 dias no cabeçalho.
+- **Limites:** escolha 5, 10 ou 15 itens por seção — a página atualiza sem recarregar tudo.
+- **Atualizar:** botão ↺ recarrega os dados do painel.
+
+### Listas e filtros
+
+Nas telas de lista (Clientes, Serviços, Pagamentos, etc.):
+
+- **Desktop:** a barra de filtros fica sempre visível abaixo do título.
+- **Mobile:** use o botão **⇅** (Filtros) para abrir ou fechar os filtros.
+- Campos com filtro rápido incluem Cliente, Serviço, Status, datas e cadastros auxiliares (Comarca, Vara, etc.).
+
+### Connections (vínculos no formulário)
+
+Ao abrir um Cliente, Serviço ou outro documento, o bloco **Connections** mostra documentos relacionados.
+
+- Clique no **número** ou no **nome do tipo** (ex.: Pagamentos) para abrir a lista **já filtrada** por aquele registro.
+- Exemplo: no Serviço da cliente Carla Mendes, clicar em Pagamentos abre só os pagamentos daquele serviço.
 
 ---
 

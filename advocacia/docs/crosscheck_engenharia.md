@@ -1,15 +1,28 @@
 # Cross-audit: advocacia ↔ engenharia
 
-> **Snapshot 2026-06-06 (referência).** Vários itens foram resolvidos na v0.7.0 — ver [REGRAS_ADVOCACIA.md](../../REGRAS_ADVOCACIA.md) e `audit_*.md` nesta pasta.
+> **Snapshot 2026-06-06 (referência histórica).** Vários itens foram resolvidos na v0.7.0 — ver [REGRAS_ADVOCACIA.md](../../REGRAS_ADVOCACIA.md), [advocacia/docs/README.md](./README.md) e `audit_*.md`.
 
-**Data:** 2026-06-06  
+### Atualizações pós-snapshot (jun/2026)
+
+| Item no snapshot abaixo | Status atual (advocacia) |
+| --- | --- |
+| Sem `REGRAS_ADVOCACIA.md` | ✅ Criado |
+| Field descriptions 5,2% | ✅ 94% (218/232) |
+| Frontend painel monolítico 4097 linhas | ✅ Modular `public/js/painel/` (~2.500 linhas) |
+| Sem `bench seed-demo` | ✅ `seed-demo-advocacia` / `clear-demo-advocacia` |
+| Sem `test_permissions.py` | ✅ 6 métodos |
+| Sem `list_filters` | ✅ `list_filters.js` + CSS responsivo |
+| Connections lista genérica | ✅ `list_nav.js` filtra por documento pai |
+| 222 testes | ✅ **230** testes (jun/2026) |
+
+**Data original:** 2026-06-06  
 **Escopo:** comparação read-only de padrões entre os apps Frappe v16 `advocacia` (brownfield, PT) e `engenharia` (greenfield, EN).  
 **Paths inspecionados:**
 - `/home/frappe/frappe-bench/apps/advocacia`
 - `/home/frappe/frappe-bench/apps/engenharia`
 
 **Execução de testes:**
-- `bench --site advocacia.local run-tests --app advocacia` → **222 testes, OK** (6,7s)
+- `bench --site advocacia.local run-tests --app advocacia` → **230 testes, OK** (jun/2026)
 - `bench --site advocacia.local run-tests --app engenharia` → **falhou** (`DocType Document Kit not found` — app não instalado neste site)
 
 ---
@@ -18,24 +31,24 @@
 
 | Categoria | Engenharia | Advocacia | Recomendação | Esforço |
 | --- | --- | --- | --- | --- |
-| **1. Infraestrutura de código** | `REGRAS_OBRIGATORIAS.md` (515 linhas); 38 DocTypes EN; `custom: 0` em 38/38 | `CODEBASE.md` + `ENGENHARIA_STANDARDS.md` (norma do outro app); 24 DocTypes PT; `custom: 0` em 24/24 | Criar `REGRAS_ADVOCACIA.md` espelhando checklist de engenharia, adaptado ao brownfield PT | Médio |
-| **1.1 REGRAS equivalente** | Sim (`REGRAS_OBRIGATORIAS.md`) | Não — só inventário (`CODEBASE.md`) | Documentar regras fechadas do advocacia (não renomear DocTypes) | Médio |
+| **1. Infraestrutura de código** | `REGRAS_OBRIGATORIAS.md` (515 linhas); 38 DocTypes EN | `REGRAS_ADVOCACIA.md` + `CODEBASE.md`; 24 DocTypes PT | Paridade documental OK | — |
+| **1.1 REGRAS equivalente** | Sim (`REGRAS_OBRIGATORIAS.md`) | ✅ `REGRAS_ADVOCACIA.md` | — | — |
 | **1.2 Naming conventions** | DocTypes EN; fieldnames `snake_case` EN | DocTypes PT congelados; 148 fieldnames distintos, maioria PT (`cliente`, `servico`, `descricao`, `valor`, …) | Manter PT no advocacia; usar engenharia só como referência de *padrão*, não de idioma | — |
 | **1.3 `custom: 0` explícito** | 38/38 JSONs | 24/24 JSONs | Nenhuma ação — paridade OK | Quick win (n/a) |
 | **1.4 Deprecations** | `cur_frm`/`add_fetch`/`$c_obj`: 0; `limit_page_length`: 4 refs (dashboard) | Mesmas deprecations: 0; `limit_page_length`: **40 refs** em 16 arquivos `.py` | Advocacia já conforme; engenharia pode expandir caps em reports/APIs | Quick win |
 | **2. Títulos e naming IDs** | `titles.py`; descritores por domínio (obra, medição, comissão) | `titulos.py`; descritor = cliente ou `descricao` | Paridade estrutural OK; advocacia pode enriquecer descritores por DocType como engenharia | Médio |
-| **3. Roles e permissões** | `setup/roles.py` + `setup/permissions.py`; permlevel 1 em campos financeiros; dashboard filtra por Manager | Roles criados em `setup/install.py`; **sem** `permissions.py`; financeiro visível a quem lê `Servico` | Portar conceito de `permissions.py` + filtro Manager no painel | Longo |
+| **3. Roles e permissões** | `setup/roles.py` + `setup/permissions.py`; dashboard filtra Manager | ✅ `permissions.py` + `strip_financial_payload` + `test_permissions.py` | Paridade OK | — |
 | **3.2 Whitelist audit** | 25 endpoints; 21 com `has_permission`; 19 com type hints | 21 endpoints; 14 com `has_permission`; 0 type hints | Fechar gaps: `painel_api`, timers, parcelas, `tarefa.concluir` | Médio |
-| **4. Dashboard / Painel** | Backend modular (12 arquivos, ~1200 linhas); frontend modular (~999 linhas JS) | Backend modular (7 arquivos, ~1104 linhas); frontend **monolítico** `painel.js` (4097 linhas) | Extrair módulos JS do painel (espelhar `public/js/dashboard/`) | Longo |
+| **4. Dashboard / Painel** | Backend modular (12 arquivos); frontend modular (~999 linhas JS) | Backend modular (7 arquivos); frontend modular `public/js/painel/` (~2.500 linhas) | Paridade estrutural OK; soft refresh jun/2026 | — |
 | **4.2 KPIs** | Obras, protocolos, margem, comissões, reembolsáveis | Clientes, serviços, audiências, honorários, custas, taxa recebimento | Manter KPIs de domínio; opcional: tiles de atenção/saúde como engenharia | Médio |
 | **5. Calendar sync** | `Deadline` + `Permit` → `Event` | `Audiencia` + `Controle de Prazos` → `Event` | Paridade OK; testes em ambos (`test_calendar_sync.py`) | — |
-| **6. Testes** | 192 métodos; `test_permissions`, `test_agent_api`, `test_dashboard` | 222 métodos; sem testes de permissão/IA; suite verde no site | Adicionar `test_permissions.py` e cobrir `painel_api` com usuário User | Médio |
-| **7. Connections / Links** | Hub `Construction Project`; 12 satélites com `project` | Hub `Servico`; 9 satélites com `servico` | Padrão hub-and-spoke equivalente | — |
-| **8. Field descriptions** | 346/352 campos (98,3%) via `scripts/add_field_descriptions.py` | 12/232 campos (5,2%) | Script de descriptions adaptado ao PT (prioridade UX) | Médio |
+| **6. Testes** | 192 métodos; `test_permissions`, `test_agent_api` | **230** métodos; `test_permissions`, `test_painel_api` | Adicionar `test_agent_api.py` jurídico | Médio |
+| **7. Connections / Links** | Hub `Construction Project`; 12 satélites | Hub `Servico`; 9 satélites; lista filtrada (`list_nav.js`) | Engenharia pode portar `list_nav` | Médio |
+| **8. Field descriptions** | 346/352 (98,3%) | 218/232 (94%) | Paridade aceitável | — |
 | **9. Hooks e scheduler** | 7 `doc_events`; scheduler daily (1 job) | 6 `doc_events`; scheduler daily (5) + weekly (1) | Advocacia mais completo em notificações; sem duplicatas de handler | Quick win (documentar) |
 | **10. Geração de documentos** | `documents.py` (492 linhas); kits + templates | `documentos.py` (601 linhas); kits + templates | Paridade; engenharia tem placeholders de obra | — |
-| **11. Navegação (FAB + Header)** | `quick_actions.js` no dashboard; **sem** `list_nav.js` | `list_nav.js` + integração no painel (`advocacia.list_nav.goto`) | Portar `list_nav.js` para engenharia **ou** unificar padrão FAB | Médio |
-| **12. Demo data seeder** | `demo_data.py` + `bench seed-demo` / `clear-demo` | `seed_demo.py` (dev only); sem comando bench | Expor `bench seed-demo` no advocacia com guard de ambiente | Quick win |
+| **11. Navegação (FAB + Header)** | `quick_actions.js`; sem `list_nav.js` | `list_nav.js` + `list_filters.js` + painel hero | Portar navegação filtrada para engenharia | Médio |
+| **12. Demo data seeder** | `bench seed-demo` / `clear-demo` | `bench seed-demo-advocacia` / `clear-demo-advocacia` | Paridade OK (nomes distintos) | — |
 | **13. AI readiness** | `agent_api.py` (3 endpoints) + `test_agent_api.py` + `docs/audit_ai_readiness.md` | **Inexistente** | Criar `agent_api.py` jurídico (`get_active_servicos`, resumo financeiro condicional) | Longo |
 
 ---

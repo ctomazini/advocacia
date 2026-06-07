@@ -22,12 +22,14 @@ alwaysApply: true
 - Script `scripts/generate_manual.py` re-executável via bench execute
 
 # AUDITORIAS
+- Índice: `advocacia/docs/README.md`
 - Cada `docs/audit_*.md` reflete o estado REAL do código
 - Atualizar auditorias quando o código mudar
 
 # TESTES
 - test_seed_demo.py: seed cria, é idempotente, clear remove tudo
-- Rodar `bench --site SITE run-tests --app advocacia` após cada bloco
+- Rodar `bench --site SITE run-tests --app advocacia` após cada bloco (230 testes, jun/2026)
+- E2E UI opcional: `tests/e2e/playwright_flow.py` — ver `advocacia/docs/e2e_playwright.md`
 
 # COMMITS
 - Conventional Commits — um tema por commit

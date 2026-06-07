@@ -4,7 +4,7 @@ Aplicativo Frappe v16 para gestão jurídica de escritórios de advocacia no Bra
 
 **Versão:** 0.7.0 · **Branch:** `frappe-v16`
 
-Documentação técnica: [CODEBASE.md](./CODEBASE.md) · Regras de deploy: [REGRAS_ADVOCACIA.md](./REGRAS_ADVOCACIA.md) · Manual: [advocacia/docs/manual_usuario.md](./advocacia/docs/manual_usuario.md)
+Documentação: [advocacia/docs/README.md](./advocacia/docs/README.md) (índice) · [CODEBASE.md](./CODEBASE.md) · [REGRAS_ADVOCACIA.md](./REGRAS_ADVOCACIA.md) · [Manual](./advocacia/docs/manual_usuario.md)
 
 ## Requisitos
 
@@ -32,7 +32,9 @@ bench --site seu-site.local set-config allow_tests true
 bench --site seu-site.local run-tests --app advocacia
 ```
 
-Suíte atual: **228 testes** unitários + **4 testes** de seed-demo (`FrappeTestCase` / `IntegrationTestCase`).
+Suíte atual: **230 testes** (`bench run-tests --app advocacia`, jun/2026).
+
+E2E browser (opcional): [advocacia/docs/e2e_playwright.md](./advocacia/docs/e2e_playwright.md)
 
 ## Dados de demonstração (dev)
 
@@ -58,7 +60,17 @@ Audiências e Prazos criados no app geram **Events** nativos do Frappe, que pode
 
 Após alterar DocType JSON: `bench --site seu-site.local migrate`  
 Após alterar JS de DocType: `bench --site seu-site.local clear-cache`  
-Após alterar `public/js/`: `bench build --app advocacia`
+Após alterar `public/js/` ou `public/css/`: `bench build --app advocacia`
+
+### E2E Playwright (opcional)
+
+```bash
+export ADVOCACIA_E2E_PWD='sua-senha'
+bench --site advocacia.local serve --port 8000 --noreload   # sem reloader
+python advocacia/advocacia/tests/e2e/playwright_flow.py
+```
+
+Ver [advocacia/docs/e2e_playwright.md](./advocacia/docs/e2e_playwright.md) para requisitos e variáveis.
 
 ## Licença
 

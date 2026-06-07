@@ -1,6 +1,6 @@
 # REGRAS_ADVOCACIA.md
 
-**App:** `advocacia` · **Frappe v16** (sem ERPNext) · **Versão:** 0.7.0 · **Data:** 2026-06-02  
+**App:** `advocacia` · **Frappe v16** (sem ERPNext) · **Versão:** 0.7.0 · **Data:** 2026-06-07  
 **Branch:** `frappe-v16` · **Objetivo:** checklist operacional fechado para deploy.
 
 > `ENGENHARIA_STANDARDS.md` governa o app **engenharia**, não este repositório.
@@ -15,7 +15,7 @@
 | Nomes DocType | **Português congelado** — não renomear |
 | Fieldnames | `snake_case`; labels UI em português |
 | Hub | `Servico` — 9 satélites com campo `servico` |
-| Testes | 232 (`run-tests --app advocacia`) |
+| Testes | 230 (`run-tests --app advocacia`) |
 
 ---
 
@@ -45,6 +45,8 @@
 | 8 | Sem `eval`/`exec`; sem `except Exception: pass` |
 | 9 | JS: sem `cur_frm`, `add_fetch`, `$c_obj`; charts com CSS vars |
 | 10 | Demo: `DEMO_MARKER = "_DEMO_"` — **proibido em produção** |
+| 11 | Listas: `in_standard_filter` em campos Link/Select/Date repetitivos |
+| 12 | Connections: navegação filtrada via `list_nav.js`, nunca lista genérica |
 
 ---
 
@@ -58,6 +60,19 @@
 | Permissão | `Servico` read na entrada |
 | Financeiro | `strip_financial_payload` para **Advocacia User** |
 | Commit | Nunca no `get()` |
+| Soft refresh | Período e `list_limits` recarregam payload sem reload da page |
+
+---
+
+## 4.1 Listas e filtros
+
+| Item | Regra |
+| --- | --- |
+| Filtros padrão | `in_standard_filter: 1` em Link/Select/Date dos transacionais |
+| Desktop | Barra de filtros sempre visível (`list_filters.css`) |
+| Mobile | Filtros no botão nativo ⇅ (`list_filters.js`) |
+| Connections | Clique em count/link → `advocacia.list_nav.goto` ou `open_connection_list` |
+| Painel → lista | `frappe.set_route("List", doctype, filterObject)` |
 
 ---
 
@@ -88,12 +103,26 @@ Setup: `setup/roles.py` + `setup/permissions.py` no `after_migrate`.
 ```bash
 bench --site advocacia.local migrate
 bench --site advocacia.local clear-cache    # após JS de DocType
-bench build --app advocacia                 # após public/js/
+bench build --app advocacia                 # após public/js/ ou public/css/
 bench --site advocacia.local run-tests --app advocacia
 bench export-fixtures --app advocacia       # antes de commit
-bench --site advocacia.local seed-demo      # DEV ONLY
-bench --site advocacia.local clear-demo     # DEV ONLY
+bench --site advocacia.local seed-demo-advocacia   # DEV ONLY
+bench --site advocacia.local clear-demo-advocacia  # DEV ONLY
 bench restart
+```
+
+---
+
+## 7.1 E2E Playwright (opcional)
+
+Script manual: `advocacia/advocacia/tests/e2e/playwright_flow.py`  
+Marcador: `_PW_E2E_` — cleanup automático.  
+Documentação: `advocacia/docs/e2e_playwright.md`
+
+```bash
+export ADVOCACIA_E2E_PWD='...'
+bench --site advocacia.local serve --port 8000 --noreload
+python advocacia/advocacia/tests/e2e/playwright_flow.py
 ```
 
 ---
@@ -106,7 +135,7 @@ bench restart
 - [ ] Whitelist: `has_permission` + type hints
 - [ ] Queries com limit; sem N+1
 - [ ] `doc_events`: um handler por evento
-- [ ] `run-tests` verde (232)
+- [ ] `run-tests` verde (230)
 - [ ] Sem segredos/dados reais no diff
 - [ ] Conventional Commit (`feat:`, `fix:`, `refactor:`, `chore:`)
 - [ ] Snapshot Proxmox antes de mudança destrutiva em produção
@@ -117,7 +146,9 @@ bench restart
 
 | Arquivo | Conteúdo |
 | --- | --- |
-| `advocacia/docs/audit_code.md` | Código, 232 testes, whitelists |
+| `advocacia/docs/README.md` | Índice da documentação |
+| `advocacia/docs/e2e_playwright.md` | E2E UI Playwright |
+| `advocacia/docs/audit_code.md` | Código, 230 testes, whitelists |
 | `advocacia/docs/audit_dashboard.md` | Painel modular backend/frontend |
 | `advocacia/docs/audit_data_integrity.md` | CPF/CNPJ/CNJ/telefone, sync |
 | `advocacia/docs/audit_google_calendar.md` | Event + Google |

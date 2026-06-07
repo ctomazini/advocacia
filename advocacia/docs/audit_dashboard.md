@@ -2,7 +2,7 @@
 
 **Page:** `painel` (`advocacia/advocacia/page/painel/`)  
 **Backend:** `advocacia/painel/` · **Facade:** `painel_api.py`  
-**Frontend modular:** `public/js/painel/` · **Data:** 2026-06-02 · **Versão app:** 0.7.0
+**Frontend modular:** `public/js/painel/` · **Data:** 2026-06-07 · **Versão app:** 0.7.0
 
 ---
 
@@ -141,7 +141,7 @@ user_is_advocacia_manager() → Advocacia Manager
 
 **Cores:** Chart.js e cards usam CSS variables Frappe — sem hex hardcoded no JS de produção.
 
-**Refresh:** botão ↺ Atualizar; limites 5/10/15 por seção sem reload total da página.
+**Refresh:** botão ↺ Atualizar; limites 5/10/15 e filtro de período recarregam payload via xcall **sem reload total** da page (soft refresh, jun/2026).
 
 ---
 
@@ -168,7 +168,7 @@ frappe.xcall("advocacia.advocacia.painel_api.get_painel_data", {...})
 |---|---|---|
 | `limit_page_length` no backend | 🟡 | Migrar para `limit` (v17) |
 | Engenharia tem `attention.py`/`health.py` separados | 🟢 | Advocacia usa `centro_atencao` em `prazos.py` — equivalente funcional |
-| E2E browser automatizado | 🟡 | Coberto por `test_painel_api.py`, não Playwright |
+| E2E browser automatizado | 🟡 | `test_painel_api.py` + script Playwright `tests/e2e/playwright_flow.py` (manual) |
 
 ---
 
@@ -177,6 +177,7 @@ frappe.xcall("advocacia.advocacia.painel_api.get_painel_data", {...})
 - [ ] `bench build --app advocacia` após editar `public/js/painel/`
 - [ ] `bench --site advocacia.local clear-cache`
 - [ ] `bench --site advocacia.local run-tests --app advocacia` — `test_painel_api.py` verde
+- [ ] Smoke manual: soft refresh ao mudar período/limites
 - [ ] Smoke manual: User sem financeiro · Manager com gráfico
 
 ---

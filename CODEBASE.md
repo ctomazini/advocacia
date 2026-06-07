@@ -1,8 +1,8 @@
 # CODEBASE — App Advocacia (Frappe v16)
 
-> Gerado em **2026-06-02** — re-audit pós-UX (títulos, list views, sidebar, painel). Branch **`frappe-v16`**. Frappe puro, **sem ERPNext**.
+> Gerado em **2026-06-02**, atualizado **2026-06-07** (filtros, connections, E2E). Branch **`frappe-v16`**. Frappe puro, **sem ERPNext**.
 
-> **HEAD:** `9d0c473 2026-06-02 14:15:51 +0000 fix: restore payment origin column and add client ID badge`
+> **HEAD:** `cf33fc5 test: add Playwright E2E script for Advocacia UI flow`
 
 ---
 
@@ -19,7 +19,7 @@
 | Site dev | advocacia.local (porta 8000) |
 | Linhas Python | ~9967 |
 | Linhas JavaScript | ~6720 |
-| Métodos de teste | 232 (228 + 4 seed-demo) |
+| Métodos de teste | 230 (`run-tests --app advocacia`) |
 | DocTypes | 24 (todos `custom: 0`) |
 | Script Reports | 6 |
 
@@ -31,28 +31,23 @@
 
 | Área | Mudança |
 | --- | --- |
-| **Naming** | `format:PREFIX-{YYYY}-{####}` + `naming_rule: Expression` |
-| **Títulos** | `titulos.py`: `{ID} — {descritor}`; `show_title_field_in_link` |
-| **List views** | 12 `*_list.js` com `hide_name_column` e `states` |
-| **Cliente** | `title_field=nome`; badge ID em `cliente_list.js` |
-| **Pagamento** | Coluna Origem (`tipo_origem` + link Acordo/Registro) |
-| **Painel** | Nomes legíveis via `painel/`; `painel.js` ~4100 linhas |
-| **Sidebar** | `collapsible: 1` nas seções (fix scroll Frappe v16) |
+| **Filtros de lista** | `in_standard_filter` em 17 DocTypes; `list_filters.js` + `list_filters.css` (desktop sempre visível, mobile no botão ⇅) |
+| **Connections** | `list_nav.js`: clique em count/link abre lista filtrada pelo documento pai |
+| **Painel** | Frontend modular `public/js/painel/`; soft refresh (período/limites sem reload total) |
+| **Naming / títulos** | `format:PREFIX-{YYYY}-{####}`; `titulos.py` → `{ID} — {descritor}` |
+| **List views** | 12 `*_list.js`; Pagamento coluna Origem; Cliente badge ID |
+| **E2E UI** | `tests/e2e/playwright_flow.py` — marcador `_PW_E2E_`, cleanup automático |
+| **Sidebar** | `collapsible: 1` (fix scroll Frappe v16) |
 
 **Commits recentes:**
 ```text
-9d0c473 fix: restore payment origin column and add client ID badge
-81f7fca fix: enforce ID-prefixed titles and simplify list columns
-55a90ad fix: Section Breaks collapsíveis na sidebar Advocacia
-13b5ab1 fix: painel exibe nomes legíveis em vez de IDs
-bed6850 feat: título visível no topo do form com composição automática
-54d3a96 fix: padronizar autoname com ano em todos os DocTypes
-a3dd069 chore: add demo seed utility for dev testing
-63923a0 feat: ID-based editable titles with show_title_field_in_link across all doctypes
-979cbcb feat: homogeneous title pattern (ID + descriptive title) across all doctypes
-8291317 feat: show descriptive titles instead of codes in links, forms and list views
-c62bcf9 fix: allow Registro de Horas without duration and add save-and-start timer
-8e18133 fix: resolve Registro de Horas 403 (timer sync) and make timer loop resilient to permission errors
+cf33fc5 test: add Playwright E2E script for Advocacia UI flow
+a2d9305 fix: painel soft refresh for period and list limit filters
+7dcd549 feat: responsive list filter bar for mobile and desktop
+26edc2b fix: navigate form connections to filtered list views
+4cd02fe feat: expand dashboard connections and standard list filters on DocTypes
+18783a7 docs: phase 2 audit suite, manual_usuario.md and REGRAS_ADVOCACIA v0.7.0
+36f57b3 refactor: split painel.js into modular JS files and page CSS
 ```
 
 ## 2. Árvore de Arquivos (anotada)
@@ -63,13 +58,15 @@ advocacia/
 └── advocacia/
     ├── hooks.py, modules.txt, patches.txt, patches/v16_0/
     ├── fixtures/, workspace_sidebar/advocacia.json
-    ├── public/js/ (4: masks, list_nav, cliente_from_servico, timer_global)
+    ├── public/js/ (masks, list_nav, list_filters, cliente_from_servico, timer_global, painel/*)
+    ├── public/css/ (list_filters.css, painel.css)
     └── advocacia/
         ├── validators.py, titulos.py, painel_api.py (facade)
         ├── painel/ (kpis, financeiro, prazos, timeline, _helpers)
         ├── documentos.py, financeiro.py, tasks.py, notificacoes.py, calendar_sync.py
         ├── setup/ (install, sidebar, workspace, reports, translations, seed_demo)
-        ├── tests/ (33 arquivos), doctype/ (24), page/painel/, report/ (6), workspace/
+        ├── tests/ (35 arquivos + e2e/), doctype/ (24), page/painel/, report/ (6), workspace/
+        └── docs/ (manual, audit_*, e2e_playwright.md, README índice)
 ```
 
 ## 3. Mapa de DocTypes (24)
@@ -493,13 +490,18 @@ Colunas: `fieldname` | label | fieldtype | options | reqd | unique. Section/Colu
 ### fixtures
 Workspace Advocacia; Notifications prazo/audiência; Custom Field Event `custom_source%`.
 
-### app_include_js (4)
+### app_include_css (1)
+- `/assets/advocacia/css/list_filters.css`
+
+### app_include_js (11)
 - `/assets/advocacia/js/masks.js`
+- `/assets/advocacia/js/painel/utils.js` … `index.js` (7 módulos painel)
 - `/assets/advocacia/js/list_nav.js`
+- `/assets/advocacia/js/list_filters.js`
 - `/assets/advocacia/js/cliente_from_servico.js`
 - `/assets/advocacia/js/timer_global.js`
 
-**Removidos:** `navegacao.js`, widget painel global, `servico_link.js` (label de Serviço em `servico_query` / `format_servico_link_label`).
+**Removidos:** `navegacao.js`, widget painel global, `servico_link.js`.
 
 ### doc_events
 
@@ -545,8 +547,11 @@ Ver §4 (`tasks.py`, `notificacoes.py`). Sem `commit()` em request/scheduler.
 
 ## 7. Client JS
 
-- Globais (4), 12 list formatters, forms (acordo, servico, audiencia Híbrida).
-- `painel.js` ~4100 linhas; CSS vars para charts.
+- **Globais:** masks, list_nav, list_filters, cliente_from_servico, timer_global.
+- **Painel:** 7 módulos em `public/js/painel/` + shell `page/painel/painel.js` (13 linhas).
+- **Listas:** 12 `*_list.js`; `in_standard_filter` em Link/Select/Date dos transacionais.
+- **Connections:** `list_nav.js` intercepta cliques no dashboard do form → `frappe.set_route("List", doctype, filters)`.
+- **Filtros responsivos:** `list_filters.js` patch em `BaseList.setup_filter_area` — desktop barra visível; mobile ⇅.
 - Calendários: `audiencia_calendar.js`, `controle_de_prazos_calendar.js`.
 
 ## 8. Setup / migrations
@@ -571,9 +576,10 @@ Status Pagamento: Pendente, Vencido, Recebido, Cancelado, Renegociado, Repassado
 
 ## 11. Testes
 
-- **221** métodos em **33** arquivos.
+- **230** métodos em **35** arquivos `test_*.py` (+ `tests/e2e/` manual).
 - `bench --site advocacia.local run-tests --app advocacia`
-- Última run (site dev): **221** testes, **OK** (jun/2026).
+- Última run (site dev): **230/230 OK** (jun/2026).
+- E2E browser: `tests/e2e/playwright_flow.py` — ver `advocacia/docs/e2e_playwright.md`.
 
 ## 12. Integrações
 
@@ -584,7 +590,8 @@ Status Pagamento: Pendente, Vencido, Recebido, Cancelado, Renegociado, Repassado
 1. Chart.js → frappe.ui.Chart
 2. Fieldnames EN auxiliares (`city`, `phase_name`)
 3. sql → qb no painel
-4. Modularizar `painel.js`
+4. `agent_api.py` jurídico (pós-deploy)
+5. CI opcional com Playwright E2E
 
 ## 14. Re-audit e prontidão para produção
 
@@ -603,8 +610,9 @@ Status Pagamento: Pendente, Vencido, Recebido, Cancelado, Renegociado, Repassado
 | 9 | JS = UX | ✅ | Negócio em Python |
 | 10 | Hooks | ✅ | Pagamento handler único; schedulers |
 | 11 | Workspace/sidebar | ✅ | collapsible fix |
-| 12 | Testes | ✅ | 221/221 OK |
+| 12 | Testes | ✅ | 230/230 OK |
 | 13 | Reinstall limpo | ⏳ | Obrigatório pré go-live |
+| 14 | Filtros / Connections UX | ✅ | list_filters + list_nav (jun/2026) |
 
 ### 14.2 Ajustes de teste (2026-06-02)
 
@@ -619,7 +627,7 @@ Status Pagamento: Pendente, Vencido, Recebido, Cancelado, Renegociado, Repassado
 | Código Git (custom:0) | ✅ |
 | Blocos auditoria 1–4 | ✅ |
 | UX jun/2026 | ✅ (smoke manual) |
-| Suite 221/221 verde | ✅ |
+| Suite 230/230 verde | ✅ |
 | install-app site limpo | ⏳ recomendado pré go-live |
 
 **Conclusão:** código e testes **prontos para produção**; validar reinstall limpo e smoke manual do painel/sidebar antes do go-live.

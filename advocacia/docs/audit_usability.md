@@ -1,6 +1,6 @@
 # Seção 3 — Verificação de Usabilidade
 
-**App:** `advocacia` · **Data:** 2026-06-02 · **Versão:** 0.7.0
+**App:** `advocacia` · **Data:** 2026-06-07 · **Versão:** 0.7.0
 
 ---
 
@@ -58,7 +58,9 @@ O script acrescenta sufixo *"Visível apenas para Advocacia Manager."* em campos
 
 | Arquivo | Função |
 |---|---|
-| `list_nav.js` | Navegação painel → lista com filtros |
+| `list_nav.js` | Painel e Connections → lista com filtros (`frappe.set_route`) |
+| `list_filters.js` | Barra de filtros responsiva (desktop visível / mobile ⇅) |
+| `list_filters.css` | Layout da barra de filtros padrão |
 | `cliente_from_servico.js` | Preenche cliente ao selecionar serviço |
 | `timer_global.js` | Timer de Registro de Horas no desk |
 
@@ -90,22 +92,24 @@ O script acrescenta sufixo *"Visível apenas para Advocacia Manager."* em campos
 
 ## 3.4 List views
 
-12 arquivos `*_list.js` em transacionais principais:
+12 arquivos `*_list.js` em transacionais principais.
+
+**Filtros padrão (`in_standard_filter`):** 17 DocTypes transacionais expõem Link/Select/Date na barra de filtros — ver `list_filters.js`.
 
 | DocType | hide_name_column | Indicador status | Filtros rápidos |
 |---|---|---|---|
-| Servico | ✅ title | via status | 🟡 |
-| Cliente | ✅ nome + badge ID | 🟡 | — |
-| Pagamento | ✅ | ✅ cores + Origem | ✅ onload |
-| Acordo de Honorarios Processuais | ✅ | ✅ | 🟡 |
-| Registro de Atos | ✅ | ✅ | 🟡 |
-| Audiencia | ✅ | ✅ | 🟡 |
-| Controle de Prazos | ✅ | ✅ | 🟡 |
-| Despesa do Escritorio | ✅ | ✅ | 🟡 |
-| Custa Processual | ✅ | ✅ | 🟡 |
-| Comunicacao | ✅ | 🟡 | 🟡 |
-| Tarefa | ✅ | ✅ | 🟡 |
-| Registro de Horas | ✅ | 🟡 | — |
+| Servico | ✅ title | via status | ✅ |
+| Cliente | ✅ nome + badge ID | 🟡 | ✅ |
+| Pagamento | ✅ | ✅ cores + Origem | ✅ |
+| Acordo de Honorarios Processuais | ✅ | ✅ | ✅ |
+| Registro de Atos | ✅ | ✅ | ✅ |
+| Audiencia | ✅ | ✅ | ✅ |
+| Controle de Prazos | ✅ | ✅ | ✅ |
+| Despesa do Escritorio | ✅ | ✅ | ✅ |
+| Custa Processual | ✅ | ✅ | ✅ |
+| Comunicacao | ✅ | 🟡 | ✅ |
+| Tarefa | ✅ | ✅ | ✅ |
+| Registro de Horas | ✅ | 🟡 | ✅ |
 
 **Gap:** cadastros auxiliares (Comarca, Vara, Tribunal) sem `*_list.js` custom — aceitável (poucos registros).
 
@@ -153,8 +157,8 @@ O script acrescenta sufixo *"Visível apenas para Advocacia Manager."* em campos
 
 | Comando | Função |
 |---|---|
-| `bench seed-demo --site advocacia.local` | Popula dados com `_DEMO_` |
-| `bench clear-demo --site advocacia.local` | Remove por marcador |
+| `bench --site SITE seed-demo-advocacia` | Popula dados com `_DEMO_` |
+| `bench --site SITE clear-demo-advocacia` | Remove por marcador |
 
 **Produção:** não executar — módulo marcado dev-only.
 
@@ -165,9 +169,9 @@ O script acrescenta sufixo *"Visível apenas para Advocacia Manager."* em campos
 | Gap | Severidade | Ação sugerida |
 |---|---|---|
 | 14 campos sem description | 🟢 | Completar no próximo sprint UX |
-| Tarefa/Pagamento fora Connections do Servico | 🟢 | Adicionar DocType Links |
 | Onboarding in-app | 🟡 | Workspace intro ou vídeo |
 | Mobile desk | 🟡 | Painel responsivo parcial (CSS vars) |
+| E2E CI | 🟢 | Playwright script manual; CI opcional |
 
 ---
 
@@ -178,8 +182,9 @@ O script acrescenta sufixo *"Visível apenas para Advocacia Manager."* em campos
 - [ ] Smoke: tooltip em Acordo (campo honorários)
 - [ ] Smoke: sidebar colapsa sem travar scroll
 - [ ] Smoke: lista Pagamento mostra coluna Origem
-- [ ] User sem valores financeiros no painel
+- [ ] Smoke: Connections em Serviço abre lista filtrada
+- [ ] Smoke: filtros visíveis no desktop / ⇅ no mobile
 
 ---
 
-*Usabilidade v0.7.0: descriptions 94%, painel modular, sidebar v16-safe.*
+*Usabilidade v0.7.0: descriptions 94%, filtros responsivos, connections filtradas, painel modular.*

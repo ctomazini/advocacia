@@ -137,7 +137,8 @@ Configurados em `servico.json` → aba Connections:
 | Recurso | Uso |
 |---|---|
 | `standard_queries["Servico"]` | Autocomplete filtrado |
-| `list_nav.js` | Painel → lista com filtros `{servico: X}` |
+| `list_nav.js` | Painel e Connections → lista com filtros `{servico: X}` etc. |
+| `list_filters.js` | Filtros padrão responsivos em todas as list views |
 | `cliente_from_servico.js` | Preenche cliente ao escolher serviço |
 | Reports (6) | Agrupam por servico/cliente |
 

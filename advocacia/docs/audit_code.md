@@ -1,6 +1,6 @@
 # Seção 1 — Auditoria de Código Completa
 
-**App:** `advocacia` · **Versão:** 0.7.0 · **Site:** `advocacia.local` · **Data:** 2026-06-02  
+**App:** `advocacia` · **Versão:** 0.7.0 · **Site:** `advocacia.local` · **Data:** 2026-06-07  
 **Referência normativa:** `REGRAS_ADVOCACIA.md` (raiz do repo) · Inventário técnico: `CODEBASE.md`
 
 ---
@@ -28,21 +28,21 @@
 | Zero N+1 no painel | 🟢 OK | `_servico_lookup`, `_cliente_nome_lookup` em batch em `painel/_helpers.py`. |
 | doc_events: um handler/evento | 🟢 OK | `hooks.py`: um handler por par DocType+evento. |
 | Tabs não spaces | 🟢 OK | Amostragem `.py`/`.js` usa tabs. |
-| Testes com assert real | 🟢 OK | 228 métodos base + 4 seed = **232 total**; 34 arquivos em `tests/`. |
+| Testes com assert real | 🟢 OK | **230** métodos em 35 arquivos `test_*.py`; E2E Playwright manual em `tests/e2e/`. |
 
 ### Inconsistências prioritárias
 
 1. 🟡 **`gerar_pagamento_atos`** delega para `sincronizar_pagamento_atos` sem check na facade — check existe no callee.
 2. 🟡 **`limit_page_length`** em massa — migrar para `limit` antes do upgrade v17.
 3. 🟡 **Type hints** incompletos em whitelists legados (`financeiro.py`, `documentos.py`).
-4. 🟢 **`pyproject.toml`** ainda marca `0.6.0` — release tag v0.7.0 é a referência de deploy.
+4. 🟢 **`pyproject.toml`** em `0.7.0` — alinhado ao release tag.
 
 ---
 
 ## 1.2 Cobertura de testes
 
 **Comando:** `bench --site advocacia.local run-tests --app advocacia`  
-**Total:** 232 testes (228 suite principal + 4 `test_seed_demo.py`).
+**Total:** 230 testes (jun/2026).
 
 | DocType / Módulo | Tem teste? | Nº testes* | Funcionalidades testadas | SEM teste |
 |---|---|---|---|---|
@@ -144,7 +144,7 @@
 | Linhas JavaScript | ~5.116 |
 | Script Reports | 6 |
 | Arquivos de teste | 34 |
-| Métodos de teste | 232 |
+| Métodos de teste | 230 |
 | Whitelists | 22 |
 | `doc_events` handlers | 6 pares DocType+evento |
 | Scheduler daily | 5 jobs |
@@ -159,7 +159,7 @@
 |---|---|
 | Módulo | `setup/seed_demo.py` (~919 linhas) |
 | Marcador | `DEMO_MARKER = "_DEMO_"` |
-| Comandos | `bench seed-demo`, `bench clear-demo`, `bench seed-demo-advocacia` |
+| Comandos | `bench seed-demo-advocacia`, `bench clear-demo-advocacia` |
 | Produção | **Proibido** — comentário explícito no topo do módulo |
 | Testes | `test_seed_demo.py` (4 testes) |
 

@@ -116,7 +116,7 @@ Facade pattern igual ao painel — único path de `xcall`.
 | `test_manager_financial_summary` | Valores presentes |
 | `test_permission_denied_guest` | PermissionError |
 
-Estimativa: 8–12 métodos. Suite total passaria de 232 para ~244.
+Estimativa: 8–12 métodos. Suite total passaria de 230 para ~242.
 
 ---
 
