@@ -6,16 +6,24 @@ frappe.listview_settings["Legal Payment"] = {
 			const origem = (value || "").trim();
 			if (!origem) return "";
 
-			let link = "";
 			if (origem === "Honorários (Parcela)" && doc.fee_agreement) {
-				link = frappe.utils.get_form_link("Fee Agreement", doc.fee_agreement, true);
-			} else if (origem === "Atos Advocatícios" && doc.service_record) {
-				link = frappe.utils.get_form_link("Service Record", doc.service_record, true);
+				return frappe.utils.get_form_link(
+					"Fee Agreement",
+					doc.fee_agreement,
+					true,
+					origem
+				);
+			}
+			if (origem === "Atos Advocatícios" && doc.service_record) {
+				return frappe.utils.get_form_link(
+					"Service Record",
+					doc.service_record,
+					true,
+					origem
+				);
 			}
 
-			if (!link) return frappe.utils.escape_html(origem);
-
-			return `<a href="${link}" class="text-muted">${frappe.utils.escape_html(origem)}</a>`;
+			return frappe.utils.escape_html(origem);
 		},
 	},
 	get_indicator(doc) {

@@ -45,9 +45,9 @@ def _build_financeiro(hoje, periodo_fim, mes_inicio, mes_fim, kpis, periodo_dias
 		"count": len(previsto_periodo_rows),
 		"valor": previsto_periodo_valor,
 	}
-	vencido_valor = flt(kpis["parcelas_vencidas"]["valor"])
+	vencido_valor = flt(kpis["fee_installments_vencidas"]["valor"])
 	recebido_valor = flt(kpis["recebido_mes"]["valor"])
-	pendente_valor = flt(kpis["parcelas_a_vencer_30d"]["valor"])
+	pendente_valor = flt(kpis["fee_installments_a_vencer_30d"]["valor"])
 	base_inadimplencia = vencido_valor + recebido_valor + pendente_valor
 	taxa_inadimplencia = (
 		round((vencido_valor / base_inadimplencia) * 100, 1) if base_inadimplencia else 0
@@ -58,11 +58,11 @@ def _build_financeiro(hoje, periodo_fim, mes_inicio, mes_fim, kpis, periodo_dias
 		"recebido_mes": kpis["recebido_mes"],
 		"recebido_hoje": kpis.get("recebido_hoje") or {"count": 0, "valor": 0},
 		"recebido_periodo": kpis.get("recebido_periodo") or {"count": 0, "valor": 0},
-		"vencido": kpis["parcelas_vencidas"],
+		"vencido": kpis["fee_installments_vencidas"],
 		"previsto_mes": kpis["previsto_mes"],
 		"previsto_periodo": previsto_periodo,
 		"previsto_semana": previsto_periodo,
-		"a_vencer_30d": kpis["parcelas_a_vencer_30d"],
+		"a_vencer_30d": kpis["fee_installments_a_vencer_30d"],
 		"taxa_inadimplencia": taxa_inadimplencia,
 		"taxa_recebimento": kpis.get("taxa_recebimento") or 0,
 		"grafico": [

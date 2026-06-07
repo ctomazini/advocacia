@@ -130,6 +130,20 @@ function montar_dialog_gerar_documentos(frm, templates, kits) {
 				options: checklist_html,
 			},
 		],
+		secondary_action_label: __("Ver placeholders"),
+		secondary_action() {
+			frappe.call({
+				method: "advocacia.advocacia.documentos.get_placeholders_referencia",
+				freeze: true,
+				freeze_message: __("Carregando placeholders..."),
+				callback(r) {
+					if (!r.message) {
+						return;
+					}
+					window.advocacia_render_placeholders_referencia(r.message);
+				},
+			});
+		},
 		primary_action_label: __("Gerar documentos"),
 		primary_action() {
 			const selecionados = [];

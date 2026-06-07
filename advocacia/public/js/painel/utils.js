@@ -92,7 +92,7 @@ frappe.provide("advocacia.painel.utils");
 	    return {
 	        timeline: 5,
 	        comunicacoes: 5,
-	        parcelas: 5,
+	        fee_installments: 5,
 	        despesas: 5,
 	        custas: 5,
 	    };

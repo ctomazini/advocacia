@@ -1,6 +1,6 @@
 # Manual do Usuário — Advocacia
 
-**Gerado em:** 2026-06-06 · **Atualizado:** 2026-06-07  
+**Gerado em:** 2026-06-07
 **Versão do app:** 0.7.0
 
 ---
@@ -14,25 +14,6 @@ O **Serviço** funciona como hub: audiências, prazos, pagamentos e atos orbitam
 ### Painel
 
 Acesse `/app/painel` para KPIs, listas rápidas (prazos, audiências, tarefas) e atalhos de criação.
-
-- **Período:** filtre por 1, 7, 15 ou 30 dias no cabeçalho.
-- **Limites:** escolha 5, 10 ou 15 itens por seção — a página atualiza sem recarregar tudo.
-- **Atualizar:** botão ↺ recarrega os dados do painel.
-
-### Listas e filtros
-
-Nas telas de lista (Clients, Serviços, Legal Payments, etc.):
-
-- **Desktop:** a barra de filtros fica sempre visível abaixo do título.
-- **Mobile:** use o botão **⇅** (Filtros) para abrir ou fechar os filtros.
-- Campos com filtro rápido incluem Client, Serviço, Status, datas e cadastros auxiliares (Jurisdiction, Court Branch, etc.).
-
-### Connections (vínculos no formulário)
-
-Ao abrir um Client, Serviço ou outro documento, o bloco **Connections** mostra documentos relacionados.
-
-- Clique no **número** ou no **nome do tipo** (ex.: Legal Payments) para abrir a lista **já filtrada** por aquele registro.
-- Exemplo: no Serviço da cliente Carla Mendes, clicar em Legal Payments abre só os pagamentos daquele serviço.
 
 ---
 
@@ -188,6 +169,7 @@ Define honorários contratados com o cliente, parcelas e vencimentos. O sistema 
 | Número de Parcelas | Int |  | Quantidade de parcelas planejadas. |
 | Data Primeira Parcela | Date |  | Vencimento da primeira parcela. |
 | Valor da Parcela | Currency |  | Valor médio por parcela (referência). |
+| Gerar Parcelas | Button |  |  |
 |  | Table |  | Parcelas do acordo. Ao salvar, o sistema gera ou atualiza os pagamentos. |
 | Total Advogada | Currency |  | Soma das parcelas da advogada. Calculado automaticamente. |
 | Total Client | Currency |  | Soma das parcelas do cliente. Calculado automaticamente. |
@@ -305,7 +287,7 @@ Audiências judiciais vinculadas a um serviço. Sincroniza com o calendário Fra
 
 ### Deadline
 
-Prazos processuais com data fatal. Notificações automáticas para prazos urgentes (≤3 dias).
+Prazos processuais com data fatal. Notificações automáticas usam `dias_notificacao` do prazo ou o padrão de Office Settings.
 
 **Código automático:** `format:PRAZO-{YYYY}-{####}`
 
@@ -386,6 +368,7 @@ Prazos processuais com data fatal. Notificações automáticas para prazos urgen
 | Total Geral | Currency |  | Total geral dos atos. Calculado automaticamente. |
 | Vencimento da Cobrança | Date |  | Vencimento sugerido ao gerar cobrança dos atos pendentes. |
 | Último Legal Payment | Link |  | Último pagamento de atos vinculado a este registro. |
+| Sincronizar Cobrança | Button |  |  |
 | Observações | Text Editor |  | Observações sobre o registro de atos. |
 | Título | Data |  | Título automático no formato ID — descritor. |
 
@@ -421,7 +404,7 @@ Prazos processuais com data fatal. Notificações automáticas para prazos urgen
 
 ### Document Template
 
-Modelo .docx com placeholders para geração automática.
+Modelo .docx com placeholders para geração automática. Use o botão **Ver Placeholders Disponíveis** para a lista completa.
 
 **Código automático:** `field:titulo`
 
@@ -432,6 +415,7 @@ Modelo .docx com placeholders para geração automática.
 | Descricao | Small Text |  | Descrição do uso deste modelo. |
 | Habilitado | Check |  | Desmarque para ocultar o modelo na geração de documentos. |
 | Arquivo Template (.docx) | Attach | ✅ | Arquivo .docx com placeholders para geração. |
+| Ver Placeholders Disponíveis | Button |  | Abre a referência de placeholders disponíveis no modelo. |
 
 **Permissões:** Advocacia Manager (completo); Advocacia User conforme DocType.
 
@@ -454,20 +438,129 @@ Conjunto de templates para geração em lote.
 
 ---
 
+### Placeholders para templates .docx
+
+Sintaxe **docxtpl**: `{{ nome_do_campo }}`. Grupos *condicionais* só têm valor quando há acordo de honorários vinculado. A logo usa `{{ escritorio_logo }}` como imagem inline.
+
+#### Escritório
+
+| Placeholder | Descrição | Alias legado |
+|-------------|-----------|--------------|
+| `{{ escritorio_razao_social }}` | Razão social do escritório | — |
+| `{{ escritorio_cnpj }}` | CNPJ do escritório (mascarado) | — |
+| `{{ escritorio_oab }}` | OAB do escritório | — |
+| `{{ escritorio_advogada }}` | Advogada(o) principal | — |
+| `{{ escritorio_endereco }}` | Endereço profissional | — |
+| `{{ escritorio_registro }}` | Registro SIA/OAB | — |
+| `{{ escritorio_logo }}` | Logo do escritório (imagem — somente em .docx) | — |
+| `{{ escritorio_banco }}` | Banco | — |
+| `{{ escritorio_agencia }}` | Agência | — |
+| `{{ escritorio_conta }}` | Conta corrente | — |
+| `{{ escritorio_pix }}` | Chave PIX | — |
+
+#### Cliente
+
+| Placeholder | Descrição | Alias legado |
+|-------------|-----------|--------------|
+| `{{ cliente_nome }}` | Nome / razão social | `{{ nome }}` |
+| `{{ cliente_tipo_pessoa }}` | Tipo de pessoa (PF/PJ) | — |
+| `{{ cliente_cpf }}` | CPF (mascarado) | `{{ cpf }}` |
+| `{{ cliente_cnpj }}` | CNPJ (mascarado) | `{{ cnpj }}` |
+| `{{ cliente_rg }}` | RG | `{{ rg }}` |
+| `{{ cliente_nacionalidade }}` | Nacionalidade | `{{ nacionalidade }}` |
+| `{{ cliente_estado_civil }}` | Estado civil | `{{ estado_civil }}` |
+| `{{ cliente_profissao }}` | Profissão | `{{ profissao }}` |
+| `{{ cliente_representante }}` | Representante legal | `{{ representante }}` |
+| `{{ cliente_cpf_representante }}` | CPF do representante | `{{ cpf_representante }}` |
+| `{{ cliente_cargo_representante }}` | Cargo do representante | — |
+| `{{ cliente_nome_fantasia }}` | Nome fantasia | — |
+
+#### Endereço do cliente
+
+| Placeholder | Descrição | Alias legado |
+|-------------|-----------|--------------|
+| `{{ endereco_logradouro }}` | Logradouro | `{{ endereco }}` |
+| `{{ endereco_numero }}` | Número | `{{ numero }}` |
+| `{{ endereco_complemento }}` | Complemento | `{{ complemento }}` |
+| `{{ endereco_bairro }}` | Bairro | `{{ bairro }}` |
+| `{{ endereco_cidade }}` | Cidade | `{{ cidade }}` |
+| `{{ endereco_estado }}` | UF | `{{ estado }}` |
+| `{{ endereco_cep }}` | CEP (mascarado) | `{{ cep }}` |
+| `{{ endereco_completo }}` | Endereço completo formatado | — |
+
+#### Contato
+
+| Placeholder | Descrição | Alias legado |
+|-------------|-----------|--------------|
+| `{{ contato_nome }}` | Nome do contato | — |
+| `{{ contato_telefone }}` | Telefone fixo | `{{ telefone }}` |
+| `{{ contato_celular }}` | Celular | — |
+| `{{ contato_email }}` | E-mail | `{{ email }}` |
+| `{{ telefone_contato }}` | Telefone principal (legado) | — |
+
+#### Serviço / processo
+
+| Placeholder | Descrição | Alias legado |
+|-------------|-----------|--------------|
+| `{{ servico_codigo }}` | Código do serviço (ID) | `{{ legal_case }}` |
+| `{{ servico_titulo }}` | Título do serviço | `{{ titulo_servico }}` |
+| `{{ servico_tipo }}` | Tipo de serviço | `{{ tipo_servico }}` |
+| `{{ servico_status }}` | Status do serviço | — |
+| `{{ servico_numero_processo }}` | Número do processo (CNJ) | `{{ numero_processo }}` |
+| `{{ servico_area }}` | Área jurídica | `{{ area }}` |
+| `{{ servico_vara }}` | Vara | `{{ court_branch_link }}` |
+| `{{ servico_comarca }}` | Comarca | `{{ jurisdiction }}` |
+| `{{ servico_tribunal }}` | Tribunal | — |
+| `{{ servico_fase_processual }}` | Fase processual | — |
+| `{{ servico_parte_contraria }}` | Parte contrária | `{{ parte_contraria }}` |
+| `{{ servico_valor_causa }}` | Valor da causa (R$) | `{{ valor_causa }}` |
+| `{{ servico_data_abertura }}` | Data de abertura | `{{ data_abertura }}` |
+
+#### Acordo de honorários *(condicional)*
+
+| Placeholder | Descrição | Alias legado |
+|-------------|-----------|--------------|
+| `{{ acordo_modo_honorarios }}` | Modo de honorários | — |
+| `{{ acordo_status }}` | Status do acordo | — |
+| `{{ acordo_valor_total_do_acordo }}` | Valor total do acordo (R$) | — |
+| `{{ acordo_percentual_advogada }}` | Percentual da advogada (%) | — |
+| `{{ acordo_valor_fixo_de_honorarios }}` | Valor fixo de honorários (R$) | — |
+| `{{ acordo_valor_advogada }}` | Valor da advogada (R$) | — |
+| `{{ acordo_numero_de_parcelas }}` | Número de parcelas | — |
+| `{{ acordo_data_primeira_parcela }}` | Data da 1ª parcela | — |
+| `{{ acordo_valor_da_parcela }}` | Valor da parcela (R$) | — |
+| `{{ acordo_total_advogada }}` | Total advogada (R$) | — |
+| `{{ acordo_total_cliente }}` | Total cliente (R$) | — |
+
+#### Data
+
+| Placeholder | Descrição | Alias legado |
+|-------------|-----------|--------------|
+| `{{ data_hoje }}` | Data de hoje (dd/MM/yyyy) | — |
+| `{{ data_hoje_extenso }}` | Data de hoje por extenso | — |
+
 ## Configuração
 
 ### Office Settings
 
-Dados institucionais do escritório (OAB, CNPJ, endereço).
+Dados institucionais do escritório: OAB, CNPJ, endereço, logo, dados bancários e dias padrão de antecedência para alertas de prazos.
+
+**Código automático:** `Office Settings`
 
 | Campo | Tipo | Obrigatório | Descrição |
 |-------|------|:-----------:|-----------|
 | Razão Social | Data | ✅ | Razão social do escritório. Usada em documentos gerados. |
 | CNPJ | Data |  | CNPJ do escritório. Usado em contratos e documentos oficiais. |
 | Registro SIA | Data |  | Registro no SIA/OAB do escritório. |
+| Logo do Escritório | Attach Image |  | Logotipo exibido em documentos gerados (opcional). |
 | Advogada(o) Principal | Data | ✅ | Nome da advogada responsável pelo escritório. |
 | OAB | Data | ✅ | Número da OAB (apenas dígitos). |
+| Dias padrão de antecedência (prazos) | Int |  | Dias padrão de antecedência para alertas de prazos. |
 | Endereço Completo | Small Text | ✅ | Endereço completo do escritório para documentos. |
+| Banco | Data |  | Nome do banco para dados em contratos e recibos. |
+| Agência | Data |  | Agência bancária. |
+| Conta | Data |  | Número da conta corrente. |
+| Chave PIX | Data |  | Chave PIX para recebimentos. |
 
 **Permissões:** Advocacia Manager (completo); Advocacia User conforme DocType.
 

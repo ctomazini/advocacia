@@ -9,7 +9,7 @@ frappe.query_reports["fluxo_de_caixa"] = {
 		},
 		{
 			fieldname: "client",
-			label: __("Client"),
+			label: __("Cliente"),
 			fieldtype: "Link",
 			options: "Client",
 		},

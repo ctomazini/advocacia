@@ -107,7 +107,7 @@ frappe.provide("advocacia.painel.kpis");
 	            count: (centro.payments_periodo && centro.payments_periodo.count) || 0,
 	            label: U.painel_periodo_a_receber_label(periodo_dias),
 	            meta: U.fmt_currency((centro.payments_periodo && centro.payments_periodo.valor) || 0, true),
-	            route: "pagamentos_periodo",
+	            route: "payments_periodo",
 	        },
 	        {
 	            tone: "green",
@@ -377,8 +377,8 @@ frappe.provide("advocacia.painel.kpis");
 	        {
 	            key: "vencidas",
 	            label: __("Parcelas vencidas"),
-	            value: U.fmt_currency(k.fee_installments_vencidas.valor),
-	            meta: __("{0} parcela(s)", [k.fee_installments_vencidas.count]),
+	            value: U.fmt_currency((k.fee_installments_vencidas && k.fee_installments_vencidas.valor) || 0),
+	            meta: __("{0} parcela(s)", [(k.fee_installments_vencidas && k.fee_installments_vencidas.count) || 0]),
 	            urgent: true,
 	        },
 	        {

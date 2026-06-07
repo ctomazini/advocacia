@@ -11,8 +11,8 @@ from frappe.utils import add_months, cint, date_diff, flt, getdate, today
 def execute(filters=None):
 	filters = frappe._dict(filters or {})
 	columns = _get_columns()
-	data, chart = _get_data(filters)
-	return columns, data, None, chart
+	data, chart, report_summary = _get_data(filters)
+	return columns, data, None, chart, report_summary
 
 
 def _get_columns():
@@ -131,6 +131,8 @@ def _get_data(filters):
 	chart_labels = []
 	honorarios_chart = []
 	custas_chart = []
+	sum_servicos = sum_honorarios = sum_custas = sum_lucro = sum_horas = 0
+	sum_em_andamento = sum_encerrados = 0
 
 	for area, stats in sorted(by_area.items()):
 		total = stats["total"]
@@ -166,6 +168,31 @@ def _get_data(filters):
 		chart_labels.append(area)
 		honorarios_chart.append(total_hon)
 		custas_chart.append(total_cust)
+		sum_servicos += total
+		sum_em_andamento += stats["em_andamento"]
+		sum_encerrados += enc
+		sum_honorarios += total_hon
+		sum_custas += total_cust
+		sum_lucro += lucro
+		sum_horas += total_horas
+
+	if rows:
+		rows.append({})
+		rows.append(
+			{
+				"area": _("Total"),
+				"total_servicos": sum_servicos,
+				"em_andamento": sum_em_andamento,
+				"encerrados": sum_encerrados,
+				"taxa_encerramento": (sum_encerrados / sum_servicos * 100) if sum_servicos else 0,
+				"tempo_medio_dias": None,
+				"total_honorarios": sum_honorarios,
+				"total_custas": sum_custas,
+				"lucro_liquido": sum_lucro,
+				"horas_registradas": round(sum_horas, 2),
+				"valor_hora_efetivo": sum_honorarios / sum_horas if sum_horas else 0,
+			}
+		)
 
 	chart = None
 	if chart_labels:
@@ -178,9 +205,46 @@ def _get_data(filters):
 				],
 			},
 			"type": "bar",
+			"colors": ["#3b82f6", "#f97316"],
 		}
 
-	return rows, chart
+	report_summary = [
+		{
+			"value": sum_servicos,
+			"label": _("Serviços"),
+			"datatype": "Int",
+			"indicator": "Blue",
+		},
+		{
+			"value": sum_honorarios,
+			"label": _("Honorários"),
+			"datatype": "Currency",
+			"indicator": "Green",
+		},
+		{
+			"value": sum_custas,
+			"label": _("Custas"),
+			"datatype": "Currency",
+			"indicator": "Orange",
+		},
+		{
+			"value": sum_lucro,
+			"label": _("Lucro Líquido"),
+			"datatype": "Currency",
+			"indicator": "Green" if sum_lucro >= 0 else "Red",
+		},
+	]
+	if cint(filters.get("incluir_horas", 1)):
+		report_summary.append(
+			{
+				"value": round(sum_horas, 2),
+				"label": _("Horas Registradas"),
+				"datatype": "Float",
+				"indicator": "Blue",
+			}
+		)
+
+	return rows, chart, report_summary
 
 
 def _sum_honorarios_by_servico():

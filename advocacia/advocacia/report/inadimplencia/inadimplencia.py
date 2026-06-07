@@ -19,7 +19,7 @@ def _get_columns():
 	return [
 		{
 			"fieldname": "client",
-			"label": _("Client"),
+			"label": _("Cliente"),
 			"fieldtype": "Link",
 			"options": "Client",
 			"width": 180,

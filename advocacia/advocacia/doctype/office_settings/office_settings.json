@@ -10,11 +10,19 @@
   "razao_social",
   "cnpj",
   "registro_sia",
+  "office_logo",
   "column_break_1",
   "advogada",
   "oab",
+  "default_notify_days",
   "sec_endereco",
-  "endereco"
+  "endereco",
+  "sec_bank",
+  "bank_name",
+  "bank_agency",
+  "col_break_bank",
+  "bank_account",
+  "bank_pix"
  ],
  "fields": [
   {
@@ -46,9 +54,16 @@
    "idx": 4
   },
   {
+   "fieldname": "office_logo",
+   "fieldtype": "Attach Image",
+   "label": "Logo do Escritório",
+   "description": "Logotipo exibido em documentos gerados (opcional).",
+   "idx": 5
+  },
+  {
    "fieldname": "column_break_1",
    "fieldtype": "Column Break",
-   "idx": 5
+   "idx": 6
   },
   {
    "fieldname": "advogada",
@@ -56,7 +71,7 @@
    "label": "Advogada(o) Principal",
    "reqd": 1,
    "description": "Nome da advogada responsável pelo escritório.",
-   "idx": 6
+   "idx": 7
   },
   {
    "fieldname": "oab",
@@ -64,13 +79,21 @@
    "label": "OAB",
    "reqd": 1,
    "description": "Número da OAB (apenas dígitos).",
-   "idx": 7
+   "idx": 8
+  },
+  {
+   "default": "3",
+   "fieldname": "default_notify_days",
+   "fieldtype": "Int",
+   "label": "Dias padrão de antecedência (prazos)",
+   "description": "Dias padrão de antecedência para alertas de prazos sem valor individual.",
+   "idx": 9
   },
   {
    "fieldname": "sec_endereco",
    "fieldtype": "Section Break",
    "label": "Endereço Profissional",
-   "idx": 8
+   "idx": 10
   },
   {
    "fieldname": "endereco",
@@ -78,14 +101,53 @@
    "label": "Endereço Completo",
    "reqd": 1,
    "description": "Endereço completo do escritório para documentos.",
-   "idx": 9
+   "idx": 11
+  },
+  {
+   "fieldname": "sec_bank",
+   "fieldtype": "Section Break",
+   "label": "Dados Bancários",
+   "idx": 12
+  },
+  {
+   "fieldname": "bank_name",
+   "fieldtype": "Data",
+   "label": "Banco",
+   "description": "Nome do banco para dados em contratos e recibos.",
+   "idx": 13
+  },
+  {
+   "fieldname": "bank_agency",
+   "fieldtype": "Data",
+   "label": "Agência",
+   "description": "Agência bancária.",
+   "idx": 14
+  },
+  {
+   "fieldname": "col_break_bank",
+   "fieldtype": "Column Break",
+   "idx": 15
+  },
+  {
+   "fieldname": "bank_account",
+   "fieldtype": "Data",
+   "label": "Conta",
+   "description": "Número da conta corrente.",
+   "idx": 16
+  },
+  {
+   "fieldname": "bank_pix",
+   "fieldtype": "Data",
+   "label": "Chave PIX",
+   "description": "Chave PIX para recebimentos.",
+   "idx": 17
   }
  ],
  "issingle": 1,
  "autoname": "Office Settings",
  "naming_rule": "Expression",
  "links": [],
- "modified": "2026-05-31 12:00:00",
+ "modified": "2026-06-02 12:00:00",
  "modified_by": "Administrator",
  "module": "Advocacia",
  "name": "Office Settings",

@@ -27,7 +27,7 @@ def _get_columns():
 		{"fieldname": "titulo", "label": _("Título"), "fieldtype": "Data", "width": 200},
 		{
 			"fieldname": "client",
-			"label": _("Client"),
+			"label": _("Cliente"),
 			"fieldtype": "Link",
 			"options": "Client",
 			"width": 160,

@@ -9,6 +9,7 @@ from advocacia.advocacia.documentos import (
 	_build_context,
 	_formatar_data_extenso,
 	gerar_documentos_em_lote,
+	get_document_placeholder_keys,
 	get_kits_disponiveis,
 	get_placeholders_referencia,
 	get_templates_disponiveis,
@@ -24,6 +25,8 @@ def _ensure_test_escritorio_config(advogada="Advogada Teste"):
 	cfg.advogada = advogada
 	cfg.endereco = "Rua Teste, 100, Cidade Teste/RS"
 	cfg.registro_sia = "00000"
+	cfg.bank_name = "Banco Documentos"
+	cfg.bank_pix = "52998224725"
 	cfg.save(ignore_permissions=True)
 	return cfg
 
@@ -45,8 +48,16 @@ class TestDocumentos(FrappeTestCase):
 		self.assertIsInstance(result, list)
 		grupos = [bloco["grupo"] for bloco in result]
 		self.assertIn("Escritório", grupos)
-		self.assertIn("Client", grupos)
-		self.assertIn("Serviço", grupos)
+		self.assertIn("Cliente", grupos)
+		self.assertIn("Serviço / processo", grupos)
+
+	def test_placeholders_referencia_cobre_contexto(self):
+		_ensure_test_escritorio_config()
+		servico = create_test_legal_case()
+		context = _build_context(servico.name)
+		documented = get_document_placeholder_keys()
+		missing = sorted(set(context.keys()) - documented)
+		self.assertEqual(missing, [], msg=f"Placeholders no contexto sem documentação: {missing}")
 
 	def test_data_extenso_marco_com_cedilha(self):
 		self.assertIn("março", _formatar_data_extenso("2026-03-15"))
@@ -57,6 +68,8 @@ class TestDocumentos(FrappeTestCase):
 		context = _build_context(servico.name)
 		self.assertEqual(context["escritorio_advogada"], "Advogada Teste")
 		self.assertEqual(context["escritorio_razao_social"], "Escritorio Teste Advocacia")
+		self.assertEqual(context["escritorio_banco"], "Banco Documentos")
+		self.assertEqual(context["escritorio_pix"], "52998224725")
 		self.assertTrue(context["cliente_nome"])
 		self.assertEqual(context["nome"], context["cliente_nome"])
 		self.assertIn("data_hoje", context)

@@ -1,12 +1,27 @@
 import frappe
 
+# Nomes exibidos na UI (desk, breadcrumbs, títulos de lista). IDs internos permanecem EN.
 DOCTYPE_LABELS = {
+	"Legal Case": "Serviços",
+	"Client": "Clientes",
+	"Legal Payment": "Pagamentos",
+	"Legal Task": "Tarefas",
+	"Time Entry": "Registro de Horas",
+	"Service Record": "Registro de Atos",
+	"Hearing": "Audiências",
+	"Case Communication": "Comunicações",
+	"Court Cost": "Custas Processuais",
+	"Office Expense": "Despesas",
 	"Fee Agreement": "Honorários",
 	"Deadline": "Prazos",
 	"Document Template": "Documentos",
 	"Document Kit": "Kits de Documentos",
 	"Office Settings": "Configuração do Escritório",
-	"Service Record": "Service Record",
+	"Jurisdiction": "Comarca",
+	"Court Branch": "Vara",
+	"Court": "Tribunal",
+	"Case Phase": "Fase Processual",
+	"Fee Installment": "Parcelas de Honorários",
 }
 
 

@@ -2,6 +2,157 @@
 (function (AP) {
 	var U = advocacia.painel.utils;
 
+	function painel_build_routes(page) {
+		var hoje = frappe.datetime.get_today();
+		var amanha = frappe.datetime.add_days(hoje, 1);
+		var tres_dias = frappe.datetime.add_days(hoje, 3);
+		var periodo_fim = U.painel_periodo_fim(page);
+		var mes_inicio = frappe.datetime.month_start(hoje);
+		var mes_fim = frappe.datetime.month_end(hoje);
+
+		return {
+			audiencias_hoje: function () {
+				U.painel_goto_list("Hearing", [
+					["data_hora", "between", [hoje + " 00:00:00", hoje + " 23:59:59"]],
+				]);
+			},
+			audiencias_amanha: function () {
+				U.painel_goto_list("Hearing", [
+					["data_hora", "between", [amanha + " 00:00:00", amanha + " 23:59:59"]],
+				]);
+			},
+			audiencias_periodo: function () {
+				U.painel_goto_list("Hearing", [
+					["data_hora", "between", [hoje + " 00:00:00", periodo_fim + " 23:59:59"]],
+				]);
+			},
+			audiencias_semana: function () {
+				U.painel_goto_list("Hearing", [
+					["data_hora", "between", [hoje + " 00:00:00", periodo_fim + " 23:59:59"]],
+				]);
+			},
+			prazos_vencidos: function () {
+				U.painel_goto_list("Deadline", [
+					["status", "=", "Pendente"],
+					["data_prazo", "<", hoje],
+				]);
+			},
+			prazos_proximos: function () {
+				U.painel_goto_list("Deadline", [
+					["status", "=", "Pendente"],
+					["data_prazo", "between", [hoje, tres_dias]],
+				]);
+			},
+			prazos_criticos: function () {
+				U.painel_goto_list("Deadline", [
+					["status", "=", "Pendente"],
+					["data_prazo", "<=", tres_dias],
+				]);
+			},
+			tarefas_atrasadas: function () {
+				U.painel_goto_list("Legal Task", [
+					["status", "in", ["Pendente", "Em Andamento"]],
+					["data_limite", "<", hoje],
+				]);
+			},
+			tarefas_pendentes: function () {
+				U.painel_goto_list("Legal Task", [["status", "in", ["Pendente", "Em Andamento"]]]);
+			},
+			parcelas_vencidas: function () {
+				U.painel_goto_list("Legal Payment", [["status", "=", "Vencido"]]);
+			},
+			pagamentos_periodo: function () {
+				U.painel_goto_list("Legal Payment", [
+					["status", "=", "Pendente"],
+					["data_vencimento", "between", [hoje, periodo_fim]],
+				]);
+			},
+			payments_periodo: function () {
+				U.painel_goto_list("Legal Payment", [
+					["status", "=", "Pendente"],
+					["data_vencimento", "between", [hoje, periodo_fim]],
+				]);
+			},
+			recebimentos_periodo: function () {
+				U.painel_goto_list("Legal Payment", [
+					["status", "in", ["Recebido", "Repassado"]],
+					["data_recebimento", "between", [hoje, periodo_fim]],
+				]);
+			},
+			receita_mes: function () {
+				U.painel_goto_list("Legal Payment", [
+					["status", "in", ["Recebido", "Repassado"]],
+					["data_recebimento", "between", [mes_inicio, mes_fim]],
+				]);
+			},
+			honorarios_ativos: function () {
+				U.painel_goto_list("Fee Agreement", [["status", "=", "Vigente"]]);
+			},
+			horas: function () {
+				U.painel_goto_list("Time Entry", [["data", "between", [hoje, periodo_fim]]]);
+			},
+			clientes: function () {
+				U.painel_goto_list("Client", []);
+			},
+			taxa_recebimento: function () {
+				frappe.set_route("query-report", "inadimplencia");
+			},
+			processos_ativos: function () {
+				U.painel_goto_list("Legal Case", [["status", "=", "Em andamento"]]);
+			},
+			custas_abertas: function () {
+				U.painel_goto_list("Court Cost", [
+					["status", "in", ["Pendente", "Pago"]],
+					["repassar_cliente", "=", 1],
+				]);
+			},
+			despesas_mes: function () {
+				U.painel_goto_list("Office Expense", [
+					["data_vencimento", "between", [mes_inicio, mes_fim]],
+				]);
+			},
+			vencidas: function () {
+				U.painel_goto_list("Legal Payment", [["status", "=", "Vencido"]]);
+			},
+			recebido: function () {
+				U.painel_goto_list("Legal Payment", [
+					["status", "in", ["Recebido", "Repassado"]],
+					["data_recebimento", "between", [mes_inicio, mes_fim]],
+				]);
+			},
+			previsto: function () {
+				U.painel_goto_list("Legal Payment", [
+					["status", "=", "Pendente"],
+					["data_vencimento", "between", [mes_inicio, mes_fim]],
+				]);
+			},
+			audiencias: function () {
+				U.painel_goto_list("Hearing", [
+					["data_hora", "between", [hoje + " 00:00:00", hoje + " 23:59:59"]],
+				]);
+			},
+			prazos: function () {
+				U.painel_goto_list("Deadline", [
+					["status", "=", "Pendente"],
+					["data_prazo", "<=", tres_dias],
+				]);
+			},
+			servicos: function () {
+				U.painel_goto_list("Legal Case", [["status", "=", "Em andamento"]]);
+			},
+		};
+	}
+
+	function painel_run_route(page, key) {
+		var routes = painel_build_routes(page);
+		if (routes[key]) {
+			routes[key]();
+		}
+	}
+
+	AP.painel_build_routes = painel_build_routes;
+	AP.painel_run_route = painel_run_route;
+
 	AP.bind_painel_filters = function ($root, page) {
 		$root.off("click.painelFilters");
 		$root.on("click.painelFilters", ".painel-periodo-btn", function (e) {
@@ -33,107 +184,13 @@
 	AP.bind_atencao_routes = function ($root, page) {
 		$root.off("click.painelAtencao");
 		$root.on("click.painelAtencao", ".painel-atencao-card[data-atencao-route]", function () {
-			var hoje = frappe.datetime.get_today();
-			var amanha = frappe.datetime.add_days(hoje, 1);
-			var tres_dias = frappe.datetime.add_days(hoje, 3);
-			var periodo_fim = U.painel_periodo_fim(page);
-			var mes_inicio = frappe.datetime.month_start(hoje);
-			var mes_fim = frappe.datetime.month_end(hoje);
-			var key = $(this).attr("data-atencao-route");
-
-			var routes = {
-				audiencias_hoje: function () {
-					U.painel_goto_list("Hearing", [
-						["data_hora", "between", [hoje + " 00:00:00", hoje + " 23:59:59"]],
-					]);
-				},
-				audiencias_amanha: function () {
-					U.painel_goto_list("Hearing", [
-						["data_hora", "between", [amanha + " 00:00:00", amanha + " 23:59:59"]],
-					]);
-				},
-				audiencias_periodo: function () {
-					U.painel_goto_list("Hearing", [
-						["data_hora", "between", [hoje + " 00:00:00", periodo_fim + " 23:59:59"]],
-					]);
-				},
-				prazos_vencidos: function () {
-					U.painel_goto_list("Deadline", [
-						["status", "=", "Pendente"],
-						["data_prazo", "<", hoje],
-					]);
-				},
-				prazos_proximos: function () {
-					U.painel_goto_list("Deadline", [
-						["status", "=", "Pendente"],
-						["data_prazo", "between", [hoje, tres_dias]],
-					]);
-				},
-				prazos_criticos: function () {
-					U.painel_goto_list("Deadline", [
-						["status", "=", "Pendente"],
-						["data_prazo", "<=", tres_dias],
-					]);
-				},
-				tarefas_atrasadas: function () {
-					U.painel_goto_list("Legal Task", [
-						["status", "in", ["Pendente", "Em Andamento"]],
-						["data_limite", "<", hoje],
-					]);
-				},
-				tarefas_pendentes: function () {
-					U.painel_goto_list("Legal Task", [["status", "in", ["Pendente", "Em Andamento"]]]);
-				},
-				parcelas_vencidas: function () {
-					U.painel_goto_list("Legal Payment", [["status", "=", "Vencido"]]);
-				},
-				pagamentos_periodo: function () {
-					U.painel_goto_list("Legal Payment", [
-						["status", "=", "Pendente"],
-						["data_vencimento", "between", [hoje, periodo_fim]],
-					]);
-				},
-				recebimentos_periodo: function () {
-					U.painel_goto_list("Legal Payment", [
-						["status", "in", ["Recebido", "Repassado"]],
-						["data_recebimento", "between", [hoje, periodo_fim]],
-					]);
-				},
-				receita_mes: function () {
-					U.painel_goto_list("Legal Payment", [
-						["status", "in", ["Recebido", "Repassado"]],
-						["data_recebimento", "between", [mes_inicio, mes_fim]],
-					]);
-				},
-				honorarios_ativos: function () {
-					U.painel_goto_list("Fee Agreement", [["status", "=", "Vigente"]]);
-				},
-				horas: function () {
-					U.painel_goto_list("Time Entry", [["data", "between", [hoje, periodo_fim]]]);
-				},
-				clientes: function () {
-					U.painel_goto_list("Client", []);
-				},
-				taxa_recebimento: function () {
-					frappe.set_route("query-report", "inadimplencia");
-				},
-				processos_ativos: function () {
-					U.painel_goto_list("Legal Case", [["status", "=", "Em andamento"]]);
-				},
-				custas_abertas: function () {
-					U.painel_goto_list("Court Cost", [
-						["status", "in", ["Pendente", "Pago"]],
-						["repassar_cliente", "=", 1],
-					]);
-				},
-				despesas_mes: function () {
-					U.painel_goto_list("Office Expense", [
-						["data_vencimento", "between", [mes_inicio, mes_fim]],
-					]);
-				},
-			};
-
-			if (routes[key]) routes[key]();
+			painel_run_route(page, $(this).attr("data-atencao-route"));
+		});
+		$root.on("click.painelKpiRoutes", "[data-kpi-route]", function () {
+			painel_run_route(page, $(this).attr("data-kpi-route"));
+		});
+		$root.on("click.painelKpiRoutes", "[data-kpi]", function () {
+			painel_run_route(page, $(this).attr("data-kpi"));
 		});
 	};
 })(advocacia.painel);
@@ -193,14 +250,32 @@ $(document).on("click", ".painel-op-item[data-dt]", function (e) {
 	if (dt && dn) frappe.set_route("Form", dt, dn);
 });
 
+$(document).on("click", ".painel-row-despesa[data-dt], .painel-row-custa[data-dt]", function (e) {
+	var dt = $(this).attr("data-dt");
+	var dn = $(this).attr("data-dn");
+	if (dt && dn) frappe.set_route("Form", dt, dn);
+});
+
 $(document).on("click", ".painel-parcela-critica", function (e) {
 	if ($(e.target).closest(".painel-btn-recebida").length) return;
+	var dt = $(this).attr("data-dt");
+	var dn = $(this).attr("data-dn");
+	if (dt && dn) {
+		frappe.set_route("Form", dt, dn);
+		return;
+	}
 	var acordo = $(this).attr("data-acordo");
 	if (acordo) frappe.set_route("Form", "Fee Agreement", acordo);
 });
 
 $(document).on("click", ".painel-row-acordo", function (e) {
 	if ($(e.target).closest(".painel-btn-recebida").length) return;
+	var dt = $(this).attr("data-dt");
+	var dn = $(this).attr("data-dn");
+	if (dt && dn) {
+		frappe.set_route("Form", dt, dn);
+		return;
+	}
 	var acordo = $(this).attr("data-acordo");
 	if (acordo) frappe.set_route("Form", "Fee Agreement", acordo);
 });

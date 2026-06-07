@@ -43,18 +43,55 @@ DOCTYPE_DESCRIPTIONS = {
 		"Audiências judiciais vinculadas a um serviço. Sincroniza com o calendário Frappe (Google Calendar)."
 	),
 	"Deadline": (
-		"Prazos processuais com data fatal. Notificações automáticas para prazos urgentes (≤3 dias)."
+		"Prazos processuais com data fatal. Notificações automáticas usam "
+		"`dias_notificacao` do prazo ou o padrão de Office Settings."
 	),
 	"Jurisdiction": "Divisão judiciária geográfica. Cadastro rígido para consistência.",
 	"Court Branch": "Unidade judicial dentro de uma comarca.",
 	"Court": "Court de justiça competente (ex.: TJRS, TRF4).",
 	"Case Phase": "Fase do processo no fluxo (Distribuído, Sentenciado, etc.).",
-	"Document Template": "Modelo .docx com placeholders para geração automática.",
+	"Document Template": (
+		"Modelo .docx com placeholders para geração automática. "
+		"Use o botão **Ver Placeholders Disponíveis** para a lista completa."
+	),
 	"Document Kit": "Conjunto de templates para geração em lote.",
-	"Office Settings": "Dados institucionais do escritório (OAB, CNPJ, endereço).",
+	"Office Settings": (
+		"Dados institucionais do escritório: OAB, CNPJ, endereço, logo, dados bancários "
+		"e dias padrão de antecedência para alertas de prazos."
+	),
 }
 
-SKIP_TYPES = {"Section Break", "Column Break", "Tab Break", "HTML", "Fold", "Button"}
+SKIP_TYPES = {"Section Break", "Column Break", "Tab Break", "HTML", "Fold"}
+
+
+def _render_placeholders_section() -> list[str]:
+	try:
+		from advocacia.advocacia.documentos import PLACEHOLDER_REFERENCIA
+	except ImportError:
+		return []
+
+	lines = [
+		"### Placeholders para templates .docx",
+		"",
+		"Sintaxe **docxtpl**: `{{ nome_do_campo }}`. "
+		"Grupos *condicionais* só têm valor quando há acordo de honorários vinculado. "
+		"A logo usa `{{ escritorio_logo }}` como imagem inline.",
+		"",
+	]
+	for block in PLACEHOLDER_REFERENCIA:
+		if block.get("grupo", "").startswith("Legados"):
+			continue
+		tag = " *(condicional)*" if block.get("condicional") else ""
+		lines.append(f"#### {block['grupo']}{tag}")
+		lines.append("")
+		lines.append("| Placeholder | Descrição | Alias legado |")
+		lines.append("|-------------|-----------|--------------|")
+		for item in block.get("items") or []:
+			ph = f"`{{{{ {item['placeholder']} }}}}`"
+			alias = f"`{{{{ {item['alias']} }}}}`" if item.get("alias") else "—"
+			lines.append(f"| {ph} | {item.get('label', '')} | {alias} |")
+		lines.append("")
+	return lines
 
 
 def _auto_describe(field: dict) -> str:
@@ -172,6 +209,9 @@ def generate():
 			lines.append("---")
 			lines.append("")
 
+		if section_title == "Documentos":
+			lines.extend(_render_placeholders_section())
+
 	lines.extend(
 		[
 			"## Fluxos Comuns",
@@ -199,18 +239,7 @@ def generate():
 
 
 def main() -> None:
-	root = Path(__file__).resolve().parents[1] / "doctype"
-	out = Path(__file__).resolve().parents[1] / "docs" / "manual_usuario.md"
-	field_descs = {}
-	try:
-		from advocacia.advocacia.scripts.add_field_descriptions import DESCRIPTIONS
-
-		field_descs = DESCRIPTIONS
-	except ImportError:
-		pass
-
-	# minimal offline stub — prefer bench execute
-	print(f"Use bench execute para gerar. DocTypes em {root}")
+	generate()
 
 
 if __name__ == "__main__":

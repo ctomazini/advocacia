@@ -1,13 +1,19 @@
 import frappe
 from frappe import _
+from frappe.utils import cint
 
 
 def _app_display_name():
 	return frappe.db.get_single_value("System Settings", "app_name") or "Advocacia"
 
 
+def _default_notify_days():
+	return cint(frappe.db.get_single_value("Office Settings", "default_notify_days")) or 3
+
+
 def notificar_prazos_diario():
 	hoje = frappe.utils.today()
+	default_days = _default_notify_days()
 
 	prazos = frappe.get_all(
 		"Deadline",
@@ -31,7 +37,7 @@ def notificar_prazos_diario():
 		if not prazo.data_prazo:
 			continue
 		dias_restantes = frappe.utils.date_diff(prazo.data_prazo, hoje)
-		dias_notif = prazo.dias_notificacao or 3
+		dias_notif = prazo.dias_notificacao or default_days
 		if dias_restantes <= dias_notif:
 			prazo["dias_restantes"] = dias_restantes
 			prazos_urgentes.append(prazo)

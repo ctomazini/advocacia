@@ -35,6 +35,7 @@ app_include_css = [
 
 app_include_js = [
     "/assets/advocacia/js/masks.js",
+    "/assets/advocacia/js/documentos_placeholders.js",
     "/assets/advocacia/js/painel/utils.js",
     "/assets/advocacia/js/painel/hero.js",
     "/assets/advocacia/js/painel/kpis.js",

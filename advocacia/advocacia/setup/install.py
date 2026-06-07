@@ -37,6 +37,22 @@ def ensure_event_custom_fields():
 	frappe.clear_cache(doctype="Event")
 
 
+def ensure_office_settings():
+	"""Seed idempotente do Single de configuração do escritório."""
+	if frappe.db.exists("Office Settings", "Office Settings"):
+		return
+	frappe.get_doc(
+		{
+			"doctype": "Office Settings",
+			"razao_social": "Escritório de Advocacia",
+			"advogada": "Advogada(o) Responsável",
+			"oab": "000000",
+			"endereco": "Endereço profissional do escritório",
+			"default_notify_days": 3,
+		}
+	).insert(ignore_permissions=True)  # setup: seed do Single de configuração
+
+
 def after_install():
 	create_roles()
 	setup_permissions()
@@ -44,4 +60,5 @@ def after_install():
 	ensure_doctype_translations()
 	ensure_advocacia_sidebar()
 	ensure_advocacia_reports()
+	ensure_office_settings()
 	frappe.db.commit()

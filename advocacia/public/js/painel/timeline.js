@@ -267,7 +267,7 @@ frappe.provide("advocacia.painel.timeline");
 	    h += '<div class="painel-panel"><div class="painel-schedule-list">';
 	    comunicacoes.forEach(function (c) {
 	        h +=
-	            '<div class="painel-schedule-item" data-comunicacao="' +
+	            '<div class="painel-schedule-item" data-dt="Case Communication" data-dn="' +
 	            frappe.utils.escape_html(c.name || "") +
 	            '">' +
 	            '<div class="painel-schedule-main">' +

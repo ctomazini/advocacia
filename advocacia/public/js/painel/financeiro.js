@@ -93,7 +93,11 @@ frappe.provide("advocacia.painel.financeiro");
 	        "</h2>" +
 	        '<p class="painel-section-sub">' +
 	        __("Recebíveis e projeção {0}", [U.painel_periodo_enunciado(periodo_dias)]) +
-	        "</p></div></div>" +
+	        "</p></div>" +
+	        '<div class="painel-section-head-actions">' +
+	        '<span class="painel-section-link" data-route-list="Legal Payment">' +
+	        __("Ver pagamentos") +
+	        "</span></div></div>" +
 	        '<div class="painel-finance-grid">' +
 	        '<div class="painel-panel"><div class="painel-finance-stats">' +
 	        '<div class="painel-stat"><div class="painel-stat-label">' +
@@ -158,7 +162,9 @@ frappe.provide("advocacia.painel.financeiro");
 	                    "</button>";
 	            }
 	            return (
-	                '<div class="painel-op-item painel-parcela-critica" data-acordo="' +
+	                '<div class="painel-op-item painel-parcela-critica" data-dt="Legal Payment" data-dn="' +
+	                frappe.utils.escape_html(p.name || "") +
+	                '" data-acordo="' +
 	                frappe.utils.escape_html(p.parent || "") +
 	                '">' +
 	                '<div class="painel-op-body"><div class="painel-op-title">' +
@@ -251,7 +257,9 @@ frappe.provide("advocacia.painel.financeiro");
 	                "</button>";
 	        }
 	        h +=
-	            '<div class="painel-list-item painel-parcela-card painel-row-acordo" data-acordo="' +
+	            '<div class="painel-list-item painel-parcela-card painel-row-acordo" data-dt="Legal Payment" data-dn="' +
+	            frappe.utils.escape_html(p.name || "") +
+	            '" data-acordo="' +
 	            frappe.utils.escape_html(p.parent || "") +
 	            '">' +
 	            '<div class="painel-parcela-main"><div class="painel-op-title">' +
@@ -319,7 +327,7 @@ frappe.provide("advocacia.painel.financeiro");
 	                ? '<span class="indicator-pill red">' + __("Atrasado") + "</span>"
 	                : '<span class="indicator-pill orange">' + __("Pendente") + "</span>";
 	        h +=
-	            '<div class="painel-list-item painel-schedule-item painel-row-despesa" data-despesa="' +
+	            '<div class="painel-list-item painel-schedule-item painel-row-despesa" data-dt="Office Expense" data-dn="' +
 	            frappe.utils.escape_html(d.name || "") +
 	            '">' +
 	            '<div class="painel-schedule-main">' +
@@ -380,7 +388,7 @@ frappe.provide("advocacia.painel.financeiro");
 	    h += '<div class="painel-panel"><div class="painel-schedule-list">';
 	    custas.forEach(function (c) {
 	        h +=
-	            '<div class="painel-list-item painel-schedule-item" data-custa="' +
+	            '<div class="painel-list-item painel-schedule-item painel-row-custa" data-dt="Court Cost" data-dn="' +
 	            frappe.utils.escape_html(c.name || "") +
 	            '">' +
 	            '<div class="painel-schedule-main">' +

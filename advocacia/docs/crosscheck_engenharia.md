@@ -13,7 +13,7 @@
 | Sem `test_permissions.py` | ✅ 6 métodos |
 | Sem `list_filters` | ✅ `list_filters.js` + CSS responsivo |
 | Connections lista genérica | ✅ `list_nav.js` filtra por documento pai |
-| 222 testes | ✅ **230** testes (jun/2026) |
+| 222 testes | ✅ **241** testes (jun/2026) |
 
 **Data original:** 2026-06-06  
 **Escopo:** comparação read-only de padrões entre os apps Frappe v16 `advocacia` (brownfield, PT) e `engenharia` (greenfield, EN).  
@@ -22,7 +22,7 @@
 - `/home/frappe/frappe-bench/apps/engenharia`
 
 **Execução de testes:**
-- `bench --site advocacia.local run-tests --app advocacia` → **230 testes, OK** (jun/2026)
+- `bench --site advocacia.local run-tests --app advocacia` → **241 testes, OK** (jun/2026)
 - `bench --site advocacia.local run-tests --app engenharia` → **falhou** (`DocType Document Kit not found` — app não instalado neste site)
 
 ---
@@ -42,14 +42,14 @@
 | **4. Dashboard / Painel** | Backend modular (12 arquivos); frontend modular (~999 linhas JS) | Backend modular (7 arquivos); frontend modular `public/js/painel/` (~2.500 linhas) | Paridade estrutural OK; soft refresh jun/2026 | — |
 | **4.2 KPIs** | Obras, protocolos, margem, comissões, reembolsáveis | Clients, serviços, audiências, honorários, custas, taxa recebimento | Manter KPIs de domínio; opcional: tiles de atenção/saúde como engenharia | Médio |
 | **5. Calendar sync** | `Deadline` + `Permit` → `Event` | `Hearing` + `Deadline` → `Event` | Paridade OK; testes em ambos (`test_calendar_sync.py`) | — |
-| **6. Testes** | 192 métodos; `test_permissions`, `test_agent_api` | **230** métodos; `test_permissions`, `test_painel_api` | Adicionar `test_agent_api.py` jurídico | Médio |
+| **6. Testes** | 192 métodos; `test_permissions`, `test_agent_api` | **241** métodos; `test_permissions`, `test_painel_api`, `test_agent_api` | — | — |
 | **7. Connections / Links** | Hub `Construction Project`; 12 satélites | Hub `Legal Case`; 9 satélites; lista filtrada (`list_nav.js`) | Engenharia pode portar `list_nav` | Médio |
 | **8. Field descriptions** | 346/352 (98,3%) | 218/232 (94%) | Paridade aceitável | — |
 | **9. Hooks e scheduler** | 7 `doc_events`; scheduler daily (1 job) | 6 `doc_events`; scheduler daily (5) + weekly (1) | Advocacia mais completo em notificações; sem duplicatas de handler | Quick win (documentar) |
 | **10. Geração de documentos** | `documents.py` (492 linhas); kits + templates | `documentos.py` (601 linhas); kits + templates | Paridade; engenharia tem placeholders de obra | — |
 | **11. Navegação (FAB + Header)** | `quick_actions.js`; sem `list_nav.js` | `list_nav.js` + `list_filters.js` + painel hero | Portar navegação filtrada para engenharia | Médio |
 | **12. Demo data seeder** | `bench seed-demo` / `clear-demo` | `bench seed-demo-advocacia` / `clear-demo-advocacia` | Paridade OK (nomes distintos) | — |
-| **13. AI readiness** | `agent_api.py` (3 endpoints) + `test_agent_api.py` + `docs/audit_ai_readiness.md` | **Inexistente** | Criar `agent_api.py` jurídico (`get_active_servicos`, resumo financeiro condicional) | Longo |
+| **13. AI readiness** | `agent_api.py` (3 endpoints) + `test_agent_api.py` | ✅ `agent_api.py` (4 endpoints) + `test_agent_api.py` + `audit_ai_readiness.md` | Fase 2 MCP tools | Médio |
 
 ---
 
@@ -262,7 +262,7 @@ Paridade estrutural — domínios diferentes, implementação equivalente.
 | Execução site `advocacia.local` | ✅ OK | ❌ app não instalado |
 | Testes de permissão | ❌ | ✅ `test_permissions.py` (7) |
 | Testes dashboard/painel | ✅ `test_painel_api.py` (9) | ✅ `test_dashboard.py` (10) |
-| Testes IA | ❌ | ✅ `test_agent_api.py` (6) |
+| Testes IA | ✅ `test_agent_api.py` (6) | ✅ `test_agent_api.py` (10) |
 | Stubs vazios (`pass` / `...`) | 0 encontrados | 0 encontrados |
 
 **Cobertura destacada advocacia:** validators (16), registro_horas (15), cliente (13), scheduler (9), financeiro (7), calendar_sync (6).
@@ -396,11 +396,11 @@ Engenharia adiciona placeholders de obra (specs, contrato, customer). Advocacia 
 
 | | Engenharia | Advocacia |
 | --- | --- | --- |
-| `agent_api.py` | ✅ 3 endpoints read-only agregados | ❌ |
+| `agent_api.py` | ✅ 3 endpoints read-only agregados | ✅ 4 endpoints read-only |
 | Endpoints | `get_active_projects`, `get_project_summary`, `get_costs_by_category` | — |
 | Permissões | `has_permission` + strip financeiro para User | — |
 | Documentação | `docs/audit_ai_readiness.md` | — |
-| Testes | `test_agent_api.py` | — |
+| Testes | `test_agent_api.py` | `test_agent_api.py` |
 
 Equivalente jurídico sugerido: `get_active_servicos`, `get_servico_summary` (honorários/prazos/audiências; financeiro só Manager).
 
@@ -469,7 +469,7 @@ Estes itens são **específicos de domínio de obra** ou decisões greenfield �
 | Documentos | `advocacia/documentos.py` | `engenharia/documents.py` |
 | Permissões | `setup/install.py` (roles only) | `setup/permissions.py`, `setup/roles.py` |
 | Demo | `setup/seed_demo.py` | `setup/demo_data.py`, `commands.py` |
-| IA | — | `agent_api.py` |
+| IA | — | ✅ `agent_api.py` (Fase 1) |
 | Descriptions | — | `scripts/add_field_descriptions.py` |
 | Navegação lista | `public/js/list_nav.js` | — |
 

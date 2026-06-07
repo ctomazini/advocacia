@@ -44,44 +44,52 @@ PLACEHOLDER_REFERENCIA = [
 	{
 		"grupo": "Escritório",
 		"items": [
-			{"placeholder": "escritorio_razao_social", "label": "Razão Social"},
-			{"placeholder": "escritorio_cnpj", "label": "CNPJ"},
-			{"placeholder": "escritorio_oab", "label": "OAB"},
-			{"placeholder": "escritorio_advogada", "label": "Advogada"},
-			{"placeholder": "escritorio_endereco", "label": "Endereço"},
-			{"placeholder": "escritorio_registro", "label": "Registro SIA"},
+			{"placeholder": "escritorio_razao_social", "label": "Razão social do escritório"},
+			{"placeholder": "escritorio_cnpj", "label": "CNPJ do escritório (mascarado)"},
+			{"placeholder": "escritorio_oab", "label": "OAB do escritório"},
+			{"placeholder": "escritorio_advogada", "label": "Advogada(o) principal"},
+			{"placeholder": "escritorio_endereco", "label": "Endereço profissional"},
+			{"placeholder": "escritorio_registro", "label": "Registro SIA/OAB"},
+			{
+				"placeholder": "escritorio_logo",
+				"label": "Logo do escritório (imagem — somente em .docx)",
+			},
+			{"placeholder": "escritorio_banco", "label": "Banco"},
+			{"placeholder": "escritorio_agencia", "label": "Agência"},
+			{"placeholder": "escritorio_conta", "label": "Conta corrente"},
+			{"placeholder": "escritorio_pix", "label": "Chave PIX"},
 		],
 	},
 	{
-		"grupo": "Client",
+		"grupo": "Cliente",
 		"items": [
-			{"placeholder": "cliente_nome", "label": "Nome / Razão Social", "alias": "nome"},
-			{"placeholder": "cliente_tipo_pessoa", "label": "Tipo de Pessoa"},
+			{"placeholder": "cliente_nome", "label": "Nome / razão social", "alias": "nome"},
+			{"placeholder": "cliente_tipo_pessoa", "label": "Tipo de pessoa (PF/PJ)"},
 			{"placeholder": "cliente_cpf", "label": "CPF (mascarado)", "alias": "cpf"},
 			{"placeholder": "cliente_cnpj", "label": "CNPJ (mascarado)", "alias": "cnpj"},
 			{"placeholder": "cliente_rg", "label": "RG", "alias": "rg"},
 			{"placeholder": "cliente_nacionalidade", "label": "Nacionalidade", "alias": "nacionalidade"},
-			{"placeholder": "cliente_estado_civil", "label": "Estado Civil", "alias": "estado_civil"},
+			{"placeholder": "cliente_estado_civil", "label": "Estado civil", "alias": "estado_civil"},
 			{"placeholder": "cliente_profissao", "label": "Profissão", "alias": "profissao"},
-			{"placeholder": "cliente_representante", "label": "Representante Legal", "alias": "representante"},
+			{"placeholder": "cliente_representante", "label": "Representante legal", "alias": "representante"},
 			{
 				"placeholder": "cliente_cpf_representante",
-				"label": "CPF do Representante",
+				"label": "CPF do representante",
 				"alias": "cpf_representante",
 			},
-			{"placeholder": "cliente_cargo_representante", "label": "Cargo do Representante"},
-			{"placeholder": "cliente_nome_fantasia", "label": "Nome Fantasia"},
+			{"placeholder": "cliente_cargo_representante", "label": "Cargo do representante"},
+			{"placeholder": "cliente_nome_fantasia", "label": "Nome fantasia"},
 		],
 	},
 	{
-		"grupo": "Endereço",
+		"grupo": "Endereço do cliente",
 		"items": [
 			{"placeholder": "endereco_logradouro", "label": "Logradouro", "alias": "endereco"},
 			{"placeholder": "endereco_numero", "label": "Número", "alias": "numero"},
 			{"placeholder": "endereco_complemento", "label": "Complemento", "alias": "complemento"},
 			{"placeholder": "endereco_bairro", "label": "Bairro", "alias": "bairro"},
 			{"placeholder": "endereco_cidade", "label": "Cidade", "alias": "cidade"},
-			{"placeholder": "endereco_estado", "label": "Estado", "alias": "estado"},
+			{"placeholder": "endereco_estado", "label": "UF", "alias": "estado"},
 			{"placeholder": "endereco_cep", "label": "CEP (mascarado)", "alias": "cep"},
 			{"placeholder": "endereco_completo", "label": "Endereço completo formatado"},
 		],
@@ -89,61 +97,62 @@ PLACEHOLDER_REFERENCIA = [
 	{
 		"grupo": "Contato",
 		"items": [
-			{"placeholder": "contato_telefone", "label": "Telefone", "alias": "telefone"},
+			{"placeholder": "contato_nome", "label": "Nome do contato"},
+			{"placeholder": "contato_telefone", "label": "Telefone fixo", "alias": "telefone"},
 			{"placeholder": "contato_celular", "label": "Celular"},
 			{"placeholder": "contato_email", "label": "E-mail", "alias": "email"},
-			{"placeholder": "contato_nome", "label": "Nome do contato"},
-			{"placeholder": "telefone_contato", "label": "Telefone (legado)", "alias": "telefone_contato"},
+			{"placeholder": "telefone_contato", "label": "Telefone principal (legado)"},
 		],
 	},
 	{
-		"grupo": "Serviço",
+		"grupo": "Serviço / processo",
 		"items": [
-			{"placeholder": "servico_titulo", "label": "Título", "alias": "titulo_servico"},
-			{"placeholder": "servico_tipo", "label": "Tipo", "alias": "tipo_servico"},
-			{"placeholder": "servico_status", "label": "Status"},
+			{"placeholder": "servico_codigo", "label": "Código do serviço (ID)", "alias": "legal_case"},
+			{"placeholder": "servico_titulo", "label": "Título do serviço", "alias": "titulo_servico"},
+			{"placeholder": "servico_tipo", "label": "Tipo de serviço", "alias": "tipo_servico"},
+			{"placeholder": "servico_status", "label": "Status do serviço"},
 			{
 				"placeholder": "servico_numero_processo",
 				"label": "Número do processo (CNJ)",
 				"alias": "numero_processo",
 			},
-			{"placeholder": "servico_area", "label": "Área", "alias": "area"},
-			{"placeholder": "servico_vara", "label": "Court Branch", "alias": "court_branch_link"},
-			{"placeholder": "servico_comarca", "label": "Jurisdiction", "alias": "jurisdiction"},
-			{"placeholder": "servico_tribunal", "label": "Court"},
-			{"placeholder": "servico_fase_processual", "label": "Case Phase"},
+			{"placeholder": "servico_area", "label": "Área jurídica", "alias": "area"},
+			{"placeholder": "servico_vara", "label": "Vara", "alias": "court_branch_link"},
+			{"placeholder": "servico_comarca", "label": "Comarca", "alias": "jurisdiction"},
+			{"placeholder": "servico_tribunal", "label": "Tribunal"},
+			{"placeholder": "servico_fase_processual", "label": "Fase processual"},
 			{
 				"placeholder": "servico_parte_contraria",
-				"label": "Parte Contrária",
+				"label": "Parte contrária",
 				"alias": "parte_contraria",
 			},
 			{
 				"placeholder": "servico_valor_causa",
-				"label": "Valor da Causa",
+				"label": "Valor da causa (R$)",
 				"alias": "valor_causa",
 			},
 			{
 				"placeholder": "servico_data_abertura",
-				"label": "Data de Abertura",
+				"label": "Data de abertura",
 				"alias": "data_abertura",
 			},
 		],
 	},
 	{
-		"grupo": "Acordo",
+		"grupo": "Acordo de honorários",
 		"condicional": True,
 		"items": [
-			{"placeholder": "acordo_modo_honorarios", "label": "Modo de Honorários"},
-			{"placeholder": "acordo_status", "label": "Status"},
-			{"placeholder": "acordo_valor_total_do_acordo", "label": "Valor Total do Acordo"},
-			{"placeholder": "acordo_percentual_advogada", "label": "Percentual Advogada"},
-			{"placeholder": "acordo_valor_fixo_de_honorarios", "label": "Valor Fixo de Honorários"},
-			{"placeholder": "acordo_valor_advogada", "label": "Valor Advogada"},
-			{"placeholder": "acordo_numero_de_parcelas", "label": "Número de Parcelas"},
-			{"placeholder": "acordo_data_primeira_parcela", "label": "Data Primeira Parcela"},
-			{"placeholder": "acordo_valor_da_parcela", "label": "Valor da Parcela"},
-			{"placeholder": "acordo_total_advogada", "label": "Total Advogada"},
-			{"placeholder": "acordo_total_cliente", "label": "Total Client"},
+			{"placeholder": "acordo_modo_honorarios", "label": "Modo de honorários"},
+			{"placeholder": "acordo_status", "label": "Status do acordo"},
+			{"placeholder": "acordo_valor_total_do_acordo", "label": "Valor total do acordo (R$)"},
+			{"placeholder": "acordo_percentual_advogada", "label": "Percentual da advogada (%)"},
+			{"placeholder": "acordo_valor_fixo_de_honorarios", "label": "Valor fixo de honorários (R$)"},
+			{"placeholder": "acordo_valor_advogada", "label": "Valor da advogada (R$)"},
+			{"placeholder": "acordo_numero_de_parcelas", "label": "Número de parcelas"},
+			{"placeholder": "acordo_data_primeira_parcela", "label": "Data da 1ª parcela"},
+			{"placeholder": "acordo_valor_da_parcela", "label": "Valor da parcela (R$)"},
+			{"placeholder": "acordo_total_advogada", "label": "Total advogada (R$)"},
+			{"placeholder": "acordo_total_cliente", "label": "Total cliente (R$)"},
 		],
 	},
 	{
@@ -158,6 +167,19 @@ PLACEHOLDER_REFERENCIA = [
 		"items": [{"placeholder": p, "label": p} for p in LEGACY_PLACEHOLDERS],
 	},
 ]
+
+
+def get_document_placeholder_keys() -> set[str]:
+	"""Chaves documentadas na referência (inclui aliases legados)."""
+	keys = set()
+	for block in PLACEHOLDER_REFERENCIA:
+		for item in block.get("items") or []:
+			if item.get("loop_only"):
+				continue
+			keys.add(item["placeholder"])
+			if item.get("alias"):
+				keys.add(item["alias"])
+	return keys
 
 
 def _only_digits(value):
@@ -318,7 +340,39 @@ def _get_escritorio_context():
 		"escritorio_advogada": cfg.advogada or "",
 		"escritorio_endereco": cfg.endereco or "",
 		"escritorio_registro": cfg.registro_sia or "",
+		"escritorio_banco": cfg.bank_name or "",
+		"escritorio_agencia": cfg.bank_agency or "",
+		"escritorio_conta": cfg.bank_account or "",
+		"escritorio_pix": cfg.bank_pix or "",
+		"escritorio_logo": "",
 	}
+
+
+def _inject_logo_context(tpl, context):
+	"""Insere InlineImage no contexto quando há logo configurada."""
+	logo_url = frappe.db.get_single_value("Office Settings", "office_logo")
+	if not logo_url:
+		context["escritorio_logo"] = ""
+		return
+
+	try:
+		from docx.shared import Mm
+		from docxtpl import InlineImage
+	except ImportError:
+		context["escritorio_logo"] = ""
+		return
+
+	file_name = frappe.db.get_value("File", {"file_url": logo_url}, "name")
+	if not file_name:
+		context["escritorio_logo"] = ""
+		return
+
+	logo_path = frappe.get_doc("File", file_name).get_full_path()
+	if not os.path.exists(logo_path):
+		context["escritorio_logo"] = ""
+		return
+
+	context["escritorio_logo"] = InlineImage(tpl, logo_path, width=Mm(25))
 
 
 def _build_context(servico_name):
@@ -422,6 +476,7 @@ def _build_context(servico_name):
 
 	context.update(
 		{
+			"servico_codigo": servico.name,
 			"legal_case": servico.name,
 			"tipo_servico": context["servico_tipo"],
 			"titulo_servico": context["servico_titulo"],
@@ -471,6 +526,7 @@ def _render_and_attach(servico_name, template_doc, context):
 		frappe.throw(_("Arquivo do template nao encontrado no servidor."))
 
 	tpl = DocxTemplate(file_path)
+	_inject_logo_context(tpl, context)
 	tpl.render(context)
 
 	buffer = io.BytesIO()

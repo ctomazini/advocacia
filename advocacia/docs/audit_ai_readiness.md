@@ -1,150 +1,103 @@
-# Seção 7 — Preparação para IA (Pós-deploy)
+# Seção 7 — Preparação para IA
 
-**App:** `advocacia` · **Status:** planejado · **Data:** 2026-06-02 · **Versão alvo:** pós v0.7.0
+**App:** `advocacia` · **Status:** Fase 1 implementada · **Data:** 2026-06-02 · **Versão:** 1.0.0+
 
 ---
 
 ## 7.1 Estado atual
 
-| Componente | Status v0.7.0 |
+| Componente | Status |
 |---|---|
-| `agent_api.py` | ❌ Não existe |
-| `test_agent_api.py` | ❌ Não existe |
-| Endpoints agregados para agente | ❌ |
-| Documentação de contrato IA | ✅ Este arquivo |
+| `agent_api.py` | ✅ Implementado (4 endpoints) |
+| `test_agent_api.py` | ✅ 10 testes |
+| Endpoints agregados para agente | ✅ Read-only |
+| Documentação de contrato IA | ✅ Este arquivo + `docs/README.md` |
 | REST `/api/resource/` em DocTypes | ✅ Nativo Frappe (24 DocTypes `custom: 0`) |
-| Permissões role-aware | ✅ `setup/permissions.py` + `strip_financial_payload` |
+| Permissões role-aware | ✅ `setup/permissions.py` + redação financeira no summary |
 
-O app está **operacional para humanos** e **parcialmente pronto para agentes** via REST genérico. Falta camada de conveniência read-only otimizada para LLM/MCP.
+O app está **operacional para humanos** e **pronto para integração MCP/Hermes** via endpoints agregados. Fase 2 (tools MCP registradas) permanece no backlog.
 
 ---
 
-## 7.2 Superfície existente utilizável hoje
+## 7.2 Superfície existente
 
-### Whitelists já seguros (candidatos a tools MCP)
+### `agent_api.py` (Fase 1 — implementado)
+
+| Função | Permission | Retorno |
+|---|---|---|
+| `get_active_cases` | Legal Case read | Lista casos `Em andamento` + `client_name`, contadores |
+| `get_case_summary` | Legal Case read | Prazos, audiências, tarefas; financeiro condicional |
+| `get_court_costs_by_type` | Manager + Court Cost read | Custas agregadas por tipo |
+| `get_financial_overview` | Manager + Legal Payment read | Inadimplência e recebimentos do mês |
+
+**Regras aplicadas:** read-only · `has_permission(..., throw=True)` · type hints · zero `commit()` · financeiro omitido para Advocacia User (espelha painel).
+
+### Whitelists complementares (candidatos a tools MCP)
 
 | Função | Módulo | Permission | Uso por agente |
 |---|---|---|---|
 | `get_painel_data` | painel_api.py | Legal Case read | Snapshot operacional do escritório |
-| `servico_query` | servico.py | Legal Case read | Autocomplete processos |
-| `get_resumo_audiencia` | audiencia.py | Hearing read | Detalhe audiência |
-| `get_resumo_prazo` | controle_de_prazos.py | Deadline read | Detalhe prazo |
-| `generate_document` | documentos.py | Legal Case read | Gerar docx |
+| `legal_case_query` | legal_case.py | Legal Case read | Autocomplete processos |
+| `gerar_documentos_em_lote` | documentos.py | Legal Case read | Gerar docx |
+| `get_placeholders_referencia` | documentos.py | Document Template read | Referência de templates |
 | `get_timer_ativo_usuario` | registro_de_horas.py | Time Entry read | Timer ativo |
 
-### REST CRUD (Frappe nativo)
-
-DocTypes expõem CRUD com DocPerm. **Advocacia User** não cria `Legal Payment` — agente com credencial User herda essa restrição.
-
 ---
 
-## 7.3 Endpoints planejados (`agent_api.py`)
+## 7.3 Equivalência engenharia ↔ advocacia
 
-Módulo sugerido: `advocacia/advocacia/agent_api.py`  
-Facade pattern igual ao painel — único path de `xcall`.
-
-| Função proposta | Parâmetros | Permission | Retorno |
-|---|---|---|---|
-| `get_active_servicos` | `status=None`, `limit=20` | Legal Case read | Lista `{name, title, cliente, status, fase}` |
-| `get_servico_summary` | `servico` | Legal Case read | Resumo: prazos abertos, próxima audiência, tarefas pendentes |
-| `get_servico_financial_summary` | `servico` | **Manager only** | Honorários, parcelas vencidas, custas — ou 403 para User |
-| `get_deadlines_due` | `days=7`, `servico=None` | Deadline read | Prazos no período |
-| `get_upcoming_audiencias` | `days=7`, `servico=None` | Hearing read | Audiências no período |
-
-### Regras de desenho
-
-1. **Read-only** — agente não altera dados nesta fase.
-2. **`has_permission(..., throw=True)`** em todo endpoint.
-3. **Type hints** em todas as assinaturas.
-4. **Zero N+1** — batch lookups como `painel/_helpers.py`.
-5. **Zero `commit()`** no módulo.
-6. **Financeiro condicional** — versão User omite valores (espelhar `strip_financial_payload`).
-
----
-
-## 7.4 Gaps para agente IA (MCP / assistente)
-
-| Operação | Possível hoje? | Gap |
-|---|---|---|
-| Listar processos ativos | 🟡 REST GET Legal Case | Sem agregação; precisa filtros manuais |
-| Resumo de um processo | 🟡 Múltiplos GETs | Sem endpoint único |
-| Prazos da semana | 🟡 REST GET Deadline | Sem whitelist dedicado |
-| Honorários pendentes | 🟡 Manager REST Legal Payment | User bloqueado — correto |
-| Gerar petição/docx | ✅ `documentos.generate_document` | — |
-| Criar prazo | ✅ REST POST | Agente precisa write + validação datas |
-| Marcar parcela recebida | ✅ `painel_api.marcar_parcela_recebida` | Requer Manager/write Legal Payment |
-| Consultar carteira | 🟡 Report `carteira_ativa` | Sem API JSON dedicada |
-| Timer horas | ✅ whitelisted | — |
-
----
-
-## 7.5 Schema / DX para LLM
-
-| Item | Ação planejada |
+| Engenharia | Advocacia |
 |---|---|
-| OpenAPI ou docstring estruturada | Gerar a partir de `agent_api.py` |
-| Exemplos de payload | Incluir em `docs/` após implementação |
-| Lista estável de chaves JSON | Versionar — não renomear sem bump |
-| System prompt do escritório | Template com roles Advocacia User/Manager |
+| `get_active_projects` | `get_active_cases` |
+| `get_project_summary` | `get_case_summary` |
+| `get_costs_by_category` | `get_court_costs_by_type` |
+| (implícito no summary) | `get_financial_overview` |
 
-### Payload exemplo (planejado) — `get_servico_summary`
+---
+
+## 7.4 Payload exemplo — `get_case_summary`
 
 ```json
 {
-  "servico": "SERV-2026-0042",
-  "title": "SERV-2026-0042 — Silva Advogados Ltda",
-  "cliente": "CLI-2026-0015",
-  "cliente_nome": "Silva Advogados Ltda",
+  "name": "LC-2026-0042",
+  "title": "LC-2026-0042 — Silva Advogados Ltda",
+  "client": "CLI-2026-0015",
+  "client_name": "Silva Advogados Ltda",
   "status": "Em andamento",
-  "prazos_abertos": 3,
-  "proxima_audiencia": "2026-06-10 14:00:00",
-  "tarefas_pendentes": 2,
-  "is_manager": false,
-  "financeiro": null
+  "deadlines": [],
+  "hearings": [],
+  "tasks": [],
+  "fee_agreement_value": 15000.0,
+  "amount_receivable": 3000.0,
+  "pending_payments_count": +2,
+  "court_costs_total": 850.0
 }
 ```
 
+Para **Advocacia User**, chaves financeiras são omitidas e `financial_restricted: true` é retornado.
+
 ---
 
-## 7.6 Testes planejados (`test_agent_api.py`)
+## 7.5 Testes (`test_agent_api.py`)
 
 | Teste | Assert |
 |---|---|
-| `test_get_active_servicos` | Retorna lista com title |
-| `test_get_servico_summary` | Chaves estáveis |
-| `test_user_no_financial_summary` | `financeiro` ausente ou null |
-| `test_manager_financial_summary` | Valores presentes |
-| `test_permission_denied_guest` | PermissionError |
-
-Estimativa: 8–12 métodos. Suite total passaria de 230 para ~242.
-
----
-
-## 7.7 Segurança e privacidade
-
-| Risco | Mitigação |
-|---|---|
-| Vazamento honorários para User | `get_servico_financial_summary` só Manager |
-| Agente com credencial Administrator | Documentar — usar role dedicada |
-| Dados demo `_DEMO_` em produção | Proibir `seed-demo` em prod |
-| CPF/CNPJ em prompts | API retorna dígitos — mascarar no client do agente |
-| Log de chamadas IA | Futuro: `Communication` tipo "Sistema" |
+| `test_get_active_cases_has_counts_and_client_name` | Contadores + `client_name` |
+| `test_get_case_summary_financial_for_manager` | KPIs financeiros presentes |
+| `test_get_case_summary_redacts_financial_for_user` | Sem valores para User |
+| `test_get_court_costs_by_type` | Agregação por tipo |
+| `test_get_court_costs_by_type_requires_manager` | PermissionError para User |
+| `test_permission_denied_without_access` | PermissionError sem role |
 
 ---
 
-## 7.8 Roadmap de implementação
+## 7.6 Roadmap restante
 
-### Fase 1 — Read-only (1–2 dias)
-
-1. Criar `agent_api.py` com 3 endpoints mínimos.
-2. `test_agent_api.py` + `has_permission` em todos.
-3. Documentar chaves neste arquivo (seção 7.5).
-
-### Fase 2 — Tools MCP (2–3 dias)
+### Fase 2 — Tools MCP
 
 1. Registrar tools espelhando `agent_api.py`.
-2. Smoke com Cursor MCP ou script `xcall`.
-3. Avaliar cache de `get_painel_data` vs endpoints granulares.
+2. OpenAPI ou docstring estruturada exportável.
+3. Smoke com Cursor MCP ou script `xcall`.
 
 ### Fase 3 — Write controlado (futuro)
 
@@ -154,18 +107,15 @@ Estimativa: 8–12 métodos. Suite total passaria de 230 para ~242.
 
 ---
 
-## 7.9 Referência cruzada
+## 7.7 Segurança
 
-| App | Implementação |
+| Risco | Mitigação |
 |---|---|
-| Engenharia | `agent_api.py` (3 endpoints) + `test_agent_api.py` + este padrão de doc |
-| Advocacia v0.7.0 | Painel modular + permissions — base pronta; falta `agent_api` |
-
-**Equivalente jurídico fechado:**
-- `get_active_servicos` ↔ `get_active_projects`
-- `get_servico_summary` ↔ `get_project_summary`
-- `get_servico_financial_summary` ↔ custos/honorários (Manager)
+| Vazamento honorários para User | Endpoints financeiros só Manager |
+| Agente com credencial Administrator | Documentar — usar role dedicada |
+| Dados demo `_DEMO_` em produção | Proibir `seed-demo` em prod |
+| CPF/CNPJ em prompts | API retorna mascarado nos placeholders docx |
 
 ---
 
-*Documento normativo para planejamento pós-deploy v0.7.0. Implementação de `agent_api.py` é pré-requisito para integração MCP/Hermes.*
+*Atualizado pós-implementação Fase 1 (jun/2026). Ver também [crosscheck_engenharia.md](./crosscheck_engenharia.md).*

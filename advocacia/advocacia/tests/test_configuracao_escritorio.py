@@ -18,12 +18,19 @@ class TestConfiguracaoEscritorio(FrappeTestCase):
 		cfg.oab = "OAB/RS 123456"
 		cfg.endereco = "Rua Teste, 100, Porto Alegre/RS"
 		cfg.cnpj = "11222333000181"
+		cfg.bank_name = "Banco Teste"
+		cfg.bank_agency = "1234"
+		cfg.bank_account = "56789-0"
+		cfg.bank_pix = "teste@exemplo.com"
+		cfg.default_notify_days = 5
 		cfg.save(ignore_permissions=True)
 
 		reloaded = frappe.get_single("Office Settings")
 		self.assertEqual(reloaded.razao_social, "Escritório Teste Advocacia LTDA")
 		self.assertEqual(reloaded.advogada, "Dra. Teste")
 		self.assertEqual(reloaded.oab, "OAB/RS 123456")
+		self.assertEqual(reloaded.bank_name, "Banco Teste")
+		self.assertEqual(reloaded.default_notify_days, 5)
 
 	def test_required_razao_social_falha(self):
 		cfg = frappe.get_single("Office Settings")

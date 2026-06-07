@@ -15,7 +15,7 @@
 | Nomes DocType | **Português congelado** — não renomear |
 | Fieldnames | `snake_case`; labels UI em português |
 | Hub | `Legal Case` — 9 satélites com campo `servico` |
-| Testes | 230 (`run-tests --app advocacia`) |
+| Testes | 241 (`run-tests --app advocacia`) |
 
 ---
 
@@ -135,7 +135,7 @@ python advocacia/advocacia/tests/e2e/playwright_flow.py
 - [ ] Whitelist: `has_permission` + type hints
 - [ ] Queries com limit; sem N+1
 - [ ] `doc_events`: um handler por evento
-- [ ] `run-tests` verde (230)
+- [ ] `run-tests` verde (241)
 - [ ] Sem segredos/dados reais no diff
 - [ ] Conventional Commit (`feat:`, `fix:`, `refactor:`, `chore:`)
 - [ ] Snapshot Proxmox antes de mudança destrutiva em produção
@@ -148,13 +148,13 @@ python advocacia/advocacia/tests/e2e/playwright_flow.py
 | --- | --- |
 | `advocacia/docs/README.md` | Índice da documentação |
 | `advocacia/docs/e2e_playwright.md` | E2E UI Playwright |
-| `advocacia/docs/audit_code.md` | Código, 230 testes, whitelists |
+| `advocacia/docs/audit_code.md` | Código, 241 testes, whitelists |
 | `advocacia/docs/audit_dashboard.md` | Painel modular backend/frontend |
 | `advocacia/docs/audit_data_integrity.md` | CPF/CNPJ/CNJ/telefone, sync |
 | `advocacia/docs/audit_google_calendar.md` | Event + Google |
 | `advocacia/docs/audit_links.md` | Hub Legal Case e satélites |
 | `advocacia/docs/audit_usability.md` | Máscaras, 218/232 descriptions |
-| `advocacia/docs/audit_ai_readiness.md` | `agent_api.py` pós-deploy |
+| `advocacia/docs/audit_ai_readiness.md` | `agent_api.py` Fase 1 (implementado) |
 | `CODEBASE.md` | Inventário técnico |
 
 ---

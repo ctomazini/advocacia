@@ -280,9 +280,15 @@ DESCRIPTIONS: dict[str, dict[str, str]] = {
 		"razao_social": "Razão social do escritório. Usada em documentos gerados.",
 		"cnpj": "CNPJ do escritório. Usado em contratos e documentos oficiais.",
 		"registro_sia": "Registro no SIA/OAB do escritório.",
+		"office_logo": "Logotipo exibido em documentos gerados (opcional).",
 		"advogada": "Nome da advogada responsável pelo escritório.",
 		"oab": "Número da OAB (apenas dígitos).",
+		"default_notify_days": "Dias padrão de antecedência para alertas de prazos.",
 		"endereco": "Endereço completo do escritório para documentos.",
+		"bank_name": "Nome do banco para dados em contratos e recibos.",
+		"bank_agency": "Agência bancária.",
+		"bank_account": "Número da conta corrente.",
+		"bank_pix": "Chave PIX para recebimentos.",
 	},
 }
 

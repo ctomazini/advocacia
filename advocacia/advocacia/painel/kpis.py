@@ -92,17 +92,20 @@ def _build_kpis(hoje, periodo_fim, mes_inicio, mes_fim):
 	base_taxa = vencido_valor + recebido_mes_valor + sum(flt(p.valor) for p in proximos_periodo)
 	taxa_recebimento = round((recebido_mes_valor / base_taxa) * 100, 1) if base_taxa else 100
 
+	fee_installments_vencidas = {
+		"count": len(vencidos),
+		"valor": vencido_valor,
+	}
+	fee_installments_a_vencer_30d = {
+		"count": len(proximos_periodo),
+		"valor": sum(flt(p.valor) for p in proximos_periodo),
+	}
+
 	return {
 		"total_clientes": frappe.db.count("Client"),
-		"servicos_ativos": frappe.db.count("Legal Case", {"status": "Em andamento"}),
-		"parcelas_vencidas": {
-			"count": len(vencidos),
-			"valor": vencido_valor,
-		},
-		"parcelas_a_vencer_30d": {
-			"count": len(proximos_periodo),
-			"valor": sum(flt(p.valor) for p in proximos_periodo),
-		},
+		"legal_cases_ativos": frappe.db.count("Legal Case", {"status": "Em andamento"}),
+		"fee_installments_vencidas": fee_installments_vencidas,
+		"fee_installments_a_vencer_30d": fee_installments_a_vencer_30d,
 		"recebido_mes": {
 			"count": len(recebidos_mes),
 			"valor": recebido_mes_valor,
@@ -151,8 +154,8 @@ def _build_kpis(hoje, periodo_fim, mes_inicio, mes_fim):
 				"data_prazo": ["between", [hoje, add_days(hoje, 3)]],
 			},
 		),
-		"tarefas_pendentes": tarefas_pendentes,
-		"tarefas_atrasadas": tarefas_atrasadas,
+		"legal_tasks_pendentes": tarefas_pendentes,
+		"legal_tasks_atrasadas": tarefas_atrasadas,
 		"honorarios_ativos": honorarios_ativos,
 		"custas_abertas": custas_abertas,
 		"taxa_recebimento": taxa_recebimento,
@@ -162,14 +165,14 @@ def _build_resumo(hoje, kpis, financeiro, periodo_dias=7):
 		"data_hoje": frappe.utils.formatdate(hoje, "EEEE, d 'de' MMMM"),
 		"periodo_dias": periodo_dias,
 		"audiencias_hoje": kpis.get("audiencias_hoje") or 0,
-		"parcelas_vencidas": kpis["parcelas_vencidas"]["count"],
+		"fee_installments_vencidas": kpis["fee_installments_vencidas"]["count"],
 		"prazos_urgentes": kpis["prazos_urgentes"],
 		"previsto_periodo_valor": financeiro["previsto_periodo"]["valor"],
 		"previsto_semana_valor": financeiro["previsto_periodo"]["valor"],
 		"urgencia": "alta"
-		if kpis["parcelas_vencidas"]["count"]
+		if kpis["fee_installments_vencidas"]["count"]
 		or kpis["prazos_urgentes"]
-		or kpis.get("tarefas_atrasadas")
+		or kpis.get("legal_tasks_atrasadas")
 		else "normal",
 	}
 def _count_custas_abertas():

@@ -28,7 +28,7 @@
 | Zero N+1 no painel | 🟢 OK | `_servico_lookup`, `_cliente_nome_lookup` em batch em `painel/_helpers.py`. |
 | doc_events: um handler/evento | 🟢 OK | `hooks.py`: um handler por par DocType+evento. |
 | Tabs não spaces | 🟢 OK | Amostragem `.py`/`.js` usa tabs. |
-| Testes com assert real | 🟢 OK | **230** métodos em 35 arquivos `test_*.py`; E2E Playwright manual em `tests/e2e/`. |
+| Testes com assert real | 🟢 OK | **241** métodos em 35+ arquivos `test_*.py`; E2E Playwright manual em `tests/e2e/`. |
 
 ### Inconsistências prioritárias
 
@@ -42,7 +42,7 @@
 ## 1.2 Cobertura de testes
 
 **Comando:** `bench --site advocacia.local run-tests --app advocacia`  
-**Total:** 230 testes (jun/2026).
+**Total:** 241 testes (jun/2026).
 
 | DocType / Módulo | Tem teste? | Nº testes* | Funcionalidades testadas | SEM teste |
 |---|---|---|---|---|
@@ -60,7 +60,7 @@
 | Office Expense | Sim | 11 | Categorias, vencimento | — |
 | Document Kit | Sim | 6 | Itens, templates | — |
 | Cadastros (Jurisdiction, Court Branch, Court, Fase) | Sim | 4–5 cada | CRUD, unique | — |
-| Office Settings | Sim | 6 | CNPJ escritório | — |
+| Office Settings | Sim | 17 | CNPJ escritório, logo, banco, prazos | — |
 | **Child tables** (5) | Parcial | via pai | Contato, Endereco, Parcela, Ato, Kit Item | CRUD isolado |
 | **Painel** | Sim | 9 | Payload, limits, permissões | E2E browser |
 | **Permissions** | Sim | 6 | User vs Manager, painel redaction | — |
@@ -80,7 +80,7 @@
 
 | Área | Gap | Severidade |
 |---|---|---|
-| `agent_api.py` | Inexistente (planejado pós-deploy) | 🟡 |
+| `agent_api.py` | ✅ 4 endpoints read-only + testes | 🟢 |
 | Google Calendar OAuth | Sem teste E2E de integração Google | 🟢 |
 | Permlevel campos financeiros | Coberto em backend; UI não testada | 🟢 |
 
@@ -144,7 +144,7 @@
 | Linhas JavaScript | ~5.116 |
 | Script Reports | 6 |
 | Arquivos de teste | 34 |
-| Métodos de teste | 230 |
+| Métodos de teste | 241 |
 | Whitelists | 22 |
 | `doc_events` handlers | 6 pares DocType+evento |
 | Scheduler daily | 5 jobs |

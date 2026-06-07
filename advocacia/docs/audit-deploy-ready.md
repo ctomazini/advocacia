@@ -1,5 +1,7 @@
 # Auditoria Deploy-Ready — Advocacia
 
+> **Nota (jun/2026):** relatório histórico da fase v0.7. App em **v1.0.0+** com `agent_api.py`, Office Settings ampliado, placeholders documentados e 241 testes. Itens resolvidos desde então: `agent_api.py`, campos Office Settings (logo/banco/prazos), paridade IA Fase 1. Consulte [docs/README.md](./README.md) e [audit_ai_readiness.md](./audit_ai_readiness.md) para estado atual.
+
 **Data:** 2026-06-07  
 **Commit:** `28467df` — docs: organize documentation for filters, connections and E2E  
 **Site auditado:** `advocacia.local` (bench nativo, Frappe v16)  

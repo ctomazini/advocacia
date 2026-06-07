@@ -114,7 +114,7 @@ def main():
 			["Item", "Valor"],
 			[
 				["Nome", "advocacia"],
-				["Versão", "0.6.0 (`pyproject.toml`)"],
+				["Versão", "1.0.0 (`pyproject.toml`)"],
 				["Framework", "Frappe v16.19.0"],
 				["Licença", "MIT"],
 				["Branch", "frappe-v16"],
@@ -136,13 +136,14 @@ def main():
 	L.append("### 1.1 Entregas recentes (jun/2026)\n\n")
 	L.append("| Área | Mudança |\n| --- | --- |\n")
 	for a, b in [
-		("Naming", "`format:PREFIX-{YYYY}-{####}` + `naming_rule: Expression`"),
-		("Títulos", "`titulos.py`: `{ID} — {descritor}`; `show_title_field_in_link`"),
-		("List views", "12 `*_list.js` com `hide_name_column` e `states`"),
-		("Client", "`title_field=nome`; badge ID em `cliente_list.js`"),
-		("Legal Payment", "Coluna Origem (`tipo_origem` + link Acordo/Registro)"),
-		("Painel", "Nomes legíveis via `painel/`; `painel.js` ~4100 linhas"),
-		("Sidebar", "`collapsible: 1` nas seções (fix scroll Frappe v16)"),
+		("v1.0.0", "24 DocTypes renomeados PT→EN; tabs no painel; tag `v1.0.0`"),
+		("Office Settings", "Logo, dados bancários, `default_notify_days`; seed idempotente"),
+		("Documentos", "Referência completa de placeholders; logo inline docx; botão no Legal Case"),
+		("IA", "`agent_api.py` (4 endpoints read-only) + `test_agent_api.py`"),
+		("Painel", "Chaves EN backend/frontend; handlers KPI; soft refresh"),
+		("Relatórios", "6 reports com KPIs, gráficos e linha Total padronizados"),
+		("Sidebar", "Labels PT sincronizados com workspace e traduções"),
+		("Legal Payment", "Fix coluna Origem na list view"),
 	]:
 		L.append(f"| **{a}** | {b} |\n")
 	L.append(f"\n**Commits recentes:**\n```text\n{recent}\n```\n\n")
@@ -151,9 +152,9 @@ def main():
 	L.append("advocacia/\n├── CODEBASE.md, README.md, pyproject.toml\n└── advocacia/\n")
 	L.append("    ├── hooks.py, modules.txt, patches.txt, patches/v16_0/\n")
 	L.append("    ├── fixtures/, workspace_sidebar/advocacia.json\n")
-	L.append("    ├── public/js/ (4: masks, list_nav, cliente_from_servico, timer_global)\n")
+	L.append("    ├── public/js/ (masks, documentos_placeholders, painel/*, list_nav, …)\n")
 	L.append("    └── advocacia/\n")
-	L.append("        ├── validators.py, titulos.py, painel_api.py (facade)\n")
+	L.append("        ├── validators.py, titulos.py, agent_api.py, painel_api.py (facade)\n")
 	L.append("        ├── painel/ (kpis, financeiro, prazos, timeline, _helpers)\n")
 	L.append("        ├── documentos.py, financeiro.py, tasks.py, notificacoes.py, calendar_sync.py\n")
 	L.append("        ├── setup/ (install, sidebar, workspace, reports, translations, seed_demo)\n")
@@ -185,8 +186,16 @@ def main():
 
 	L.append("## 4. hooks.py\n\n### fixtures\n")
 	L.append("Workspace Advocacia; Notifications prazo/audiência; Custom Field Event `custom_source%`.\n\n")
-	L.append("### app_include_js (4)\n")
-	for js in ("masks.js", "list_nav.js", "cliente_from_servico.js", "timer_global.js"):
+	L.append("### app_include_js\n")
+	for js in (
+		"masks.js",
+		"documentos_placeholders.js",
+		"painel/utils.js … index.js (8 módulos)",
+		"list_nav.js",
+		"list_filters.js",
+		"cliente_from_servico.js",
+		"timer_global.js",
+	):
 		L.append(f"- `/assets/advocacia/js/{js}`\n")
 	L.append(
 		"\n**Removidos:** `navegacao.js`, widget painel global, `servico_link.js` "
@@ -227,7 +236,10 @@ def main():
 				["legal_case_query", "legal_case", "query", "Link Legal Case"],
 				["gerar_documento_servico / em_lote", "documentos", "Legal Case read/write", "servico.js"],
 				["get_kits_disponiveis", "documentos", "read", "servico.js"],
-				["get_placeholders_referencia", "documentos", "Template read", "template_documento.js"],
+				["get_placeholders_referencia", "documentos", "Template read", "document_template.js"],
+				["get_active_cases / get_case_summary", "agent_api", "Legal Case read", "MCP / agente IA"],
+				["get_court_costs_by_type", "agent_api", "Manager + Court Cost read", "MCP / agente IA"],
+				["get_financial_overview", "agent_api", "Manager + Legal Payment read", "MCP / agente IA"],
 				["registrar_recebimento/repasse", "parcela", "write", "form"],
 				["concluir", "legal_task", "write", "tarefa.js"],
 				["timer APIs", "registro_de_horas", "write", "timer_global.js"],
@@ -263,14 +275,17 @@ def main():
 	L.append("## 11. Testes\n\n")
 	L.append(f"- **{test_methods}** métodos em **{len(test_files)}** arquivos.\n")
 	L.append("- `bench --site advocacia.local run-tests --app advocacia`\n")
-	L.append("- Última run (site dev): **221** testes, **OK** (jun/2026).\n\n")
+	L.append(f"- Última run (site dev): **{test_methods}** testes, **OK** (jun/2026).\n\n")
 	L.append("## 12. Integrações\n\n")
-	L.append("- calendar_sync → Event; documentos → docxtpl; Office Settings (Single).\n\n")
+	L.append(
+		"- calendar_sync → Event; documentos → docxtpl; Office Settings (logo, banco, prazos); "
+		"`agent_api.py` para agentes IA.\n\n"
+	)
 	L.append("## 13. Backlog consciente\n\n")
 	L.append("1. Chart.js → frappe.ui.Chart\n")
-	L.append("2. Fieldnames EN auxiliares (`city`, `case_phase_name`)\n")
-	L.append("3. sql → qb no painel\n")
-	L.append("4. Modularizar `painel.js`\n\n")
+	L.append("2. Fieldnames EN auxiliares residuais (`city`, `phase_name`)\n")
+	L.append("3. Migrar sql → qb no painel\n")
+	L.append("4. OpenAPI / tools MCP espelhando `agent_api.py`\n\n")
 
 	L.append("## 14. Re-audit e prontidão para produção\n\n")
 	L.append("### 14.1 Checklist (13 categorias)\n\n")

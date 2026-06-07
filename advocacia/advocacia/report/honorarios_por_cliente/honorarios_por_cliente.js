@@ -2,7 +2,7 @@ frappe.query_reports["honorarios_por_cliente"] = {
 	filters: [
 		{
 			fieldname: "client",
-			label: __("Client"),
+			label: __("Cliente"),
 			fieldtype: "Link",
 			options: "Client",
 		},

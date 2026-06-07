@@ -92,8 +92,8 @@ def user_is_advocacia_manager() -> bool:
 
 
 _KPIS_FINANCIAL_KEYS = (
-	"parcelas_vencidas",
-	"parcelas_a_vencer_30d",
+	"fee_installments_vencidas",
+	"fee_installments_a_vencer_30d",
 	"recebido_mes",
 	"recebido_periodo",
 	"recebido_hoje",
@@ -104,7 +104,7 @@ _KPIS_FINANCIAL_KEYS = (
 )
 
 _RESUMO_FINANCIAL_KEYS = (
-	"parcelas_vencidas",
+	"fee_installments_vencidas",
 	"previsto_periodo_valor",
 	"previsto_semana_valor",
 )
