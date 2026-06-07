@@ -12,6 +12,8 @@ DOCTYPES_WITH_CONNECTIONS = (
 	"Legal Task",
 	"Time Entry",
 	"Service Record",
+	"Court Cost",
+	"Case Communication",
 )
 
 
