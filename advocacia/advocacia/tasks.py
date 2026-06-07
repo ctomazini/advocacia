@@ -1,7 +1,11 @@
 import frappe
 from frappe import _
-from frappe.desk.doctype.notification_log.notification_log import enqueue_create_notification
 from frappe.utils import add_days, getdate, today
+
+from advocacia.advocacia.notification_helpers import (
+	notification_already_sent,
+	send_system_notification,
+)
 
 
 def verificar_parcelas_vencidas():
@@ -61,7 +65,7 @@ def notificar_parcelas_vencidas():
 	count = 0
 	for p in pagamentos:
 		subject = _("Legal Payment vencido: {0}").format(p.name)
-		if _notification_already_sent("Legal Payment", p.name, subject):
+		if notification_already_sent("Legal Payment", p.name, subject):
 			continue
 		message = _(
 			"O pagamento {0} (vencimento {1}) esta vencido ha 3 dias. Origem: {2}."
@@ -70,7 +74,7 @@ def notificar_parcelas_vencidas():
 			frappe.utils.formatdate(p.data_vencimento),
 			_pagamento_origem_label(p),
 		)
-		_send_system_notification(
+		send_system_notification(
 			users=_pagamento_recipients(p),
 			doctype="Legal Payment",
 			docname=p.name,
@@ -105,7 +109,7 @@ def notificar_audiencias_hoje():
 			aud.client or aud.name,
 			aud.tipo or "",
 		)
-		if _notification_already_sent("Hearing", aud.name, subject):
+		if notification_already_sent("Hearing", aud.name, subject):
 			continue
 		message = _(
 			"Hearing {0} ({1}) hoje as {2}. Court Branch: {3}."
@@ -115,7 +119,7 @@ def notificar_audiencias_hoje():
 			frappe.utils.format_datetime(aud.data_hora) if aud.data_hora else "",
 			aud.court_branch or _("N/A"),
 		)
-		_send_system_notification(
+		send_system_notification(
 			users=[aud.owner] if aud.owner else [],
 			doctype="Hearing",
 			docname=aud.name,
@@ -220,34 +224,6 @@ def _pagamento_origem_label(pagamento):
 	if getattr(pagamento, "service_record", None):
 		return _("Atos: {0}").format(pagamento.service_record)
 	return _("N/A")
-
-
-def _notification_already_sent(document_type, document_name, subject):
-	return frappe.db.exists(
-		"Notification Log",
-		{
-			"document_type": document_type,
-			"document_name": document_name,
-			"subject": subject,
-		},
-	)
-
-
-def _send_system_notification(users, doctype, docname, subject, message):
-	users = [u for u in users if u]
-	if not users:
-		users = ["Administrator"]
-	enqueue_create_notification(
-		users=users,
-		doc={
-			"type": "Alert",
-			"document_type": doctype,
-			"document_name": docname,
-			"subject": subject,
-			"email_content": message,
-			"from_user": frappe.session.user or "Administrator",
-		},
-	)
 
 
 def verificar_status_servicos():

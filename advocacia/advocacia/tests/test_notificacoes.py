@@ -4,8 +4,8 @@ import frappe
 from frappe.tests.utils import FrappeTestCase
 from frappe.utils import add_days, today
 
-from advocacia.advocacia.notificacoes import notificar_prazos_diario
-from advocacia.advocacia.tests.test_setup import create_test_prazo
+from advocacia.advocacia.notificacoes import notificar_prazos_diario, notificar_tarefas_atrasadas
+from advocacia.advocacia.tests.test_setup import create_test_legal_task, create_test_prazo
 
 
 class TestNotificacoes(FrappeTestCase):
@@ -23,6 +23,28 @@ class TestNotificacoes(FrappeTestCase):
 			self.skipTest("Fixture Notification Advocacia - Hearing amanha não instalada")
 		doc = frappe.get_doc("Notification", "Advocacia - Hearing amanha")
 		self.assertTrue(doc.enabled)
+
+	def test_fixture_parcela_vencida_existe(self):
+		if not frappe.db.exists("Notification", "Advocacia - Parcela vencida"):
+			self.skipTest("Fixture Notification Advocacia - Parcela vencida não instalada")
+		doc = frappe.get_doc("Notification", "Advocacia - Parcela vencida")
+		self.assertTrue(doc.enabled)
+		self.assertEqual(doc.document_type, "Legal Payment")
+		self.assertEqual(doc.event, "Value Change")
+
+	def test_fixture_tarefa_atrasada_existe(self):
+		if not frappe.db.exists("Notification", "Advocacia - Tarefa atrasada"):
+			self.skipTest("Fixture Notification Advocacia - Tarefa atrasada não instalada")
+		doc = frappe.get_doc("Notification", "Advocacia - Tarefa atrasada")
+		self.assertTrue(doc.enabled)
+		self.assertEqual(doc.document_type, "Legal Task")
+		self.assertEqual(doc.event, "Days After")
+
+	@patch("advocacia.advocacia.notification_helpers.enqueue_create_notification")
+	def test_notificar_tarefas_atrasadas(self, mock_notify):
+		create_test_legal_task(data_limite=add_days(today(), -2), status="Pendente")
+		notificar_tarefas_atrasadas()
+		self.assertTrue(mock_notify.called)
 
 	@patch("frappe.sendmail")
 	def test_notificar_prazos_diario_envia_email(self, mock_sendmail):

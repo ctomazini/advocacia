@@ -57,7 +57,7 @@ class TestScheduler(FrappeTestCase):
 				"data_vencimento": add_days(today(), -3),
 			},
 		)
-		with patch("advocacia.advocacia.tasks.enqueue_create_notification") as mock_notify:
+		with patch("advocacia.advocacia.notification_helpers.enqueue_create_notification") as mock_notify:
 			notificar_parcelas_vencidas()
 			self.assertTrue(mock_notify.called)
 
@@ -69,7 +69,7 @@ class TestScheduler(FrappeTestCase):
 			pag_name,
 			{"status": "Vencido", "data_vencimento": add_days(today(), -1)},
 		)
-		with patch("advocacia.advocacia.tasks.enqueue_create_notification") as mock_notify:
+		with patch("advocacia.advocacia.notification_helpers.enqueue_create_notification") as mock_notify:
 			notificar_parcelas_vencidas()
 			notified = [
 				call
@@ -80,13 +80,13 @@ class TestScheduler(FrappeTestCase):
 
 	def test_notificar_audiencias_hoje(self):
 		aud = create_test_hearing(data_hora=now_datetime())
-		with patch("advocacia.advocacia.tasks.enqueue_create_notification") as mock_notify:
+		with patch("advocacia.advocacia.notification_helpers.enqueue_create_notification") as mock_notify:
 			notificar_audiencias_hoje()
 			self.assertTrue(mock_notify.called)
 
 	def test_notificar_audiencias_amanha_nao_dispara(self):
 		aud_amanha = create_test_hearing(data_hora=add_days(now_datetime(), 1))
-		with patch("advocacia.advocacia.tasks.enqueue_create_notification") as mock_notify:
+		with patch("advocacia.advocacia.notification_helpers.enqueue_create_notification") as mock_notify:
 			notificar_audiencias_hoje()
 			notified_docnames = [
 				call.kwargs.get("doc", {}).get("document_name")

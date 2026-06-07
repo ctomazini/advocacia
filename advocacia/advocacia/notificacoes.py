@@ -110,3 +110,63 @@ def notificar_prazos_diario():
 			message=html,
 			now=True,
 		)
+
+
+def _manager_users():
+	users = frappe.get_all(
+		"Has Role",
+		filters={"role": "Advocacia Manager", "parenttype": "User"},
+		pluck="parent",
+	)
+	return list({user for user in users if user and user != "Administrator"})
+
+
+def _task_recipients(task):
+	users = _manager_users()
+	for field in ("responsavel", "owner"):
+		value = task.get(field)
+		if value and value not in users:
+			users.append(value)
+	return users or ["Administrator"]
+
+
+def notificar_tarefas_atrasadas():
+	"""Notifica tarefas jurídicas com data limite vencida."""
+	from advocacia.advocacia.notification_helpers import (
+		notification_already_sent,
+		send_system_notification,
+	)
+
+	hoje = frappe.utils.today()
+	tarefas = frappe.get_all(
+		"Legal Task",
+		filters={
+			"status": ["in", ["Pendente", "Em Andamento"]],
+			"data_limite": ["<", hoje],
+		},
+		fields=["name", "titulo", "legal_case", "responsavel", "owner", "data_limite"],
+		limit_page_length=500,
+	)
+	count = 0
+	for task in tarefas:
+		subject = _("Tarefa atrasada: {0}").format(task.titulo or task.name)
+		if notification_already_sent("Legal Task", task.name, subject):
+			continue
+		message = _(
+			"A tarefa {0} (Legal Case: {1}) está atrasada desde {2}."
+		).format(
+			task.titulo or task.name,
+			task.legal_case or _("N/A"),
+			frappe.utils.formatdate(task.data_limite),
+		)
+		send_system_notification(
+			users=_task_recipients(task),
+			doctype="Legal Task",
+			docname=task.name,
+			subject=subject,
+			message=message,
+		)
+		count += 1
+
+	if count:
+		frappe.logger().info("Notificacoes de tarefas atrasadas enviadas: {0}".format(count))
