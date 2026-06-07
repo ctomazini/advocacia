@@ -22,13 +22,21 @@
 			case "centro_atencao":
 				return AT.render(d.atencao);
 			case "agenda_dias":
-				return AG.render_day_strip(d.agenda_dias);
+				return (
+					'<div class="painel-agenda-strip-host painel-dashboard-card">' +
+					AG.render_day_strip(d.agenda_dias) +
+					"</div>"
+				);
 			case "proximo_evento":
 				return AG.render_proximo_evento(d.proximo_evento);
 			case "prox_audiencia":
 				return AG.render_proximo_evento(d.proximo_evento);
 			case "saude_operacional":
-				return SA.render(d.saude_operacional);
+				return (
+					'<div class="painel-saude-host painel-dashboard-card">' +
+					SA.render(d.saude_operacional) +
+					"</div>"
+				);
 			case "timeline":
 				return T.render_timeline(d.timeline, periodo, meta.timeline, limits.timeline);
 			case "comunicacoes":

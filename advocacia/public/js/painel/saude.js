@@ -31,7 +31,7 @@ frappe.provide("advocacia.painel.saude");
 			.join("");
 
 		return (
-			'<div class="painel-saude-card painel-priority-max" id="painel-saude-operacional">' +
+			'<div class="painel-saude-card" id="painel-saude-operacional">' +
 			'<div class="painel-saude-head">' +
 			'<span class="painel-saude-badge tone-' +
 			tone +

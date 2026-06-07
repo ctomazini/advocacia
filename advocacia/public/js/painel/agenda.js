@@ -94,7 +94,7 @@ frappe.provide("advocacia.painel.agenda");
 		}
 
 		return (
-			'<section class="painel-section painel-agenda-proximo" id="painel-proximo-evento">' +
+			'<section class="painel-agenda-proximo painel-dashboard-card" id="painel-proximo-evento">' +
 			'<div class="painel-section-head">' +
 			"<div>" +
 			'<h3 class="painel-section-title">' +

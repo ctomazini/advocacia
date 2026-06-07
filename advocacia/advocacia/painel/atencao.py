@@ -45,6 +45,7 @@ def build_attention_tiles(hoje, kpis, financeiro, include_financial=True):
 	parcelas_vencidas = kpis.get("fee_installments_vencidas") or {"count": 0, "valor": 0}
 	audiencias_hoje = cint(kpis.get("audiencias_hoje") or 0)
 	audiencias_amanha = cint(kpis.get("audiencias_amanha") or 0)
+	amanha = add_days(hoje, 1)
 
 	candidates = [
 		_prazos_tile(overdue_deadlines, urgent_deadlines, hoje, three_days),
@@ -76,27 +77,33 @@ def build_attention_tiles(hoje, kpis, financeiro, include_financial=True):
 		if include_financial and cint(parcelas_vencidas.get("count") or 0)
 		else None,
 		_tile(
-			audiencias_hoje + audiencias_amanha,
-			"orange" if audiencias_hoje else "yellow",
+			audiencias_hoje,
+			"orange",
 			"gavel",
-			_("Audiências"),
+			_("Audiências hoje"),
 			{
 				"doctype": "Hearing",
 				"filters": [
-					[
-						"data_hora",
-						"between",
-						[
-							f"{hoje} 00:00:00",
-							f"{add_days(hoje, 1 if audiencias_amanha and not audiencias_hoje else 0)} 23:59:59",
-						],
-					],
+					["data_hora", "between", [f"{hoje} 00:00:00", f"{hoje} 23:59:59"]],
 				],
 			},
-			meta=_("{0} hoje · {1} amanhã").format(audiencias_hoje, audiencias_amanha),
-			pulse=bool(audiencias_hoje),
+			pulse=True,
 		)
-		if audiencias_hoje or audiencias_amanha
+		if audiencias_hoje
+		else None,
+		_tile(
+			audiencias_amanha,
+			"yellow",
+			"gavel",
+			_("Audiências amanhã"),
+			{
+				"doctype": "Hearing",
+				"filters": [
+					["data_hora", "between", [f"{amanha} 00:00:00", f"{amanha} 23:59:59"]],
+				],
+			},
+		)
+		if audiencias_amanha
 		else None,
 	]
 
@@ -105,5 +112,4 @@ def build_attention_tiles(hoje, kpis, financeiro, include_financial=True):
 		"tiles": tiles,
 		"all_clear": not tiles,
 		"empty_label": _("Nada exige ação agora"),
-		"ok_summary": _("Resto em dia ✓"),
 	}

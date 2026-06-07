@@ -26,48 +26,45 @@ frappe.provide("advocacia.painel.atencao");
 				frappe.utils.escape_html(atencao.empty_label || __("Nada exige ação agora")) +
 				"</span></div>";
 		} else {
-			var cards = tiles
-				.map(function (tile, index) {
-					var meta =
-						tile.meta != null
-							? frappe.utils.escape_html(String(tile.meta))
-							: tile.meta_currency != null
-								? currency_html(tile.meta_currency)
-								: "";
-					var pulse = tile.pulse ? " painel-atencao-card--pulse" : "";
-					return (
-						'<button type="button" class="painel-atencao-card tone-' +
-						tile.tone +
-						pulse +
-						'" data-atencao-index="' +
-						index +
-						'">' +
-						'<div class="painel-atencao-icon">' +
-						U.painel_icon(tile.icon || "alert-circle") +
-						"</div>" +
-						'<div class="painel-atencao-body">' +
-						'<div class="painel-atencao-count">' +
-						frappe.utils.escape_html(String(tile.count)) +
-						"</div>" +
-						'<div class="painel-atencao-label">' +
-						frappe.utils.escape_html(tile.label || "") +
-						"</div>" +
-						(meta ? '<div class="painel-atencao-meta">' + meta + "</div>" : "") +
-						"</div></button>"
-					);
-				})
-				.join("");
 			bodyHtml =
 				'<div class="painel-centro-grid">' +
-				cards +
-				"</div>" +
-				'<p class="painel-atencao-ok">' +
-				frappe.utils.escape_html(atencao.ok_summary || __("Resto em dia ✓")) +
-				"</p>";
+				tiles
+					.map(function (tile, index) {
+						var meta =
+							tile.meta != null
+								? frappe.utils.escape_html(String(tile.meta))
+								: tile.meta_currency != null
+									? currency_html(tile.meta_currency)
+									: "";
+						var pulse = tile.pulse ? " painel-atencao-card--pulse" : "";
+						return (
+							'<button type="button" class="painel-atencao-card tone-' +
+							tile.tone +
+							pulse +
+							'" data-atencao-index="' +
+							index +
+							'">' +
+							'<div class="painel-atencao-icon">' +
+							U.painel_icon(tile.icon || "alert-circle") +
+							"</div>" +
+							'<div class="painel-atencao-body">' +
+							'<div class="painel-atencao-count">' +
+							frappe.utils.escape_html(String(tile.count)) +
+							"</div>" +
+							'<div class="painel-atencao-label">' +
+							frappe.utils.escape_html(tile.label || "") +
+							"</div>" +
+							(meta ? '<div class="painel-atencao-meta">' + meta + "</div>" : "") +
+							"</div></button>"
+						);
+					})
+					.join("") +
+				"</div>";
 		}
 
 		return (
-			'<section class="painel-section painel-centro-atencao painel-priority-max" id="painel-centro-atencao" data-atencao-tiles="' +
+			'<div class="painel-zona-critica-host">' +
+			'<section class="painel-centro-atencao painel-dashboard-card" id="painel-centro-atencao" data-atencao-tiles="' +
 			frappe.utils.escape_html(JSON.stringify(tiles)) +
 			'">' +
 			'<div class="painel-section-head">' +
@@ -79,7 +76,7 @@ frappe.provide("advocacia.painel.atencao");
 			__("Somente o que exige ação agora") +
 			"</p></div></div>" +
 			bodyHtml +
-			"</section>"
+			"</section></div>"
 		);
 	};
 

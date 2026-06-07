@@ -103,10 +103,21 @@ advocacia.painel.init = function (wrapper) {
 		html += H.render_filtros_painel(periodo);
 		html += H.render_acoes_rapidas();
 		html += '<div class="painel-zona-critica">';
+		html += '<div class="painel-attention-duo">';
 		html += AT.render(d.atencao);
-		html += AG.render_day_strip(d.agenda_dias);
-		html += '<div class="painel-destaques-grid">';
-		html += AG.render_proximo_evento(d.proximo_evento);
+		html +=
+			'<div class="painel-proximo-evento-host">' +
+			AG.render_proximo_evento(d.proximo_evento) +
+			"</div>";
+		html += "</div>";
+		var agendaStrip = AG.render_day_strip(d.agenda_dias);
+		if (agendaStrip) {
+			html +=
+				'<div class="painel-agenda-strip-host painel-dashboard-card">' +
+				agendaStrip +
+				"</div>";
+		}
+		html += '<div class="painel-saude-host painel-dashboard-card">';
 		html += SA.render(d.saude_operacional);
 		html += "</div></div>";
 		html += T.render_timeline(d.timeline, periodo, meta.timeline, limits.timeline);

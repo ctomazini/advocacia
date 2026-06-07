@@ -73,10 +73,10 @@
 
 		var sections = [
 			{ sel: "#painel-hero", key: "hero" },
-			{ sel: "#painel-centro-atencao", key: "centro_atencao" },
-			{ sel: "#painel-agenda-dias", key: "agenda_dias" },
+			{ sel: ".painel-zona-critica-host", key: "centro_atencao" },
+			{ sel: ".painel-agenda-strip-host", key: "agenda_dias" },
 			{ sel: "#painel-proximo-evento", key: "proximo_evento" },
-			{ sel: "#painel-saude-operacional", key: "saude_operacional" },
+			{ sel: ".painel-saude-host", key: "saude_operacional" },
 			{ sel: "#painel-timeline", key: "timeline" },
 			{ sel: "#painel-comunicacoes", key: "comunicacoes" },
 			{ sel: "#painel-indicadores", key: "indicadores" },
