@@ -32,7 +32,8 @@
    "fieldtype": "Link",
    "options": "Servico",
    "label": "Serviço",
-   "in_list_view": 0
+   "in_list_view": 0,
+   "description": "Serviço relacionado à comunicação (opcional)."
   },
   {
    "fieldname": "cliente",
@@ -42,7 +43,8 @@
    "reqd": 1,
    "read_only": 1,
    "fetch_from": "servico.cliente",
-   "in_list_view": 1
+   "in_list_view": 1,
+   "description": "Cliente envolvido na comunicação."
   },
   {
    "fieldname": "column_break_info",
@@ -54,7 +56,8 @@
    "label": "Data",
    "reqd": 1,
    "default": "Now",
-   "in_list_view": 1
+   "in_list_view": 1,
+   "description": "Data e hora da comunicação."
   },
   {
    "fieldname": "tipo",
@@ -62,7 +65,8 @@
    "label": "Tipo",
    "reqd": 1,
    "in_list_view": 0,
-   "options": "Telefone\nWhatsApp\nEmail\nReunião Presencial\nReunião Virtual\nOutro"
+   "options": "Telefone\nWhatsApp\nEmail\nReunião Presencial\nReunião Virtual\nOutro",
+   "description": "Canal: Telefone, WhatsApp, E-mail, Reunião, etc."
   },
   {
    "fieldname": "detalhes_section",
@@ -74,12 +78,14 @@
    "fieldtype": "Data",
    "label": "Assunto",
    "reqd": 1,
-   "in_list_view": 1
+   "in_list_view": 1,
+   "description": "Assunto principal da comunicação."
   },
   {
    "fieldname": "resumo",
    "fieldtype": "Text Editor",
-   "label": "Resumo"
+   "label": "Resumo",
+   "description": "Resumo do que foi tratado."
   },
   {
    "fieldname": "proximos_passos_section",
@@ -90,7 +96,8 @@
   {
    "fieldname": "proximos_passos",
    "fieldtype": "Small Text",
-   "label": "Próximos Passos"
+   "label": "Próximos Passos",
+   "description": "Próximos passos combinados (opcional)."
   },
   {
    "fieldname": "gerar_tarefa",
@@ -105,7 +112,8 @@
    "options": "Tarefa",
    "label": "Tarefa Gerada",
    "read_only": 1,
-   "depends_on": "eval:doc.tarefa"
+   "depends_on": "eval:doc.tarefa",
+   "description": "Tarefa gerada a partir desta comunicação."
   },
   {
    "fieldname": "title",
@@ -114,7 +122,8 @@
    "read_only": 0,
    "allow_in_quick_entry": 1,
    "hidden": 0,
-   "in_list_view": 0
+   "in_list_view": 0,
+   "description": "Título automático no formato ID — descritor."
   }
  ],
  "index_web_pages_for_search": 1,

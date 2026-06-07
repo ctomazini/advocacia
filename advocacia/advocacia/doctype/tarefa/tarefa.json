@@ -40,7 +40,8 @@
    "options": "Servico",
    "allow_in_quick_entry": 1,
    "in_list_view": 1,
-   "in_standard_filter": 1
+   "in_standard_filter": 1,
+   "description": "Serviço relacionado (opcional)."
   },
   {
    "fieldname": "cliente",
@@ -50,7 +51,8 @@
    "read_only": 1,
    "fetch_from": "servico.cliente",
    "in_list_view": 1,
-   "in_standard_filter": 1
+   "in_standard_filter": 1,
+   "description": "Preenchido automaticamente a partir do serviço."
   },
   {
    "fieldname": "col_break_1",
@@ -64,7 +66,8 @@
    "in_list_view": 0,
    "in_global_search": 1,
    "bold": 1,
-   "allow_in_quick_entry": 1
+   "allow_in_quick_entry": 1,
+   "description": "Descrição curta da tarefa."
   },
   {
    "fieldname": "status",
@@ -74,7 +77,8 @@
    "default": "Pendente",
    "in_list_view": 0,
    "in_standard_filter": 1,
-   "bold": 1
+   "bold": 1,
+   "description": "Pendente, Em Andamento, Concluída ou Cancelada."
   },
   {
    "fieldname": "prioridade",
@@ -83,13 +87,15 @@
    "options": "Normal\nAlta\nUrgente",
    "default": "Normal",
    "in_list_view": 0,
-   "in_standard_filter": 1
+   "in_standard_filter": 1,
+   "description": "Baixa, Média ou Alta."
   },
   {
    "fieldname": "data_limite",
    "label": "Data Limite",
    "fieldtype": "Date",
-   "in_list_view": 1
+   "in_list_view": 1,
+   "description": "Prazo para conclusão da tarefa (opcional)."
   },
   {
    "fieldname": "sec_detalhes",
@@ -99,7 +105,8 @@
   {
    "fieldname": "descricao",
    "label": "Descrição",
-   "fieldtype": "Text Editor"
+   "fieldtype": "Text Editor",
+   "description": "Detalhamento da tarefa e instruções."
   },
   {
    "fieldname": "col_break_2",
@@ -109,12 +116,14 @@
    "fieldname": "responsavel",
    "label": "Responsável",
    "fieldtype": "Link",
-   "options": "User"
+   "options": "User",
+   "description": "Usuário responsável pela execução."
   },
   {
    "fieldname": "data_conclusao",
    "label": "Data de Conclusão",
-   "fieldtype": "Date"
+   "fieldtype": "Date",
+   "description": "Preenchida automaticamente ao concluir a tarefa."
   },
   {
    "fieldname": "title",
@@ -124,7 +133,8 @@
    "allow_in_quick_entry": 1,
    "hidden": 0,
    "idx": 2,
-   "in_list_view": 0
+   "in_list_view": 0,
+   "description": "Título automático no formato ID — descritor."
   }
  ],
  "permissions": [

@@ -17,7 +17,8 @@
    "unique": 1,
    "in_list_view": 1,
    "in_standard_filter": 1,
-   "allow_in_quick_entry": 1
+   "allow_in_quick_entry": 1,
+   "description": "Nome único da vara. Usado como identificador do registro."
   },
   {
    "fieldname": "comarca",
@@ -27,7 +28,8 @@
    "reqd": 1,
    "in_list_view": 1,
    "in_standard_filter": 1,
-   "allow_in_quick_entry": 1
+   "allow_in_quick_entry": 1,
+   "description": "Comarca à qual esta vara pertence."
   },
   {
    "fieldname": "court_type",
@@ -35,7 +37,8 @@
    "fieldtype": "Select",
    "options": "Cível\nCriminal\nFamília\nTrabalho\nFederal\nJuizado Especial\nFazenda Pública",
    "in_list_view": 1,
-   "in_standard_filter": 1
+   "in_standard_filter": 1,
+   "description": "Tipo: Cível, Criminal, Família, Trabalho, Federal ou Juizado Especial."
   }
  ],
  "permissions": [

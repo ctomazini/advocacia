@@ -46,7 +46,8 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Origem",
-   "options": "Honorários (Parcela)\nAtos Advocatícios"
+   "options": "Honorários (Parcela)\nAtos Advocatícios",
+   "description": "Honorários (Parcela) ou Atos Advocatícios."
   },
   {
    "fieldname": "acordo",
@@ -56,7 +57,8 @@
    "label": "Acordo",
    "mandatory_depends_on": "eval:doc.tipo_origem=='Honorários (Parcela)'",
    "options": "Acordo de Honorarios Processuais",
-   "search_index": 1
+   "search_index": 1,
+   "description": "Acordo de honorários que originou este pagamento (parcelas)."
   },
   {
    "depends_on": "eval:doc.tipo_origem=='Atos Advocatícios'",
@@ -65,7 +67,8 @@
    "label": "Registro de Atos",
    "mandatory_depends_on": "eval:doc.tipo_origem=='Atos Advocatícios'",
    "options": "Registro de Atos",
-   "read_only": 1
+   "read_only": 1,
+   "description": "Registro de atos vinculado (cobrança de atos)."
   },
   {
    "fieldname": "servico",
@@ -75,7 +78,8 @@
    "label": "Serviço",
    "options": "Servico",
    "reqd": 1,
-   "search_index": 1
+   "search_index": 1,
+   "description": "Serviço ou processo relacionado."
   },
   {
    "fieldname": "cliente",
@@ -87,7 +91,8 @@
    "read_only": 1,
    "fetch_from": "servico.cliente",
    "reqd": 1,
-   "search_index": 1
+   "search_index": 1,
+   "description": "Preenchido automaticamente a partir do serviço ou acordo."
   },
   {
    "fieldname": "col_rel_1",
@@ -97,14 +102,16 @@
    "fieldname": "numero_parcela",
    "fieldtype": "Int",
    "in_list_view": 0,
-   "label": "Nº Parcela"
+   "label": "Nº Parcela",
+   "description": "Número sequencial da parcela no acordo."
   },
   {
    "bold": 1,
    "fieldname": "descricao",
    "fieldtype": "Small Text",
    "in_list_view": 0,
-   "label": "Descrição"
+   "label": "Descrição",
+   "description": "Descrição exibida na parcela e nos relatórios."
   },
   {
    "fieldname": "sec_origem",
@@ -116,20 +123,23 @@
    "fieldtype": "Data",
    "label": "ID Origem",
    "read_only": 1,
-   "unique": 1
+   "unique": 1,
+   "description": "Identificador interno para sincronização com parcelas do acordo."
   },
   {
    "fieldname": "sincronizado_em",
    "fieldtype": "Datetime",
    "label": "Sincronizado em",
-   "read_only": 1
+   "read_only": 1,
+   "description": "Data e hora da última sincronização automática."
   },
   {
    "default": "0",
    "fieldname": "manual_override",
    "depends_on": "eval:doc.tipo_origem=='Honorários (Parcela)'",
    "fieldtype": "Check",
-   "label": "Edição manual (não sincronizar)"
+   "label": "Edição manual (não sincronizar)",
+   "description": "Quando marcado, o sistema não sobrescreve este pagamento na sincronização."
   },
   {
    "fieldname": "sec_financeiro",
@@ -141,12 +151,14 @@
    "fieldtype": "Currency",
    "in_list_view": 1,
    "label": "Valor",
-   "reqd": 1
+   "reqd": 1,
+   "description": "Valor previsto da parcela ou cobrança."
   },
   {
    "fieldname": "valor_recebido",
    "fieldtype": "Currency",
-   "label": "Valor Recebido"
+   "label": "Valor Recebido",
+   "description": "Valor efetivamente recebido."
   },
   {
    "fieldname": "col_fin_1",
@@ -159,12 +171,14 @@
    "in_standard_filter": 1,
    "label": "Vencimento",
    "reqd": 1,
-   "search_index": 1
+   "search_index": 1,
+   "description": "Data de vencimento."
   },
   {
    "fieldname": "data_recebimento",
    "fieldtype": "Date",
-   "label": "Data de Recebimento"
+   "label": "Data de Recebimento",
+   "description": "Data em que o pagamento foi recebido."
   },
   {
    "default": "Pendente",
@@ -175,7 +189,8 @@
    "label": "Status",
    "options": "Pendente\nVencido\nRecebido\nCancelado\nRenegociado\nRepassado",
    "reqd": 1,
-   "search_index": 1
+   "search_index": 1,
+   "description": "Pendente, Vencido, Recebido, Repassado, Cancelado ou Renegociado."
   },
   {
    "fieldname": "sec_controle",
@@ -185,12 +200,14 @@
   {
    "fieldname": "observacoes",
    "fieldtype": "Small Text",
-   "label": "Observações"
+   "label": "Observações",
+   "description": "Observações internas sobre o pagamento."
   },
   {
    "fieldname": "comprovante",
    "fieldtype": "Attach",
-   "label": "Comprovante"
+   "label": "Comprovante",
+   "description": "Comprovante de recebimento anexado."
   },
   {
    "fieldname": "title",
@@ -200,7 +217,8 @@
    "read_only": 0,
    "allow_in_quick_entry": 1,
    "idx": 2,
-   "in_list_view": 0
+   "in_list_view": 0,
+   "description": "Título automático com ID e descritor."
   }
  ],
  "index_web_pages_for_search": 1,

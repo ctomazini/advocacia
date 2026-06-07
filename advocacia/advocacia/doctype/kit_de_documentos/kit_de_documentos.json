@@ -22,12 +22,14 @@
    "in_standard_filter": 1,
    "label": "Título",
    "reqd": 1,
-   "unique": 1
+   "unique": 1,
+   "description": "Nome do kit. Identificador único."
   },
   {
    "fieldname": "descricao",
    "fieldtype": "Small Text",
-   "label": "Descrição"
+   "label": "Descrição",
+   "description": "Descrição do conjunto de modelos incluídos."
   },
   {
    "fieldname": "column_break_1",
@@ -38,7 +40,8 @@
    "fieldname": "habilitado",
    "fieldtype": "Check",
    "in_list_view": 1,
-   "label": "Habilitado"
+   "label": "Habilitado",
+   "description": "Desmarque para desabilitar o kit na geração em lote."
   },
   {
    "fieldname": "templates_section",
@@ -50,7 +53,8 @@
    "fieldtype": "Table",
    "label": "Templates",
    "options": "Kit Documento Item",
-   "reqd": 1
+   "reqd": 1,
+   "description": "Modelos de documento incluídos neste kit."
   }
  ],
  "links": [],

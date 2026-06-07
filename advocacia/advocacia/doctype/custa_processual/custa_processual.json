@@ -39,7 +39,8 @@
    "label": "Serviço",
    "reqd": 1,
    "allow_in_quick_entry": 1,
-   "in_list_view": 1
+   "in_list_view": 1,
+   "description": "Serviço ou processo vinculado à custa."
   },
   {
    "fieldname": "cliente",
@@ -48,7 +49,8 @@
    "label": "Cliente",
    "read_only": 1,
    "fetch_from": "servico.cliente",
-   "in_list_view": 0
+   "in_list_view": 0,
+   "description": "Selecione o registro vinculado. Preenchido ou calculado automaticamente pelo sistema."
   },
   {
    "fieldname": "tipo",
@@ -57,7 +59,8 @@
    "reqd": 1,
    "allow_in_quick_entry": 1,
    "in_list_view": 0,
-   "options": "Taxa Judicial\nPerícia\nCertidão\nDeslocamento\nCópia/Impressão\nCorreios\nCartório\nDiligência\nOutros"
+   "options": "Taxa Judicial\nPerícia\nCertidão\nDeslocamento\nCópia/Impressão\nCorreios\nCartório\nDiligência\nOutros",
+   "description": "Taxa Judicial, Emolumento, Despesa Cartorial, etc."
   },
   {
    "fieldname": "column_break_info",
@@ -69,7 +72,8 @@
    "label": "Descrição",
    "reqd": 1,
    "allow_in_quick_entry": 1,
-   "in_list_view": 1
+   "in_list_view": 1,
+   "description": "Descrição da custa ou taxa."
   },
   {
    "fieldname": "status",
@@ -78,7 +82,8 @@
    "default": "Pendente",
    "in_list_view": 0,
    "in_standard_filter": 1,
-   "options": "Pendente\nPago\nRepassado\nCancelado"
+   "options": "Pendente\nPago\nRepassado\nCancelado",
+   "description": "Pendente, Pago, Repassado ou Cancelado."
   },
   {
    "fieldname": "valores_section",
@@ -91,12 +96,14 @@
    "label": "Valor",
    "reqd": 1,
    "allow_in_quick_entry": 1,
-   "in_list_view": 1
+   "in_list_view": 1,
+   "description": "Valor da custa em reais."
   },
   {
    "fieldname": "data_pagamento",
    "fieldtype": "Date",
-   "label": "Data de Pagamento"
+   "label": "Data de Pagamento",
+   "description": "Data em que a custa foi paga."
   },
   {
    "fieldname": "column_break_val",
@@ -106,19 +113,22 @@
    "fieldname": "repassar_cliente",
    "fieldtype": "Check",
    "label": "Repassar ao Cliente",
-   "default": "1"
+   "default": "1",
+   "description": "Marque se o valor deve ser repassado ao cliente."
   },
   {
    "fieldname": "data_repasse",
    "fieldtype": "Date",
    "label": "Data de Repasse",
-   "depends_on": "eval:doc.repassar_cliente==1"
+   "depends_on": "eval:doc.repassar_cliente==1",
+   "description": "Data do repasse ao cliente."
   },
   {
    "fieldname": "forma_pagamento",
    "fieldtype": "Select",
    "label": "Forma de Pagamento",
-   "options": "PIX\nTED\nBoleto\nDinheiro\nCartão"
+   "options": "PIX\nTED\nBoleto\nDinheiro\nCartão",
+   "description": "Forma de pagamento: PIX, TED, Dinheiro, etc."
   },
   {
    "fieldname": "anexos_section",
@@ -129,7 +139,8 @@
   {
    "fieldname": "comprovante",
    "fieldtype": "Attach",
-   "label": "Comprovante"
+   "label": "Comprovante",
+   "description": "Comprovante de pagamento anexado."
   },
   {
    "fieldname": "observacoes_section",
@@ -140,7 +151,8 @@
   {
    "fieldname": "observacoes",
    "fieldtype": "Small Text",
-   "label": "Observações"
+   "label": "Observações",
+   "description": "Observações sobre a custa."
   },
   {
    "fieldname": "title",
@@ -150,7 +162,8 @@
    "read_only": 0,
    "allow_in_quick_entry": 1,
    "idx": 2,
-   "in_list_view": 0
+   "in_list_view": 0,
+   "description": "Título automático no formato ID — descritor."
   }
  ],
  "index_web_pages_for_search": 1,

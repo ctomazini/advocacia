@@ -26,7 +26,8 @@
    "fieldname": "razao_social",
    "fieldtype": "Data",
    "label": "Razão Social",
-   "reqd": 1
+   "reqd": 1,
+   "description": "Razão social do escritório. Usada em documentos gerados."
   },
   {
    "fieldname": "cnpj",
@@ -37,7 +38,8 @@
   {
    "fieldname": "registro_sia",
    "fieldtype": "Data",
-   "label": "Registro SIA"
+   "label": "Registro SIA",
+   "description": "Registro no SIA/OAB do escritório."
   },
   {
    "fieldname": "column_break_1",
@@ -47,13 +49,15 @@
    "fieldname": "advogada",
    "fieldtype": "Data",
    "label": "Advogada(o) Principal",
-   "reqd": 1
+   "reqd": 1,
+   "description": "Nome da advogada responsável pelo escritório."
   },
   {
    "fieldname": "oab",
    "fieldtype": "Data",
    "label": "OAB",
-   "reqd": 1
+   "reqd": 1,
+   "description": "Número da OAB (apenas dígitos)."
   },
   {
    "fieldname": "sec_endereco",
@@ -64,7 +68,8 @@
    "fieldname": "endereco",
    "fieldtype": "Small Text",
    "label": "Endereço Completo",
-   "reqd": 1
+   "reqd": 1,
+   "description": "Endereço completo do escritório para documentos."
   }
  ],
  "issingle": 1,

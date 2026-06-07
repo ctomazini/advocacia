@@ -17,7 +17,8 @@
    "unique": 1,
    "in_list_view": 1,
    "in_standard_filter": 1,
-   "allow_in_quick_entry": 1
+   "allow_in_quick_entry": 1,
+   "description": "Nome único do tribunal."
   },
   {
    "fieldname": "abbreviation",
@@ -26,7 +27,8 @@
    "reqd": 1,
    "unique": 1,
    "in_list_view": 1,
-   "allow_in_quick_entry": 1
+   "allow_in_quick_entry": 1,
+   "description": "Sigla oficial (ex.: TJRS, TRT4)."
   },
   {
    "fieldname": "jurisdiction",
@@ -36,7 +38,8 @@
    "options": "Estadual\nFederal\nTrabalho\nSuperior\nMilitar\nEleitoral",
    "in_list_view": 1,
    "in_standard_filter": 1,
-   "allow_in_quick_entry": 1
+   "allow_in_quick_entry": 1,
+   "description": "Esfera: Estadual, Federal, Trabalho, Superior ou Militar."
   }
  ],
  "permissions": [
