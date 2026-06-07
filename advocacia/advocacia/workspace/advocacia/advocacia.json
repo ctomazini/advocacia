@@ -625,12 +625,12 @@
    "icon": null,
    "kanban_board": null,
    "label": "Documentos",
-   "link_to": null,
+   "link_to": "Template Documento",
    "report_ref_doctype": null,
    "restrict_to_domain": null,
    "stats_filter": null,
-   "type": "URL",
-   "url": "/app/template-documento"
+   "type": "DocType",
+   "url": null
   },
   {
    "color": "Grey",
