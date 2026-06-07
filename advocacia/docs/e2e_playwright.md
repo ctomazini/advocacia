@@ -1,28 +1,39 @@
 # E2E Playwright — App Advocacia
 
-**Script:** `advocacia/advocacia/tests/e2e/playwright_flow.py`  
-**Marcador:** `_PW_E2E_` (cleanup automático ao final)  
-**Versão app:** 0.7.0
+> **Preferido:** pacote npm em [`/e2e/README.md`](../../e2e/README.md) — `npm test` após `npm install`.
+
+**Script legado (deprecated):** `advocacia/advocacia/tests/e2e/playwright_flow.py`  
+**Marcador legado:** `_PW_E2E_`
 
 ---
 
-## Objetivo
-
-Validar o fluxo completo na UI (Client → Serviço → satélites) com dados fictícios, **sem alterar documentos existentes**. Complementa a suite `run-tests` (230 testes backend), que não cobre interação browser.
-
----
-
-## Requisitos
+## Uso recomendado (npm)
 
 ```bash
-pip install playwright          # ou usar env do bench
-playwright install chromium
-sudo playwright install-deps    # libnspr4 etc. no Linux (obrigatório em servidores headless)
+cd /home/frappe/frappe-bench/apps/advocacia/e2e
+npm install
+npm run install:browsers
+export E2E_PASS='sua-senha'
+bench --site advocacia.local serve --port 8000 --noreload
+npm test
 ```
 
 ---
 
-## Variáveis de ambiente
+## Wrapper Python (deprecated)
+
+Mantido apenas por compatibilidade. Não evoluir — use o pacote npm.
+
+```bash
+export ADVOCACIA_E2E_PWD='sua-senha'
+python advocacia/advocacia/tests/e2e/playwright_flow.py
+```
+
+Variáveis e limitações do script legado permanecem válidas abaixo.
+
+---
+
+## Variáveis de ambiente (script Python legado)
 
 | Variável | Default | Descrição |
 | --- | --- | --- |
