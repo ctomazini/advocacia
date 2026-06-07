@@ -13,6 +13,7 @@ def verificar_parcelas_vencidas():
 		"Pagamento",
 		filters={"data_vencimento": ["<", hoje], "status": "Pendente", "manual_override": 0},
 		fields=["name", "parcela_origem_id"],
+		limit_page_length=0,  # processa todos — scheduler batch
 	)
 	for row in pagamentos:
 		frappe.db.set_value("Pagamento", row.name, "status", "Vencido", update_modified=False)
@@ -23,6 +24,7 @@ def verificar_parcelas_vencidas():
 		"Parcela de Honorarios",
 		filters={"vencimento": ["<", hoje], "status": "Pendente"},
 		pluck="name",
+		limit_page_length=0,  # processa todos — scheduler batch
 	)
 	for name in parcelas:
 		frappe.db.set_value("Parcela de Honorarios", name, "status", "Vencido", update_modified=False)
@@ -38,6 +40,7 @@ def verificar_despesas_vencidas():
 		"Despesa do Escritorio",
 		filters={"status": "Pendente", "data_vencimento": ("<", today())},
 		pluck="name",
+		limit_page_length=0,  # processa todos — scheduler batch
 	)
 	for name in despesas:
 		frappe.db.set_value("Despesa do Escritorio", name, "status", "Atrasado", update_modified=False)
@@ -53,6 +56,7 @@ def notificar_parcelas_vencidas():
 		"Pagamento",
 		filters={"status": "Vencido", "data_vencimento": data_alvo},
 		fields=["name", "acordo", "cliente", "data_vencimento", "owner", "tipo_origem", "registro_atos"],
+		limit_page_length=500,
 	)
 	count = 0
 	for p in pagamentos:
@@ -93,6 +97,7 @@ def notificar_audiencias_hoje():
 			"local_vara",
 			"owner",
 		],
+		limit_page_length=500,
 	)
 	count = 0
 	for aud in audiencias:
@@ -159,6 +164,7 @@ def _marcar_acordo_quitado_se_completo(acordo_name, usar_pagamentos=False):
 			"Pagamento",
 			filters={"acordo": acordo_name, "status": ["not in", ["Cancelado"]]},
 			fields=["status"],
+			limit_page_length=500,
 		)
 		if not pagamentos or not all(p.status in ("Recebido", "Repassado") for p in pagamentos):
 			return
@@ -170,6 +176,7 @@ def _marcar_acordo_quitado_se_completo(acordo_name, usar_pagamentos=False):
 				"parenttype": "Acordo de Honorarios Processuais",
 			},
 			fields=["status"],
+			limit_page_length=500,
 		)
 		if not parcelas or not all(p.status == "Recebido" for p in parcelas):
 			return
@@ -251,6 +258,7 @@ def verificar_status_servicos():
 		"Servico",
 		filters={"status": "Em andamento"},
 		fields=["name"],
+		limit_page_length=0,  # processa todos — scheduler batch
 	)
 	if not servicos:
 		return
@@ -260,6 +268,7 @@ def verificar_status_servicos():
 		"Acordo de Honorarios Processuais",
 		filters={"servico": ["in", servico_names], "status": "Vigente"},
 		fields=["name", "servico"],
+		limit_page_length=0,  # processa todos — scheduler batch
 	)
 	acordo_names = [ac.name for ac in acordos]
 	servicos_com_parcela_aberta = set()
@@ -273,6 +282,7 @@ def verificar_status_servicos():
 			},
 			fields=["parent"],
 			pluck="parent",
+			limit_page_length=0,  # processa todos — scheduler batch
 		)
 		pagamentos_abertos = frappe.get_all(
 			"Pagamento",
@@ -282,6 +292,7 @@ def verificar_status_servicos():
 			},
 			fields=["acordo"],
 			pluck="acordo",
+			limit_page_length=0,  # processa todos — scheduler batch
 		)
 		acordos_com_pendencia = set(parcelas_abertas) | set(pagamentos_abertos)
 		for ac in acordos:
@@ -294,6 +305,7 @@ def verificar_status_servicos():
 			filters={"servico": ["in", servico_names], "status": "Pendente"},
 			fields=["servico"],
 			pluck="servico",
+			limit_page_length=0,  # processa todos — scheduler batch
 		)
 	)
 	servicos_com_audiencia = set(
@@ -305,6 +317,7 @@ def verificar_status_servicos():
 			},
 			fields=["servico"],
 			pluck="servico",
+			limit_page_length=0,  # processa todos — scheduler batch
 		)
 	)
 

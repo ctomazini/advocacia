@@ -558,6 +558,7 @@ def get_templates_disponiveis() -> list[dict]:
 		fields=["name", "titulo", "tipo_documento", "descricao"],
 		filters={"habilitado": 1},
 		order_by="titulo",
+		limit_page_length=500,
 	)
 
 
@@ -570,6 +571,7 @@ def get_kits_disponiveis() -> list[dict]:
 		fields=["name", "titulo", "descricao"],
 		filters={"habilitado": 1},
 		order_by="titulo",
+		limit_page_length=500,
 	)
 	if not kits:
 		return kits
@@ -580,6 +582,7 @@ def get_kits_disponiveis() -> list[dict]:
 		filters={"parent": ["in", kit_names]},
 		fields=["parent", "template", "ordem"],
 		order_by="parent asc, ordem asc, idx asc",
+		limit_page_length=0,  # kits pequenos — carrega todos os itens
 	)
 	templates_por_kit = {name: [] for name in kit_names}
 	for row in item_rows:
