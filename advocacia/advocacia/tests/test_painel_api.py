@@ -27,6 +27,10 @@ class TestPainelApi(FrappeTestCase):
 			"financeiro",
 			"alertas",
 			"centro_atencao",
+			"saude_operacional",
+			"atencao",
+			"agenda_dias",
+			"proximo_evento",
 			"timeline",
 			"fee_installments",
 			"despesas_pendentes",
@@ -123,3 +127,23 @@ class TestPainelApi(FrappeTestCase):
 			"servico_titulo deve vir preenchido (não só o ID)",
 		)
 		self.assertIn(servico.name, audiencias[0]["servico_titulo"])
+
+	def test_get_painel_data_sem_role_advocacia(self):
+		user = "test_painel_no_role@example.com"
+		if not frappe.db.exists("User", user):
+			frappe.get_doc(
+				{
+					"doctype": "User",
+					"email": user,
+					"first_name": "No",
+					"last_name": "Role",
+					"send_welcome_email": 0,
+				}
+			).insert(ignore_permissions=True)
+
+		frappe.set_user(user)
+		try:
+			with self.assertRaises(frappe.PermissionError):
+				get_painel_data()
+		finally:
+			frappe.set_user("Administrator")

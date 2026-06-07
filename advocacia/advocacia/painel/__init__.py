@@ -6,12 +6,16 @@ from advocacia.advocacia.painel import financeiro as painel_financeiro
 from advocacia.advocacia.painel import kpis as painel_kpis
 from advocacia.advocacia.painel import prazos as painel_prazos
 from advocacia.advocacia.painel import timeline as painel_timeline
+from advocacia.advocacia.painel import agenda as painel_agenda
+from advocacia.advocacia.painel import atencao as painel_atencao
+from advocacia.advocacia.painel import saude as painel_saude
 from advocacia.advocacia.painel._helpers import (
 	LIST_LIMIT_MAX,
 	_list_cap,
 	_normalize_list_limits,
 	_normalize_periodo_dias,
 	strip_financial_payload,
+	user_is_advocacia_manager,
 )
 
 
@@ -76,6 +80,15 @@ def get(
 		hoje, periodo_fim, audiencias, prazos, tarefas_all
 	)
 	timeline = timeline_full[:timeline_cap]
+	is_manager = user_is_advocacia_manager()
+	saude_operacional = painel_saude.build_saude_operacional(
+		kpis, centro_atencao, financeiro, include_financial=is_manager
+	)
+	atencao = painel_atencao.build_attention_tiles(
+		hoje, kpis, financeiro, include_financial=is_manager
+	)
+	agenda_dias = painel_agenda.build_agenda_dias(hoje, periodo_dias, timeline_full)
+	proximo_evento = painel_agenda.build_proximo_evento(timeline_full, hoje=hoje)
 
 	list_meta = {
 		"timeline": {"showing": len(timeline), "total": len(timeline_full)},
@@ -96,6 +109,10 @@ def get(
 			"financeiro": financeiro,
 			"alertas": alertas,
 			"centro_atencao": centro_atencao,
+			"saude_operacional": saude_operacional,
+			"atencao": atencao,
+			"agenda_dias": agenda_dias,
+			"proximo_evento": proximo_evento,
 			"timeline": timeline,
 			"fee_installments": parcelas,
 			"despesas_pendentes": despesas_pendentes,

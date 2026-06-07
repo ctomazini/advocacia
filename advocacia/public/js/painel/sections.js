@@ -3,6 +3,9 @@
 	var U = advocacia.painel.utils;
 	var H = advocacia.painel.hero;
 	var K = advocacia.painel.kpis;
+	var SA = advocacia.painel.saude;
+	var AT = advocacia.painel.atencao;
+	var AG = advocacia.painel.agenda;
 	var A = advocacia.painel.audiencias;
 	var T = advocacia.painel.timeline;
 	var F = advocacia.painel.financeiro;
@@ -17,18 +20,15 @@
 			case "hero":
 				return H.render_header(d.resumo, d.kpis, periodo, d.financeiro);
 			case "centro_atencao":
-				return K.render_centro_atencao(
-					d.centro_atencao,
-					d.kpis,
-					d.financeiro,
-					horas,
-					d.total_despesas_mes,
-					periodo
-				);
+				return AT.render(d.atencao);
+			case "agenda_dias":
+				return AG.render_day_strip(d.agenda_dias);
+			case "proximo_evento":
+				return AG.render_proximo_evento(d.proximo_evento);
 			case "prox_audiencia":
-				return A.render_proxima_audiencia(d.audiencias, d.timeline);
+				return AG.render_proximo_evento(d.proximo_evento);
 			case "saude_operacional":
-				return K.render_saude_operacional(d.centro_atencao, d.kpis, d.financeiro);
+				return SA.render(d.saude_operacional);
 			case "timeline":
 				return T.render_timeline(d.timeline, periodo, meta.timeline, limits.timeline);
 			case "comunicacoes":

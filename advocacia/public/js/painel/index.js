@@ -20,6 +20,12 @@ advocacia.painel.init = function (wrapper) {
 	page.painel_list_limits = advocacia.painel.utils.painel_default_list_limits();
 	advocacia.painel.bind_painel_filters(page.painel_container, page);
 	advocacia.painel.bind_atencao_routes(page.painel_container, page);
+	if (advocacia.painel.atencao && advocacia.painel.atencao.bind) {
+		advocacia.painel.atencao.bind(page.painel_container, page);
+	}
+	if (advocacia.painel.agenda && advocacia.painel.agenda.bind) {
+		advocacia.painel.agenda.bind(page.painel_container);
+	}
 	advocacia.painel.load(page);
 };
 
@@ -27,6 +33,9 @@ advocacia.painel.init = function (wrapper) {
 	var U = advocacia.painel.utils;
 	var H = advocacia.painel.hero;
 	var K = advocacia.painel.kpis;
+	var SA = advocacia.painel.saude;
+	var AT = advocacia.painel.atencao;
+	var AG = advocacia.painel.agenda;
 	var A = advocacia.painel.audiencias;
 	var T = advocacia.painel.timeline;
 	var F = advocacia.painel.financeiro;
@@ -94,17 +103,11 @@ advocacia.painel.init = function (wrapper) {
 		html += H.render_filtros_painel(periodo);
 		html += H.render_acoes_rapidas();
 		html += '<div class="painel-zona-critica">';
-		html += K.render_centro_atencao(
-			d.centro_atencao,
-			d.kpis,
-			d.financeiro,
-			horas,
-			d.total_despesas_mes,
-			periodo
-		);
+		html += AT.render(d.atencao);
+		html += AG.render_day_strip(d.agenda_dias);
 		html += '<div class="painel-destaques-grid">';
-		html += A.render_proxima_audiencia(d.audiencias, d.timeline);
-		html += K.render_saude_operacional(d.centro_atencao, d.kpis, d.financeiro);
+		html += AG.render_proximo_evento(d.proximo_evento);
+		html += SA.render(d.saude_operacional);
 		html += "</div></div>";
 		html += T.render_timeline(d.timeline, periodo, meta.timeline, limits.timeline);
 		html += T.render_comunicacoes_pendentes(

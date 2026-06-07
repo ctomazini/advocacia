@@ -1693,4 +1693,75 @@
     .painel-tl-item { grid-template-columns: 1fr; }
     .painel-tl-item .indicator-pill { justify-self: start; }
 }
-    
+
+.painel-saude-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+    flex: 1;
+}
+.painel-saude-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+.painel-saude-row-label {
+    flex: 1;
+    padding-right: 8px;
+}
+.painel-atencao-ok {
+    margin: 12px 0 0;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+.painel-atencao-empty {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px;
+}
+.painel-atencao-card--pulse {
+    animation: painel-atencao-pulse 2s ease-in-out infinite;
+}
+@keyframes painel-atencao-pulse {
+    0%, 100% { box-shadow: var(--painel-shadow); }
+    50% { box-shadow: 0 0 0 3px color-mix(in srgb, var(--orange-500) 25%, transparent); }
+}
+.painel-agenda-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
+    gap: 8px;
+    margin-bottom: 16px;
+}
+.painel-agenda-day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 8px;
+    border-radius: var(--painel-radius-sm);
+    border: 1px solid color-mix(in srgb, var(--border-color) 60%, transparent);
+    background: var(--card-bg);
+}
+.painel-agenda-day.tone-red {
+    border-color: color-mix(in srgb, var(--red-500) 35%, transparent);
+}
+.painel-agenda-day.tone-orange {
+    border-color: color-mix(in srgb, var(--orange-500) 35%, transparent);
+}
+.painel-agenda-day-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+.painel-agenda-day-count {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text-color);
+}
+.painel-agenda-proximo {
+    margin-bottom: 16px;
+}
