@@ -11,6 +11,14 @@ fixtures = [
         "filters": [["name", "=", "Advocacia"]]
     },
     {
+        "dt": "Role",
+        "filters": [["name", "in", ["Advocacia User", "Advocacia Manager"]]],
+    },
+    {
+        "dt": "Kanban Board",
+        "filters": [["name", "=", "Advocacia Tarefas"]],
+    },
+    {
         "dt": "Notification",
         "filters": [
             [
@@ -19,6 +27,8 @@ fixtures = [
                 [
                     "Advocacia - Prazo vencendo",
                     "Advocacia - Hearing amanha",
+                    "Advocacia - Parcela vencida",
+                    "Advocacia - Tarefa atrasada",
                 ],
             ]
         ],
@@ -75,6 +85,7 @@ scheduler_events = {
         "advocacia.advocacia.tasks.notificar_parcelas_vencidas",
         "advocacia.advocacia.tasks.notificar_audiencias_hoje",
         "advocacia.advocacia.notificacoes.notificar_prazos_diario",
+        "advocacia.advocacia.notificacoes.notificar_tarefas_atrasadas",
     ],
     "weekly": [
         "advocacia.advocacia.tasks.verificar_status_servicos",

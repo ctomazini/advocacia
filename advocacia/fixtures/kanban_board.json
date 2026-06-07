@@ -1,0 +1,39 @@
+[
+ {
+  "columns": [
+   {
+    "column_name": "Pendente",
+    "indicator": "Gray",
+    "order": "1",
+    "status": "Active"
+   },
+   {
+    "column_name": "Em Andamento",
+    "indicator": "Orange",
+    "order": "2",
+    "status": "Active"
+   },
+   {
+    "column_name": "Concluída",
+    "indicator": "Green",
+    "order": "3",
+    "status": "Active"
+   },
+   {
+    "column_name": "Cancelada",
+    "indicator": "Red",
+    "order": "4",
+    "status": "Active"
+   }
+  ],
+  "doctype": "Kanban Board",
+  "field_name": "status",
+  "fields": "[\"titulo\", \"legal_case\", \"prioridade\", \"data_limite\"]",
+  "filters": "[]",
+  "kanban_board_name": "Advocacia Tarefas",
+  "name": "Advocacia Tarefas",
+  "private": 0,
+  "reference_doctype": "Legal Task",
+  "show_labels": 0
+ }
+]

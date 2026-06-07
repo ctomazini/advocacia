@@ -95,5 +95,47 @@
   "slack_webhook_url": null,
   "subject": "Hearing amanha: {{ doc.cliente }} - {{ doc.tipo }}",
   "value_changed": null
+ },
+ {
+  "channel": "System Notification",
+  "condition": "doc.status == \"Vencido\"",
+  "doctype": "Notification",
+  "document_type": "Legal Payment",
+  "enabled": 1,
+  "event": "Value Change",
+  "message": "<p>A parcela {{ doc.name }} ({{ doc.descricao or doc.title }}) venceu em {{ frappe.utils.formatdate(doc.data_vencimento) }}.</p>",
+  "message_type": "Markdown",
+  "module": "Advocacia",
+  "name": "Advocacia - Parcela vencida",
+  "recipients": [
+   {
+    "receiver_by_role": "Advocacia Manager"
+   }
+  ],
+  "subject": "Parcela vencida: {{ doc.descricao or doc.name }}",
+  "value_changed": "status"
+ },
+ {
+  "channel": "System Notification",
+  "condition": "doc.status in (\"Pendente\", \"Em Andamento\")",
+  "date_changed": "data_limite",
+  "days_in_advance": 1,
+  "doctype": "Notification",
+  "document_type": "Legal Task",
+  "enabled": 1,
+  "event": "Days After",
+  "message": "<p>A tarefa {{ doc.titulo }} ({{ doc.legal_case or \"—\" }}) está atrasada (vencimento {{ frappe.utils.formatdate(doc.data_limite) }}).</p>",
+  "message_type": "Markdown",
+  "module": "Advocacia",
+  "name": "Advocacia - Tarefa atrasada",
+  "recipients": [
+   {
+    "receiver_by_document_field": "responsavel"
+   },
+   {
+    "receiver_by_role": "Advocacia Manager"
+   }
+  ],
+  "subject": "Tarefa atrasada: {{ doc.titulo }}"
  }
 ]
