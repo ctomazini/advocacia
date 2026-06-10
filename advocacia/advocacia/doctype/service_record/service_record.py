@@ -80,14 +80,14 @@ class ServiceRecord(Document):
 		pendente = 0
 		cobrado = 0
 		for row in self.acts or []:
-			valor = flt(row.valor)
+			valor = flt(row.amount)
 			if row.status == "Pendente":
 				pendente += valor
 			elif row.status == "Cobrado":
 				cobrado += valor
-		self.total_pendente = pendente
-		self.total_cobrado = cobrado
-		self.total_geral = pendente + cobrado
+		self.pending_total = pendente
+		self.billed_total = cobrado
+		self.grand_total = pendente + cobrado
 
 	def _atualizar_status(self):
 		if not self.acts:
