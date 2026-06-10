@@ -1,9 +1,9 @@
 frappe.views.calendar["Deadline"] = {
 	field_map: {
-		start: "data_prazo",
-		end: "data_prazo",
+		start: "due_date",
+		end: "due_date",
 		id: "name",
-		title: "descricao",
+		title: "description",
 		allDay: 1,
 		status: "status",
 	},
