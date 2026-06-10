@@ -436,7 +436,7 @@ def _seed_clientes() -> None:
 			"doctype": "Client",
 			"person_type": tipo,
 			"client_name": nome,
-			"addresses": [_endereco_demo(city=cidade)],
+			"addresses": [_endereco_demo(cidade=cidade)],
 			"contacts": [_contato_demo(nome.replace(DEMO_MARKER, "").strip(), email)],
 		}
 		if cpf:
