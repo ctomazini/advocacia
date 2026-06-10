@@ -6,7 +6,7 @@
  "istable": 1,
  "fields": [
   {
-   "fieldname": "nome",
+   "fieldname": "contact_name",
    "label": "Nome",
    "fieldtype": "Data",
    "reqd": 1,
@@ -16,7 +16,7 @@
    "idx": 1
   },
   {
-   "fieldname": "tipo",
+   "fieldname": "type",
    "label": "Tipo",
    "fieldtype": "Select",
    "options": "Principal\nConjuge\nResponsável\nOutro",
@@ -26,7 +26,7 @@
    "idx": 2
   },
   {
-   "fieldname": "telefone",
+   "fieldname": "phone",
    "label": "Telefone",
    "fieldtype": "Data",
    "in_list_view": 1,
@@ -34,7 +34,7 @@
    "idx": 3
   },
   {
-   "fieldname": "celular",
+   "fieldname": "mobile",
    "label": "Celular",
    "fieldtype": "Data",
    "in_list_view": 1,
@@ -51,7 +51,7 @@
    "idx": 5
   },
   {
-   "fieldname": "observacao",
+   "fieldname": "remarks",
    "label": "Observação",
    "fieldtype": "Small Text",
    "description": "Observações sobre este contato.",

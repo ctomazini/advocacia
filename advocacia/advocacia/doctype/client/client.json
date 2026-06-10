@@ -10,11 +10,11 @@
  "allow_import": 1,
  "autoname": "format:CLI-{YYYY}-{####}",
  "naming_rule": "Expression",
- "title_field": "nome",
- "search_fields": "nome,cpf,cnpj",
+ "title_field": "client_name",
+ "search_fields": "client_name,cpf,cnpj",
  "fields": [
   {
-   "fieldname": "tipo_pessoa",
+   "fieldname": "person_type",
    "label": "Tipo de Pessoa",
    "fieldtype": "Select",
    "options": "Pessoa Física\nPessoa Jurídica",
@@ -27,7 +27,7 @@
    "idx": 1
   },
   {
-   "fieldname": "nome",
+   "fieldname": "client_name",
    "label": "Nome / Razão Social",
    "fieldtype": "Data",
    "reqd": 1,
@@ -39,10 +39,10 @@
    "idx": 2
   },
   {
-   "fieldname": "nome_fantasia",
+   "fieldname": "trade_name",
    "label": "Nome Fantasia",
    "fieldtype": "Data",
-   "depends_on": "eval:doc.tipo_pessoa=='Pessoa Jurídica'",
+   "depends_on": "eval:doc.person_type=='Pessoa Jurídica'",
    "description": "Nome fantasia da empresa (apenas pessoa jurídica).",
    "idx": 3
   },
@@ -55,8 +55,8 @@
    "fieldname": "cpf",
    "label": "CPF",
    "fieldtype": "Data",
-   "depends_on": "eval:doc.tipo_pessoa=='Pessoa Física'",
-   "mandatory_depends_on": "eval:doc.tipo_pessoa=='Pessoa Física'",
+   "depends_on": "eval:doc.person_type=='Pessoa Física'",
+   "mandatory_depends_on": "eval:doc.person_type=='Pessoa Física'",
    "allow_in_quick_entry": 1,
    "unique": 1,
    "in_list_view": 0,
@@ -67,7 +67,7 @@
    "fieldname": "rg",
    "label": "RG",
    "fieldtype": "Data",
-   "depends_on": "eval:doc.tipo_pessoa=='Pessoa Física'",
+   "depends_on": "eval:doc.person_type=='Pessoa Física'",
    "description": "Documento de identidade (pessoa física).",
    "idx": 6
   },
@@ -75,8 +75,8 @@
    "fieldname": "cnpj",
    "label": "CNPJ",
    "fieldtype": "Data",
-   "depends_on": "eval:doc.tipo_pessoa=='Pessoa Jurídica'",
-   "mandatory_depends_on": "eval:doc.tipo_pessoa=='Pessoa Jurídica'",
+   "depends_on": "eval:doc.person_type=='Pessoa Jurídica'",
+   "mandatory_depends_on": "eval:doc.person_type=='Pessoa Jurídica'",
    "allow_in_quick_entry": 1,
    "unique": 1,
    "in_list_view": 0,
@@ -87,11 +87,11 @@
    "fieldname": "sec_pf",
    "label": "Dados Pessoais",
    "fieldtype": "Section Break",
-   "depends_on": "eval:doc.tipo_pessoa=='Pessoa Física'",
+   "depends_on": "eval:doc.person_type=='Pessoa Física'",
    "idx": 8
   },
   {
-   "fieldname": "nacionalidade",
+   "fieldname": "nationality",
    "label": "Nacionalidade",
    "fieldtype": "Data",
    "default": "Brasileira",
@@ -99,7 +99,7 @@
    "idx": 9
   },
   {
-   "fieldname": "estado_civil",
+   "fieldname": "marital_status",
    "label": "Estado Civil",
    "fieldtype": "Select",
    "options": "\nSolteiro(a)\nCasado(a)\nDivorciado(a)\nViúvo(a)\nUnião Estável",
@@ -108,7 +108,7 @@
    "idx": 10
   },
   {
-   "fieldname": "profissao",
+   "fieldname": "occupation",
    "label": "Profissão",
    "fieldtype": "Data",
    "description": "Profissão declarada (pessoa física).",
@@ -118,11 +118,11 @@
    "fieldname": "sec_pj",
    "label": "Dados da Empresa",
    "fieldtype": "Section Break",
-   "depends_on": "eval:doc.tipo_pessoa=='Pessoa Jurídica'",
+   "depends_on": "eval:doc.person_type=='Pessoa Jurídica'",
    "idx": 12
   },
   {
-   "fieldname": "representante",
+   "fieldname": "representative",
    "label": "Representante Legal",
    "fieldtype": "Data",
    "bold": 1,
@@ -130,7 +130,7 @@
    "idx": 13
   },
   {
-   "fieldname": "cpf_representante",
+   "fieldname": "representative_cpf",
    "label": "CPF do Representante",
    "fieldtype": "Data",
    "description": "CPF do representante legal, com validação automática.",
@@ -142,14 +142,14 @@
    "idx": 15
   },
   {
-   "fieldname": "cargo_representante",
+   "fieldname": "representative_role",
    "label": "Cargo",
    "fieldtype": "Data",
    "description": "Cargo do representante legal na empresa.",
    "idx": 16
   },
   {
-   "fieldname": "nacionalidade_pj",
+   "fieldname": "representative_nationality",
    "label": "Nacionalidade do Representante",
    "fieldtype": "Data",
    "default": "Brasileira",
@@ -192,7 +192,7 @@
    "idx": 22
   },
   {
-   "fieldname": "observacoes",
+   "fieldname": "remarks",
    "label": "Observações",
    "fieldtype": "Text Editor",
    "description": "Anotações internas sobre o cliente.",

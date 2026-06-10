@@ -23,7 +23,7 @@ frappe.ui.form.on("Client", {
 		if (window.AdvocaciaMasks) {
 			AdvocaciaMasks.formatFormField(
 				frm,
-				"cpf_representante",
+				"representative_cpf",
 				AdvocaciaMasks.applyCPF
 			);
 		}
@@ -33,15 +33,15 @@ frappe.ui.form.on("Client", {
 frappe.ui.form.on("Client Contact", {
 	form_render(frm) {
 		if (!window.AdvocaciaMasks) return;
-		AdvocaciaMasks.bindMask(frm, "telefone", AdvocaciaMasks.applyPhone, "fixo");
-		AdvocaciaMasks.bindMask(frm, "celular", AdvocaciaMasks.applyPhone, "celular");
+		AdvocaciaMasks.bindMask(frm, "phone", AdvocaciaMasks.applyPhone, "fixo");
+		AdvocaciaMasks.bindMask(frm, "mobile", AdvocaciaMasks.applyPhone, "mobile");
 	},
 	telefone(frm, cdt, cdn) {
 		if (window.AdvocaciaMasks) {
 			AdvocaciaMasks.formatChildField(
 				cdt,
 				cdn,
-				"telefone",
+				"phone",
 				AdvocaciaMasks.applyPhone
 			);
 		}
@@ -51,7 +51,7 @@ frappe.ui.form.on("Client Contact", {
 			AdvocaciaMasks.formatChildField(
 				cdt,
 				cdn,
-				"celular",
+				"mobile",
 				AdvocaciaMasks.applyPhone
 			);
 		}
