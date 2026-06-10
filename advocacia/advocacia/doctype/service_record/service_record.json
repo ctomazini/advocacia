@@ -1225,6 +1225,15 @@
   },
   {
    "idx": 17,
+   "fieldname": "column_break_cob",
+   "fieldtype": "Column Break",
+   "parent": "Service Record",
+   "parentfield": "fields",
+   "parenttype": "DocType",
+   "doctype": "DocField"
+  },
+  {
+   "idx": 18,
    "fieldname": "last_payment",
    "label": "Último Legal Payment",
    "fieldtype": "Link",
@@ -1467,6 +1476,29 @@
    "in_list_view": 0,
    "description": "Título automático no formato ID — descritor."
   }
+ ],
+ "field_order": [
+  "informacoes_section",
+  "legal_case",
+  "client",
+  "column_break_info",
+  "status",
+  "opening_date",
+  "atos_section",
+  "acts",
+  "totais_section",
+  "pending_total",
+  "column_break_tot",
+  "billed_total",
+  "grand_total",
+  "cobranca_section",
+  "billing_due_date",
+  "column_break_cob",
+  "last_payment",
+  "generate_billing",
+  "observacoes_section",
+  "remarks",
+  "title"
  ],
  "states": [
   {

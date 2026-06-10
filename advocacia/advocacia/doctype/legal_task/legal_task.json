@@ -21,11 +21,10 @@
   "status",
   "priority",
   "due_date",
-  "sec_detalhes",
-  "description",
-  "col_break_2",
   "responsible",
-  "completion_date"
+  "completion_date",
+  "sec_detalhes",
+  "description"
  ],
  "fields": [
   {

@@ -22,8 +22,9 @@
   "atividade_section",
   "activity",
   "category",
-  "description",
+  "column_break_ativ",
   "billable",
+  "description",
   "timer_section",
   "timer_display",
   "timer_start",
@@ -153,10 +154,8 @@
    "idx": 15
   },
   {
-   "fieldname": "description",
-   "fieldtype": "Small Text",
-   "label": "Detalhes",
-   "description": "Detalhamento complementar da atividade.",
+   "fieldname": "column_break_ativ",
+   "fieldtype": "Column Break",
    "idx": 16
   },
   {
@@ -166,6 +165,13 @@
    "default": "1",
    "description": "Marque se o tempo deve entrar em relatórios de cobrança.",
    "idx": 17
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Detalhes",
+   "description": "Detalhamento complementar da atividade.",
+   "idx": 18
   },
   {
    "fieldname": "timer_section",

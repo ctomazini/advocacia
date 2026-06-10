@@ -20,6 +20,7 @@
   "description",
   "sec_origem",
   "installment_origin_id",
+  "col_orig_1",
   "synced_at",
   "manual_override",
   "sec_financeiro",
@@ -31,6 +32,7 @@
   "status",
   "sec_controle",
   "remarks",
+  "col_ctrl_1",
   "receipt"
  ],
  "fields": [
@@ -138,6 +140,11 @@
    "idx": 11
   },
   {
+   "fieldname": "col_orig_1",
+   "fieldtype": "Column Break",
+   "idx": 12
+  },
+  {
    "fieldname": "synced_at",
    "fieldtype": "Datetime",
    "label": "Sincronizado em",
@@ -152,13 +159,13 @@
    "fieldtype": "Check",
    "label": "Edição manual (não sincronizar)",
    "description": "Quando marcado, o sistema não sobrescreve este pagamento na sincronização.",
-   "idx": 13
+   "idx": 14
   },
   {
    "fieldname": "sec_financeiro",
    "fieldtype": "Section Break",
    "label": "Financeiro",
-   "idx": 14
+   "idx": 15
   },
   {
    "fieldname": "amount",
@@ -227,11 +234,16 @@
    "idx": 22
   },
   {
+   "fieldname": "col_ctrl_1",
+   "fieldtype": "Column Break",
+   "idx": 23
+  },
+  {
    "fieldname": "receipt",
    "fieldtype": "Attach",
    "label": "Comprovante",
    "description": "Comprovante de recebimento anexado.",
-   "idx": 23
+   "idx": 24
   },
   {
    "fieldname": "title",

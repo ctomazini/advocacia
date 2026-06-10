@@ -10,6 +10,12 @@
  "naming_rule": "By fieldname",
  "title_field": "court_name",
  "search_fields": "court_name,abbreviation",
+ "field_order": [
+  "court_name",
+  "abbreviation",
+  "column_break_1",
+  "jurisdiction"
+ ],
  "fields": [
   {
    "fieldname": "court_name",
@@ -35,6 +41,11 @@
    "idx": 2
   },
   {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break",
+   "idx": 3
+  },
+  {
    "fieldname": "jurisdiction",
    "label": "Esfera",
    "fieldtype": "Select",
@@ -44,7 +55,7 @@
    "in_standard_filter": 1,
    "allow_in_quick_entry": 1,
    "description": "Esfera: Estadual, Federal, Trabalho, Superior ou Militar.",
-   "idx": 3
+   "idx": 4
   }
  ],
  "permissions": [

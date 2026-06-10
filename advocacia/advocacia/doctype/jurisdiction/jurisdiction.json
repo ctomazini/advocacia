@@ -10,6 +10,12 @@
  "naming_rule": "By fieldname",
  "title_field": "jurisdiction_name",
  "search_fields": "jurisdiction_name,uf",
+ "field_order": [
+  "jurisdiction_name",
+  "column_break_1",
+  "uf",
+  "city"
+ ],
  "fields": [
   {
    "fieldname": "jurisdiction_name",
@@ -24,6 +30,11 @@
    "idx": 1
   },
   {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break",
+   "idx": 2
+  },
+  {
    "fieldname": "uf",
    "label": "UF",
    "fieldtype": "Select",
@@ -33,7 +44,7 @@
    "in_standard_filter": 1,
    "allow_in_quick_entry": 1,
    "description": "Unidade federativa (UF) da comarca.",
-   "idx": 2
+   "idx": 3
   },
   {
    "fieldname": "city",
@@ -42,7 +53,7 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "description": "Cidade sede da comarca.",
-   "idx": 3
+   "idx": 4
   }
  ],
  "permissions": [

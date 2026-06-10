@@ -9,6 +9,12 @@
  "naming_rule": "By fieldname",
  "title_field": "court_branch_name",
  "search_fields": "court_branch_name,jurisdiction",
+ "field_order": [
+  "court_branch_name",
+  "column_break_1",
+  "jurisdiction",
+  "court_type"
+ ],
  "fields": [
   {
    "fieldname": "court_branch_name",
@@ -23,6 +29,11 @@
    "idx": 1
   },
   {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break",
+   "idx": 2
+  },
+  {
    "fieldname": "jurisdiction",
    "label": "Jurisdiction",
    "fieldtype": "Link",
@@ -32,7 +43,7 @@
    "in_standard_filter": 1,
    "allow_in_quick_entry": 1,
    "description": "Jurisdiction à qual esta vara pertence.",
-   "idx": 2
+   "idx": 3
   },
   {
    "fieldname": "court_type",
@@ -42,7 +53,7 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "description": "Tipo: Cível, Criminal, Família, Trabalho, Federal ou Juizado Especial.",
-   "idx": 3
+   "idx": 4
   }
  ],
  "permissions": [

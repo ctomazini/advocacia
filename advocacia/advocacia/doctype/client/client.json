@@ -99,6 +99,11 @@
    "idx": 9
   },
   {
+   "fieldname": "column_break_pf",
+   "fieldtype": "Column Break",
+   "idx": 10
+  },
+  {
    "fieldname": "marital_status",
    "label": "Estado Civil",
    "fieldtype": "Select",
@@ -295,6 +300,32 @@
    "email": 1,
    "idx": 3
   }
+ ],
+ "field_order": [
+  "person_type",
+  "client_name",
+  "trade_name",
+  "col_break_1",
+  "cpf",
+  "rg",
+  "cnpj",
+  "sec_pf",
+  "nationality",
+  "column_break_pf",
+  "marital_status",
+  "occupation",
+  "sec_pj",
+  "representative",
+  "representative_cpf",
+  "col_break_pj",
+  "representative_role",
+  "representative_nationality",
+  "sec_contatos",
+  "contacts",
+  "sec_enderecos",
+  "addresses",
+  "sec_obs",
+  "remarks"
  ],
  "show_title_field_in_link": 1
 }
