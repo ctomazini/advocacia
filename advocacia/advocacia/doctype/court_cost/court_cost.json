@@ -8,23 +8,23 @@
  "field_order": [
   "informacoes_section",
   "title",
-  "servico",
-  "cliente",
-  "tipo",
+  "legal_case",
+  "client",
+  "type",
   "column_break_info",
-  "descricao",
+  "description",
   "status",
   "valores_section",
-  "valor",
-  "data_pagamento",
+  "amount",
+  "payment_date",
   "column_break_val",
-  "repassar_cliente",
-  "data_repasse",
-  "forma_pagamento",
+  "bill_to_client",
+  "transfer_date",
+  "payment_method",
   "anexos_section",
-  "comprovante",
+  "receipt",
   "observacoes_section",
-  "observacoes"
+  "remarks"
  ],
  "fields": [
   {
@@ -51,13 +51,13 @@
    "options": "Client",
    "label": "Client",
    "read_only": 1,
-   "fetch_from": "servico.cliente",
+   "fetch_from": "legal_case.client",
    "in_list_view": 0,
    "description": "Selecione o registro vinculado. Preenchido ou calculado automaticamente pelo sistema.",
    "idx": 3
   },
   {
-   "fieldname": "tipo",
+   "fieldname": "type",
    "fieldtype": "Select",
    "label": "Tipo",
    "reqd": 1,
@@ -74,7 +74,7 @@
    "idx": 5
   },
   {
-   "fieldname": "descricao",
+   "fieldname": "description",
    "fieldtype": "Data",
    "label": "Descrição",
    "reqd": 1,
@@ -101,7 +101,7 @@
    "idx": 8
   },
   {
-   "fieldname": "valor",
+   "fieldname": "amount",
    "fieldtype": "Currency",
    "label": "Valor",
    "reqd": 1,
@@ -111,7 +111,7 @@
    "idx": 9
   },
   {
-   "fieldname": "data_pagamento",
+   "fieldname": "payment_date",
    "fieldtype": "Date",
    "label": "Data de Legal Payment",
    "description": "Data em que a custa foi paga.",
@@ -124,7 +124,7 @@
    "idx": 11
   },
   {
-   "fieldname": "repassar_cliente",
+   "fieldname": "bill_to_client",
    "fieldtype": "Check",
    "label": "Repassar ao Client",
    "default": "1",
@@ -132,16 +132,16 @@
    "idx": 12
   },
   {
-   "fieldname": "data_repasse",
+   "fieldname": "transfer_date",
    "fieldtype": "Date",
    "label": "Data de Repasse",
-   "depends_on": "eval:doc.repassar_cliente==1",
+   "depends_on": "eval:doc.bill_to_client==1",
    "description": "Data do repasse ao cliente.",
    "in_standard_filter": 1,
    "idx": 13
   },
   {
-   "fieldname": "forma_pagamento",
+   "fieldname": "payment_method",
    "fieldtype": "Select",
    "label": "Forma de Legal Payment",
    "options": "PIX\nTED\nBoleto\nDinheiro\nCartão",
@@ -157,7 +157,7 @@
    "idx": 15
   },
   {
-   "fieldname": "comprovante",
+   "fieldname": "receipt",
    "fieldtype": "Attach",
    "label": "Comprovante",
    "description": "Comprovante de pagamento anexado.",
@@ -171,7 +171,7 @@
    "idx": 17
   },
   {
-   "fieldname": "observacoes",
+   "fieldname": "remarks",
    "fieldtype": "Small Text",
    "label": "Observações",
    "description": "Observações sobre a custa.",
@@ -236,8 +236,8 @@
  "autoname": "format:CUST-{YYYY}-{####}",
  "naming_rule": "Expression",
  "title_field": "title",
- "search_fields": "descricao,cliente,status",
- "sort_field": "data_pagamento",
+ "search_fields": "description,client,status",
+ "sort_field": "payment_date",
  "sort_order": "DESC",
  "quick_entry": 1,
  "track_changes": 1,

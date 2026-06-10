@@ -15,9 +15,9 @@ class CourtCost(Document):
 		if not self.client:
 			frappe.throw(_("Client é obrigatório. Selecione um Serviço válido."))
 
-		if self.data_pagamento and self.status == "Pendente":
+		if self.payment_date and self.status == "Pendente":
 			self.status = "Pago"
-		if self.data_repasse and self.status == "Pago":
+		if self.transfer_date and self.status == "Pago":
 			self.status = "Repassado"
 		self._compor_titulo()
 

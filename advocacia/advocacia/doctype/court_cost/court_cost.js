@@ -13,15 +13,15 @@ frappe.ui.form.on("Court Cost", {
 
 		if (status === "Pendente" && !frm.is_new()) {
 			frm.add_custom_button(__("Marcar como Pago"), function () {
-				frm.set_value("data_pagamento", frappe.datetime.get_today());
+				frm.set_value("payment_date", frappe.datetime.get_today());
 				frm.set_value("status", "Pago");
 				frm.save();
 			}, __("Ações"));
 		}
 
-		if (status === "Pago" && frm.doc.repassar_cliente && !frm.is_new()) {
+		if (status === "Pago" && frm.doc.bill_to_client && !frm.is_new()) {
 			frm.add_custom_button(__("Marcar como Repassado"), function () {
-				frm.set_value("data_repasse", frappe.datetime.get_today());
+				frm.set_value("transfer_date", frappe.datetime.get_today());
 				frm.set_value("status", "Repassado");
 				frm.save();
 			}, __("Ações"));
