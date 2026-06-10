@@ -95,7 +95,7 @@
    "parentfield": "fields",
    "parenttype": "DocType",
    "idx": 1,
-   "fieldname": "vencimento",
+   "fieldname": "due_date",
    "label": "Vencimento",
    "oldfieldname": null,
    "fieldtype": "Date",
@@ -167,7 +167,7 @@
    "parentfield": "fields",
    "parenttype": "DocType",
    "idx": 2,
-   "fieldname": "valor_total",
+   "fieldname": "total_amount",
    "label": "Valor Total",
    "oldfieldname": null,
    "fieldtype": "Currency",
@@ -239,7 +239,7 @@
    "parentfield": "fields",
    "parenttype": "DocType",
    "idx": 3,
-   "fieldname": "valor_advogada",
+   "fieldname": "lawyer_amount",
    "label": "Valor Advogada",
    "oldfieldname": null,
    "fieldtype": "Currency",
@@ -383,7 +383,7 @@
    "parentfield": "fields",
    "parenttype": "DocType",
    "idx": 5,
-   "fieldname": "valor_cliente",
+   "fieldname": "client_amount",
    "label": "Valor Client",
    "oldfieldname": null,
    "fieldtype": "Currency",
@@ -517,7 +517,7 @@
    "doctype": "DocField"
   },
   {
-   "fieldname": "parcela_origem_id",
+   "fieldname": "installment_origin_id",
    "fieldtype": "Data",
    "label": "ID de Origem",
    "read_only": 1,
@@ -610,7 +610,7 @@
    "doctype": "DocField"
   },
   {
-   "fieldname": "data_recebimento",
+   "fieldname": "received_date",
    "label": "Data de Recebimento",
    "fieldtype": "Date",
    "description": "Data em que a parcela foi recebida.",
@@ -618,16 +618,16 @@
    "idx": 10
   },
   {
-   "fieldname": "data_repasse",
+   "fieldname": "transfer_date",
    "label": "Data de Repasse ao Client",
    "fieldtype": "Date",
-   "depends_on": "eval:doc.valor_cliente > 0",
+   "depends_on": "eval:doc.client_amount > 0",
    "description": "Data do repasse ao cliente, quando aplicável.",
    "in_standard_filter": 1,
    "idx": 11
   },
   {
-   "fieldname": "forma_recebimento",
+   "fieldname": "payment_method",
    "label": "Forma de Recebimento",
    "fieldtype": "Select",
    "options": "\nPIX\nTED\nDinheiro\nCartão\nBoleto",
@@ -636,7 +636,7 @@
    "idx": 12
   },
   {
-   "fieldname": "observacao",
+   "fieldname": "remarks",
    "label": "Observação",
    "fieldtype": "Small Text",
    "description": "Observações sobre esta parcela.",

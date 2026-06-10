@@ -23,17 +23,17 @@ class FeeAgreement(Document):
 		recompor_titulo_se_vazio(self)
 
 	def _eh_direto(self):
-		return self.modo_honorarios == "Honorários Diretos"
+		return self.fee_mode == "Honorários Diretos"
 
 	def _validar_financeiro(self):
-		total_acordo = flt(self.valor_total_do_acordo)
+		total_acordo = flt(self.total_agreement_value)
 		parcelas = self.get("fee_installments") or []
 
 		if parcelas and total_acordo <= 0:
 			frappe.throw(_("Valor total do acordo deve ser maior que zero."))
 
 		if self.get("installment_count") and flt(self.installment_count) > 0:
-			if not self.data_primeira_parcela:
+			if not self.first_installment_date:
 				frappe.throw(_("Informe a data da primeira parcela."))
 			if total_acordo <= 0:
 				frappe.throw(_("Valor total do acordo deve ser maior que zero para gerar parcelas."))
@@ -43,8 +43,8 @@ class FeeAgreement(Document):
 
 		tipo_cobranca = self.get("billing_type")
 		if tipo_cobranca in ("Percentual do acordo", "Percentual da causa"):
-			perc_adv = flt(self.percentual_advogada)
-			perc_cli = flt(self.percentual_cliente)
+			perc_adv = flt(self.lawyer_percentage)
+			perc_cli = flt(self.client_percentage)
 			if abs(perc_adv + perc_cli - 100) > 0.02:
 				frappe.throw(
 					_("Percentual advogada ({0}%) + cliente ({1}%) deve somar 100%.").format(
@@ -53,15 +53,15 @@ class FeeAgreement(Document):
 				)
 
 		if tipo_cobranca == "Misto":
-			perc_adv = flt(self.percentual_advogada)
+			perc_adv = flt(self.lawyer_percentage)
 			if perc_adv < 0 or perc_adv > 100:
 				frappe.throw(_("Percentual da advogada deve estar entre 0 e 100."))
-			if flt(self.valor_fixo_de_honorarios) < 0:
+			if flt(self.fixed_fee_amount) < 0:
 				frappe.throw(_("Valor fixo de honorários não pode ser negativo."))
 
 		if total_acordo > 0 and not self._eh_direto():
-			valor_adv = flt(self.valor_advogada)
-			valor_cli = flt(self.valor_cliente)
+			valor_adv = flt(self.lawyer_amount)
+			valor_cli = flt(self.client_amount)
 			sucumbencia = flt(self.get("contingency_fee_amount"))
 			if valor_cli < 0:
 				frappe.throw(_("Valor do cliente não pode ser negativo."))
@@ -87,11 +87,11 @@ class FeeAgreement(Document):
 			return
 
 		erros = []
-		data_primeira = getdate(self.data_primeira_parcela) if self.data_primeira_parcela else None
+		data_primeira = getdate(self.first_installment_date) if self.first_installment_date else None
 
 		if self._eh_direto():
-			total_parcelas = sum(flt(p.valor_total) for p in parcelas)
-			total_acordo = flt(self.valor_total_do_acordo)
+			total_parcelas = sum(flt(p.total_amount) for p in parcelas)
+			total_acordo = flt(self.total_agreement_value)
 			if abs(total_parcelas - total_acordo) > 0.02:
 				erros.append(
 					_("Soma das parcelas (R$ {0}) ≠ valor total do acordo (R$ {1}).").format(
@@ -103,29 +103,29 @@ class FeeAgreement(Document):
 			total_cli_tabela = 0
 			total_suc_tabela = 0
 			total_geral_tabela = 0
-			valor_adv_esperado = flt(self.valor_advogada)
-			valor_cli_esperado = flt(self.valor_cliente)
+			valor_adv_esperado = flt(self.lawyer_amount)
+			valor_cli_esperado = flt(self.client_amount)
 			suc_esperada = flt(self.get("contingency_fee_amount"))
 			total_esperado = valor_adv_esperado + valor_cli_esperado + suc_esperada
 
 			for p in parcelas:
 				soma_linha = (
-					flt(p.valor_advogada) + flt(p.valor_cliente) + flt(p.get("contingency_amount"))
+					flt(p.lawyer_amount) + flt(p.client_amount) + flt(p.get("contingency_amount"))
 				)
-				if abs(soma_linha - flt(p.valor_total)) > 0.02:
+				if abs(soma_linha - flt(p.total_amount)) > 0.02:
 					erros.append(
 						_("Parcela {0}: soma dos valores ≠ valor total da linha.").format(p.idx)
 					)
-				if flt(p.valor_cliente) < 0:
+				if flt(p.client_amount) < 0:
 					erros.append(_("Parcela {0}: valor do cliente negativo.").format(p.idx))
-				if data_primeira and p.vencimento and getdate(p.vencimento) < data_primeira:
+				if data_primeira and p.due_date and getdate(p.due_date) < data_primeira:
 					erros.append(
 						_("Parcela {0}: vencimento anterior à data da primeira parcela.").format(p.idx)
 					)
-				total_adv_tabela += flt(p.valor_advogada)
-				total_cli_tabela += flt(p.valor_cliente)
+				total_adv_tabela += flt(p.lawyer_amount)
+				total_cli_tabela += flt(p.client_amount)
 				total_suc_tabela += flt(p.get("contingency_amount"))
-				total_geral_tabela += flt(p.valor_total)
+				total_geral_tabela += flt(p.total_amount)
 
 			if abs(total_adv_tabela - valor_adv_esperado) > 0.02:
 				erros.append(_("Soma advogada nas parcelas ≠ valor advogada do formulário."))
