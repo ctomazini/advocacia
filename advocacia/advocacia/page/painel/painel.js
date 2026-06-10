@@ -13,6 +13,7 @@ const PAINEL_ASSETS = [
 	"/assets/advocacia/js/painel/refresh.js",
 	"/assets/advocacia/js/painel/sections.js",
 	"/assets/advocacia/js/painel/handlers.js",
+	"/assets/advocacia/js/painel/main.js",
 	"/assets/advocacia/js/painel/index.js",
 ];
 

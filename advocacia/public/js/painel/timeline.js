@@ -4,7 +4,6 @@ frappe.provide("advocacia.painel.timeline");
 	var U = advocacia.painel.utils;
 	var H = advocacia.painel.hero;
 	var K = advocacia.painel.kpis;
-	var A = advocacia.painel.audiencias;
 	var T = advocacia.painel.timeline;
 	var F = advocacia.painel.financeiro;
 
