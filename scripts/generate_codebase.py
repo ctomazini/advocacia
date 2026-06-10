@@ -103,8 +103,8 @@ def main():
 	L = []
 	L.append("# CODEBASE — App Advocacia (Frappe v16)\n\n")
 	L.append(
-		f"> Gerado em **{date.today().isoformat()}** — re-audit pós-UX (títulos, list views, sidebar, painel). "
-		"Branch **`frappe-v16`**. Frappe puro, **sem ERPNext**.\n\n"
+		f"> Gerado em **{date.today().isoformat()}** — inventário pós-P1 reports + P2 painel. "
+		"Branch **`main`**. Frappe puro, **sem ERPNext**.\n\n"
 	)
 	L.append(f"> **HEAD:** `{head}`\n\n---\n\n")
 
@@ -117,7 +117,7 @@ def main():
 				["Versão", "1.0.0 (`pyproject.toml`)"],
 				["Framework", "Frappe v16.19.0"],
 				["Licença", "MIT"],
-				["Branch", "frappe-v16"],
+				["Branch", "main"],
 				["Remote", "git@github.com:ctomazini/advocacia.git"],
 				["Site dev", "advocacia.local (porta 8000)"],
 				["Linhas Python", f"~{py_lines}"],
@@ -140,8 +140,8 @@ def main():
 		("Office Settings", "Logo, dados bancários, `default_notify_days`; seed idempotente"),
 		("Documentos", "Referência completa de placeholders; logo inline docx; botão no Legal Case"),
 		("IA", "`agent_api.py` (4 endpoints read-only) + `test_agent_api.py`"),
-		("Painel", "Chaves EN backend/frontend; handlers KPI; soft refresh"),
-		("Relatórios", "6 reports com KPIs, gráficos e linha Total padronizados"),
+		("Painel P2", "`public/js/painel/` (14 módulos); `main.js` orquestrador; backend `painel/` (9 módulos)"),
+		("Relatórios P1", "`boot.py`, `reports.css`, `reports_common.js`, print formats Report (9)"),
 		("Sidebar", "Labels PT sincronizados com workspace e traduções"),
 		("Legal Payment", "Fix coluna Origem na list view"),
 	]:
@@ -152,10 +152,15 @@ def main():
 	L.append("advocacia/\n├── CODEBASE.md, README.md, pyproject.toml\n└── advocacia/\n")
 	L.append("    ├── hooks.py, modules.txt, patches.txt, patches/v16_0/\n")
 	L.append("    ├── fixtures/, workspace_sidebar/advocacia.json\n")
-	L.append("    ├── public/js/ (masks, documentos_placeholders, painel/*, list_nav, …)\n")
+	L.append("    ├── public/js/ (masks, list_nav, reports_common, painel/* page-scoped, …)\n")
+	L.append("    ├── public/css/ (list_filters, case_hub, reports)\n")
+	L.append("    ├── boot.py, print_formats/reports/\n")
 	L.append("    └── advocacia/\n")
 	L.append("        ├── validators.py, titulos.py, agent_api.py, painel_api.py (facade)\n")
-	L.append("        ├── painel/ (kpis, financeiro, prazos, timeline, _helpers)\n")
+	L.append(
+		"        ├── painel/ (__init__, _helpers, kpis, financeiro, prazos, timeline, "
+		"agenda, atencao, saude, operational)\n"
+	)
 	L.append("        ├── documentos.py, financeiro.py, tasks.py, notificacoes.py, calendar_sync.py\n")
 	L.append("        ├── setup/ (install, sidebar, workspace, reports, translations, seed_demo)\n")
 	L.append("        ├── tests/ (33 arquivos), doctype/ (24), page/painel/, report/ (6), workspace/\n")
@@ -186,20 +191,28 @@ def main():
 
 	L.append("## 4. hooks.py\n\n### fixtures\n")
 	L.append("Workspace Advocacia; Notifications prazo/audiência; Custom Field Event `custom_source%`.\n\n")
-	L.append("### app_include_js\n")
+	L.append("### boot_session\n")
+	L.append("- `advocacia.boot.boot_session` → `frappe.boot.adv_office` (Office Settings para prints)\n\n")
+	L.append("### app_include_css\n")
+	for css in ("list_filters.css", "case_hub.css", "reports.css"):
+		L.append(f"- `/assets/advocacia/css/{css}`\n")
+	L.append("\n### app_include_js\n")
 	for js in (
 		"masks.js",
 		"documentos_placeholders.js",
-		"painel/utils.js … index.js (8 módulos)",
 		"list_nav.js",
 		"list_filters.js",
 		"cliente_from_servico.js",
 		"timer_global.js",
+		"case_hub.js",
+		"reports_common.js",
 	):
 		L.append(f"- `/assets/advocacia/js/{js}`\n")
 	L.append(
-		"\n**Removidos:** `navegacao.js`, widget painel global, `servico_link.js` "
-		"(label de Serviço em `legal_case_query` / `format_servico_link_label`).\n\n"
+		"\n**Painel (page-scoped):** `page/painel/painel.js` → `frappe.require(PAINEL_ASSETS)` — "
+		"14 módulos em `public/js/painel/` (utils, hero, kpis, saude, atencao, agenda, timeline, "
+		"financeiro, operational, refresh, sections, handlers, main, index).\n\n"
+		"**Removidos:** `navegacao.js`, widget painel global, `servico_link.js`, `audiencias.js` (morto).\n\n"
 	)
 	L.append("### doc_events\n\n")
 	L.append(
@@ -253,9 +266,12 @@ def main():
 
 	L.append("## 6. Schedulers\n\nVer §4 (`tasks.py`, `notificacoes.py`). Sem `commit()` em request/scheduler.\n\n")
 	L.append("## 7. Client JS\n\n")
-	L.append("- Globais (4), 12 list formatters, forms (acordo, servico, audiencia Híbrida).\n")
-	L.append("- `painel.js` ~4100 linhas; CSS vars para charts.\n")
-	L.append("- Calendários: `audiencia_calendar.js`, `controle_de_prazos_calendar.js`.\n\n")
+	L.append("- Globais: máscaras, list_nav, list_filters, reports_common, case_hub, timer.\n")
+	L.append(
+		"- **Painel modular** (~2.490 linhas JS + 2.130 CSS): orquestrador `main.js` (`load`/`render`); "
+		"`index.js` bootstrap; CSS vars para charts; carregado só na Page `painel`.\n"
+	)
+	L.append("- Calendários: `hearing_calendar.js`, `deadline_calendar.js`.\n\n")
 	L.append("## 8. Setup / migrations\n\n")
 	L.append("Idempotente; `commit()` só em setup/patches/seed (`seed_demo.py` = dev only).\n\n")
 	L.append("## 9. Reports (6)\n\n")
@@ -304,7 +320,7 @@ def main():
 				["9", "JS = UX", "✅", "Negócio em Python"],
 				["10", "Hooks", "✅", "Legal Payment handler único; schedulers"],
 				["11", "Workspace/sidebar", "✅", "collapsible fix"],
-				["12", "Testes", "✅", "221/221 OK"],
+				["12", "Testes", "✅", f"{test_methods}/{test_methods} OK"],
 				["13", "Reinstall limpo", "⏳", "Obrigatório pré go-live"],
 			],
 		)
@@ -321,7 +337,7 @@ def main():
 		"| Código Git (custom:0) | ✅ |\n"
 		"| Blocos auditoria 1–4 | ✅ |\n"
 		"| UX jun/2026 | ✅ (smoke manual) |\n"
-		"| Suite 221/221 verde | ✅ |\n"
+		f"| Suite {test_methods}/{test_methods} verde | ✅ |\n"
 		"| install-app site limpo | ⏳ recomendado pré go-live |\n\n"
 		"**Conclusão:** código e testes **prontos para produção**; validar reinstall limpo e smoke manual do painel/sidebar antes do go-live.\n"
 	)

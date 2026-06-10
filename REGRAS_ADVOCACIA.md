@@ -1,7 +1,7 @@
 # REGRAS_ADVOCACIA.md
 
 **App:** `advocacia` · **Frappe v16** (sem ERPNext) · **Versão:** 0.7.0 · **Data:** 2026-06-07  
-**Branch:** `frappe-v16` · **Objetivo:** checklist operacional fechado para deploy.
+**Branch:** `main` · **Objetivo:** checklist operacional fechado para deploy.
 
 > `ENGENHARIA_STANDARDS.md` governa o app **engenharia**, não este repositório.
 
@@ -54,9 +54,11 @@
 
 | Item | Regra |
 | --- | --- |
-| Backend | `advocacia/painel/` — orquestrador `get()` |
+| Backend | `advocacia/painel/` — orquestrador `get()` (9 módulos: kpis, financeiro, prazos, timeline, agenda, atencao, saude, operational, _helpers) |
 | Facade | Único `xcall`: `painel_api.get_painel_data` |
-| Frontend | `public/js/painel/` — carregado **somente** na Page via `frappe.require(PAINEL_ASSETS)` em `page/painel/painel.js` (não em `app_include_js`) |
+| Frontend | `public/js/painel/` (14 arquivos) — carregado **somente** na Page via `frappe.require(PAINEL_ASSETS)` em `page/painel/painel.js` |
+| Orquestrador JS | `main.js` (`load` + `render`); `index.js` (`init`); infra: `refresh.js`, `sections.js`, `handlers.js` |
+| CSS | `page/painel/painel.css` (~2.130 linhas) — co-localizado com a Page |
 | Permissão | `Legal Case` read na entrada |
 | Financeiro | `strip_financial_payload` para **Advocacia User** |
 | Commit | Nunca no `get()` |
@@ -168,7 +170,7 @@ npm test
 - [ ] Whitelist: `has_permission` + type hints
 - [ ] Queries com limit; sem N+1
 - [ ] `doc_events`: um handler por evento
-- [ ] `run-tests` verde (255)
+- [ ] `run-tests` verde (283+)
 - [ ] Sem segredos/dados reais no diff
 - [ ] Conventional Commit (`feat:`, `fix:`, `refactor:`, `chore:`)
 - [ ] Snapshot Proxmox antes de mudança destrutiva em produção
@@ -181,7 +183,7 @@ npm test
 | --- | --- |
 | `advocacia/docs/README.md` | Índice da documentação |
 | `advocacia/docs/e2e_playwright.md` | E2E UI Playwright |
-| `advocacia/docs/audit_code.md` | Código, 241 testes, whitelists |
+| `advocacia/docs/audit_code.md` | Código, 283 testes, whitelists |
 | `advocacia/docs/audit_dashboard.md` | Painel modular backend/frontend |
 | `advocacia/docs/audit_data_integrity.md` | CPF/CNPJ/CNJ/telefone, sync |
 | `advocacia/docs/audit_google_calendar.md` | Event + Google |

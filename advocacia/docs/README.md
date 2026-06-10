@@ -1,6 +1,6 @@
 # Documentação — App Advocacia
 
-**Versão:** 1.0.0 · **Branch:** `frappe-v16` · **Atualizado:** 2026-06-02
+**Versão:** 1.0.0 · **Branch:** `main` · **Atualizado:** 2026-06-10
 
 ---
 
@@ -21,14 +21,14 @@ Relatórios de conformidade. Consultar junto com [audit-deploy-ready.md](./audit
 
 | Arquivo | Foco | Status jun/2026 |
 | --- | --- | --- |
-| [audit_code.md](./audit_code.md) | Python, whitelists, testes | Parcialmente desatualizado — ver CODEBASE |
-| [audit_dashboard.md](./audit_dashboard.md) | Painel backend/frontend modular | ✅ painel modular + soft refresh |
+| [audit_code.md](./audit_code.md) | Python, whitelists, testes | ✅ 283 testes (jun/2026) |
+| [audit_dashboard.md](./audit_dashboard.md) | Painel backend/frontend modular | ✅ P2: `main.js` + 14 módulos JS |
 | [audit_data_integrity.md](./audit_data_integrity.md) | CPF/CNPJ/CNJ, sync financeiro | ✅ |
 | [audit_google_calendar.md](./audit_google_calendar.md) | Audiência/Prazo → Event → Google | ✅ |
 | [audit_links.md](./audit_links.md) | Hub Legal Case, Connections | ✅ |
 | [audit_usability.md](./audit_usability.md) | Máscaras, filtros, sidebar | ✅ labels PT jun/2026 |
 | [audit_ai_readiness.md](./audit_ai_readiness.md) | `agent_api.py` + roadmap MCP | ✅ Fase 1 implementada |
-| [audit-deploy-ready.md](./audit-deploy-ready.md) | Checklist pré-deploy consolidado | Referência histórica v0.7 |
+| [audit-deploy-ready.md](./audit-deploy-ready.md) | Checklist pré-deploy consolidado | Snapshot histórico — ver audits acima |
 
 ---
 
@@ -60,17 +60,16 @@ Relatórios de conformidade. Consultar junto com [audit-deploy-ready.md](./audit
 - 24 DocTypes renomeados PT→EN (Legal Case, Client, Office Settings, …)
 - Painel com abas; `agent_api.py` inicial; tag `v1.0.0`
 
-### pós v1.0.0 (jun/2026)
+### jun/2026 — P1 Reports + P2 Painel
 
 | Área | Mudança |
 | --- | --- |
-| **Office Settings** | Logo, dados bancários (banco/agência/conta/PIX), `default_notify_days` |
-| **Documentos** | Referência completa de placeholders; logo inline docx; botão no Legal Case |
-| **IA** | `get_active_cases`, `get_case_summary`, `get_court_costs_by_type`, `get_financial_overview` |
-| **Painel** | Chaves EN alinhadas backend/frontend; handlers de KPI e links |
-| **Relatórios** | 6 reports com KPIs, gráficos e formatação padronizada |
+| **Relatórios P1** | `boot.py` (`adv_office`), `reports.css`, `reports_common.js`, print formats (9 Report + 3 DocType) |
+| **Painel P2** | Backend `painel/` (9 módulos); frontend `public/js/painel/` (14 módulos); `main.js` orquestrador |
+| **Office Settings** | Logo, dados bancários, `default_notify_days` |
+| **Documentos** | Placeholders; logo inline docx |
+| **IA** | `agent_api.py` — 4 endpoints read-only |
 | **Sidebar / workspace** | Labels PT; traduções de DocType na UI |
-| **Legal Payment** | Correção HTML na coluna Origem da list view |
 
 ---
 
@@ -78,7 +77,7 @@ Relatórios de conformidade. Consultar junto com [audit-deploy-ready.md](./audit
 
 ```bash
 bench --site advocacia.local set-config allow_tests true
-bench --site advocacia.local run-tests --app advocacia   # 241 testes (jun/2026)
+bench --site advocacia.local run-tests --app advocacia   # 283 testes (jun/2026)
 ```
 
 E2E browser (opcional, fora da suite Frappe): ver [e2e_playwright.md](./e2e_playwright.md).

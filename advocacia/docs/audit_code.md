@@ -1,6 +1,6 @@
 # Seção 1 — Auditoria de Código Completa
 
-**App:** `advocacia` · **Versão:** 0.7.0 · **Site:** `advocacia.local` · **Data:** 2026-06-07  
+**App:** `advocacia` · **Versão:** 1.0.0 · **Site:** `advocacia.local` · **Data:** 2026-06-10  
 **Referência normativa:** `REGRAS_ADVOCACIA.md` (raiz do repo) · Inventário técnico: `CODEBASE.md`
 
 ---
@@ -28,7 +28,7 @@
 | Zero N+1 no painel | 🟢 OK | `_servico_lookup`, `_cliente_nome_lookup` em batch em `painel/_helpers.py`. |
 | doc_events: um handler/evento | 🟢 OK | `hooks.py`: um handler por par DocType+evento. |
 | Tabs não spaces | 🟢 OK | Amostragem `.py`/`.js` usa tabs. |
-| Testes com assert real | 🟢 OK | **241** métodos em 35+ arquivos `test_*.py`; E2E Playwright manual em `tests/e2e/`. |
+| Testes com assert real | 🟢 OK | **291** métodos em 45 arquivos `test_*.py`; última run **283 OK** (jun/2026); E2E Playwright manual. |
 
 ### Inconsistências prioritárias
 
@@ -42,7 +42,7 @@
 ## 1.2 Cobertura de testes
 
 **Comando:** `bench --site advocacia.local run-tests --app advocacia`  
-**Total:** 241 testes (jun/2026).
+**Total:** 283 testes executados, OK (jun/2026). 291 métodos definidos em 45 arquivos.
 
 | DocType / Módulo | Tem teste? | Nº testes* | Funcionalidades testadas | SEM teste |
 |---|---|---|---|---|
@@ -62,7 +62,8 @@
 | Cadastros (Jurisdiction, Court Branch, Court, Fase) | Sim | 4–5 cada | CRUD, unique | — |
 | Office Settings | Sim | 17 | CNPJ escritório, logo, banco, prazos | — |
 | **Child tables** (5) | Parcial | via pai | Contato, Endereco, Parcela, Ato, Kit Item | CRUD isolado |
-| **Painel** | Sim | 9 | Payload, limits, permissões | E2E browser |
+| **Painel** | Sim | 17 | Payload, limits, permissões, módulos (`test_painel_api`, `test_painel_modulos`) | E2E browser |
+| **Reports boot/print** | Sim | 4 | `test_boot`, `test_print_formats` | — |
 | **Permissions** | Sim | 6 | User vs Manager, painel redaction | — |
 | **Financeiro** | Sim | 7 | Sync acordo, atos, flags | resync commit |
 | **Calendar sync** | Sim | 6 | Hearing/Prazo → Event | Google OAuth E2E |
@@ -119,7 +120,7 @@
 
 | Área | Ocorrências aprox. |
 |---|---:|
-| `painel/` (kpis, prazos, financeiro, timeline) | 20 |
+| `painel/` (kpis, financeiro, prazos, timeline, agenda, atencao, saude, operational) | 20 |
 | Script Reports (6) | 13 |
 | `notificacoes.py`, `servico.py`, `seed_demo.py` | 7 |
 
@@ -143,8 +144,8 @@
 | Linhas Python | ~10.949 |
 | Linhas JavaScript | ~5.116 |
 | Script Reports | 6 |
-| Arquivos de teste | 34 |
-| Métodos de teste | 241 |
+| Arquivos de teste | 45 |
+| Métodos de teste | 291 (283 executados OK) |
 | Whitelists | 22 |
 | `doc_events` handlers | 6 pares DocType+evento |
 | Scheduler daily | 5 jobs |
@@ -165,4 +166,4 @@
 
 ---
 
-*Auditoria read-only. Próxima revisão recomendada após deploy v0.7.0 ou upgrade Frappe v17.*
+*Auditoria read-only. Próxima revisão recomendada após upgrade Frappe v17.*

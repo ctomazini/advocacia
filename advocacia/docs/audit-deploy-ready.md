@@ -1,5 +1,7 @@
 # Auditoria Deploy-Ready — Advocacia
 
+> **Snapshot histórico** (v0.7.0, jun/2026). Estado atual: [README.md](./README.md), [audit_code.md](./audit_code.md), [audit_dashboard.md](./audit_dashboard.md). **Suíte atual: 283 testes OK.**
+
 **Data:** 2026-06-02  
 **Commit:** `3810cb0` — feat: office settings, IA, placeholders, painel/reports e docs v1.0.0  
 **Site auditado:** `advocacia.local` (bench nativo, Frappe v16)  
@@ -31,7 +33,7 @@
 | `custom: 1` em DocTypes do app | ✅ **Zero** |
 | `frappe.db.commit()` em handlers de request/scheduler | ✅ **Removido** de `documentos`, `painel`, `financeiro`, `tasks`, `notificacoes` |
 | `agent_api.py` inexistente | ✅ **Implementado** (4 endpoints + 10 testes) |
-| Painel JS monolítico (>3000 linhas) | ✅ **Modularizado** — `public/js/painel/` (~2813 linhas total, 8 módulos) |
+| Painel JS monolítico (>3000 linhas) | ✅ **Modularizado** — `public/js/painel/` (~2.490 linhas, 14 módulos + `main.js`) |
 | Nomes PT congelados (decisão REGRAS v0.6) | ⚠️ **Supersedido** por v1.0.0 EN — documentar para equipe |
 
 ---
@@ -245,7 +247,7 @@ Cobertura destacada: CRUD auxiliares, reports (6), `agent_api`, painel, financei
 ### SEÇÃO 9 — Débito Específico Advocacia
 
 #### 9.1 Painel modular
-✅ **Modularizado** — maior arquivo `timeline.js` (427 linhas); total painel ~2813 linhas em 8 módulos + CSS vars.
+✅ **Modularizado** — maior arquivo `timeline.js` (426 linhas); total painel ~2.490 linhas JS + 2.130 CSS em 14 módulos; orquestrador `main.js`.
 
 #### 9.2 Roles
 ✅ **Advocacia Manager** e **Advocacia User** presentes no site.

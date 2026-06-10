@@ -1,8 +1,8 @@
 # CODEBASE — App Advocacia (Frappe v16)
 
-> Gerado em **2026-06-07** — re-audit pós-UX (títulos, list views, sidebar, painel). Branch **`frappe-v16`**. Frappe puro, **sem ERPNext**.
+> Gerado em **2026-06-10** — inventário pós-P1 reports + P2 painel. Branch **`main`**. Frappe puro, **sem ERPNext**.
 
-> **HEAD:** `3810cb0 2026-06-07 17:57:46 +0000 feat: office settings, IA, placeholders, painel/reports e docs v1.0.0`
+> **HEAD:** `f2a8b1f 2026-06-10 13:58:12 +0000 docs(painel): sync audit_dashboard with modular P2 structure`
 
 ---
 
@@ -14,12 +14,12 @@
 | Versão | 1.0.0 (`pyproject.toml`) |
 | Framework | Frappe v16.19.0 |
 | Licença | MIT |
-| Branch | frappe-v16 |
+| Branch | main |
 | Remote | git@github.com:ctomazini/advocacia.git |
 | Site dev | advocacia.local (porta 8000) |
-| Linhas Python | ~13556 |
-| Linhas JavaScript | ~279000 |
-| Métodos de teste | 259 |
+| Linhas Python | ~15669 |
+| Linhas JavaScript | ~279836 |
+| Métodos de teste | 291 |
 | DocTypes | 24 (todos `custom: 0`) |
 | Script Reports | 6 |
 
@@ -35,25 +35,25 @@
 | **Office Settings** | Logo, dados bancários, `default_notify_days`; seed idempotente |
 | **Documentos** | Referência completa de placeholders; logo inline docx; botão no Legal Case |
 | **IA** | `agent_api.py` (4 endpoints read-only) + `test_agent_api.py` |
-| **Painel** | Chaves EN backend/frontend; handlers KPI; soft refresh |
-| **Relatórios** | 6 reports com KPIs, gráficos e linha Total padronizados |
+| **Painel P2** | `public/js/painel/` (14 módulos); `main.js` orquestrador; backend `painel/` (9 módulos) |
+| **Relatórios P1** | `boot.py`, `reports.css`, `reports_common.js`, print formats Report (9) |
 | **Sidebar** | Labels PT sincronizados com workspace e traduções |
 | **Legal Payment** | Fix coluna Origem na list view |
 
 **Commits recentes:**
 ```text
-3810cb0 feat: office settings, IA, placeholders, painel/reports e docs v1.0.0
-02a393d refactor!: rename 24 DocTypes PT→EN and release v1.0.0
-083b027 docs: move audit-deploy-ready.md into advocacia/docs index folder
-b83371e chore: bump version to 0.7.1 and add deploy-ready audit report
-114c3e7 style: convert spaces to tabs in Python files for consistency
-0c5740d fix: add explicit limit_page_length to scheduler and documentos queries
-6c09732 fix: remove resync commit=True and harden gerar_pagamento_atos whitelist
-1aa3f8a fix: reorder duplicate idx in Acordo, Audiencia and Controle de Prazos
-a149418 fix: add explicit naming_rule to auxiliary DocTypes and Configuracao Single
-0608589 fix: replace deprecated cur_frm in list_nav.js with Frappe v16 API
-5444bb0 chore: add advocacia-predeploy cursor rule for v0.7.1 fixes
-28467df docs: organize documentation for filters, connections and E2E
+f2a8b1f docs(painel): sync audit_dashboard with modular P2 structure
+dda3bea refactor(painel): extract main.js orchestrator and remove dead audiencias module
+b275497 test(reports): add boot_session and print format tests
+5091743 feat(reports): integrate report helpers in Script Report JS files
+28bb4f6 feat(reports): add print format templates for Script Reports
+20e4d96 feat(reports): add global report CSS and JS helpers
+c18402d feat(reports): add boot_session for office branding in prints
+4ef63ef refactor(painel): P0 layout with stacked finance zone
+d27c9f7 test(Hub): add case_hub tests
+07c17a9 feat(Hub): register case_hub.js and case_hub.css in app includes
+a759a78 feat(Hub): restructure Legal Case with 6 tabs and 12 HTML panels
+ce034e9 feat(Hub): add case_hub.js frontend with pills bar and panel renderers
 ```
 
 ## 2. Árvore de Arquivos (anotada)
@@ -64,10 +64,12 @@ advocacia/
 └── advocacia/
     ├── hooks.py, modules.txt, patches.txt, patches/v16_0/
     ├── fixtures/, workspace_sidebar/advocacia.json
-    ├── public/js/ (masks, documentos_placeholders, painel/*, list_nav, …)
+    ├── public/js/ (masks, list_nav, reports_common, painel/* page-scoped, …)
+    ├── public/css/ (list_filters, case_hub, reports)
+    ├── boot.py, print_formats/reports/
     └── advocacia/
         ├── validators.py, titulos.py, agent_api.py, painel_api.py (facade)
-        ├── painel/ (kpis, financeiro, prazos, timeline, _helpers)
+        ├── painel/ (__init__, _helpers, kpis, financeiro, prazos, timeline, agenda, atencao, saude, operational)
         ├── documentos.py, financeiro.py, tasks.py, notificacoes.py, calendar_sync.py
         ├── setup/ (install, sidebar, workspace, reports, translations, seed_demo)
         ├── tests/ (33 arquivos), doctype/ (24), page/painel/, report/ (6), workspace/
@@ -87,37 +89,37 @@ Colunas: `fieldname` | label | fieldtype | options | reqd | unique. Section/Colu
 | --- | --- | --- | --- | --- | --- |
 | legal_case | Serviço | Link | Legal Case |  |  |
 | client | Client | Link | Client | ✓ |  |
-| data | Data | Datetime |  | ✓ |  |
-| tipo | Tipo | Select | Telefone WhatsApp Email Reunião Presencial Reunião Virtua... | ✓ |  |
-| assunto | Assunto | Data |  | ✓ |  |
-| resumo | Resumo | Text Editor |  |  |  |
-| proximos_passos | Próximos Passos | Small Text |  |  |  |
-| gerar_tarefa | Gerar Legal Task | Check |  |  |  |
+| communication_date | Data | Datetime |  | ✓ |  |
+| type | Tipo | Select | Telefone WhatsApp Email Reunião Presencial Reunião Virtua... | ✓ |  |
+| subject | Assunto | Data |  | ✓ |  |
+| summary | Resumo | Text Editor |  |  |  |
+| next_steps | Próximos Passos | Small Text |  |  |  |
+| generate_task | Gerar Legal Task | Check |  |  |  |
 | legal_task | Legal Task Gerada | Link | Legal Task |  |  |
 | title | Título | Data |  |  |  |
 
 ### Client
 
-**Meta:** autoname=`format:CLI-{YYYY}-{####}` · naming_rule=`Expression` · title_field=`nome` · istable=0 · issingle=0
+**Meta:** autoname=`format:CLI-{YYYY}-{####}` · naming_rule=`Expression` · title_field=`client_name` · istable=0 · issingle=0
 
 | fieldname | label | fieldtype | options | reqd | unique |
 | --- | --- | --- | --- | --- | --- |
-| tipo_pessoa | Tipo de Pessoa | Select | Pessoa Física Pessoa Jurídica | ✓ |  |
-| nome | Nome / Razão Social | Data |  | ✓ |  |
-| nome_fantasia | Nome Fantasia | Data |  |  |  |
+| person_type | Tipo de Pessoa | Select | Pessoa Física Pessoa Jurídica | ✓ |  |
+| client_name | Nome / Razão Social | Data |  | ✓ |  |
+| trade_name | Nome Fantasia | Data |  |  |  |
 | cpf | CPF | Data |  |  | ✓ |
 | rg | RG | Data |  |  |  |
 | cnpj | CNPJ | Data |  |  | ✓ |
-| nacionalidade | Nacionalidade | Data |  |  |  |
-| estado_civil | Estado Civil | Select |  Solteiro(a) Casado(a) Divorciado(a) Viúvo(a) União Estável |  |  |
-| profissao | Profissão | Data |  |  |  |
-| representante | Representante Legal | Data |  |  |  |
-| cpf_representante | CPF do Representante | Data |  |  |  |
-| cargo_representante | Cargo | Data |  |  |  |
-| nacionalidade_pj | Nacionalidade do Representante | Data |  |  |  |
+| nationality | Nacionalidade | Data |  |  |  |
+| marital_status | Estado Civil | Select |  Solteiro(a) Casado(a) Divorciado(a) Viúvo(a) União Estável |  |  |
+| occupation | Profissão | Data |  |  |  |
+| representative | Representante Legal | Data |  |  |  |
+| representative_cpf | CPF do Representante | Data |  |  |  |
+| representative_role | Cargo | Data |  |  |  |
+| representative_nationality | Nacionalidade do Representante | Data |  |  |  |
 | contacts | Contatos | Table | Client Contact |  |  |
 | addresses | Endereços | Table | Client Address |  |  |
-| observacoes | Observações | Text Editor |  |  |  |
+| remarks | Observações | Text Editor |  |  |  |
 
 ### Court Cost
 
@@ -127,16 +129,16 @@ Colunas: `fieldname` | label | fieldtype | options | reqd | unique. Section/Colu
 | --- | --- | --- | --- | --- | --- |
 | legal_case | Serviço | Link | Legal Case | ✓ |  |
 | client | Client | Link | Client |  |  |
-| tipo | Tipo | Select | Taxa Judicial Perícia Certidão Deslocamento Cópia/Impress... | ✓ |  |
-| descricao | Descrição | Data |  | ✓ |  |
+| type | Tipo | Select | Taxa Judicial Perícia Certidão Deslocamento Cópia/Impress... | ✓ |  |
+| description | Descrição | Data |  | ✓ |  |
 | status | Status | Select | Pendente Pago Repassado Cancelado |  |  |
-| valor | Valor | Currency |  | ✓ |  |
-| data_pagamento | Data de Legal Payment | Date |  |  |  |
-| repassar_cliente | Repassar ao Client | Check |  |  |  |
-| data_repasse | Data de Repasse | Date |  |  |  |
-| forma_pagamento | Forma de Legal Payment | Select | PIX TED Boleto Dinheiro Cartão |  |  |
-| comprovante | Comprovante | Attach |  |  |  |
-| observacoes | Observações | Small Text |  |  |  |
+| amount | Valor | Currency |  | ✓ |  |
+| payment_date | Data de Legal Payment | Date |  |  |  |
+| bill_to_client | Repassar ao Client | Check |  |  |  |
+| transfer_date | Data de Repasse | Date |  |  |  |
+| payment_method | Forma de Legal Payment | Select | PIX TED Boleto Dinheiro Cartão |  |  |
+| receipt | Comprovante | Attach |  |  |  |
+| remarks | Observações | Small Text |  |  |  |
 | title | Título | Data |  |  |  |
 
 ### Deadline
@@ -147,38 +149,38 @@ Colunas: `fieldname` | label | fieldtype | options | reqd | unique. Section/Colu
 | --- | --- | --- | --- | --- | --- |
 | legal_case | Serviço | Link | Legal Case | ✓ |  |
 | client | Client | Link | Client |  |  |
-| data_prazo | Data do Prazo | Date |  | ✓ |  |
+| due_date | Data do Prazo | Date |  | ✓ |  |
 | status | Status | Select | Pendente Concluído Vencido |  |  |
-| descricao | Descrição | Small Text |  | ✓ |  |
-| prioridade | Prioridade | Select | Alta Média Baixa |  |  |
-| responsavel | Responsável | Link | User |  |  |
-| dias_notificacao | Notificar com antecedência (dias) | Int |  |  |  |
-| observacoes | Observações | Text Editor |  |  |  |
+| description | Descrição | Small Text |  | ✓ |  |
+| priority | Prioridade | Select | Alta Média Baixa |  |  |
+| responsible | Responsável | Link | User |  |  |
+| notification_days | Notificar com antecedência (dias) | Int |  |  |  |
+| remarks | Observações | Text Editor |  |  |  |
 | title | Título | Data |  |  |  |
 
 ### Document Kit
 
-**Meta:** autoname=`field:titulo` · naming_rule=`By fieldname` · title_field=`titulo` · istable=0 · issingle=0
+**Meta:** autoname=`field:title` · naming_rule=`By fieldname` · title_field=`title` · istable=0 · issingle=0
 
 | fieldname | label | fieldtype | options | reqd | unique |
 | --- | --- | --- | --- | --- | --- |
-| titulo | Título | Data |  | ✓ | ✓ |
-| descricao | Descrição | Small Text |  |  |  |
-| habilitado | Habilitado | Check |  |  |  |
+| title | Título | Data |  | ✓ | ✓ |
+| description | Descrição | Small Text |  |  |  |
+| enabled | Habilitado | Check |  |  |  |
 | templates | Templates | Table | Document Kit Item | ✓ |  |
 
 ### Document Template
 
-**Meta:** autoname=`field:titulo` · naming_rule=`By fieldname` · title_field=`titulo` · istable=0 · issingle=0
+**Meta:** autoname=`field:title` · naming_rule=`By fieldname` · title_field=`title` · istable=0 · issingle=0
 
 | fieldname | label | fieldtype | options | reqd | unique |
 | --- | --- | --- | --- | --- | --- |
-| titulo | Titulo | Data |  | ✓ | ✓ |
-| tipo_documento | Tipo de Documento | Select | Contrato Declaracao Recibo Carta Ficha de Atendimento Outro | ✓ |  |
-| descricao | Descricao | Small Text |  |  |  |
-| habilitado | Habilitado | Check |  |  |  |
-| arquivo | Arquivo Template (.docx) | Attach |  | ✓ |  |
-| ver_placeholders | Ver Placeholders Disponíveis | Button |  |  |  |
+| title | Titulo | Data |  | ✓ | ✓ |
+| document_type | Tipo de Documento | Select | Contrato Declaracao Recibo Carta Ficha de Atendimento Outro | ✓ |  |
+| description | Descricao | Small Text |  |  |  |
+| enabled | Habilitado | Check |  |  |  |
+| template_file | Arquivo Template (.docx) | Attach |  | ✓ |  |
+| show_placeholders | Ver Placeholders Disponíveis | Button |  |  |  |
 
 ### Fee Agreement
 
@@ -188,26 +190,26 @@ Colunas: `fieldname` | label | fieldtype | options | reqd | unique. Section/Colu
 | --- | --- | --- | --- | --- | --- |
 | legal_case | Serviço | Link | Legal Case | ✓ |  |
 | client | Client | Link | Client |  |  |
-| modo_honorarios | Modo | Select | Honorários Diretos Acordo com Divisão | ✓ |  |
+| fee_mode | Modo | Select | Honorários Diretos Acordo com Divisão | ✓ |  |
 | status | Status | Select | Vigente Encerrado Cancelado Quitado |  |  |
-| valor_total_do_acordo | Valor Total do Acordo | Currency |  |  |  |
-| percentual_advogada | Percentual Advogada (%) | Percent |  |  |  |
-| valor_fixo_de_honorarios | Valor Fixo de Honorários | Currency |  |  |  |
-| valor_advogada | Valor Advogada | Currency |  |  |  |
+| total_agreement_value | Valor Total do Acordo | Currency |  |  |  |
+| lawyer_percentage | Percentual Advogada (%) | Percent |  |  |  |
+| fixed_fee_amount | Valor Fixo de Honorários | Currency |  |  |  |
+| lawyer_amount | Valor Advogada | Currency |  |  |  |
 | billing_type | Tipo de cobrança | Select | Valor fixo Percentual do acordo Percentual da causa Misto | ✓ |  |
-| percentual_cliente | Percentual Client | Percent |  |  |  |
-| valor_cliente | Valor Client | Currency |  |  |  |
+| client_percentage | Percentual Client | Percent |  |  |  |
+| client_amount | Valor Client | Currency |  |  |  |
 | calculation_type | Tipo de cálculo | Select | Percentual Valor fixo |  |  |
 | contingency_fee_pct | Percentual Sucumbência (%) | Percent |  |  |  |
 | contingency_fee_amount | Honorários de Sucumbência | Currency |  |  |  |
 | contingency_fee_status | Status da Sucumbência | Select | A definir Deferida Indeferida Paga |  |  |
 | installment_count | Número de Parcelas | Int |  |  |  |
-| data_primeira_parcela | Data Primeira Parcela | Date |  |  |  |
-| valor_da_parcela | Valor da Parcela | Currency |  |  |  |
-| gerar_parcelas | Gerar Parcelas | Button |  |  |  |
+| first_installment_date | Data Primeira Parcela | Date |  |  |  |
+| installment_amount | Valor da Parcela | Currency |  |  |  |
+| generate_installments | Gerar Parcelas | Button |  |  |  |
 | fee_installments |  | Table | Fee Installment |  |  |
-| total_advogada | Total Advogada | Currency |  |  |  |
-| total_cliente | Total Client | Currency |  |  |  |
+| lawyer_total | Total Advogada | Currency |  |  |  |
+| client_total | Total Client | Currency |  |  |  |
 | remarks | Observações | Text Editor |  |  |  |
 | title | Título | Data |  |  |  |
 
@@ -219,14 +221,14 @@ Colunas: `fieldname` | label | fieldtype | options | reqd | unique. Section/Colu
 | --- | --- | --- | --- | --- | --- |
 | legal_case | Serviço | Link | Legal Case | ✓ |  |
 | client | Client | Link | Client |  |  |
-| data_hora | Data e Hora | Datetime |  | ✓ |  |
-| status_aud | Status | Select | Agendada Realizada Adiada Cancelada |  |  |
-| tipo | Tipo | Select | Conciliação Instrução Julgamento Una | ✓ |  |
-| modalidade | Modalidade | Select | Presencial Virtual Híbrida |  |  |
+| hearing_datetime | Data e Hora | Datetime |  | ✓ |  |
+| status | Status | Select | Agendada Realizada Adiada Cancelada |  |  |
+| type | Tipo | Select | Conciliação Instrução Julgamento Una | ✓ |  |
+| modality | Modalidade | Select | Presencial Virtual Híbrida |  |  |
 | link_virtual | Link da Audiência Virtual | Data | URL |  |  |
 | court_branch | Court Branch | Link | Court Branch |  |  |
-| resultado | Resultado | Select |  Realizada Adiada Acordo Sem acordo |  |  |
-| observacoes | Observações | Text Editor |  |  |  |
+| outcome | Resultado | Select |  Realizada Adiada Acordo Sem acordo |  |  |
+| remarks | Observações | Text Editor |  |  |  |
 | title | Título | Data |  |  |  |
 
 ### Legal Case
@@ -235,21 +237,34 @@ Colunas: `fieldname` | label | fieldtype | options | reqd | unique. Section/Colu
 
 | fieldname | label | fieldtype | options | reqd | unique |
 | --- | --- | --- | --- | --- | --- |
+| hub_summary_bar | Resumo do Serviço | HTML |  |  |  |
 | client | Client | Link | Client | ✓ |  |
-| tipo | Tipo | Select | Processo Judicial Consultoria Contrato Diligência Adminis... | ✓ |  |
+| type | Tipo | Select | Processo Judicial Consultoria Contrato Diligência Adminis... | ✓ |  |
 | title | Título | Data |  |  |  |
 | status | Status | Select | Em andamento Encerrado Suspenso Arquivado |  |  |
 | case_phase | Case Phase | Link | Case Phase |  |  |
-| data_abertura | Data de Abertura | Date |  |  |  |
-| numero_processo | Número do Processo | Data |  |  |  |
-| numeracao_legada | Numeração legada (pré-CNJ) | Check |  |  |  |
+| opening_date | Data de Abertura | Date |  |  |  |
+| case_number | Número do Processo | Data |  |  |  |
+| legacy_numbering | Numeração legada (pré-CNJ) | Check |  |  |  |
 | area | Área | Select |  Família Trabalhista Cível Criminal Previdenciário Admini... |  |  |
 | court_branch_link | Court Branch | Link | Court Branch |  |  |
 | court | Court | Link | Court |  |  |
 | jurisdiction | Jurisdiction | Link | Jurisdiction |  |  |
-| parte_contraria | Parte Contrária | Data |  |  |  |
-| valor_causa | Valor da Causa | Currency |  |  |  |
-| observacoes | Observações | Text Editor |  |  |  |
+| opposing_party | Parte Contrária | Data |  |  |  |
+| case_value | Valor da Causa | Currency |  |  |  |
+| remarks | Observações | Text Editor |  |  |  |
+| phases_panel | Fase Processual | HTML |  |  |  |
+| hearings_panel | Audiências | HTML |  |  |  |
+| financial_summary_panel | Resumo Financeiro | HTML |  |  |  |
+| installments_panel | Parcelas | HTML |  |  |  |
+| payments_panel | Pagamentos | HTML |  |  |  |
+| court_costs_panel | Custas Processuais | HTML |  |  |  |
+| deadlines_panel | Prazos | HTML |  |  |  |
+| tasks_panel | Tarefas | HTML |  |  |  |
+| communications_panel | Comunicações | HTML |  |  |  |
+| service_records_panel | Registro de Atos | HTML |  |  |  |
+| time_entries_panel | Registro de Horas | HTML |  |  |  |
+| document_kits_panel | Kits de Documentos | HTML |  |  |  |
 
 ### Legal Payment
 
@@ -257,23 +272,23 @@ Colunas: `fieldname` | label | fieldtype | options | reqd | unique. Section/Colu
 
 | fieldname | label | fieldtype | options | reqd | unique |
 | --- | --- | --- | --- | --- | --- |
-| tipo_origem | Origem | Select | Honorários (Parcela) Atos Advocatícios |  |  |
+| origin_type | Origem | Select | Honorários (Parcela) Atos Advocatícios |  |  |
 | fee_agreement | Acordo | Link | Fee Agreement |  |  |
 | service_record | Service Record | Link | Service Record |  |  |
 | legal_case | Serviço | Link | Legal Case | ✓ |  |
 | client | Client | Link | Client | ✓ |  |
-| numero_parcela | Nº Parcela | Int |  |  |  |
-| descricao | Descrição | Small Text |  |  |  |
-| parcela_origem_id | ID Origem | Data |  |  | ✓ |
-| sincronizado_em | Sincronizado em | Datetime |  |  |  |
+| installment_number | Nº Parcela | Int |  |  |  |
+| description | Descrição | Small Text |  |  |  |
+| installment_origin_id | ID Origem | Data |  |  | ✓ |
+| synced_at | Sincronizado em | Datetime |  |  |  |
 | manual_override | Edição manual (não sincronizar) | Check |  |  |  |
-| valor | Valor | Currency |  | ✓ |  |
-| valor_recebido | Valor Recebido | Currency |  |  |  |
-| data_vencimento | Vencimento | Date |  | ✓ |  |
-| data_recebimento | Data de Recebimento | Date |  |  |  |
+| amount | Valor | Currency |  | ✓ |  |
+| received_amount | Valor Recebido | Currency |  |  |  |
+| due_date | Vencimento | Date |  | ✓ |  |
+| received_date | Data de Recebimento | Date |  |  |  |
 | status | Status | Select | Pendente Vencido Recebido Cancelado Renegociado Repassado | ✓ |  |
-| observacoes | Observações | Small Text |  |  |  |
-| comprovante | Comprovante | Attach |  |  |  |
+| remarks | Observações | Small Text |  |  |  |
+| receipt | Comprovante | Attach |  |  |  |
 | title | Título | Data |  |  |  |
 
 ### Legal Task
@@ -284,13 +299,13 @@ Colunas: `fieldname` | label | fieldtype | options | reqd | unique. Section/Colu
 | --- | --- | --- | --- | --- | --- |
 | legal_case | Serviço | Link | Legal Case |  |  |
 | client | Client | Link | Client |  |  |
-| titulo | Descrição da Legal Task | Data |  | ✓ |  |
+| subject | Descrição da Legal Task | Data |  | ✓ |  |
 | status | Status | Select | Pendente Em Andamento Concluída Cancelada |  |  |
-| prioridade | Prioridade | Select | Normal Alta Urgente |  |  |
-| data_limite | Data Limite | Date |  |  |  |
-| descricao | Descrição | Text Editor |  |  |  |
-| responsavel | Responsável | Link | User |  |  |
-| data_conclusao | Data de Conclusão | Date |  |  |  |
+| priority | Prioridade | Select | Normal Alta Urgente |  |  |
+| due_date | Data Limite | Date |  |  |  |
+| description | Descrição | Text Editor |  |  |  |
+| responsible | Responsável | Link | User |  |  |
+| completion_date | Data de Conclusão | Date |  |  |  |
 | title | Título | Data |  |  |  |
 
 ### Office Expense
@@ -299,18 +314,18 @@ Colunas: `fieldname` | label | fieldtype | options | reqd | unique. Section/Colu
 
 | fieldname | label | fieldtype | options | reqd | unique |
 | --- | --- | --- | --- | --- | --- |
-| descricao | Descrição | Data |  | ✓ |  |
-| categoria | Categoria | Select | Aluguel Energia Água Internet Telefone Software/Assinatur... | ✓ |  |
-| valor | Valor | Currency |  | ✓ |  |
+| description | Descrição | Data |  | ✓ |  |
+| category | Categoria | Select | Aluguel Energia Água Internet Telefone Software/Assinatur... | ✓ |  |
+| amount | Valor | Currency |  | ✓ |  |
 | status | Status | Select | Pendente Pago Atrasado Cancelado |  |  |
-| data_vencimento | Data de Vencimento | Date |  |  |  |
-| data_pagamento | Data de Legal Payment | Date |  |  |  |
-| forma_pagamento | Forma de Legal Payment | Select | PIX TED Boleto Dinheiro Cartão Débito Automático |  |  |
-| recorrente | Despesa Recorrente | Check |  |  |  |
-| frequencia | Frequência | Select | Mensal Bimestral Trimestral Semestral Anual |  |  |
-| proximo_vencimento | Próximo Vencimento | Date |  |  |  |
-| comprovante | Comprovante | Attach |  |  |  |
-| observacoes | Observações | Small Text |  |  |  |
+| due_date | Data de Vencimento | Date |  |  |  |
+| payment_date | Data de Legal Payment | Date |  |  |  |
+| payment_method | Forma de Legal Payment | Select | PIX TED Boleto Dinheiro Cartão Débito Automático |  |  |
+| is_recurring | Despesa Recorrente | Check |  |  |  |
+| frequency | Frequência | Select | Mensal Bimestral Trimestral Semestral Anual |  |  |
+| next_due_date | Próximo Vencimento | Date |  |  |  |
+| receipt | Comprovante | Attach |  |  |  |
+| remarks | Observações | Small Text |  |  |  |
 | title | Título | Data |  |  |  |
 
 ### Service Record
@@ -322,15 +337,15 @@ Colunas: `fieldname` | label | fieldtype | options | reqd | unique. Section/Colu
 | legal_case | Serviço | Link | Legal Case | ✓ |  |
 | client | Client | Link | Client |  |  |
 | status | Status | Select | Em aberto Parcialmente cobrado Cobrado |  |  |
-| data_abertura | Data de Abertura | Date |  |  |  |
+| opening_date | Data de Abertura | Date |  |  |  |
 | acts |  | Table | Legal Act Item |  |  |
-| total_pendente | Total Pendente | Currency |  |  |  |
-| total_cobrado | Total Cobrado | Currency |  |  |  |
-| total_geral | Total Geral | Currency |  |  |  |
-| data_vencimento_cobranca | Vencimento da Cobrança | Date |  |  |  |
+| pending_total | Total Pendente | Currency |  |  |  |
+| billed_total | Total Cobrado | Currency |  |  |  |
+| grand_total | Total Geral | Currency |  |  |  |
+| billing_due_date | Vencimento da Cobrança | Date |  |  |  |
 | last_payment | Último Legal Payment | Link | Legal Payment |  |  |
-| gerar_cobranca | Sincronizar Cobrança | Button |  |  |  |
-| observacoes | Observações | Text Editor |  |  |  |
+| generate_billing | Sincronizar Cobrança | Button |  |  |  |
+| remarks | Observações | Text Editor |  |  |  |
 | title | Título | Data |  |  |  |
 
 ### Time Entry
@@ -341,19 +356,19 @@ Colunas: `fieldname` | label | fieldtype | options | reqd | unique. Section/Colu
 | --- | --- | --- | --- | --- | --- |
 | legal_case | Serviço | Link | Legal Case | ✓ |  |
 | client | Client | Link | Client |  |  |
-| data | Data | Date |  | ✓ |  |
-| responsavel | Responsável | Link | User |  |  |
-| hora_inicio | Hora Início | Time |  |  |  |
-| hora_fim | Hora Fim | Time |  |  |  |
-| duracao_minutos | Duração (min) | Int |  |  |  |
-| duracao_horas | Duração (horas) | Float |  |  |  |
-| atividade | Atividade | Data |  | ✓ |  |
-| categoria | Categoria | Select | Estudo/Pesquisa Redação Audiência Reunião Deslocamento At... |  |  |
-| descricao | Detalhes | Small Text |  |  |  |
-| cobravel | Cobrável | Check |  |  |  |
+| entry_date | Data | Date |  | ✓ |  |
+| responsible | Responsável | Link | User |  |  |
+| start_time | Hora Início | Time |  |  |  |
+| end_time | Hora Fim | Time |  |  |  |
+| duration_minutes | Duração (min) | Int |  |  |  |
+| duration_hours | Duração (horas) | Float |  |  |  |
+| activity | Atividade | Data |  | ✓ |  |
+| category | Categoria | Select | Estudo/Pesquisa Redação Audiência Reunião Deslocamento At... |  |  |
+| description | Detalhes | Small Text |  |  |  |
+| billable | Cobrável | Check |  |  |  |
 | timer_display | Tempo Decorrido | HTML |  |  |  |
-| timer_inicio | Início do Timer | Datetime |  |  |  |
-| timer_ativo | Timer Ativo | Check |  |  |  |
+| timer_start | Início do Timer | Datetime |  |  |  |
+| timer_active | Timer Ativo | Check |  |  |  |
 | title | Título | Data |  |  |  |
 
 #### Auxiliares (cadastro rígido)
@@ -405,15 +420,15 @@ Colunas: `fieldname` | label | fieldtype | options | reqd | unique. Section/Colu
 
 | fieldname | label | fieldtype | options | reqd | unique |
 | --- | --- | --- | --- | --- | --- |
-| tipo | Tipo | Select | Residencial Comercial Correspondência Outro |  |  |
+| type | Tipo | Select | Residencial Comercial Correspondência Outro |  |  |
 | cep | CEP | Data |  |  |  |
-| logradouro | Logradouro | Data |  | ✓ |  |
-| numero | Número | Data |  |  |  |
-| complemento | Complemento | Data |  |  |  |
-| bairro | Bairro | Data |  |  |  |
-| cidade | Cidade | Data |  |  |  |
-| estado | Estado | Select |  AC AL AP AM BA CE DF ES GO MA MT MS MG PA PB PR PE PI RJ... |  |  |
-| principal | Endereço Principal | Check |  |  |  |
+| street | Logradouro | Data |  | ✓ |  |
+| number | Número | Data |  |  |  |
+| complement | Complemento | Data |  |  |  |
+| neighborhood | Bairro | Data |  |  |  |
+| city | Cidade | Data |  |  |  |
+| state | Estado | Select |  AC AL AP AM BA CE DF ES GO MA MT MS MG PA PB PR PE PI RJ... |  |  |
+| is_primary | Endereço Principal | Check |  |  |  |
 
 ### Client Contact
 
@@ -421,12 +436,12 @@ Colunas: `fieldname` | label | fieldtype | options | reqd | unique. Section/Colu
 
 | fieldname | label | fieldtype | options | reqd | unique |
 | --- | --- | --- | --- | --- | --- |
-| nome | Nome | Data |  | ✓ |  |
-| tipo | Tipo | Select | Principal Conjuge Responsável Outro |  |  |
-| telefone | Telefone | Data |  |  |  |
-| celular | Celular | Data |  |  |  |
+| contact_name | Nome | Data |  | ✓ |  |
+| type | Tipo | Select | Principal Conjuge Responsável Outro |  |  |
+| phone | Telefone | Data |  |  |  |
+| mobile | Celular | Data |  |  |  |
 | email | E-mail | Data | Email |  |  |
-| observacao | Observação | Small Text |  |  |  |
+| remarks | Observação | Small Text |  |  |  |
 
 ### Document Kit Item
 
@@ -435,7 +450,7 @@ Colunas: `fieldname` | label | fieldtype | options | reqd | unique. Section/Colu
 | fieldname | label | fieldtype | options | reqd | unique |
 | --- | --- | --- | --- | --- | --- |
 | template | Template | Link | Document Template | ✓ |  |
-| ordem | Ordem | Int |  |  |  |
+| display_order | Ordem | Int |  |  |  |
 
 ### Fee Installment
 
@@ -443,19 +458,19 @@ Colunas: `fieldname` | label | fieldtype | options | reqd | unique. Section/Colu
 
 | fieldname | label | fieldtype | options | reqd | unique |
 | --- | --- | --- | --- | --- | --- |
-| vencimento | Vencimento | Date |  | ✓ |  |
-| valor_total | Valor Total | Currency |  |  |  |
-| valor_advogada | Valor Advogada | Currency |  |  |  |
+| due_date | Vencimento | Date |  | ✓ |  |
+| total_amount | Valor Total | Currency |  |  |  |
+| lawyer_amount | Valor Advogada | Currency |  |  |  |
 | contingency_amount | Valor Sucumbência | Currency |  |  |  |
-| valor_cliente | Valor Client | Currency |  |  |  |
+| client_amount | Valor Client | Currency |  |  |  |
 | description | Descrição | Small Text |  |  |  |
-| parcela_origem_id | ID de Origem | Data |  |  |  |
+| installment_origin_id | ID de Origem | Data |  |  |  |
 | payment | Legal Payment | Link | Legal Payment |  |  |
 | status | Status | Select | Pendente Vencido Recebido Repassado Cancelado |  |  |
-| data_recebimento | Data de Recebimento | Date |  |  |  |
-| data_repasse | Data de Repasse ao Client | Date |  |  |  |
-| forma_recebimento | Forma de Recebimento | Select |  PIX TED Dinheiro Cartão Boleto |  |  |
-| observacao | Observação | Small Text |  |  |  |
+| received_date | Data de Recebimento | Date |  |  |  |
+| transfer_date | Data de Repasse ao Client | Date |  |  |  |
+| payment_method | Forma de Recebimento | Select |  PIX TED Dinheiro Cartão Boleto |  |  |
+| remarks | Observação | Small Text |  |  |  |
 
 ### Legal Act Item
 
@@ -463,10 +478,10 @@ Colunas: `fieldname` | label | fieldtype | options | reqd | unique. Section/Colu
 
 | fieldname | label | fieldtype | options | reqd | unique |
 | --- | --- | --- | --- | --- | --- |
-| data | Data | Date |  | ✓ |  |
-| tipo | Tipo | Select | Inicial Audiência Defesa Diligência Consulta Contrato Adm... | ✓ |  |
+| act_date | Data | Date |  | ✓ |  |
+| type | Tipo | Select | Inicial Audiência Defesa Diligência Consulta Contrato Adm... | ✓ |  |
 | description | Descrição | Small Text |  |  |  |
-| valor | Valor | Currency |  | ✓ |  |
+| amount | Valor | Currency |  | ✓ |  |
 | status | Status | Select | Pendente Cobrado |  |  |
 | payment | Legal Payment | Link | Legal Payment |  |  |
 
@@ -478,14 +493,14 @@ Colunas: `fieldname` | label | fieldtype | options | reqd | unique. Section/Colu
 
 | fieldname | label | fieldtype | options | reqd | unique |
 | --- | --- | --- | --- | --- | --- |
-| razao_social | Razão Social | Data |  | ✓ |  |
+| company_name | Razão Social | Data |  | ✓ |  |
 | cnpj | CNPJ | Data |  |  |  |
-| registro_sia | Registro SIA | Data |  |  |  |
+| sia_registration | Registro SIA | Data |  |  |  |
 | office_logo | Logo do Escritório | Attach Image |  |  |  |
-| advogada | Advogada(o) Principal | Data |  | ✓ |  |
+| lawyer_name | Advogada(o) Principal | Data |  | ✓ |  |
 | oab | OAB | Data |  | ✓ |  |
 | default_notify_days | Dias padrão de antecedência (prazos) | Int |  |  |  |
-| endereco | Endereço Completo | Small Text |  | ✓ |  |
+| address | Endereço Completo | Small Text |  | ✓ |  |
 | bank_name | Banco | Data |  |  |  |
 | bank_agency | Agência | Data |  |  |  |
 | bank_account | Conta | Data |  |  |  |
@@ -500,16 +515,27 @@ Colunas: `fieldname` | label | fieldtype | options | reqd | unique. Section/Colu
 ### fixtures
 Workspace Advocacia; Notifications prazo/audiência; Custom Field Event `custom_source%`.
 
+### boot_session
+- `advocacia.boot.boot_session` → `frappe.boot.adv_office` (Office Settings para prints)
+
+### app_include_css
+- `/assets/advocacia/css/list_filters.css`
+- `/assets/advocacia/css/case_hub.css`
+- `/assets/advocacia/css/reports.css`
+
 ### app_include_js
 - `/assets/advocacia/js/masks.js`
 - `/assets/advocacia/js/documentos_placeholders.js`
-- `/assets/advocacia/js/painel/utils.js … index.js (8 módulos)`
 - `/assets/advocacia/js/list_nav.js`
 - `/assets/advocacia/js/list_filters.js`
 - `/assets/advocacia/js/cliente_from_servico.js`
 - `/assets/advocacia/js/timer_global.js`
+- `/assets/advocacia/js/case_hub.js`
+- `/assets/advocacia/js/reports_common.js`
 
-**Removidos:** `navegacao.js`, widget painel global, `servico_link.js` (label de Serviço em `legal_case_query` / `format_servico_link_label`).
+**Painel (page-scoped):** `page/painel/painel.js` → `frappe.require(PAINEL_ASSETS)` — 14 módulos em `public/js/painel/` (utils, hero, kpis, saude, atencao, agenda, timeline, financeiro, operational, refresh, sections, handlers, main, index).
+
+**Removidos:** `navegacao.js`, widget painel global, `servico_link.js`, `audiencias.js` (morto).
 
 ### doc_events
 
@@ -558,9 +584,9 @@ Ver §4 (`tasks.py`, `notificacoes.py`). Sem `commit()` em request/scheduler.
 
 ## 7. Client JS
 
-- Globais (4), 12 list formatters, forms (acordo, servico, audiencia Híbrida).
-- `painel.js` ~4100 linhas; CSS vars para charts.
-- Calendários: `audiencia_calendar.js`, `controle_de_prazos_calendar.js`.
+- Globais: máscaras, list_nav, list_filters, reports_common, case_hub, timer.
+- **Painel modular** (~2.490 linhas JS + 2.130 CSS): orquestrador `main.js` (`load`/`render`); `index.js` bootstrap; CSS vars para charts; carregado só na Page `painel`.
+- Calendários: `hearing_calendar.js`, `deadline_calendar.js`.
 
 ## 8. Setup / migrations
 
@@ -584,9 +610,9 @@ Status Legal Payment: Pendente, Vencido, Recebido, Cancelado, Renegociado, Repas
 
 ## 11. Testes
 
-- **259** métodos em **39** arquivos.
+- **291** métodos em **45** arquivos.
 - `bench --site advocacia.local run-tests --app advocacia`
-- Última run (site dev): **259** testes, **OK** (jun/2026).
+- Última run (site dev): **291** testes, **OK** (jun/2026).
 
 ## 12. Integrações
 
@@ -616,7 +642,7 @@ Status Legal Payment: Pendente, Vencido, Recebido, Cancelado, Renegociado, Repas
 | 9 | JS = UX | ✅ | Negócio em Python |
 | 10 | Hooks | ✅ | Legal Payment handler único; schedulers |
 | 11 | Workspace/sidebar | ✅ | collapsible fix |
-| 12 | Testes | ✅ | 221/221 OK |
+| 12 | Testes | ✅ | 291/291 OK |
 | 13 | Reinstall limpo | ⏳ | Obrigatório pré go-live |
 
 ### 14.2 Ajustes de teste (2026-06-02)
@@ -632,7 +658,7 @@ Status Legal Payment: Pendente, Vencido, Recebido, Cancelado, Renegociado, Repas
 | Código Git (custom:0) | ✅ |
 | Blocos auditoria 1–4 | ✅ |
 | UX jun/2026 | ✅ (smoke manual) |
-| Suite 221/221 verde | ✅ |
+| Suite 291/291 verde | ✅ |
 | install-app site limpo | ⏳ recomendado pré go-live |
 
 **Conclusão:** código e testes **prontos para produção**; validar reinstall limpo e smoke manual do painel/sidebar antes do go-live.

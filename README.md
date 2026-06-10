@@ -2,7 +2,7 @@
 
 Aplicativo Frappe v16 para gestão jurídica de escritórios de advocacia no Brasil: clientes, serviços/processos, honorários, pagamentos, atos, prazos, audiências, despesas operacionais, painel operacional, geração de documentos (.docx) e API read-only para agentes IA.
 
-**Versão:** 1.0.0 · **Branch:** `frappe-v16`
+**Versão:** 1.0.0 · **Branch:** `main`
 
 Documentação: [advocacia/docs/README.md](./advocacia/docs/README.md) (índice) · [CODEBASE.md](./CODEBASE.md) · [REGRAS_ADVOCACIA.md](./REGRAS_ADVOCACIA.md) · [Manual](./advocacia/docs/manual_usuario.md)
 
@@ -18,7 +18,7 @@ Documentação: [advocacia/docs/README.md](./advocacia/docs/README.md) (índice)
 
 ```bash
 cd $PATH_TO_YOUR_BENCH
-bench get-app https://github.com/ctomazini/advocacia.git --branch frappe-v16
+bench get-app https://github.com/ctomazini/advocacia.git --branch main
 bench --site seu-site.local install-app advocacia
 bench --site seu-site.local migrate
 bench build --app advocacia
@@ -32,7 +32,7 @@ bench --site seu-site.local set-config allow_tests true
 bench --site seu-site.local run-tests --app advocacia
 ```
 
-Suíte atual: **241 testes** (`bench run-tests --app advocacia`, jun/2026).
+Suíte atual: **283 testes** (`bench run-tests --app advocacia`, jun/2026).
 
 E2E browser (opcional): [advocacia/docs/e2e_playwright.md](./advocacia/docs/e2e_playwright.md)
 
