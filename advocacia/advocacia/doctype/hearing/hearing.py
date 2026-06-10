@@ -33,7 +33,7 @@ def get_events(
 	"""Eventos do calendario para Hearing."""
 	frappe.has_permission("Hearing", "read", throw=True)
 
-	filter_list = [["data_hora", "between", [start, end]]]
+	filter_list = [["hearing_datetime", "between", [start, end]]]
 	if filters:
 		parsed = frappe.parse_json(filters) if isinstance(filters, str) else filters
 		if parsed:
@@ -44,16 +44,16 @@ def get_events(
 		filters=filter_list,
 		fields=[
 			"name",
-			"data_hora",
+			"hearing_datetime",
 			"client",
-			"tipo",
+			"type",
 			"title",
 			"legal_case",
-			"status_aud",
-			"modalidade",
+			"status",
+			"modality",
 		],
-		order_by="data_hora asc",
+		order_by="hearing_datetime asc",
 	)
 	for row in rows:
-		row["title"] = row.get("title") or row.get("tipo") or row.name
+		row["title"] = row.get("title") or row.get("type") or row.name
 	return rows

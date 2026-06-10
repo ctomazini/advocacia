@@ -1,11 +1,11 @@
 frappe.views.calendar["Hearing"] = {
 	field_map: {
-		start: "data_hora",
-		end: "data_hora",
+		start: "hearing_datetime",
+		end: "hearing_datetime",
 		id: "name",
 		title: "title",
 		allDay: 0,
-		status: "status_aud",
+		status: "status",
 	},
 	get_events_method: "advocacia.advocacia.doctype.hearing.hearing.get_events",
 	filters: [
