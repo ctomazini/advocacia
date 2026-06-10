@@ -8,18 +8,18 @@
  "field_order": [
   "informacoes_section",
   "title",
-  "servico",
-  "cliente",
+  "legal_case",
+  "client",
   "column_break_info",
-  "data",
-  "tipo",
+  "communication_date",
+  "type",
   "detalhes_section",
-  "assunto",
-  "resumo",
+  "subject",
+  "summary",
   "proximos_passos_section",
-  "proximos_passos",
-  "gerar_tarefa",
-  "tarefa"
+  "next_steps",
+  "generate_task",
+  "legal_task"
  ],
  "fields": [
   {
@@ -45,7 +45,7 @@
    "label": "Client",
    "reqd": 1,
    "read_only": 1,
-   "fetch_from": "servico.cliente",
+   "fetch_from": "legal_case.client",
    "in_list_view": 1,
    "description": "Client envolvido na comunicação.",
    "idx": 3
@@ -56,7 +56,7 @@
    "idx": 4
   },
   {
-   "fieldname": "data",
+   "fieldname": "communication_date",
    "fieldtype": "Datetime",
    "label": "Data",
    "reqd": 1,
@@ -67,7 +67,7 @@
    "idx": 5
   },
   {
-   "fieldname": "tipo",
+   "fieldname": "type",
    "fieldtype": "Select",
    "label": "Tipo",
    "reqd": 1,
@@ -84,7 +84,7 @@
    "idx": 7
   },
   {
-   "fieldname": "assunto",
+   "fieldname": "subject",
    "fieldtype": "Data",
    "label": "Assunto",
    "reqd": 1,
@@ -93,7 +93,7 @@
    "idx": 8
   },
   {
-   "fieldname": "resumo",
+   "fieldname": "summary",
    "fieldtype": "Text Editor",
    "label": "Resumo",
    "description": "Resumo do que foi tratado.",
@@ -107,14 +107,14 @@
    "idx": 10
   },
   {
-   "fieldname": "proximos_passos",
+   "fieldname": "next_steps",
    "fieldtype": "Small Text",
    "label": "Próximos Passos",
    "description": "Próximos passos combinados (opcional).",
    "idx": 11
   },
   {
-   "fieldname": "gerar_tarefa",
+   "fieldname": "generate_task",
    "fieldtype": "Check",
    "label": "Gerar Legal Task",
    "default": "0",
@@ -127,7 +127,7 @@
    "options": "Legal Task",
    "label": "Legal Task Gerada",
    "read_only": 1,
-   "depends_on": "eval:doc.tarefa",
+   "depends_on": "eval:doc.generate_task",
    "description": "Legal Task gerada a partir desta comunicação.",
    "idx": 13
   },
@@ -190,8 +190,8 @@
  "autoname": "format:COM-{YYYY}-{####}",
  "naming_rule": "Expression",
  "title_field": "title",
- "search_fields": "assunto,cliente,tipo",
- "sort_field": "data",
+ "search_fields": "subject,client,type",
+ "sort_field": "communication_date",
  "sort_order": "DESC",
  "quick_entry": 0,
  "track_changes": 1,

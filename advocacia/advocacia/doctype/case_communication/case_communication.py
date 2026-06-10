@@ -8,7 +8,7 @@ from advocacia.advocacia.titulos import aplicar_titulo_pos_insert, recompor_titu
 
 class CaseCommunication(Document):
 	def validate(self):
-		if not self.tipo:
+		if not self.type:
 			frappe.throw(_("Tipo é obrigatório."))
 		if self.legal_case and not self.client:
 			self.client = frappe.db.get_value("Legal Case", self.legal_case, "client")
@@ -26,18 +26,18 @@ class CaseCommunication(Document):
 
 	def _criar_tarefa_vinculada(self):
 		"""Cria Legal Task de follow-up uma única vez, se solicitado."""
-		if not self.gerar_tarefa or not self.proximos_passos or self.legal_task:
+		if not self.generate_task or not self.next_steps or self.legal_task:
 			return
 
 		tarefa = frappe.get_doc(
 			{
 				"doctype": "Legal Task",
-				"titulo": f"Follow-up: {self.assunto}",
-				"descricao": self.proximos_passos,
+				"subject": f"Follow-up: {self.subject}",
+				"description": self.next_steps,
 				"legal_case": self.legal_case,
 				"client": self.client,
 				"status": "Pendente",
-				"data_limite": add_days(today(), 3),
+				"due_date": add_days(today(), 3),
 			}
 		)
 		frappe.has_permission("Legal Task", "create", throw=True)

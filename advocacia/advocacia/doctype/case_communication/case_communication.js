@@ -9,9 +9,9 @@ var COMUNICACAO_TIPO_COLORS = {
 
 frappe.ui.form.on("Case Communication", {
 	refresh: function (frm) {
-		var color = COMUNICACAO_TIPO_COLORS[frm.doc.tipo] || "grey";
-		if (frm.doc.tipo) {
-			frm.page.set_indicator(frm.doc.tipo, color);
+		var color = COMUNICACAO_TIPO_COLORS[frm.doc.type] || "grey";
+		if (frm.doc.type) {
+			frm.page.set_indicator(frm.doc.type, color);
 		}
 
 		if (frm.doc.legal_case && !frm.is_new()) {
