@@ -1,0 +1,8 @@
+	<div class="adv-rpt-print-footer">
+		{{ frappe.boot.adv_office.company_name }}
+		{% if frappe.boot.adv_office.cnpj %} · CNPJ {{ frappe.boot.adv_office.cnpj }}{% endif %}
+		{% if frappe.boot.adv_office.oab %} · OAB {{ frappe.boot.adv_office.oab }}{% endif %}
+		<br>
+		{{ __("Documento gerado pelo sistema Advocacia") }} — {{ frappe.datetime.str_to_user(frappe.datetime.now_datetime()) }}
+	</div>
+</div>

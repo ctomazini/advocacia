@@ -1,0 +1,32 @@
+<div class="adv-rpt-print{% if print_settings && print_settings.orientation == "Landscape" %} landscape{% endif %}">
+	<div class="adv-rpt-print-header">
+		{% if frappe.boot.adv_office.logo_url %}
+		<div class="adv-rpt-print-logo">
+			<img src="{{ frappe.boot.adv_office.logo_url }}" alt="">
+		</div>
+		{% endif %}
+		<div class="adv-rpt-print-office">
+			<strong>{{ frappe.boot.adv_office.company_name }}</strong>
+			{% if frappe.boot.adv_office.cnpj %}
+			<div class="muted">CNPJ {{ frappe.boot.adv_office.cnpj }}</div>
+			{% endif %}
+			{% if frappe.boot.adv_office.oab %}
+			<div class="muted">OAB {{ frappe.boot.adv_office.oab }}</div>
+			{% endif %}
+			{% if frappe.boot.adv_office.lawyer_name %}
+			<div class="muted">{{ frappe.boot.adv_office.lawyer_name }}</div>
+			{% endif %}
+			{% if frappe.boot.adv_office.address %}
+			<div class="muted">{{ frappe.boot.adv_office.address }}</div>
+			{% endif %}
+		</div>
+		<div class="adv-rpt-print-meta">
+			<div><strong>{{ __("Emissão") }}:</strong> {{ frappe.datetime.str_to_user(frappe.datetime.nowdate()) }}</div>
+		</div>
+	</div>
+	{% if title %}
+	<h2 class="adv-rpt-print-title">{{ __(title) }}</h2>
+	{% endif %}
+	{% if subtitle %}
+	<div class="adv-rpt-print-filters">{{ subtitle }}</div>
+	{% endif %}

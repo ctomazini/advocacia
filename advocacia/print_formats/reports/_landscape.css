@@ -1,0 +1,18 @@
+<style>
+	@media print {
+		@page {
+			size: A4 landscape;
+			margin: 10mm 12mm;
+		}
+	}
+	.adv-rpt-print.landscape table.data {
+		font-size: 8pt;
+	}
+	.adv-rpt-print.landscape table.data th {
+		font-size: 7pt;
+		padding: 4px 5px;
+	}
+	.adv-rpt-print.landscape table.data td {
+		padding: 3px 5px;
+	}
+</style>
