@@ -28,7 +28,7 @@
   ],
   "doctype": "Kanban Board",
   "field_name": "status",
-  "fields": "[\"titulo\", \"legal_case\", \"prioridade\", \"data_limite\"]",
+  "fields": "[\"subject\", \"legal_case\", \"priority\", \"due_date\"]",
   "filters": "[]",
   "kanban_board_name": "Advocacia Tarefas",
   "name": "Advocacia Tarefas",

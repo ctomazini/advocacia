@@ -18,13 +18,13 @@ class LegalTask(Document):
 		recompor_titulo_se_vazio(self)
 
 	def before_save(self):
-		if self.status == "Concluída" and not self.data_conclusao:
-			self.data_conclusao = today()
+		if self.status == "Concluída" and not self.completion_date:
+			self.completion_date = today()
 
 	@frappe.whitelist()
 	def concluir(self) -> dict:
 		frappe.has_permission("Legal Task", "write", doc=self, throw=True)
 		self.status = "Concluída"
-		self.data_conclusao = today()
+		self.completion_date = today()
 		self.save()
 		return {"status": self.status}

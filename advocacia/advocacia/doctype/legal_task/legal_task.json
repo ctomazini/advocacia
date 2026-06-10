@@ -10,22 +10,22 @@
  "autoname": "format:TAR-{YYYY}-{####}",
  "naming_rule": "Expression",
  "title_field": "title",
- "search_fields": "titulo,cliente,status",
+ "search_fields": "subject,client,status",
  "field_order": [
   "informacoes_section",
   "title",
-  "servico",
-  "cliente",
+  "legal_case",
+  "client",
   "col_break_1",
-  "titulo",
+  "subject",
   "status",
-  "prioridade",
-  "data_limite",
+  "priority",
+  "due_date",
   "sec_detalhes",
-  "descricao",
+  "description",
   "col_break_2",
-  "responsavel",
-  "data_conclusao"
+  "responsible",
+  "completion_date"
  ],
  "fields": [
   {
@@ -51,7 +51,7 @@
    "fieldtype": "Link",
    "options": "Client",
    "read_only": 1,
-   "fetch_from": "servico.cliente",
+   "fetch_from": "legal_case.client",
    "in_list_view": 1,
    "in_standard_filter": 1,
    "description": "Preenchido automaticamente a partir do serviço.",
@@ -63,7 +63,7 @@
    "idx": 4
   },
   {
-   "fieldname": "titulo",
+   "fieldname": "subject",
    "label": "Descrição da Legal Task",
    "fieldtype": "Data",
    "reqd": 1,
@@ -87,7 +87,7 @@
    "idx": 6
   },
   {
-   "fieldname": "prioridade",
+   "fieldname": "priority",
    "label": "Prioridade",
    "fieldtype": "Select",
    "options": "Normal\nAlta\nUrgente",
@@ -98,7 +98,7 @@
    "idx": 7
   },
   {
-   "fieldname": "data_limite",
+   "fieldname": "due_date",
    "label": "Data Limite",
    "fieldtype": "Date",
    "in_list_view": 1,
@@ -113,7 +113,7 @@
    "idx": 9
   },
   {
-   "fieldname": "descricao",
+   "fieldname": "description",
    "label": "Descrição",
    "fieldtype": "Text Editor",
    "description": "Detalhamento da tarefa e instruções.",
@@ -125,7 +125,7 @@
    "idx": 11
   },
   {
-   "fieldname": "responsavel",
+   "fieldname": "responsible",
    "label": "Responsável",
    "fieldtype": "Link",
    "options": "User",
@@ -134,7 +134,7 @@
    "idx": 12
   },
   {
-   "fieldname": "data_conclusao",
+   "fieldname": "completion_date",
    "label": "Data de Conclusão",
    "fieldtype": "Date",
    "description": "Preenchida automaticamente ao concluir a tarefa.",
