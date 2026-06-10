@@ -3,10 +3,10 @@
  "module": "Advocacia",
  "doctype": "DocType",
  "custom": 0,
- "autoname": "field:titulo",
+ "autoname": "field:title",
  "naming_rule": "By fieldname",
- "title_field": "titulo",
- "search_fields": "titulo,tipo_documento",
+ "title_field": "title",
+ "search_fields": "title,document_type",
  "is_submittable": 0,
  "istable": 0,
  "issingle": 0,
@@ -14,7 +14,7 @@
  "track_changes": 1,
  "fields": [
   {
-   "fieldname": "titulo",
+   "fieldname": "title",
    "fieldtype": "Data",
    "label": "Titulo",
    "reqd": 1,
@@ -25,7 +25,7 @@
    "idx": 1
   },
   {
-   "fieldname": "tipo_documento",
+   "fieldname": "document_type",
    "fieldtype": "Select",
    "label": "Tipo de Documento",
    "options": "Contrato\nDeclaracao\nRecibo\nCarta\nFicha de Atendimento\nOutro",
@@ -36,7 +36,7 @@
    "idx": 2
   },
   {
-   "fieldname": "descricao",
+   "fieldname": "description",
    "fieldtype": "Small Text",
    "label": "Descricao",
    "description": "Descrição do uso deste modelo.",
@@ -48,7 +48,7 @@
    "idx": 4
   },
   {
-   "fieldname": "habilitado",
+   "fieldname": "enabled",
    "fieldtype": "Check",
    "label": "Habilitado",
    "default": "1",
@@ -57,7 +57,7 @@
    "idx": 5
   },
   {
-   "fieldname": "arquivo",
+   "fieldname": "template_file",
    "fieldtype": "Attach",
    "label": "Arquivo Template (.docx)",
    "reqd": 1,
@@ -71,7 +71,7 @@
    "idx": 7
   },
   {
-   "fieldname": "ver_placeholders",
+   "fieldname": "show_placeholders",
    "fieldtype": "Button",
    "label": "Ver Placeholders Disponíveis",
    "description": "Clique para ver todos os placeholders que podem ser usados nos templates .docx",
@@ -113,7 +113,7 @@
    "idx": 3
   }
  ],
- "sort_field": "titulo",
+ "sort_field": "title",
  "sort_order": "ASC",
  "show_title_field_in_link": 1
 }

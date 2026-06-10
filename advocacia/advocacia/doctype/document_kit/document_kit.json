@@ -1,22 +1,22 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "field:titulo",
+ "autoname": "field:title",
  "creation": "2026-05-31 12:00:00",
  "custom": 0,
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "titulo",
-  "descricao",
+  "title",
+  "description",
   "column_break_1",
-  "habilitado",
+  "enabled",
   "templates_section",
   "templates"
  ],
  "fields": [
   {
-   "fieldname": "titulo",
+   "fieldname": "title",
    "fieldtype": "Data",
    "in_list_view": 1,
    "in_standard_filter": 1,
@@ -27,7 +27,7 @@
    "idx": 1
   },
   {
-   "fieldname": "descricao",
+   "fieldname": "description",
    "fieldtype": "Small Text",
    "label": "Descrição",
    "description": "Descrição do conjunto de modelos incluídos.",
@@ -40,7 +40,7 @@
   },
   {
    "default": "1",
-   "fieldname": "habilitado",
+   "fieldname": "enabled",
    "fieldtype": "Check",
    "in_list_view": 1,
    "label": "Habilitado",
@@ -105,11 +105,11 @@
    "idx": 3
   }
  ],
- "search_fields": "titulo",
- "sort_field": "titulo",
+ "search_fields": "title",
+ "sort_field": "title",
  "sort_order": "ASC",
  "states": [],
- "title_field": "titulo",
+ "title_field": "title",
  "track_changes": 1,
  "show_title_field_in_link": 1
 }
