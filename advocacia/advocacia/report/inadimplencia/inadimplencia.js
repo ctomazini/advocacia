@@ -36,3 +36,5 @@ frappe.query_reports["inadimplencia"] = {
 		return value;
 	},
 };
+
+advocacia.reports.enhanceReportSettings("inadimplencia");

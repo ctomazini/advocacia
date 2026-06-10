@@ -63,3 +63,5 @@ frappe.query_reports["produtividade"] = {
 		return value;
 	},
 };
+
+advocacia.reports.enhanceReportSettings("produtividade");

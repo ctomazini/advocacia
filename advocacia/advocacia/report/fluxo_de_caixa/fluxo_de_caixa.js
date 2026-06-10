@@ -43,3 +43,5 @@ frappe.query_reports["fluxo_de_caixa"] = {
 		return value;
 	},
 };
+
+advocacia.reports.enhanceReportSettings("fluxo_de_caixa");

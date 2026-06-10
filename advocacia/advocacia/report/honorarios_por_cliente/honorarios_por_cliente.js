@@ -44,3 +44,5 @@ frappe.query_reports["honorarios_por_cliente"] = {
 		return value;
 	},
 };
+
+advocacia.reports.enhanceReportSettings("honorarios_por_cliente");

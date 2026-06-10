@@ -40,3 +40,5 @@ frappe.query_reports["carteira_ativa"] = {
 		return value;
 	},
 };
+
+advocacia.reports.enhanceReportSettings("carteira_ativa");

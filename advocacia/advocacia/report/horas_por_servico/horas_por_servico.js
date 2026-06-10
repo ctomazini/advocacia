@@ -76,3 +76,5 @@ frappe.query_reports["horas_por_servico"] = {
 		return value;
 	},
 };
+
+advocacia.reports.enhanceReportSettings("horas_por_servico");
