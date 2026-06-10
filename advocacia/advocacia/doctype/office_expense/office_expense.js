@@ -9,7 +9,7 @@ frappe.ui.form.on("Office Expense", {
 			frm.page.set_indicator(__("Pago"), "green");
 		}
 
-		if (frm.doc.recorrente && !frm.is_new() && frm.doc.proximo_vencimento) {
+		if (frm.doc.is_recurring && !frm.is_new() && frm.doc.next_due_date) {
 			frm.add_custom_button(__("Gerar Próxima"), function () {
 				frappe.call({
 					method:
@@ -25,8 +25,8 @@ frappe.ui.form.on("Office Expense", {
 		}
 	},
 
-	data_pagamento: function (frm) {
-		if (frm.doc.data_pagamento) {
+	payment_date: function (frm) {
+		if (frm.doc.payment_date) {
 			frm.set_value("status", "Pago");
 		}
 	},

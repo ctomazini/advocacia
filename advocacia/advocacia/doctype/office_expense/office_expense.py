@@ -10,7 +10,7 @@ class OfficeExpense(Document):
 	def validate(self):
 		self._compor_titulo()
 		self.atualizar_status()
-		if self.recorrente and self.data_vencimento:
+		if self.is_recurring and self.due_date:
 			self.calcular_proximo_vencimento()
 
 	def after_insert(self):
@@ -22,9 +22,9 @@ class OfficeExpense(Document):
 	def atualizar_status(self):
 		if self.status == "Cancelado":
 			return
-		if self.data_pagamento:
+		if self.payment_date:
 			self.status = "Pago"
-		elif self.data_vencimento and getdate(self.data_vencimento) < getdate(today()):
+		elif self.due_date and getdate(self.due_date) < getdate(today()):
 			self.status = "Atrasado"
 
 	def calcular_proximo_vencimento(self):
@@ -35,9 +35,9 @@ class OfficeExpense(Document):
 			"Semestral": 6,
 			"Anual": 12,
 		}
-		if self.frequencia and self.frequencia in meses:
-			self.proximo_vencimento = add_months(
-				getdate(self.data_vencimento), meses[self.frequencia]
+		if self.frequency and self.frequency in meses:
+			self.next_due_date = add_months(
+				getdate(self.due_date), meses[self.frequency]
 			)
 
 
@@ -46,16 +46,16 @@ def gerar_proxima_despesa(source_name: str) -> str:
 	"""Cria nova despesa baseada na recorrente, com data de vencimento avançada."""
 	frappe.has_permission("Office Expense", "create", throw=True)
 	source = frappe.get_doc("Office Expense", source_name)
-	if not source.recorrente or not source.proximo_vencimento:
+	if not source.is_recurring or not source.next_due_date:
 		frappe.throw(
 			_("Esta despesa não é recorrente ou não tem próximo vencimento calculado.")
 		)
 
 	nova = frappe.copy_doc(source)
-	nova.data_vencimento = source.proximo_vencimento
-	nova.data_pagamento = None
+	nova.due_date = source.next_due_date
+	nova.payment_date = None
 	nova.status = "Pendente"
-	nova.comprovante = None
-	nova.proximo_vencimento = None
+	nova.receipt = None
+	nova.next_due_date = None
 	nova.insert()
 	return nova.name
