@@ -56,6 +56,7 @@ fixtures = [
 app_include_css = [
     "/assets/advocacia/css/list_filters.css",
     "/assets/advocacia/css/case_hub.css",
+    "/assets/advocacia/css/reports.css",
 ]
 
 app_include_js = [
@@ -66,6 +67,7 @@ app_include_js = [
     "/assets/advocacia/js/cliente_from_servico.js",
     "/assets/advocacia/js/timer_global.js",
     "/assets/advocacia/js/case_hub.js",
+    "/assets/advocacia/js/reports_common.js",
 ]
 
 importable_doctypes = [
@@ -75,6 +77,8 @@ importable_doctypes = [
     "Case Phase",
     "Court",
 ]
+
+boot_session = "advocacia.boot.boot_session"
 
 standard_queries = {
     "Legal Case": "advocacia.advocacia.doctype.legal_case.legal_case.legal_case_query",
