@@ -1,6 +1,6 @@
 # Seção 3 — Verificação de Usabilidade
 
-**App:** `advocacia` · **Data:** 2026-06-07 · **Versão:** 0.7.0
+**App:** `advocacia` · **Data:** 2026-06-10 · **Versão:** 1.0.0
 
 ---
 
@@ -175,6 +175,14 @@ O script acrescenta sufixo *"Visível apenas para Advocacia Manager."* em campos
 
 ---
 
+## 3.6 Layout de formulários
+
+Satélites transacionais usam **Column Break** para campos curtos (Link, Select, Date, Currency). Text Editor e tabelas permanecem full-width.
+
+Detalhes por DocType: [audit_form_layout.md](./audit_form_layout.md).
+
+---
+
 ## 3.9 Checklist UX pré-release
 
 - [ ] `bench build --app advocacia` após JS
@@ -187,4 +195,4 @@ O script acrescenta sufixo *"Visível apenas para Advocacia Manager."* em campos
 
 ---
 
-*Usabilidade v0.7.0: descriptions 94%, filtros responsivos, connections filtradas, painel modular.*
+*Usabilidade v1.0.0: descriptions 94%, filtros responsivos, connections filtradas, painel modular, forms 2 colunas.*

@@ -2,7 +2,7 @@
 
 > Gerado em **2026-06-10** — inventário pós-P1 reports + P2 painel. Branch **`main`**. Frappe puro, **sem ERPNext**.
 
-> **HEAD:** `f2a8b1f 2026-06-10 13:58:12 +0000 docs(painel): sync audit_dashboard with modular P2 structure`
+> **HEAD:** `cc3a398 2026-06-10 14:03:59 +0000 docs: sync codebase, audits and README for P1 reports and P2 painel`
 
 ---
 
@@ -35,13 +35,14 @@
 | **Office Settings** | Logo, dados bancários, `default_notify_days`; seed idempotente |
 | **Documentos** | Referência completa de placeholders; logo inline docx; botão no Legal Case |
 | **IA** | `agent_api.py` (4 endpoints read-only) + `test_agent_api.py` |
-| **Painel P2** | `public/js/painel/` (14 módulos); `main.js` orquestrador; backend `painel/` (9 módulos) |
+| **Form layout** | Column Breaks em 10 DocTypes satélites + 3 auxiliares (exc. Legal Case hub) |
 | **Relatórios P1** | `boot.py`, `reports.css`, `reports_common.js`, print formats Report (9) |
 | **Sidebar** | Labels PT sincronizados com workspace e traduções |
 | **Legal Payment** | Fix coluna Origem na list view |
 
 **Commits recentes:**
 ```text
+cc3a398 docs: sync codebase, audits and README for P1 reports and P2 painel
 f2a8b1f docs(painel): sync audit_dashboard with modular P2 structure
 dda3bea refactor(painel): extract main.js orchestrator and remove dead audiencias module
 b275497 test(reports): add boot_session and print format tests
@@ -53,7 +54,6 @@ c18402d feat(reports): add boot_session for office branding in prints
 d27c9f7 test(Hub): add case_hub tests
 07c17a9 feat(Hub): register case_hub.js and case_hub.css in app includes
 a759a78 feat(Hub): restructure Legal Case with 6 tabs and 12 HTML panels
-ce034e9 feat(Hub): add case_hub.js frontend with pills bar and panel renderers
 ```
 
 ## 2. Árvore de Arquivos (anotada)
@@ -364,8 +364,8 @@ Colunas: `fieldname` | label | fieldtype | options | reqd | unique. Section/Colu
 | duration_hours | Duração (horas) | Float |  |  |  |
 | activity | Atividade | Data |  | ✓ |  |
 | category | Categoria | Select | Estudo/Pesquisa Redação Audiência Reunião Deslocamento At... |  |  |
-| description | Detalhes | Small Text |  |  |  |
 | billable | Cobrável | Check |  |  |  |
+| description | Detalhes | Small Text |  |  |  |
 | timer_display | Tempo Decorrido | HTML |  |  |  |
 | timer_start | Início do Timer | Datetime |  |  |  |
 | timer_active | Timer Ativo | Check |  |  |  |

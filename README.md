@@ -4,7 +4,7 @@ Aplicativo Frappe v16 para gestão jurídica de escritórios de advocacia no Bra
 
 **Versão:** 1.0.0 · **Branch:** `main`
 
-Documentação: [advocacia/docs/README.md](./advocacia/docs/README.md) (índice) · [CODEBASE.md](./CODEBASE.md) · [REGRAS_ADVOCACIA.md](./REGRAS_ADVOCACIA.md) · [Manual](./advocacia/docs/manual_usuario.md)
+Documentação: [advocacia/docs/README.md](./advocacia/docs/README.md) (índice) · [CODEBASE.md](./CODEBASE.md) · [REGRAS_ADVOCACIA.md](./REGRAS_ADVOCACIA.md) · [Layout forms](./advocacia/docs/audit_form_layout.md) · [Manual](./advocacia/docs/manual_usuario.md)
 
 ## Requisitos
 

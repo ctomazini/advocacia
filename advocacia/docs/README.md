@@ -22,11 +22,12 @@ Relatórios de conformidade. Consultar junto com [audit-deploy-ready.md](./audit
 | Arquivo | Foco | Status jun/2026 |
 | --- | --- | --- |
 | [audit_code.md](./audit_code.md) | Python, whitelists, testes | ✅ 283 testes (jun/2026) |
-| [audit_dashboard.md](./audit_dashboard.md) | Painel backend/frontend modular | ✅ P2: `main.js` + 14 módulos JS |
+| [audit_dashboard.md](./audit_dashboard.md) | Painel backend/frontend modular | ✅ P2 jun/2026 |
 | [audit_data_integrity.md](./audit_data_integrity.md) | CPF/CNPJ/CNJ, sync financeiro | ✅ |
 | [audit_google_calendar.md](./audit_google_calendar.md) | Audiência/Prazo → Event → Google | ✅ |
 | [audit_links.md](./audit_links.md) | Hub Legal Case, Connections | ✅ |
-| [audit_usability.md](./audit_usability.md) | Máscaras, filtros, sidebar | ✅ labels PT jun/2026 |
+| [audit_usability.md](./audit_usability.md) | Máscaras, filtros, sidebar, layout forms | ✅ jun/2026 |
+| [audit_form_layout.md](./audit_form_layout.md) | Column Breaks e densidade de formulários | ✅ jun/2026 |
 | [audit_ai_readiness.md](./audit_ai_readiness.md) | `agent_api.py` + roadmap MCP | ✅ Fase 1 implementada |
 | [audit-deploy-ready.md](./audit-deploy-ready.md) | Checklist pré-deploy consolidado | Snapshot histórico — ver audits acima |
 
@@ -65,7 +66,8 @@ Relatórios de conformidade. Consultar junto com [audit-deploy-ready.md](./audit
 | Área | Mudança |
 | --- | --- |
 | **Relatórios P1** | `boot.py` (`adv_office`), `reports.css`, `reports_common.js`, print formats (9 Report + 3 DocType) |
-| **Painel P2** | Backend `painel/` (9 módulos); frontend `public/js/painel/` (14 módulos); `main.js` orquestrador |
+| **Painel P2** | Backend/frontend modular; `main.js` orquestrador |
+| **Form layout** | Column Breaks em 10 DocTypes satélites + auxiliares |
 | **Office Settings** | Logo, dados bancários, `default_notify_days` |
 | **Documentos** | Placeholders; logo inline docx |
 | **IA** | `agent_api.py` — 4 endpoints read-only |

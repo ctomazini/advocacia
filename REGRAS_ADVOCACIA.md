@@ -64,6 +64,15 @@
 | Commit | Nunca no `get()` |
 | Soft refresh | Período e `list_limits` recarregam payload sem reload da page |
 
+### Layout de formulários (satélites)
+
+| Item | Regra |
+| --- | --- |
+| Escopo | Todos os DocTypes **exceto** `Legal Case` (hub com abas) |
+| Campos curtos | Usar **Column Break** na mesma seção (padrão `Deadline` / `Hearing`) |
+| Text Editor / Table | Largura total — sem coluna ao lado |
+| Referência | `advocacia/docs/audit_form_layout.md` |
+
 ---
 
 ## 4.1 Listas e filtros
@@ -177,7 +186,7 @@ npm test
 
 ---
 
-## 9. Documentação de auditoria (v0.7.0)
+## 9. Documentação de auditoria (v1.0.0)
 
 | Arquivo | Conteúdo |
 | --- | --- |
@@ -185,6 +194,7 @@ npm test
 | `advocacia/docs/e2e_playwright.md` | E2E UI Playwright |
 | `advocacia/docs/audit_code.md` | Código, 283 testes, whitelists |
 | `advocacia/docs/audit_dashboard.md` | Painel modular backend/frontend |
+| `advocacia/docs/audit_form_layout.md` | Layout 2 colunas nos formulários |
 | `advocacia/docs/audit_data_integrity.md` | CPF/CNPJ/CNJ/telefone, sync |
 | `advocacia/docs/audit_google_calendar.md` | Event + Google |
 | `advocacia/docs/audit_links.md` | Hub Legal Case e satélites |

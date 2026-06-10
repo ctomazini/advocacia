@@ -140,7 +140,7 @@ def main():
 		("Office Settings", "Logo, dados bancários, `default_notify_days`; seed idempotente"),
 		("Documentos", "Referência completa de placeholders; logo inline docx; botão no Legal Case"),
 		("IA", "`agent_api.py` (4 endpoints read-only) + `test_agent_api.py`"),
-		("Painel P2", "`public/js/painel/` (14 módulos); `main.js` orquestrador; backend `painel/` (9 módulos)"),
+		("Form layout", "Column Breaks em 10 DocTypes satélites + 3 auxiliares (exc. Legal Case hub)"),
 		("Relatórios P1", "`boot.py`, `reports.css`, `reports_common.js`, print formats Report (9)"),
 		("Sidebar", "Labels PT sincronizados com workspace e traduções"),
 		("Legal Payment", "Fix coluna Origem na list view"),
