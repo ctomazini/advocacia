@@ -154,7 +154,7 @@ const AdvocaciaMasks = {
 		});
 	},
 
-	setupLegal CaseProcessoMask(frm) {
+	setupLegalCaseProcessoMask(frm) {
 		const field = frm.fields_dict && frm.fields_dict.case_number;
 		if (!field || !field.$input) return;
 

@@ -1,52 +1,61 @@
 frappe.ui.form.on("Legal Case", {
-	refresh: function (frm) {
+	refresh(frm) {
 		aplicar_mascara_processo_servico(frm);
 
-		if (frm.is_new()) return;
+		if (frm.is_new()) {
+			return;
+		}
 
-		frm.add_custom_button("+ Honorários", function () {
+		if (frm.dashboard?.wrapper) {
+			$(frm.dashboard.wrapper).hide();
+		}
+		frm.$wrapper?.find(".form-dashboard-section, .form-dashboard, .form-links").hide();
+
+		frm.add_custom_button("+ Honorários", () => {
 			frappe.new_doc("Fee Agreement", {
-				servico: frm.doc.name,
-				cliente: frm.doc.client,
+				legal_case: frm.doc.name,
+				client: frm.doc.client,
 			});
-		}, "Criar");
+		}, __("Criar"));
 
-		frm.add_custom_button("+ Prazo", function () {
+		frm.add_custom_button("+ Prazo", () => {
 			frappe.new_doc("Deadline", {
-				servico: frm.doc.name,
+				legal_case: frm.doc.name,
+				client: frm.doc.client,
 			});
-		}, "Criar");
+		}, __("Criar"));
 
-		frm.add_custom_button("+ Audiência", function () {
+		frm.add_custom_button("+ Audiência", () => {
 			frappe.new_doc("Hearing", {
-				servico: frm.doc.name,
+				legal_case: frm.doc.name,
+				client: frm.doc.client,
 			});
-		}, "Criar");
+		}, __("Criar"));
 
-		frm.add_custom_button(__("Gerar Documentos"), function () {
+		frm.add_custom_button(__("Gerar Documentos"), () => {
 			abrir_dialog_gerar_documentos(frm);
 		}, __("Documentos"));
+
+		if (window.advocacia?.hub?.load) {
+			advocacia.hub.load(frm);
+		}
 	},
-	type: function (frm) {
+	type(frm) {
 		aplicar_mascara_processo_servico(frm);
 	},
-	legacy_numbering: function (frm) {
+	legacy_numbering(frm) {
 		aplicar_mascara_processo_servico(frm);
 	},
-	case_number: function (frm) {
+	case_number(frm) {
 		if (window.AdvocaciaMasks) {
-			AdvocaciaMasks.formatFormField(
-				frm,
-				"case_number",
-				AdvocaciaMasks.applyCNJ
-			);
+			AdvocaciaMasks.formatFormField(frm, "case_number", AdvocaciaMasks.applyCNJ);
 		}
 	},
 });
 
 function aplicar_mascara_processo_servico(frm) {
 	if (window.AdvocaciaMasks) {
-		AdvocaciaMasks.setupLegal CaseProcessoMask(frm);
+		AdvocaciaMasks.setupLegalCaseProcessoMask(frm);
 	}
 }
 
@@ -202,9 +211,7 @@ function montar_dialog_gerar_documentos(frm, templates, kits) {
 function atualizar_label_botao_bulk(dialog) {
 	const total = dialog.$wrapper.find(".adv-doc-template:checked").length;
 	dialog.set_primary_action(
-		total
-			? __("Gerar {0} documento(s)", [total])
-			: __("Gerar documentos")
+		total ? __("Gerar {0} documento(s)", [total]) : __("Gerar documentos")
 	);
 }
 
@@ -263,11 +270,11 @@ function gerar_documentos_em_lote(frm, template_names) {
 	});
 }
 
-function servico_quick_entry_pseudo_form(dialog) {
+function legal_case_quick_entry_pseudo_form(dialog) {
 	return {
 		fields_dict: dialog.fields_dict,
 		doc: dialog.doc,
-		set_value: function (fieldname, value) {
+		set_value(fieldname, value) {
 			dialog.doc[fieldname] = value;
 			if (dialog.fields_dict[fieldname]) {
 				dialog.fields_dict[fieldname].set_value(value);
@@ -276,27 +283,33 @@ function servico_quick_entry_pseudo_form(dialog) {
 	};
 }
 
-function setup_servico_quick_entry_masks(dialog) {
-	if (!window.AdvocaciaMasks) return;
-	const pseudo = servico_quick_entry_pseudo_form(dialog);
-	AdvocaciaMasks.setupLegal CaseProcessoMask(pseudo);
+function setup_legal_case_quick_entry_masks(dialog) {
+	if (!window.AdvocaciaMasks) {
+		return;
+	}
+	const pseudo = legal_case_quick_entry_pseudo_form(dialog);
+	AdvocaciaMasks.setupLegalCaseProcessoMask(pseudo);
 
-	["type", "legacy_numbering", "case_number"].forEach(function (fieldname) {
+	["type", "legacy_numbering", "case_number"].forEach((fieldname) => {
 		const field = dialog.fields_dict[fieldname];
-		if (!field || !field.$input) return;
-		field.$input.off("change.legal_case_qe").on("change.legal_case_qe", function () {
-			setTimeout(function () {
-				AdvocaciaMasks.setupLegal CaseProcessoMask(servico_quick_entry_pseudo_form(dialog));
+		if (!field || !field.$input) {
+			return;
+		}
+		field.$input.off("change.legal_case_qe").on("change.legal_case_qe", () => {
+			setTimeout(() => {
+				AdvocaciaMasks.setupLegalCaseProcessoMask(
+					legal_case_quick_entry_pseudo_form(dialog)
+				);
 			}, 50);
 		});
 	});
 }
 
-frappe.ui.form.Legal CaseQuickEntryForm = class Legal CaseQuickEntryForm extends (
+frappe.ui.form.LegalCaseQuickEntryForm = class LegalCaseQuickEntryForm extends (
 	frappe.ui.form.QuickEntryForm
 ) {
 	render_dialog() {
 		super.render_dialog();
-		setup_servico_quick_entry_masks(this);
+		setup_legal_case_quick_entry_masks(this);
 	}
 };
