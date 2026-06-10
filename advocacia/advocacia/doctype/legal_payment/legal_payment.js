@@ -7,7 +7,7 @@ frappe.ui.form.on("Legal Payment", {
 		if (frm.doc.status === "Cancelado") {
 			frm.set_read_only();
 			const intro =
-				frm.doc.tipo_origem === "Atos Advocatícios"
+				frm.doc.origin_type === "Atos Advocatícios"
 					? __(
 							"Legal Payment cancelado — registro imutável. Os atos foram liberados; você pode excluir este pagamento se desejar."
 					  )
@@ -18,7 +18,7 @@ frappe.ui.form.on("Legal Payment", {
 			return;
 		}
 
-		if (frm.doc.tipo_origem === "Atos Advocatícios") {
+		if (frm.doc.origin_type === "Atos Advocatícios") {
 			configurar_botoes_atos(frm);
 		} else {
 			configurar_botoes_honorarios(frm);

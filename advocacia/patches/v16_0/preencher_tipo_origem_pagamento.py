@@ -8,8 +8,8 @@ def execute():
 	frappe.db.sql(
 		"""
 		UPDATE `tabLegal Payment`
-		SET tipo_origem = %s
-		WHERE IFNULL(tipo_origem, '') = ''
+		SET origin_type = %s
+		WHERE IFNULL(origin_type, '') = ''
 		""",
 		TIPO_HONORARIOS,
 	)

@@ -1,6 +1,6 @@
 frappe.listview_settings["Legal Payment"] = {
 	hide_name_column: true,
-	add_fields: ["status", "data_vencimento", "client", "legal_case", "valor", "tipo_origem", "fee_agreement", "service_record"],
+	add_fields: ["status", "due_date", "client", "legal_case", "amount", "origin_type", "fee_agreement", "service_record"],
 	formatters: {
 		tipo_origem(value, _df, doc) {
 			const origem = (value || "").trim();
@@ -33,9 +33,9 @@ frappe.listview_settings["Legal Payment"] = {
 		if (doc.status === "Recebido" || doc.status === "Repassado") {
 			return [__(doc.status), "green", "status,=," + doc.status];
 		}
-		if (doc.status === "Pendente" && doc.data_vencimento) {
+		if (doc.status === "Pendente" && doc.due_date) {
 			const hoje = frappe.datetime.get_today();
-			const diff = frappe.datetime.get_day_diff(doc.data_vencimento, hoje);
+			const diff = frappe.datetime.get_day_diff(doc.due_date, hoje);
 			if (diff >= 0 && diff <= 7) {
 				return [__("Próximo vencimento"), "orange", "status,=,Pendente"];
 			}
@@ -58,7 +58,7 @@ frappe.listview_settings["Legal Payment"] = {
 			listview.filter_area.clear();
 			listview.filter_area.add([
 				[listview.doctype, "status", "=", "Pendente"],
-				[listview.doctype, "data_vencimento", "between", [hoje, sete]],
+				[listview.doctype, "due_date", "between", [hoje, sete]],
 			]);
 		});
 
@@ -66,7 +66,7 @@ frappe.listview_settings["Legal Payment"] = {
 			listview.filter_area.clear();
 			listview.filter_area.add([
 				[listview.doctype, "status", "in", ["Recebido", "Repassado"]],
-				[listview.doctype, "data_recebimento", "=", hoje],
+				[listview.doctype, "received_date", "=", hoje],
 			]);
 		});
 

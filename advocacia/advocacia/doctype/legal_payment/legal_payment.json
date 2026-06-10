@@ -10,28 +10,28 @@
  "field_order": [
   "sec_relacionamentos",
   "title",
-  "servico",
-  "cliente",
+  "legal_case",
+  "client",
   "col_rel_1",
-  "tipo_origem",
-  "acordo",
-  "registro_atos",
-  "numero_parcela",
-  "descricao",
+  "origin_type",
+  "fee_agreement",
+  "service_record",
+  "installment_number",
+  "description",
   "sec_origem",
-  "parcela_origem_id",
-  "sincronizado_em",
+  "installment_origin_id",
+  "synced_at",
   "manual_override",
   "sec_financeiro",
-  "valor",
-  "valor_recebido",
+  "amount",
+  "received_amount",
   "col_fin_1",
-  "data_vencimento",
-  "data_recebimento",
+  "due_date",
+  "received_date",
   "status",
   "sec_controle",
-  "observacoes",
-  "comprovante"
+  "remarks",
+  "receipt"
  ],
  "fields": [
   {
@@ -42,7 +42,7 @@
   },
   {
    "default": "Honorários (Parcela)",
-   "fieldname": "tipo_origem",
+   "fieldname": "origin_type",
    "fieldtype": "Select",
    "in_list_view": 1,
    "in_standard_filter": 1,
@@ -57,18 +57,18 @@
    "in_list_view": 0,
    "in_standard_filter": 1,
    "label": "Acordo",
-   "mandatory_depends_on": "eval:doc.tipo_origem=='Honorários (Parcela)'",
+   "mandatory_depends_on": "eval:doc.origin_type=='Honorários (Parcela)'",
    "options": "Fee Agreement",
    "search_index": 1,
    "description": "Acordo de honorários que originou este pagamento (parcelas).",
    "idx": 3
   },
   {
-   "depends_on": "eval:doc.tipo_origem=='Atos Advocatícios'",
+   "depends_on": "eval:doc.origin_type=='Atos Advocatícios'",
    "fieldname": "service_record",
    "fieldtype": "Link",
    "label": "Service Record",
-   "mandatory_depends_on": "eval:doc.tipo_origem=='Atos Advocatícios'",
+   "mandatory_depends_on": "eval:doc.origin_type=='Atos Advocatícios'",
    "options": "Service Record",
    "read_only": 1,
    "description": "Registro de atos vinculado (cobrança de atos).",
@@ -94,7 +94,7 @@
    "label": "Client",
    "options": "Client",
    "read_only": 1,
-   "fetch_from": "servico.cliente",
+   "fetch_from": "legal_case.client",
    "reqd": 1,
    "search_index": 1,
    "description": "Preenchido automaticamente a partir do serviço ou acordo.",
@@ -106,7 +106,7 @@
    "idx": 7
   },
   {
-   "fieldname": "numero_parcela",
+   "fieldname": "installment_number",
    "fieldtype": "Int",
    "in_list_view": 0,
    "label": "Nº Parcela",
@@ -115,7 +115,7 @@
   },
   {
    "bold": 1,
-   "fieldname": "descricao",
+   "fieldname": "description",
    "fieldtype": "Small Text",
    "in_list_view": 0,
    "label": "Descrição",
@@ -129,7 +129,7 @@
    "idx": 10
   },
   {
-   "fieldname": "parcela_origem_id",
+   "fieldname": "installment_origin_id",
    "fieldtype": "Data",
    "label": "ID Origem",
    "read_only": 1,
@@ -138,7 +138,7 @@
    "idx": 11
   },
   {
-   "fieldname": "sincronizado_em",
+   "fieldname": "synced_at",
    "fieldtype": "Datetime",
    "label": "Sincronizado em",
    "read_only": 1,
@@ -148,7 +148,7 @@
   {
    "default": "0",
    "fieldname": "manual_override",
-   "depends_on": "eval:doc.tipo_origem=='Honorários (Parcela)'",
+   "depends_on": "eval:doc.origin_type=='Honorários (Parcela)'",
    "fieldtype": "Check",
    "label": "Edição manual (não sincronizar)",
    "description": "Quando marcado, o sistema não sobrescreve este pagamento na sincronização.",
@@ -161,7 +161,7 @@
    "idx": 14
   },
   {
-   "fieldname": "valor",
+   "fieldname": "amount",
    "fieldtype": "Currency",
    "in_list_view": 1,
    "label": "Valor",
@@ -170,7 +170,7 @@
    "idx": 15
   },
   {
-   "fieldname": "valor_recebido",
+   "fieldname": "received_amount",
    "fieldtype": "Currency",
    "label": "Valor Recebido",
    "description": "Valor efetivamente recebido.",
@@ -182,7 +182,7 @@
    "idx": 17
   },
   {
-   "fieldname": "data_vencimento",
+   "fieldname": "due_date",
    "fieldtype": "Date",
    "in_list_view": 1,
    "in_standard_filter": 1,
@@ -193,7 +193,7 @@
    "idx": 18
   },
   {
-   "fieldname": "data_recebimento",
+   "fieldname": "received_date",
    "fieldtype": "Date",
    "label": "Data de Recebimento",
    "description": "Data em que o pagamento foi recebido.",
@@ -220,14 +220,14 @@
    "idx": 21
   },
   {
-   "fieldname": "observacoes",
+   "fieldname": "remarks",
    "fieldtype": "Small Text",
    "label": "Observações",
    "description": "Observações internas sobre o pagamento.",
    "idx": 22
   },
   {
-   "fieldname": "comprovante",
+   "fieldname": "receipt",
    "fieldtype": "Attach",
    "label": "Comprovante",
    "description": "Comprovante de recebimento anexado.",
@@ -251,7 +251,7 @@
  "modified_by": "Administrator",
  "module": "Advocacia",
  "name": "Legal Payment",
- "search_fields": "descricao,cliente,status,data_vencimento",
+ "search_fields": "description,client,status,due_date",
  "naming_series_options": "PAY-.YYYY.-",
  "owner": "Administrator",
  "permissions": [
@@ -289,7 +289,7 @@
    "idx": 3
   }
  ],
- "sort_field": "data_vencimento",
+ "sort_field": "due_date",
  "sort_order": "ASC",
  "states": [],
  "title_field": "title",

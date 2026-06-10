@@ -9,24 +9,24 @@ from advocacia.advocacia.titulos import aplicar_titulo_pos_insert, recompor_titu
 
 class LegalPayment(Document):
 	def validate(self):
-		if not self.tipo_origem:
-			self.tipo_origem = TIPO_HONORARIOS
+		if not self.origin_type:
+			self.origin_type = TIPO_HONORARIOS
 
 		if self.legal_case and not self.client:
 			self.client = frappe.db.get_value("Legal Case", self.legal_case, "client")
 
-		if self.tipo_origem == TIPO_HONORARIOS and not self.fee_agreement:
+		if self.origin_type == TIPO_HONORARIOS and not self.fee_agreement:
 			frappe.throw(
 				_("Acordo é obrigatório para pagamentos de honorários."),
 				title=_("Campo obrigatório"),
 			)
-		if self.tipo_origem == TIPO_ATOS and not self.service_record:
+		if self.origin_type == TIPO_ATOS and not self.service_record:
 			frappe.throw(
 				_("Service Record é obrigatório para pagamentos de atos."),
 				title=_("Campo obrigatório"),
 			)
 
-		if flt(self.valor) < 0:
+		if flt(self.amount) < 0:
 			frappe.throw(_("Valor não pode ser negativo."))
 
 		if not self.is_new() and self.name:
@@ -37,15 +37,15 @@ class LegalPayment(Document):
 					title=_("Registro imutável"),
 				)
 
-		if self.parcela_origem_id and not self.is_new():
+		if self.installment_origin_id and not self.is_new():
 			existing = frappe.db.get_value(
 				"Legal Payment",
-				{"parcela_origem_id": self.parcela_origem_id, "name": ["!=", self.name]},
+				{"installment_origin_id": self.installment_origin_id, "name": ["!=", self.name]},
 				"name",
 			)
 			if existing:
 				frappe.throw(
-					_("Já existe pagamento para a origem {0}.").format(self.parcela_origem_id)
+					_("Já existe pagamento para a origem {0}.").format(self.installment_origin_id)
 				)
 
 		self._compor_titulo()
