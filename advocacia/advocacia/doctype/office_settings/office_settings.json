@@ -7,16 +7,16 @@
  "engine": "InnoDB",
  "field_order": [
   "sec_identificacao",
-  "razao_social",
+  "company_name",
   "cnpj",
-  "registro_sia",
+  "sia_registration",
   "office_logo",
   "column_break_1",
-  "advogada",
+  "lawyer_name",
   "oab",
   "default_notify_days",
   "sec_endereco",
-  "endereco",
+  "address",
   "sec_bank",
   "bank_name",
   "bank_agency",
@@ -32,7 +32,7 @@
    "idx": 1
   },
   {
-   "fieldname": "razao_social",
+   "fieldname": "company_name",
    "fieldtype": "Data",
    "label": "Razão Social",
    "reqd": 1,
@@ -47,7 +47,7 @@
    "idx": 3
   },
   {
-   "fieldname": "registro_sia",
+   "fieldname": "sia_registration",
    "fieldtype": "Data",
    "label": "Registro SIA",
    "description": "Registro no SIA/OAB do escritório.",
@@ -66,7 +66,7 @@
    "idx": 6
   },
   {
-   "fieldname": "advogada",
+   "fieldname": "lawyer_name",
    "fieldtype": "Data",
    "label": "Advogada(o) Principal",
    "reqd": 1,
@@ -96,7 +96,7 @@
    "idx": 10
   },
   {
-   "fieldname": "endereco",
+   "fieldname": "address",
    "fieldtype": "Small Text",
    "label": "Endereço Completo",
    "reqd": 1,
