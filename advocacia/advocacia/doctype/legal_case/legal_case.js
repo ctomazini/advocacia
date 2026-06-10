@@ -27,17 +27,17 @@ frappe.ui.form.on("Legal Case", {
 			abrir_dialog_gerar_documentos(frm);
 		}, __("Documentos"));
 	},
-	tipo: function (frm) {
+	type: function (frm) {
 		aplicar_mascara_processo_servico(frm);
 	},
-	numeracao_legada: function (frm) {
+	legacy_numbering: function (frm) {
 		aplicar_mascara_processo_servico(frm);
 	},
-	numero_processo: function (frm) {
+	case_number: function (frm) {
 		if (window.AdvocaciaMasks) {
 			AdvocaciaMasks.formatFormField(
 				frm,
-				"numero_processo",
+				"case_number",
 				AdvocaciaMasks.applyCNJ
 			);
 		}
@@ -77,7 +77,7 @@ function abrir_dialog_gerar_documentos(frm) {
 function montar_dialog_gerar_documentos(frm, templates, kits) {
 	const agrupados = {};
 	templates.forEach((tpl) => {
-		const tipo = tpl.tipo_documento || __("Outro");
+		const tipo = tpl.document_type || __("Outro");
 		if (!agrupados[tipo]) {
 			agrupados[tipo] = [];
 		}
@@ -108,7 +108,7 @@ function montar_dialog_gerar_documentos(frm, templates, kits) {
 					'<input type="checkbox" class="adv-doc-template" data-template="' +
 					frappe.utils.escape_html(tpl.name) +
 					'"> ' +
-					frappe.utils.escape_html(tpl.titulo) +
+					frappe.utils.escape_html(tpl.title) +
 					"</label></p>";
 			});
 		});
@@ -229,7 +229,7 @@ function gerar_documentos_em_lote(frm, template_names) {
 				data.gerados.forEach((item) => {
 					html +=
 						"<li>" +
-						frappe.utils.escape_html(item.titulo || item.template) +
+						frappe.utils.escape_html(item.title || item.template) +
 						' — <a href="' +
 						item.file_url +
 						'" target="_blank">' +
@@ -281,7 +281,7 @@ function setup_servico_quick_entry_masks(dialog) {
 	const pseudo = servico_quick_entry_pseudo_form(dialog);
 	AdvocaciaMasks.setupLegal CaseProcessoMask(pseudo);
 
-	["tipo", "numeracao_legada", "numero_processo"].forEach(function (fieldname) {
+	["type", "legacy_numbering", "case_number"].forEach(function (fieldname) {
 		const field = dialog.fields_dict[fieldname];
 		if (!field || !field.$input) return;
 		field.$input.off("change.legal_case_qe").on("change.legal_case_qe", function () {

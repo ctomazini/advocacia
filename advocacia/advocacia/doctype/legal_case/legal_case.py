@@ -14,23 +14,23 @@ from advocacia.advocacia.validators import limpar_numerico, validar_cnj
 
 class LegalCase(Document):
 	def before_save(self):
-		if self.tipo != "Processo Judicial":
-			self.numeracao_legada = 0
+		if self.type != "Processo Judicial":
+			self.legacy_numbering = 0
 
 	def validate(self):
-		if self.tipo != "Processo Judicial":
+		if self.type != "Processo Judicial":
 			self._compor_titulo()
 			return
 
-		legado = cint(self.numeracao_legada)
-		numero = (self.numero_processo or "").strip()
+		legado = cint(self.legacy_numbering)
+		numero = (self.case_number or "").strip()
 
 		if not numero:
-			self.numero_processo = None
+			self.case_number = None
 		elif not legado:
-			self.numero_processo = limpar_numerico(validar_cnj(numero))
+			self.case_number = limpar_numerico(validar_cnj(numero))
 		else:
-			self.numero_processo = numero
+			self.case_number = numero
 		self._compor_titulo()
 
 	def _compor_titulo(self):
@@ -76,14 +76,14 @@ def legal_case_query(
 		["name", "like", f"%{txt}%"],
 		["title", "like", f"%{txt}%"],
 		["client", "like", f"%{txt}%"],
-		["numero_processo", "like", f"%{txt}%"],
+		["case_number", "like", f"%{txt}%"],
 		["status", "like", f"%{txt}%"],
 	]
 
 	if txt:
 		clientes = frappe.get_all(
 			"Client",
-			filters={"nome": ["like", f"%{txt}%"]},
+			filters={"client_name": ["like", f"%{txt}%"]},
 			pluck="name",
 			limit_page_length=50,
 		)
@@ -94,7 +94,7 @@ def legal_case_query(
 		"Legal Case",
 		filters=list_filters,
 		or_filters=or_filters if txt else None,
-		fields=["name", "title", "client", "numero_processo", "status", "numeracao_legada"],
+		fields=["name", "title", "client", "case_number", "status", "legacy_numbering"],
 		limit_start=start,
 		limit_page_length=page_len,
 		order_by="modified desc",
