@@ -25,36 +25,36 @@ class TestScheduler(FrappeTestCase):
 		frappe.db.rollback()
 
 	def test_verificar_parcelas_vencidas_pagamento(self):
-		acordo = create_test_acordo(num_parcelas=1, valor_total=100)
+		acordo = create_test_acordo(num_parcelas=1, total_amount=100)
 		pag_name = get_acordo_pagamentos(acordo.name)[0].name
 		frappe.db.set_value(
 			"Legal Payment",
 			pag_name,
-			{"data_vencimento": add_days(today(), -1), "status": "Pendente", "manual_override": 0},
+			{"due_date": add_days(today(), -1), "status": "Pendente", "manual_override": 0},
 		)
 		verificar_parcelas_vencidas()
 		self.assertEqual(frappe.db.get_value("Legal Payment", pag_name, "status"), "Vencido")
 
 	def test_parcela_futura_nao_vencida(self):
-		acordo = create_test_acordo(num_parcelas=1, valor_total=100)
+		acordo = create_test_acordo(num_parcelas=1, total_amount=100)
 		pag_name = get_acordo_pagamentos(acordo.name)[0].name
 		frappe.db.set_value(
 			"Legal Payment",
 			pag_name,
-			{"data_vencimento": add_days(today(), 5), "status": "Pendente"},
+			{"due_date": add_days(today(), 5), "status": "Pendente"},
 		)
 		verificar_parcelas_vencidas()
 		self.assertEqual(frappe.db.get_value("Legal Payment", pag_name, "status"), "Pendente")
 
 	def test_notificar_parcelas_vencidas_3_dias(self):
-		acordo = create_test_acordo(num_parcelas=1, valor_total=100)
+		acordo = create_test_acordo(num_parcelas=1, total_amount=100)
 		pag_name = get_acordo_pagamentos(acordo.name)[0].name
 		frappe.db.set_value(
 			"Legal Payment",
 			pag_name,
 			{
 				"status": "Vencido",
-				"data_vencimento": add_days(today(), -3),
+				"due_date": add_days(today(), -3),
 			},
 		)
 		with patch("advocacia.advocacia.notification_helpers.enqueue_create_notification") as mock_notify:
@@ -62,12 +62,12 @@ class TestScheduler(FrappeTestCase):
 			self.assertTrue(mock_notify.called)
 
 	def test_notificar_parcelas_nao_notifica_1_dia(self):
-		acordo = create_test_acordo(num_parcelas=1, valor_total=100)
+		acordo = create_test_acordo(num_parcelas=1, total_amount=100)
 		pag_name = get_acordo_pagamentos(acordo.name)[0].name
 		frappe.db.set_value(
 			"Legal Payment",
 			pag_name,
-			{"status": "Vencido", "data_vencimento": add_days(today(), -1)},
+			{"status": "Vencido", "due_date": add_days(today(), -1)},
 		)
 		with patch("advocacia.advocacia.notification_helpers.enqueue_create_notification") as mock_notify:
 			notificar_parcelas_vencidas()
@@ -79,13 +79,13 @@ class TestScheduler(FrappeTestCase):
 			self.assertEqual(len(notified), 0)
 
 	def test_notificar_audiencias_hoje(self):
-		aud = create_test_hearing(data_hora=now_datetime())
+		aud = create_test_hearing(hearing_datetime=now_datetime())
 		with patch("advocacia.advocacia.notification_helpers.enqueue_create_notification") as mock_notify:
 			notificar_audiencias_hoje()
 			self.assertTrue(mock_notify.called)
 
 	def test_notificar_audiencias_amanha_nao_dispara(self):
-		aud_amanha = create_test_hearing(data_hora=add_days(now_datetime(), 1))
+		aud_amanha = create_test_hearing(hearing_datetime=add_days(now_datetime(), 1))
 		with patch("advocacia.advocacia.notification_helpers.enqueue_create_notification") as mock_notify:
 			notificar_audiencias_hoje()
 			notified_docnames = [
@@ -95,7 +95,7 @@ class TestScheduler(FrappeTestCase):
 			self.assertNotIn(aud_amanha.name, notified_docnames)
 
 	def test_verificar_despesas_vencidas(self):
-		desp = create_test_despesa(data_vencimento=add_days(today(), -1))
+		desp = create_test_despesa(due_date=add_days(today(), -1))
 		frappe.db.set_value("Office Expense", desp.name, "status", "Pendente")
 		verificar_despesas_vencidas()
 		self.assertEqual(
@@ -110,6 +110,6 @@ class TestScheduler(FrappeTestCase):
 
 	def test_legal_case_com_audiencia_futura_nao_arquivado(self):
 		servico = create_test_legal_case()
-		create_test_hearing(servico=servico.name, data_hora=add_days(now_datetime(), 2))
+		create_test_hearing(servico=servico.name, hearing_datetime=add_days(now_datetime(), 2))
 		verificar_status_servicos()
 		self.assertEqual(frappe.db.get_value("Legal Case", servico.name, "status"), "Em andamento")

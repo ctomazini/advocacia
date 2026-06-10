@@ -291,7 +291,7 @@ def main() -> int:
 			open_new(page, "Court Branch"),
 			fill_input(page, "court_branch_name", names["court_branch_link"]),
 			fill_link(page, "jurisdiction", names["jurisdiction"]),
-			fill_select(page, "tipo", "Cível"),
+			fill_select(page, "type", "Cível"),
 			save_form(page),
 		)[-1])
 
@@ -306,8 +306,8 @@ def main() -> int:
 
 		run_step("Client", lambda: (
 			open_new(page, "Client"),
-			fill_select(page, "tipo_pessoa", "Pessoa Física"),
-			fill_input(page, "nome", names["client"]),
+			fill_select(page, "person_type", "Pessoa Física"),
+			fill_input(page, "client_name", names["client"]),
 			fill_input(page, "cpf", cpf_masked),
 			fill_input(page, "email", f"e2e{RUN_ID}@exemplo.com"),
 			save_form(page),
@@ -318,8 +318,8 @@ def main() -> int:
 		run_step("Legal Case", lambda: (
 			open_new(page, "Legal Case"),
 			fill_link(page, "client", cliente_name),
-			fill_select(page, "tipo", "Consultoria"),
-			fill_textarea(page, "observacoes", f"{MARKER} servico {RUN_ID}"),
+			fill_select(page, "type", "Consultoria"),
+			fill_textarea(page, "remarks", f"{MARKER} servico {RUN_ID}"),
 			save_form(page),
 		)[-1])
 
@@ -328,9 +328,9 @@ def main() -> int:
 		run_step("Fee Agreement", lambda: (
 			open_new(page, "Fee Agreement"),
 			fill_link(page, "legal_case", servico_name),
-			fill_select(page, "modo_honorarios", "Honorários Diretos"),
+			fill_select(page, "fee_mode", "Honorários Diretos"),
 			fill_select(page, "billing_type", "Valor fixo"),
-			fill_input(page, "valor_total_do_acordo", "5000"),
+			fill_input(page, "total_agreement_value", "5000"),
 			fill_textarea(page, "remarks", f"{MARKER} acordo {RUN_ID}"),
 			save_form(page),
 		)[-1])
@@ -338,38 +338,38 @@ def main() -> int:
 		run_step("Service Record", lambda: (
 			open_new(page, "Service Record"),
 			fill_link(page, "legal_case", servico_name),
-			fill_textarea(page, "observacoes", f"{MARKER} atos {RUN_ID}"),
+			fill_textarea(page, "remarks", f"{MARKER} atos {RUN_ID}"),
 			save_form(page),
 		)[-1])
 
 		run_step("Hearing", lambda: (
 			open_new(page, "Hearing"),
 			fill_link(page, "legal_case", servico_name),
-			page.locator('.frappe-control[data-fieldname="data_hora"] input:visible').first.fill(
+			page.locator('.frappe-control[data-fieldname="hearing_datetime"] input:visible').first.fill(
 				f"{today()} 14:00:00"
 			),
-			fill_select(page, "tipo", "Conciliação"),
-			fill_select(page, "modalidade", "Presencial"),
-			fill_textarea(page, "observacoes", f"{MARKER} audiencia {RUN_ID}"),
+			fill_select(page, "type", "Conciliação"),
+			fill_select(page, "modality", "Presencial"),
+			fill_textarea(page, "remarks", f"{MARKER} audiencia {RUN_ID}"),
 			save_form(page),
 		)[-1])
 
 		run_step("Deadline", lambda: (
 			open_new(page, "Deadline"),
 			fill_link(page, "legal_case", servico_name),
-			fill_input(page, "descricao", f"{MARKER} prazo {RUN_ID}"),
-			page.locator('.frappe-control[data-fieldname="data_prazo"] input:visible').first.fill(
+			fill_input(page, "description", f"{MARKER} prazo {RUN_ID}"),
+			page.locator('.frappe-control[data-fieldname="due_date"] input:visible').first.fill(
 				add_days(today(), 7)
 			),
-			fill_select(page, "prioridade", "Média"),
+			fill_select(page, "priority", "Média"),
 			save_form(page),
 		)[-1])
 
 		run_step("Legal Task", lambda: (
 			open_new(page, "Legal Task"),
 			fill_link(page, "legal_case", servico_name),
-			fill_input(page, "titulo", f"{MARKER} tarefa {RUN_ID}"),
-			page.locator('.frappe-control[data-fieldname="data_limite"] input:visible').first.fill(
+			fill_input(page, "subject", f"{MARKER} tarefa {RUN_ID}"),
+			page.locator('.frappe-control[data-fieldname="due_date"] input:visible').first.fill(
 				add_days(today(), 3)
 			),
 			save_form(page),
@@ -378,26 +378,26 @@ def main() -> int:
 		run_step("Case Communication", lambda: (
 			open_new(page, "Case Communication"),
 			fill_link(page, "legal_case", servico_name),
-			fill_input(page, "assunto", f"{MARKER} comunicacao {RUN_ID}"),
-			fill_select(page, "tipo", "Email"),
+			fill_input(page, "subject", f"{MARKER} comunicacao {RUN_ID}"),
+			fill_select(page, "type", "Email"),
 			save_form(page),
 		)[-1])
 
 		run_step("Time Entry", lambda: (
 			open_new(page, "Time Entry"),
 			fill_link(page, "legal_case", servico_name),
-			page.locator('.frappe-control[data-fieldname="data"] input:visible').first.fill(today()),
-			fill_input(page, "duracao_minutos", "60"),
-			fill_input(page, "atividade", f"{MARKER} horas {RUN_ID}"),
+			page.locator('.frappe-control[data-fieldname="entry_date"] input:visible').first.fill(today()),
+			fill_input(page, "duration_minutes", "60"),
+			fill_input(page, "activity", f"{MARKER} horas {RUN_ID}"),
 			save_form(page),
 		)[-1])
 
 		run_step("Court Cost", lambda: (
 			open_new(page, "Court Cost"),
 			fill_link(page, "legal_case", servico_name),
-			fill_input(page, "descricao", f"{MARKER} custa {RUN_ID}"),
-			fill_input(page, "valor", "150"),
-			page.locator('.frappe-control[data-fieldname="data_pagamento"] input:visible').first.fill(
+			fill_input(page, "description", f"{MARKER} custa {RUN_ID}"),
+			fill_input(page, "amount", "150"),
+			page.locator('.frappe-control[data-fieldname="payment_date"] input:visible').first.fill(
 				today()
 			),
 			save_form(page),
@@ -405,9 +405,9 @@ def main() -> int:
 
 		run_step("Office Expense", lambda: (
 			open_new(page, "Office Expense"),
-			fill_input(page, "descricao", f"{MARKER} despesa {RUN_ID}"),
-			fill_input(page, "valor", "200"),
-			page.locator('.frappe-control[data-fieldname="data_vencimento"] input:visible').first.fill(
+			fill_input(page, "description", f"{MARKER} despesa {RUN_ID}"),
+			fill_input(page, "amount", "200"),
+			page.locator('.frappe-control[data-fieldname="due_date"] input:visible').first.fill(
 				add_days(today(), 10)
 			),
 			save_form(page),
@@ -416,14 +416,14 @@ def main() -> int:
 		# Exigem anexo — falha esperada sem upload de arquivo
 		run_step("Document Template", lambda: (
 			open_new(page, "Document Template"),
-			fill_input(page, "titulo", f"{MARKER} template {RUN_ID}"),
-			fill_select(page, "tipo_documento", "Contrato"),
+			fill_input(page, "title", f"{MARKER} template {RUN_ID}"),
+			fill_select(page, "document_type", "Contrato"),
 			save_form(page),
 		)[-1])
 
 		run_step("Document Kit", lambda: (
 			open_new(page, "Document Kit"),
-			fill_input(page, "titulo", f"{MARKER} kit {RUN_ID}"),
+			fill_input(page, "title", f"{MARKER} kit {RUN_ID}"),
 			save_form(page),
 		)[-1])
 

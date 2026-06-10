@@ -141,7 +141,7 @@ def validar_cnj(numero):
 	return numero
 
 
-def validar_telefone(numero, tipo="celular"):
+def validar_telefone(numero, phone_type="mobile"):
 	"""
 	Valida telefone brasileiro (ANATEL): DDD geográfico, celular 11 dígitos
 	(nono dígito 9, segundo dígito do número não 0/1) ou fixo 10 dígitos
@@ -160,7 +160,7 @@ def validar_telefone(numero, tipo="celular"):
 
 	local = numero[2:]
 
-	if tipo == "celular":
+	if phone_type == "mobile":
 		if len(numero) != 11:
 			frappe.throw(_("Celular deve ter 11 dígitos (DDD + 9 dígitos)."), title=_("Celular inválido"))
 		if local[0] != "9":

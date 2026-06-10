@@ -19,22 +19,22 @@ class TestFinanceiro(FrappeTestCase):
 		frappe.db.rollback()
 
 	def test_sincronizar_cria_pagamentos(self):
-		acordo = create_test_acordo(num_parcelas=3, valor_total=3000)
+		acordo = create_test_acordo(num_parcelas=3, total_amount=3000)
 		result = sincronizar_pagamentos_do_acordo(acordo.name)
 		self.assertGreaterEqual(result.get("criados", 0) + len(get_acordo_pagamentos(acordo.name)), 3)
 
 	def test_resync_atualiza_valor_parcela(self):
-		acordo = create_test_acordo(num_parcelas=1, valor_total=1000)
+		acordo = create_test_acordo(num_parcelas=1, total_amount=1000)
 		pag_name = get_acordo_pagamentos(acordo.name)[0].name
 		acordo_doc = frappe.get_doc("Fee Agreement", acordo.name)
-		acordo_doc.fee_installments[0].valor_total = 1500
-		acordo_doc.valor_total_do_acordo = 1500
+		acordo_doc.fee_installments[0].total_amount = 1500
+		acordo_doc.total_agreement_value = 1500
 		acordo_doc.save(ignore_permissions=True)
 		resync_pagamentos_acordo(acordo.name)
-		self.assertEqual(flt(frappe.db.get_value("Legal Payment", pag_name, "valor")), 1500)
+		self.assertEqual(flt(frappe.db.get_value("Legal Payment", pag_name, "amount")), 1500)
 
 	def test_acordo_sem_parcelas_sem_pagamento(self):
-		acordo = create_test_acordo(num_parcelas=0, valor_total=0, parcelas=[])
+		acordo = create_test_acordo(num_parcelas=0, total_amount=0, parcelas=[])
 		acordo.installment_count = 0
 		acordo.save(ignore_permissions=True)
 		pags = get_acordo_pagamentos(acordo.name)
@@ -46,20 +46,20 @@ class TestFinanceiro(FrappeTestCase):
 
 		result = gerar_pagamento_atos(registro.name)
 		pag = frappe.get_doc("Legal Payment", result["payment"])
-		self.assertEqual(flt(pag.valor), 4500)
+		self.assertEqual(flt(pag.amount), 4500)
 
 	def test_bulk_delete_pagamentos_pendentes(self):
-		acordo = create_test_acordo(num_parcelas=2, valor_total=2000)
+		acordo = create_test_acordo(num_parcelas=2, total_amount=2000)
 		names = [p.name for p in get_acordo_pagamentos(acordo.name)]
 		result = bulk_delete_pagamentos(names)
 		self.assertEqual(len(result["excluidos"]), 2)
 
 	def test_bulk_delete_ignora_recebido(self):
-		acordo = create_test_acordo(num_parcelas=1, valor_total=500)
+		acordo = create_test_acordo(num_parcelas=1, total_amount=500)
 		pag = frappe.get_doc("Legal Payment", get_acordo_pagamentos(acordo.name)[0].name)
 		pag.status = "Recebido"
-		pag.data_recebimento = today()
-		pag.valor_recebido = pag.valor
+		pag.received_date = today()
+		pag.received_amount = pag.amount
 		pag.save(ignore_permissions=True)
 		result = bulk_delete_pagamentos([pag.name])
 		self.assertEqual(len(result["ignorados"]), 1)

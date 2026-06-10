@@ -59,7 +59,7 @@ frappe.provide("advocacia.painel.hero");
 	        );
 	    }
 	    var previsto =
-	        (financeiro.previsto_periodo && financeiro.previsto_periodo.valor) ||
+	        (financeiro.previsto_periodo && financeiro.previsto_periodo.amount) ||
 	        resumo.previsto_periodo_valor ||
 	        0;
 	    if (previsto) {
@@ -85,8 +85,8 @@ frappe.provide("advocacia.painel.hero");
 	        resumo.previsto_periodo_valor != null
 	            ? resumo.previsto_periodo_valor
 	            : resumo.previsto_semana_valor ||
-	              (financeiro.previsto_periodo && financeiro.previsto_periodo.valor) ||
-	              (financeiro.previsto_semana && financeiro.previsto_semana.valor) ||
+	              (financeiro.previsto_periodo && financeiro.previsto_periodo.amount) ||
+	              (financeiro.previsto_semana && financeiro.previsto_semana.amount) ||
 	              0;
 	    var pulse_stats =
 	        '<div class="painel-hero-pulse-stats">' +

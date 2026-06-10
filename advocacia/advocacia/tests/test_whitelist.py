@@ -37,12 +37,12 @@ class TestWhitelist(FrappeTestCase):
 		self.assertTrue(result)
 
 	def test_resync_pagamentos_acordo_whitelist(self):
-		acordo = create_test_acordo(valor_total=1000, num_parcelas=1)
+		acordo = create_test_acordo(total_amount=1000, num_parcelas=1)
 		result = resync_pagamentos_acordo(acordo.name)
 		self.assertEqual(result["status"], "ok")
 
 	def test_bulk_delete_pagamentos_whitelist(self):
-		acordo = create_test_acordo(valor_total=1000, num_parcelas=1)
+		acordo = create_test_acordo(total_amount=1000, num_parcelas=1)
 		names = [p.name for p in get_acordo_pagamentos(acordo.name)]
 		result = bulk_delete_pagamentos(names)
 		self.assertEqual(len(result["excluidos"]), 1)
@@ -66,7 +66,7 @@ class TestWhitelist(FrappeTestCase):
 				}
 			).insert(ignore_permissions=True)
 
-		acordo = create_test_acordo(num_parcelas=1, valor_total=500)
+		acordo = create_test_acordo(num_parcelas=1, total_amount=500)
 		pag_name = get_acordo_pagamentos(acordo.name)[0].name
 
 		frappe.set_user(user)

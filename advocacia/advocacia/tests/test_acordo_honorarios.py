@@ -18,15 +18,15 @@ class TestAcordoHonorarios(FrappeTestCase):
 		acordo = create_test_acordo(
 			modo="Honorários Diretos",
 			tipo_cobranca="Valor fixo",
-			valor_total=10000,
+			total_amount=10000,
 			num_parcelas=2,
 		)
-		self.assertEqual(flt(acordo.valor_total_do_acordo), 10000)
+		self.assertEqual(flt(acordo.total_agreement_value), 10000)
 		self.assertEqual(len(acordo.fee_installments), 2)
 
 	def test_parcelas_soma_igual_total(self):
-		acordo = create_test_acordo(valor_total=10000, num_parcelas=5)
-		soma = sum(flt(p.valor_total) for p in acordo.fee_installments)
+		acordo = create_test_acordo(total_amount=10000, num_parcelas=5)
+		soma = sum(flt(p.total_amount) for p in acordo.fee_installments)
 		self.assertAlmostEqual(soma, 10000, places=2)
 
 	def test_parcelas_status_pendente(self):
@@ -34,17 +34,17 @@ class TestAcordoHonorarios(FrappeTestCase):
 		self.assertTrue(all(p.status == "Pendente" for p in acordo.fee_installments))
 
 	def test_sync_cria_pagamentos(self):
-		acordo = create_test_acordo(num_parcelas=3, valor_total=9000)
+		acordo = create_test_acordo(num_parcelas=3, total_amount=9000)
 		pagamentos = get_acordo_pagamentos(acordo.name)
 		self.assertEqual(len(pagamentos), 3)
 
 	def test_parcela_origem_id_vinculado(self):
 		acordo = create_test_acordo(num_parcelas=2)
 		for parcela in acordo.fee_installments:
-			self.assertTrue(parcela.parcela_origem_id)
+			self.assertTrue(parcela.installment_origin_id)
 		pagamentos = get_acordo_pagamentos(acordo.name)
-		origem_ids = {p.parcela_origem_id for p in pagamentos}
-		parcela_ids = {p.parcela_origem_id for p in acordo.fee_installments}
+		origem_ids = {p.installment_origin_id for p in pagamentos}
+		parcela_ids = {p.installment_origin_id for p in acordo.fee_installments}
 		self.assertEqual(origem_ids, parcela_ids)
 
 	def test_sem_servico_falha(self):
@@ -52,7 +52,7 @@ class TestAcordoHonorarios(FrappeTestCase):
 			frappe.get_doc(
 				{
 					"doctype": "Fee Agreement",
-					"modo_honorarios": "Honorários Diretos",
+					"fee_mode": "Honorários Diretos",
 					"billing_type": "Valor fixo",
 				}
 			).insert(ignore_permissions=True)
@@ -64,14 +64,14 @@ class TestAcordoHonorarios(FrappeTestCase):
 				{
 					"doctype": "Fee Agreement",
 					"legal_case": servico,
-					"modo_honorarios": "Honorários Diretos",
+					"fee_mode": "Honorários Diretos",
 					"billing_type": "Valor fixo",
 					"installment_count": 2,
-					"data_primeira_parcela": today(),
+					"first_installment_date": today(),
 					"fee_installments": [
 						{
-							"vencimento": today(),
-							"valor_total": 100,
+							"due_date": today(),
+							"total_amount": 100,
 							"status": "Pendente",
 						}
 					],
@@ -87,15 +87,15 @@ class TestAcordoHonorarios(FrappeTestCase):
 					"doctype": "Fee Agreement",
 					"legal_case": servico,
 					"client": cliente,
-					"modo_honorarios": "Honorários Diretos",
+					"fee_mode": "Honorários Diretos",
 					"billing_type": "Valor fixo",
-					"valor_total_do_acordo": 10000,
+					"total_agreement_value": 10000,
 					"fee_installments": [
 						{
-							"vencimento": today(),
-							"valor_total": 1000,
-							"valor_advogada": 0,
-							"valor_cliente": 0,
+							"due_date": today(),
+							"total_amount": 1000,
+							"lawyer_amount": 0,
+							"client_amount": 0,
 							"status": "Pendente",
 						}
 					],
@@ -105,12 +105,12 @@ class TestAcordoHonorarios(FrappeTestCase):
 	def test_acordo_quitado_quando_todos_pagamentos_recebidos(self):
 		from advocacia.advocacia.tasks import on_pagamento_update
 
-		acordo = create_test_acordo(num_parcelas=1, valor_total=1000)
+		acordo = create_test_acordo(num_parcelas=1, total_amount=1000)
 		for pag in get_acordo_pagamentos(acordo.name):
 			doc = frappe.get_doc("Legal Payment", pag.name)
 			doc.status = "Recebido"
-			doc.data_recebimento = today()
-			doc.valor_recebido = doc.valor
+			doc.received_date = today()
+			doc.received_amount = doc.amount
 			doc.save(ignore_permissions=True)
 			on_pagamento_update(doc, "on_update")
 
@@ -130,41 +130,41 @@ class TestAcordoHonorarios(FrappeTestCase):
 				"doctype": "Fee Agreement",
 				"legal_case": servico,
 				"client": cliente,
-				"modo_honorarios": "Acordo com Divisão",
+				"fee_mode": "Acordo com Divisão",
 				"billing_type": "Percentual do acordo",
-				"percentual_advogada": 30,
-				"percentual_cliente": 70,
-				"valor_total_do_acordo": valor_acordo,
-				"valor_advogada": valor_adv,
-				"valor_cliente": valor_cli,
+				"lawyer_percentage": 30,
+				"client_percentage": 70,
+				"total_agreement_value": valor_acordo,
+				"lawyer_amount": valor_adv,
+				"client_amount": valor_cli,
 				"contingency_fee_amount": sucumbencia,
 				"installment_count": 3,
-				"data_primeira_parcela": today(),
+				"first_installment_date": today(),
 				"fee_installments": [
 					{
-						"vencimento": today(),
-						"valor_advogada": 3000,
-						"valor_cliente": 7000,
+						"due_date": today(),
+						"lawyer_amount": 3000,
+						"client_amount": 7000,
 						"contingency_amount": 3000,
-						"valor_total": 13000,
+						"total_amount": 13000,
 						"status": "Pendente",
 						"description": "Parcela 1 + Sucumbência",
 					},
 					{
-						"vencimento": add_months(today(), 1),
-						"valor_advogada": 3000,
-						"valor_cliente": 7000,
+						"due_date": add_months(today(), 1),
+						"lawyer_amount": 3000,
+						"client_amount": 7000,
 						"contingency_amount": 0,
-						"valor_total": 10000,
+						"total_amount": 10000,
 						"status": "Pendente",
 						"description": "Parcela 2",
 					},
 					{
-						"vencimento": add_months(today(), 2),
-						"valor_advogada": 3000,
-						"valor_cliente": 7000,
+						"due_date": add_months(today(), 2),
+						"lawyer_amount": 3000,
+						"client_amount": 7000,
 						"contingency_amount": 0,
-						"valor_total": 10000,
+						"total_amount": 10000,
 						"status": "Pendente",
 						"description": "Parcela 3",
 					},
@@ -172,6 +172,6 @@ class TestAcordoHonorarios(FrappeTestCase):
 			}
 		)
 		doc.insert(ignore_permissions=True)
-		soma = sum(flt(p.valor_total) for p in doc.fee_installments)
+		soma = sum(flt(p.total_amount) for p in doc.fee_installments)
 		self.assertAlmostEqual(soma, valor_acordo + sucumbencia, places=2)
-		self.assertAlmostEqual(flt(doc.valor_advogada) + flt(doc.valor_cliente), valor_acordo, places=2)
+		self.assertAlmostEqual(flt(doc.lawyer_amount) + flt(doc.client_amount), valor_acordo, places=2)

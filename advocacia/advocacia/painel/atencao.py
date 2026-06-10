@@ -22,9 +22,9 @@ def _prazos_tile(overdue, urgent, hoje, three_days):
 	meta = _("{0} vencidos · {1} em 3 dias").format(cint(overdue), cint(urgent))
 	tone = "red" if overdue else "orange"
 	if overdue:
-		filters = [["status", "=", "Pendente"], ["data_prazo", "<", hoje]]
+		filters = [["status", "=", "Pendente"], ["due_date", "<", hoje]]
 	else:
-		filters = [["status", "=", "Pendente"], ["data_prazo", "between", [hoje, three_days]]]
+		filters = [["status", "=", "Pendente"], ["due_date", "between", [hoje, three_days]]]
 	return _tile(
 		total,
 		tone,
@@ -42,7 +42,7 @@ def build_attention_tiles(hoje, kpis, financeiro, include_financial=True):
 	overdue_deadlines = cint(kpis.get("prazos_vencidos") or 0)
 	urgent_deadlines = cint(kpis.get("prazos_criticos") or 0)
 	late_tasks = cint(kpis.get("legal_tasks_atrasadas") or 0)
-	parcelas_vencidas = kpis.get("fee_installments_vencidas") or {"count": 0, "valor": 0}
+	parcelas_vencidas = kpis.get("fee_installments_vencidas") or {"count": 0, "amount": 0}
 	audiencias_hoje = cint(kpis.get("audiencias_hoje") or 0)
 	audiencias_amanha = cint(kpis.get("audiencias_amanha") or 0)
 	amanha = add_days(hoje, 1)
@@ -58,7 +58,7 @@ def build_attention_tiles(hoje, kpis, financeiro, include_financial=True):
 				"doctype": "Legal Task",
 				"filters": [
 					["status", "in", ["Pendente", "Em Andamento"]],
-					["data_limite", "<", hoje],
+					["due_date", "<", hoje],
 				],
 			},
 			pulse=True,
@@ -71,7 +71,7 @@ def build_attention_tiles(hoje, kpis, financeiro, include_financial=True):
 			"circle-dollar-sign",
 			_("Parcelas vencidas"),
 			{"doctype": "Legal Payment", "filters": [["status", "=", "Vencido"]]},
-			meta_currency=flt(parcelas_vencidas.get("valor")),
+			meta_currency=flt(parcelas_vencidas.get("amount")),
 			pulse=True,
 		)
 		if include_financial and cint(parcelas_vencidas.get("count") or 0)
@@ -84,7 +84,7 @@ def build_attention_tiles(hoje, kpis, financeiro, include_financial=True):
 			{
 				"doctype": "Hearing",
 				"filters": [
-					["data_hora", "between", [f"{hoje} 00:00:00", f"{hoje} 23:59:59"]],
+					["hearing_datetime", "between", [f"{hoje} 00:00:00", f"{hoje} 23:59:59"]],
 				],
 			},
 			pulse=True,
@@ -99,7 +99,7 @@ def build_attention_tiles(hoje, kpis, financeiro, include_financial=True):
 			{
 				"doctype": "Hearing",
 				"filters": [
-					["data_hora", "between", [f"{amanha} 00:00:00", f"{amanha} 23:59:59"]],
+					["hearing_datetime", "between", [f"{amanha} 00:00:00", f"{amanha} 23:59:59"]],
 				],
 			},
 		)

@@ -36,10 +36,10 @@ def _create_test_template():
 		template = frappe.get_doc(
 			{
 				"doctype": "Document Template",
-				"titulo": _uid("Template Kit"),
-				"tipo_documento": "Contrato",
-				"arquivo": file_doc.file_url,
-				"habilitado": 1,
+				"title": _uid("Template Kit"),
+				"document_type": "Contrato",
+				"template_file": file_doc.file_url,
+				"enabled": 1,
 			}
 		).insert(ignore_permissions=True)
 		return template.name
@@ -62,12 +62,12 @@ class TestKitDeDocumentos(FrappeTestCase):
 		kit = frappe.get_doc(
 			{
 				"doctype": "Document Kit",
-				"titulo": titulo,
-				"templates": [{"template": self.template_name, "ordem": 0}],
+				"title": titulo,
+				"templates": [{"template": self.template_name, "display_order": 0}],
 			}
 		).insert(ignore_permissions=True)
 		self.assertTrue(frappe.db.exists("Document Kit", kit.name))
-		self.assertEqual(kit.titulo, titulo)
+		self.assertEqual(kit.title, titulo)
 		self.assertEqual(len(kit.templates), 1)
 		self.assertEqual(kit.templates[0].template, self.template_name)
 
@@ -76,24 +76,24 @@ class TestKitDeDocumentos(FrappeTestCase):
 		kit = frappe.get_doc(
 			{
 				"doctype": "Document Kit",
-				"titulo": titulo,
-				"templates": [{"template": self.template_name, "ordem": 1}],
+				"title": titulo,
+				"templates": [{"template": self.template_name, "display_order": 1}],
 			}
 		).insert(ignore_permissions=True)
 		loaded = frappe.get_doc("Document Kit", kit.name)
-		self.assertEqual(loaded.titulo, titulo)
-		self.assertEqual(loaded.templates[0].ordem, 1)
+		self.assertEqual(loaded.title, titulo)
+		self.assertEqual(loaded.templates[0].display_order, 1)
 
 	def test_update_kit_templates(self):
 		titulo = _uid("Kit Update")
 		kit = frappe.get_doc(
 			{
 				"doctype": "Document Kit",
-				"titulo": titulo,
-				"templates": [{"template": self.template_name, "ordem": 0}],
+				"title": titulo,
+				"templates": [{"template": self.template_name, "display_order": 0}],
 			}
 		).insert(ignore_permissions=True)
-		kit.append("templates", {"template": self.template_name, "ordem": 1})
+		kit.append("templates", {"template": self.template_name, "display_order": 1})
 		kit.save(ignore_permissions=True)
 		reloaded = frappe.get_doc("Document Kit", kit.name)
 		self.assertEqual(len(reloaded.templates), 2)
@@ -106,7 +106,7 @@ class TestKitDeDocumentos(FrappeTestCase):
 			frappe.get_doc(
 				{
 					"doctype": "Document Kit",
-					"templates": [{"template": self.template_name, "ordem": 0}],
+					"templates": [{"template": self.template_name, "display_order": 0}],
 				}
 			).insert(ignore_permissions=True)
 
@@ -115,7 +115,7 @@ class TestKitDeDocumentos(FrappeTestCase):
 			frappe.get_doc(
 				{
 					"doctype": "Document Kit",
-					"titulo": _uid("Kit Sem Template"),
+					"title": _uid("Kit Sem Template"),
 				}
 			).insert(ignore_permissions=True)
 
@@ -124,15 +124,15 @@ class TestKitDeDocumentos(FrappeTestCase):
 		frappe.get_doc(
 			{
 				"doctype": "Document Kit",
-				"titulo": titulo,
-				"templates": [{"template": self.template_name, "ordem": 0}],
+				"title": titulo,
+				"templates": [{"template": self.template_name, "display_order": 0}],
 			}
 		).insert(ignore_permissions=True)
 		with self.assertRaises((DuplicateEntryError, frappe.UniqueValidationError)):
 			frappe.get_doc(
 				{
 					"doctype": "Document Kit",
-					"titulo": titulo,
-					"templates": [{"template": self.template_name, "ordem": 0}],
+					"title": titulo,
+					"templates": [{"template": self.template_name, "display_order": 0}],
 				}
 			).insert(ignore_permissions=True)

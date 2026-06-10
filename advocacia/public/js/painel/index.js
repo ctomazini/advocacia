@@ -99,7 +99,7 @@ advocacia.painel.init = function (wrapper) {
 		page.painel_list_limits = limits;
 		var content_class = options.animate === false ? " painel-content--stable" : "";
 		var html = '<div class="painel-content' + content_class + '">';
-		html += H.render_header(d.resumo, d.kpis, periodo, d.financeiro);
+		html += H.render_header(d.summary, d.kpis, periodo, d.financeiro);
 		html += H.render_filtros_painel(periodo);
 		html += H.render_acoes_rapidas();
 		html += '<div class="painel-zona-critica">';

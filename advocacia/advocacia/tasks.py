@@ -15,8 +15,8 @@ def verificar_parcelas_vencidas():
 
 	pagamentos = frappe.get_all(
 		"Legal Payment",
-		filters={"data_vencimento": ["<", hoje], "status": "Pendente", "manual_override": 0},
-		fields=["name", "parcela_origem_id"],
+		filters={"due_date": ["<", hoje], "status": "Pendente", "manual_override": 0},
+		fields=["name", "installment_origin_id"],
 		limit_page_length=0,  # processa todos — scheduler batch
 	)
 	for row in pagamentos:
@@ -26,7 +26,7 @@ def verificar_parcelas_vencidas():
 
 	parcelas = frappe.get_all(
 		"Fee Installment",
-		filters={"vencimento": ["<", hoje], "status": "Pendente"},
+		filters={"due_date": ["<", hoje], "status": "Pendente"},
 		pluck="name",
 		limit_page_length=0,  # processa todos — scheduler batch
 	)
@@ -42,7 +42,7 @@ def verificar_despesas_vencidas():
 	"""Marca despesas pendentes como atrasadas se vencimento passou."""
 	despesas = frappe.get_all(
 		"Office Expense",
-		filters={"status": "Pendente", "data_vencimento": ("<", today())},
+		filters={"status": "Pendente", "due_date": ("<", today())},
 		pluck="name",
 		limit_page_length=0,  # processa todos — scheduler batch
 	)
@@ -58,8 +58,8 @@ def notificar_parcelas_vencidas():
 	data_alvo = add_days(today(), -3)
 	pagamentos = frappe.get_all(
 		"Legal Payment",
-		filters={"status": "Vencido", "data_vencimento": data_alvo},
-		fields=["name", "fee_agreement", "client", "data_vencimento", "owner", "tipo_origem", "service_record"],
+		filters={"status": "Vencido", "due_date": data_alvo},
+		fields=["name", "fee_agreement", "client", "due_date", "owner", "origin_type", "service_record"],
 		limit_page_length=500,
 	)
 	count = 0
@@ -71,7 +71,7 @@ def notificar_parcelas_vencidas():
 			"O pagamento {0} (vencimento {1}) esta vencido ha 3 dias. Origem: {2}."
 		).format(
 			p.name,
-			frappe.utils.formatdate(p.data_vencimento),
+			frappe.utils.formatdate(p.due_date),
 			_pagamento_origem_label(p),
 		)
 		send_system_notification(
@@ -91,13 +91,13 @@ def notificar_audiencias_hoje():
 	hoje = today()
 	audiencias = frappe.get_all(
 		"Hearing",
-		filters={"data_hora": ["between", [hoje + " 00:00:00", hoje + " 23:59:59"]]},
+		filters={"hearing_datetime": ["between", [hoje + " 00:00:00", hoje + " 23:59:59"]]},
 		fields=[
 			"name",
 			"client",
-			"tipo",
-			"modalidade",
-			"data_hora",
+			"type",
+			"modality",
+			"hearing_datetime",
 			"court_branch",
 			"owner",
 		],
@@ -107,16 +107,16 @@ def notificar_audiencias_hoje():
 	for aud in audiencias:
 		subject = _("Hearing hoje: {0} - {1}").format(
 			aud.client or aud.name,
-			aud.tipo or "",
+			aud.type or "",
 		)
 		if notification_already_sent("Hearing", aud.name, subject):
 			continue
 		message = _(
 			"Hearing {0} ({1}) hoje as {2}. Court Branch: {3}."
 		).format(
-			aud.tipo or "",
-			aud.modalidade or "",
-			frappe.utils.format_datetime(aud.data_hora) if aud.data_hora else "",
+			aud.type or "",
+			aud.modality or "",
+			frappe.utils.format_datetime(aud.hearing_datetime) if aud.hearing_datetime else "",
 			aud.court_branch or _("N/A"),
 		)
 		send_system_notification(
@@ -289,7 +289,7 @@ def verificar_status_servicos():
 			"Hearing",
 			filters={
 				"legal_case": ["in", servico_names],
-				"data_hora": [">=", f"{hoje} 00:00:00"],
+				"hearing_datetime": [">=", f"{hoje} 00:00:00"],
 			},
 			fields=["legal_case"],
 			pluck="legal_case",

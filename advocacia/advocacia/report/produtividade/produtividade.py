@@ -90,7 +90,7 @@ def _get_data(filters):
 	servicos = frappe.get_all(
 		"Legal Case",
 		filters=servico_filters,
-		fields=["name", "area", "status", "data_abertura", "modified"],
+		fields=["name", "area", "status", "opening_date", "modified"],
 		limit_page_length=0,
 	)
 
@@ -98,7 +98,7 @@ def _get_data(filters):
 		servicos = [
 			s
 			for s in servicos
-			if s.data_abertura and getdate(s.data_abertura) >= getdate(period_start)
+			if s.opening_date and getdate(s.opening_date) >= getdate(period_start)
 		]
 
 	by_area = defaultdict(
@@ -120,9 +120,9 @@ def _get_data(filters):
 			bucket["em_andamento"] += 1
 		elif s.status == "Encerrado":
 			bucket["encerrados"] += 1
-			if s.data_abertura:
+			if s.opening_date:
 				bucket["dias_encerramento"].append(
-					date_diff(getdate(s.modified), getdate(s.data_abertura))
+					date_diff(getdate(s.modified), getdate(s.opening_date))
 				)
 
 	honorarios = _sum_honorarios_by_servico()
@@ -230,11 +230,11 @@ def _sum_honorarios_by_servico():
 	result = defaultdict(float)
 	for row in frappe.get_all(
 		"Fee Agreement",
-		fields=["legal_case", "valor_total_do_acordo"],
+		fields=["legal_case", "total_agreement_value"],
 		limit_page_length=0,
 	):
 		if row.legal_case:
-			result[row.legal_case] += flt(row.valor_total_do_acordo)
+			result[row.legal_case] += flt(row.total_agreement_value)
 	return result
 
 
@@ -245,11 +245,11 @@ def _sum_custas_by_servico():
 	for row in frappe.get_all(
 		"Court Cost",
 		filters={"status": ["in", ["Pago", "Repassado"]]},
-		fields=["legal_case", "valor"],
+		fields=["legal_case", "amount"],
 		limit_page_length=0,
 	):
 		if row.legal_case:
-			result[row.legal_case] += flt(row.valor)
+			result[row.legal_case] += flt(row.amount)
 	return result
 
 
@@ -259,9 +259,9 @@ def _sum_horas_by_servico():
 	result = defaultdict(float)
 	for row in frappe.get_all(
 		"Time Entry",
-		fields=["legal_case", "duracao_horas"],
+		fields=["legal_case", "duration_hours"],
 		limit_page_length=0,
 	):
 		if row.legal_case:
-			result[row.legal_case] += flt(row.duracao_horas)
+			result[row.legal_case] += flt(row.duration_hours)
 	return result

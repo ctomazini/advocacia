@@ -17,14 +17,14 @@ from advocacia.advocacia.documentos import (
 from advocacia.advocacia.tests.test_setup import create_test_legal_case
 
 
-def _ensure_test_escritorio_config(advogada="Advogada Teste"):
+def _ensure_test_escritorio_config(lawyer_name="Advogada Teste"):
 	cfg = frappe.get_single("Office Settings")
-	cfg.razao_social = "Escritorio Teste Advocacia"
+	cfg.company_name = "Escritorio Teste Advocacia"
 	cfg.cnpj = "11222333000181"
 	cfg.oab = "OAB/RS 00.000"
-	cfg.advogada = advogada
-	cfg.endereco = "Rua Teste, 100, Cidade Teste/RS"
-	cfg.registro_sia = "00000"
+	cfg.lawyer_name = lawyer_name
+	cfg.address = "Rua Teste, 100, Cidade Teste/RS"
+	cfg.sia_registration = "00000"
 	cfg.bank_name = "Banco Documentos"
 	cfg.bank_pix = "52998224725"
 	cfg.save(ignore_permissions=True)
@@ -107,10 +107,10 @@ class TestDocumentos(FrappeTestCase):
 				template = frappe.get_doc(
 					{
 						"doctype": "Document Template",
-						"titulo": f"Template Lote {idx} {frappe.generate_hash(length=4)}",
-						"tipo_documento": "Contrato",
-						"arquivo": file_doc.file_url,
-						"habilitado": 1,
+						"title": f"Template Lote {idx} {frappe.generate_hash(length=4)}",
+						"document_type": "Contrato",
+						"template_file": file_doc.file_url,
+						"enabled": 1,
 					}
 				)
 				template.insert(ignore_permissions=True)

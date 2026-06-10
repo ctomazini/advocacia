@@ -14,7 +14,7 @@ frappe.provide("advocacia.painel.timeline");
 	        periodo_dias === 1
 	            ? __("Agenda de hoje")
 	            : __("Agenda — próximos {0} dias", [periodo_dias]);
-	    var subtitulo =
+	    var subtitle =
 	        periodo_dias === 1
 	            ? __("Audiências, prazos e tarefas de hoje")
 	            : __("Audiências, prazos e tarefas {0}", [U.painel_periodo_enunciado(periodo_dias)]);
@@ -52,13 +52,13 @@ frappe.provide("advocacia.painel.timeline");
 	    h += '<div class="painel-panel"><div class="painel-timeline-modern">';
 	    timeline.forEach(function (it) {
 	        var tipo_label =
-	            it.tipo === "audiencia"
+	            it.type === "audiencia"
 	                ? __("Audiência")
-	                : it.tipo === "prazo"
+	                : it.type === "prazo"
 	                  ? __("Prazo")
 	                  : __("Legal Task");
 	        var tipo_icon =
-	            it.tipo === "audiencia" ? "milestone" : it.tipo === "prazo" ? "time" : "checklist";
+	            it.type === "audiencia" ? "milestone" : it.type === "prazo" ? "time" : "checklist";
 	        var pill_map = {
 	            red: "Alta",
 	            orange: "Média",
@@ -68,8 +68,8 @@ frappe.provide("advocacia.painel.timeline");
 	        };
 	        var tone = it.urgencia || "blue";
 	        var dias =
-	            it.dias_restantes != null ? it.dias_restantes : U.painel_day_diff(it.data);
-	        var when = U.painel_timeline_when_label(it.data, it.hora, dias);
+	            it.dias_restantes != null ? it.dias_restantes : U.painel_day_diff(it.date);
+	        var when = U.painel_timeline_when_label(it.date, it.hora, dias);
 	        h +=
 	            '<div class="painel-tl-item tone-' +
 	            tone +
@@ -88,10 +88,10 @@ frappe.provide("advocacia.painel.timeline");
 	            frappe.utils.escape_html(tipo_label) +
 	            "</div>" +
 	            '<div class="painel-tl-title">' +
-	            frappe.utils.escape_html(it.titulo || "") +
+	            frappe.utils.escape_html(it.title || "") +
 	            "</div>" +
 	            '<div class="painel-tl-sub">' +
-	            frappe.utils.escape_html(it.subtitulo || "") +
+	            frappe.utils.escape_html(it.subtitle || "") +
 	            (it.detalhe ? " · " + frappe.utils.escape_html(it.detalhe) : "") +
 	            "</div></div>" +
 	            U.status_pill(pill_map[tone] || "Normal") +
@@ -105,12 +105,12 @@ frappe.provide("advocacia.painel.timeline");
 	    var items = [];
 	    (d.alertas || []).forEach(function (a) {
 	        items.push({
-	            sort: a.tipo === "prazo" && a.dias <= 0 ? 0 : 1,
-	            time: a.hora || (a.tipo === "prazo" ? __("Prazo") : __("Hoje")),
-	            title: a.titulo,
+	            sort: a.type === "prazo" && a.dias <= 0 ? 0 : 1,
+	            time: a.hora || (a.type === "prazo" ? __("Prazo") : __("Hoje")),
+	            title: a.title,
 	            sub:
 	                ((a.client_nome || a.client) ? (a.client_nome || a.client) + " · " : "") +
-	                (a.tipo === "prazo"
+	                (a.type === "prazo"
 	                    ? a.dias === 0
 	                        ? __("Vence hoje")
 	                        : __("Amanhã")
@@ -125,7 +125,7 @@ frappe.provide("advocacia.painel.timeline");
 	        items.push({
 	            sort: 2,
 	            time: a.hora || __("—"),
-	            title: a.tipo || __("Audiência"),
+	            title: a.type || __("Audiência"),
 	            sub: ((a.client_nome || a.client) || "") + (a.court_branch_link_label ? " · " + a.court_branch_link_label : ""),
 	            doctype: "Hearing",
 	            docname: a.name,
@@ -136,8 +136,8 @@ frappe.provide("advocacia.painel.timeline");
 	        if (p.dias_restantes > 1) return;
 	        items.push({
 	            sort: p.dias_restantes <= 0 ? 0 : 1,
-	            time: U.fmt_date_iso(p.data_prazo),
-	            title: p.descricao || p.name,
+	            time: U.fmt_date_iso(p.due_date),
+	            title: p.description || p.name,
 	            sub: p.client_nome || "",
 	            doctype: "Deadline",
 	            docname: p.name,
@@ -220,7 +220,7 @@ frappe.provide("advocacia.painel.timeline");
 	            frappe.utils.escape_html(c.client_nome || c.client || __("Sem cliente")) +
 	            "</div>" +
 	            '<div class="painel-com-assunto">' +
-	            frappe.utils.escape_html(c.assunto || c.name) +
+	            frappe.utils.escape_html(c.subject || c.name) +
 	            "</div>" +
 	            (c.motivo_pendencia
 	                ? '<div class="painel-com-meta">' +
@@ -272,16 +272,16 @@ frappe.provide("advocacia.painel.timeline");
 	            '">' +
 	            '<div class="painel-schedule-main">' +
 	            '<div class="painel-op-title">' +
-	            frappe.utils.escape_html(c.assunto || c.name) +
+	            frappe.utils.escape_html(c.subject || c.name) +
 	            "</div>" +
 	            '<div class="painel-op-sub">' +
-	            frappe.utils.escape_html(c.tipo || "") +
+	            frappe.utils.escape_html(c.type || "") +
 	            ((c.client_nome || c.client) ? " · " + frappe.utils.escape_html(c.client_nome || c.client) : "") +
 	            "</div></div>" +
 	            '<div class="painel-schedule-side">' +
-	            (c.data
+	            (c.communication_date
 	                ? '<span class="painel-op-sub">' +
-	                  frappe.utils.escape_html(frappe.datetime.str_to_user(c.data)) +
+	                  frappe.utils.escape_html(frappe.datetime.str_to_user(c.communication_date)) +
 	                  "</span>"
 	                : "") +
 	            "</div></div>";
@@ -296,7 +296,7 @@ frappe.provide("advocacia.painel.timeline");
 	        .map(function (p) {
 	            var dias = p.dias_restantes;
 	            var cd = U.prazo_countdown_label(dias);
-	            var parts = U.painel_date_parts(p.data_prazo);
+	            var parts = U.painel_date_parts(p.due_date);
 	            var card_cls = "painel-schedule-card";
 	            if (dias < 0) card_cls += " painel-schedule-card--urgent";
 	            else if (dias <= 1) card_cls += " painel-schedule-card--today";
@@ -320,14 +320,14 @@ frappe.provide("advocacia.painel.timeline");
 	                "</span></div>" +
 	                '<div class="painel-schedule-body">' +
 	                '<div class="painel-schedule-title">' +
-	                frappe.utils.escape_html(p.descricao || p.name) +
+	                frappe.utils.escape_html(p.description || p.name) +
 	                "</div>" +
 	                '<div class="painel-schedule-sub">' +
 	                frappe.utils.escape_html(p.client_nome || "—") +
 	                (p.legal_case_titulo ? " · " + frappe.utils.escape_html(p.legal_case_titulo) : "") +
 	                "</div></div>" +
 	                '<div class="painel-schedule-meta">' +
-	                U.status_pill(p.prioridade || "Normal") +
+	                U.status_pill(p.priority || "Normal") +
 	                "</div></div>"
 	            );
 	        })
@@ -338,8 +338,8 @@ frappe.provide("advocacia.painel.timeline");
 	    if (!tarefas || !tarefas.length) return "";
 	    return tarefas
 	        .map(function (t) {
-	            var parts = U.painel_date_parts(t.data_limite);
-	            var cd = t.data_limite
+	            var parts = U.painel_date_parts(t.due_date);
+	            var cd = t.due_date
 	                ? U.prazo_countdown_label(t.dias_restantes != null ? t.dias_restantes : 99)
 	                : { text: __("Sem prazo"), cls: "" };
 	            var card_cls = "painel-schedule-card";
@@ -355,7 +355,7 @@ frappe.provide("advocacia.painel.timeline");
 	                frappe.utils.escape_html(t.name) +
 	                '">' +
 	                '<div class="painel-schedule-when">' +
-	                (t.data_limite
+	                (t.due_date
 	                    ? '<span class="painel-schedule-day">' +
 	                      frappe.utils.escape_html(parts.day) +
 	                      "</span>" +
@@ -370,7 +370,7 @@ frappe.provide("advocacia.painel.timeline");
 	                "</span></div>" +
 	                '<div class="painel-schedule-body">' +
 	                '<div class="painel-schedule-title">' +
-	                frappe.utils.escape_html(t.titulo || "") +
+	                frappe.utils.escape_html(t.subject || "") +
 	                "</div>" +
 	                '<div class="painel-schedule-sub">' +
 	                frappe.utils.escape_html(t.responsavel_nome || "—") +

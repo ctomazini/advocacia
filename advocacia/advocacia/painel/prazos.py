@@ -26,21 +26,21 @@ def _build_alertas(hoje, periodo_fim):
 		"Deadline",
 		filters={
 			"status": "Pendente",
-			"data_prazo": ["between", [hoje, amanha]],
+			"due_date": ["between", [hoje, amanha]],
 		},
-		fields=["name", "descricao", "data_prazo", "client", "legal_case", "prioridade"],
-		order_by="data_prazo asc",
+		fields=["name", "description", "due_date", "client", "legal_case", "priority"],
+		order_by="due_date asc",
 		limit_page_length=20,
 	)
 	cliente_nome_map = _cliente_nome_lookup([p.client for p in prazos_criticos if p.client])
 	for p in prazos_criticos:
-		dias = date_diff(p.data_prazo, hoje)
+		dias = date_diff(p.due_date, hoje)
 		alertas.append(
 			{
-				"tipo": "prazo",
+				"type": "prazo",
 				"nivel": "red" if dias <= 0 else "yellow",
-				"titulo": p.descricao or p.name,
-				"data": p.data_prazo,
+				"title": p.description or p.name,
+				"date": p.due_date,
 				"client": p.client or "",
 				"cliente_nome": cliente_nome_map.get(p.client, p.client or ""),
 				"dias": dias,
@@ -51,24 +51,24 @@ def _build_alertas(hoje, periodo_fim):
 
 	audiencias_hoje = frappe.get_all(
 		"Hearing",
-		filters={"data_hora": ["between", [f"{hoje} 00:00:00", f"{hoje} 23:59:59"]]},
-		fields=["name", "client", "data_hora", "tipo", "court_branch", "modalidade"],
-		order_by="data_hora asc",
+		filters={"hearing_datetime": ["between", [f"{hoje} 00:00:00", f"{hoje} 23:59:59"]]},
+		fields=["name", "client", "hearing_datetime", "type", "court_branch", "modality"],
+		order_by="hearing_datetime asc",
 		limit_page_length=20,
 	)
 	cliente_nome_aud = _cliente_nome_lookup([a.client for a in audiencias_hoje if a.client])
 	for a in audiencias_hoje:
 		alertas.append(
 			{
-				"tipo": "audiencia",
+				"type": "audiencia",
 				"nivel": "yellow",
-				"titulo": a.tipo or _("Audiência"),
-				"data": str(a.data_hora)[:10] if a.data_hora else hoje,
-				"hora": str(a.data_hora)[11:16] if a.data_hora else "",
+				"title": a.type or _("Audiência"),
+				"date": str(a.hearing_datetime)[:10] if a.hearing_datetime else hoje,
+				"hora": str(a.hearing_datetime)[11:16] if a.hearing_datetime else "",
 				"client": a.client or "",
 				"cliente_nome": cliente_nome_aud.get(a.client, a.client or ""),
 				"court_branch_link": _vara_label(a.court_branch),
-				"modalidade": a.modalidade or "",
+				"modality": a.modality or "",
 				"doctype": "Hearing",
 				"docname": a.name,
 			}
@@ -76,7 +76,7 @@ def _build_alertas(hoje, periodo_fim):
 
 	return alertas
 def _build_centro_atencao(hoje, amanha, kpis, financeiro, tarefas):
-	previsto = financeiro.get("previsto_periodo") or financeiro.get("previsto_semana") or {"count": 0, "valor": 0}
+	previsto = financeiro.get("previsto_periodo") or financeiro.get("previsto_semana") or {"count": 0, "amount": 0}
 	return {
 		"audiencias_hoje": kpis.get("audiencias_hoje") or 0,
 		"audiencias_amanha": kpis.get("audiencias_amanha") or 0,
@@ -86,9 +86,9 @@ def _build_centro_atencao(hoje, amanha, kpis, financeiro, tarefas):
 		"prazos_urgentes": kpis.get("prazos_urgentes") or 0,
 		"legal_tasks_atrasadas": kpis.get("legal_tasks_atrasadas") or 0,
 		"legal_tasks_pendentes": kpis.get("legal_tasks_pendentes") or 0,
-		"fee_installments_vencidas": kpis.get("fee_installments_vencidas") or {"count": 0, "valor": 0},
+		"fee_installments_vencidas": kpis.get("fee_installments_vencidas") or {"count": 0, "amount": 0},
 		"payments_periodo": previsto,
-		"recebimentos_periodo": kpis.get("recebido_periodo") or {"count": 0, "valor": 0},
+		"recebimentos_periodo": kpis.get("recebido_periodo") or {"count": 0, "amount": 0},
 		"honorarios_ativos": kpis.get("honorarios_ativos") or 0,
 		"custas_abertas": kpis.get("custas_abertas") or 0,
 		"taxa_recebimento": kpis.get("taxa_recebimento") or 0,
@@ -98,18 +98,18 @@ def _build_centro_atencao(hoje, amanha, kpis, financeiro, tarefas):
 def _get_audiencias(hoje, periodo_fim, limit):
 	rows = frappe.get_all(
 		"Hearing",
-		filters={"data_hora": ["between", [f"{hoje} 00:00:00", f"{periodo_fim} 23:59:59"]]},
+		filters={"hearing_datetime": ["between", [f"{hoje} 00:00:00", f"{periodo_fim} 23:59:59"]]},
 		fields=[
 			"name",
 			"legal_case",
 			"client",
-			"data_hora",
-			"tipo",
+			"hearing_datetime",
+			"type",
 			"court_branch",
-			"modalidade",
+			"modality",
 			"link_virtual",
 		],
-		order_by="data_hora asc",
+		order_by="hearing_datetime asc",
 		limit_page_length=limit,
 	)
 	servico_map = _servico_lookup(
@@ -121,13 +121,13 @@ def _get_audiencias(hoje, periodo_fim, limit):
 		[a.client for a in rows if a.client] + [sv.client for sv in servico_map.values() if sv.client]
 	)
 	for a in rows:
-		data_hora = a.get("data_hora")
+		data_hora = a.get("hearing_datetime")
 		if data_hora:
-			a["data"] = str(data_hora)[:10]
+			a["date"] = str(data_hora)[:10]
 			a["hora"] = str(data_hora)[11:16]
-			a["dias_restantes"] = date_diff(a["data"], hoje)
+			a["dias_restantes"] = date_diff(a["date"], hoje)
 		else:
-			a["data"] = None
+			a["date"] = None
 			a["hora"] = ""
 			a["dias_restantes"] = 0
 		a["vara_label"] = _vara_label(a.get("court_branch"))
@@ -142,35 +142,35 @@ def _get_prazos(hoje, periodo_fim, limit):
 		"Deadline",
 		filters={
 			"status": "Pendente",
-			"data_prazo": ["<=", periodo_fim],
+			"due_date": ["<=", periodo_fim],
 		},
-		fields=["name", "descricao", "data_prazo", "prioridade", "legal_case", "client"],
-		order_by="data_prazo asc",
+		fields=["name", "description", "due_date", "priority", "legal_case", "client"],
+		order_by="due_date asc",
 		limit_page_length=limit * 3,
 	)
 	prioridade_ordem = {"Alta": 0, "Média": 1, "Media": 1, "Baixa": 2, "Normal": 3}
 	servico_map = _servico_lookup(
-		[p.legal_case for p in rows if p.legal_case], ["client", "title", "numero_processo"]
+		[p.legal_case for p in rows if p.legal_case], ["client", "title", "case_number"]
 	)
 	cliente_nome_map = _cliente_nome_lookup(
 		[p.client for p in rows if p.client]
 		+ [sv.client for sv in servico_map.values() if sv.client]
 	)
 	for p in rows:
-		p["dias_restantes"] = date_diff(p.data_prazo, hoje) if p.data_prazo else 0
+		p["dias_restantes"] = date_diff(p.due_date, hoje) if p.due_date else 0
 		p["cliente_nome"] = cliente_nome_map.get(p.client, p.client or "")
 		p["servico_titulo"] = ""
-		p["numero_processo"] = ""
+		p["case_number"] = ""
 		if p.legal_case:
 			sv = servico_map.get(p.legal_case)
 			if sv:
 				if not p["cliente_nome"]:
 					p["cliente_nome"] = cliente_nome_map.get(sv.client, sv.client or "")
 				p["servico_titulo"] = sv.title or ""
-				p["numero_processo"] = sv.numero_processo or ""
+				p["case_number"] = sv.case_number or ""
 	rows.sort(
 		key=lambda x: (
-			prioridade_ordem.get(x.get("prioridade"), 9),
+			prioridade_ordem.get(x.get("priority"), 9),
 			x.get("dias_restantes", 99),
 		)
 	)

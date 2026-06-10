@@ -105,7 +105,7 @@ def get(
 			"list_limits": list_limits,
 			"list_meta": list_meta,
 			"kpis": kpis,
-			"resumo": resumo,
+			"summary": resumo,
 			"financeiro": financeiro,
 			"alertas": alertas,
 			"centro_atencao": centro_atencao,

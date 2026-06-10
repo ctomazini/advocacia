@@ -23,9 +23,9 @@ class TestReportProdutividade(FrappeTestCase):
 
 	def test_produtividade_com_dados(self):
 		servico = create_test_legal_case(area="Cível", status="Encerrado")
-		create_test_acordo(servico=servico.name, valor_total=10000)
-		create_test_court_cost(servico=servico.name, valor=500, status="Pago", data_pagamento=frappe.utils.today())
-		create_test_registro_horas(servico=servico.name, duracao_minutos=120)
+		create_test_acordo(servico=servico.name, total_amount=10000)
+		create_test_court_cost(servico=servico.name, amount=500, status="Pago", payment_date=frappe.utils.today())
+		create_test_registro_horas(servico=servico.name, duration_minutes=120)
 
 		columns, data, _msg, _chart, _summary = prod_execute({"periodo": "Tudo", "incluir_horas": 1})
 		civil = next((r for r in data if r.get("area") == "Cível"), None)
@@ -37,8 +37,8 @@ class TestReportProdutividade(FrappeTestCase):
 
 	def test_horas_por_servico_executa(self):
 		servico = create_test_legal_case()
-		create_test_registro_horas(servico=servico.name, duracao_minutos=60, cobravel=1)
-		create_test_registro_horas(servico=servico.name, duracao_minutos=30, cobravel=0)
+		create_test_registro_horas(servico=servico.name, duration_minutes=60, billable=1)
+		create_test_registro_horas(servico=servico.name, duration_minutes=30, billable=0)
 
 		columns, data, _msg, chart, summary = horas_execute(
 			{"legal_case": servico.name, "periodo": "Tudo"}

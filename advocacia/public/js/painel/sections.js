@@ -18,7 +18,7 @@
 
 		switch (list_key) {
 			case "hero":
-				return H.render_header(d.resumo, d.kpis, periodo, d.financeiro);
+				return H.render_header(d.summary, d.kpis, periodo, d.financeiro);
 			case "centro_atencao":
 				return AT.render(d.atencao);
 			case "agenda_dias":

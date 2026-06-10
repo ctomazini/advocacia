@@ -27,17 +27,17 @@ def get_active_cases() -> list[dict]:
 	cases = frappe.get_all(
 		"Legal Case",
 		filters={"status": ["in", list(ACTIVE_CASE_STATUSES)]},
-		fields=["name", "title", "client", "tipo", "numero_processo", "area", "status"],
+		fields=["name", "title", "client", "type", "case_number", "area", "status"],
 		order_by="modified desc",
 		limit_page_length=100,
 	)
 
 	client_names = {
-		row.name: row.nome
+		row.name: row.client_name
 		for row in frappe.get_all(
 			"Client",
 			filters={"name": ["in", [case.client for case in cases if case.client]]},
-			fields=["name", "nome"],
+			fields=["name", "client_name"],
 			limit_page_length=100,
 		)
 	}
@@ -84,33 +84,33 @@ def _case_financial_summary(case_name: str) -> dict:
 	fee_agreement = frappe.get_all(
 		"Fee Agreement",
 		filters={"legal_case": case_name, "status": ["!=", "Cancelado"]},
-		fields=["name", "valor_total_do_acordo", "status"],
+		fields=["name", "total_agreement_value", "status"],
 		order_by="modified desc",
 		limit=1,
 	)
 	payments = frappe.get_all(
 		"Legal Payment",
 		filters={"legal_case": case_name, "status": ["in", ["Pendente", "Vencido"]]},
-		fields=["valor"],
+		fields=["amount"],
 		limit_page_length=100,
 	)
 	court_costs = frappe.get_all(
 		"Court Cost",
 		filters={"legal_case": case_name, "status": ["!=", "Cancelado"]},
-		fields=["valor", "repassar_cliente"],
+		fields=["amount", "bill_to_client"],
 		limit_page_length=200,
 	)
 
-	agreement_value = flt(fee_agreement[0].valor_total_do_acordo) if fee_agreement else 0
+	agreement_value = flt(fee_agreement[0].total_agreement_value) if fee_agreement else 0
 	reimbursable = sum(
-		flt(row.valor) for row in court_costs if row.repassar_cliente and row.valor
+		flt(row.amount) for row in court_costs if row.bill_to_client and row.amount
 	)
-	total_costs = sum(flt(row.valor) for row in court_costs if row.valor)
+	total_costs = sum(flt(row.amount) for row in court_costs if row.amount)
 
 	return {
 		"fee_agreement_value": agreement_value,
 		"fee_agreement_status": fee_agreement[0].status if fee_agreement else None,
-		"amount_receivable": sum(flt(row.valor) for row in payments),
+		"amount_receivable": sum(flt(row.amount) for row in payments),
 		"pending_payments_count": len(payments),
 		"court_costs_total": total_costs,
 		"court_costs_reimbursable": reimbursable,
@@ -128,33 +128,33 @@ def get_case_summary(case_name: str) -> dict:
 		"title": case.title,
 		"client": case.client,
 		"client_name": get_cliente_nome(case.client),
-		"tipo": case.tipo,
+		"type": case.type,
 		"status": case.status,
-		"numero_processo": case.numero_processo,
+		"case_number": case.case_number,
 		"area": case.area,
 	}
 
 	summary["deadlines"] = frappe.get_all(
 		"Deadline",
 		filters={"legal_case": case_name, "status": "Pendente"},
-		fields=["name", "title", "data_prazo", "prioridade"],
-		order_by="data_prazo asc",
+		fields=["name", "title", "due_date", "priority"],
+		order_by="due_date asc",
 		limit_page_length=20,
 	)
 
 	summary["hearings"] = frappe.get_all(
 		"Hearing",
-		filters={"legal_case": case_name, "status_aud": ["!=", "Cancelada"]},
-		fields=["name", "title", "data_hora", "tipo", "modalidade"],
-		order_by="data_hora asc",
+		filters={"legal_case": case_name, "status": ["!=", "Cancelada"]},
+		fields=["name", "title", "hearing_datetime", "type", "modality"],
+		order_by="hearing_datetime asc",
 		limit_page_length=10,
 	)
 
 	summary["tasks"] = frappe.get_all(
 		"Legal Task",
 		filters={"legal_case": case_name, "status": ["in", ["Pendente", "Em Andamento"]]},
-		fields=["name", "titulo", "status", "data_limite", "prioridade"],
-		order_by="data_limite asc",
+		fields=["name", "subject", "status", "due_date", "priority"],
+		order_by="due_date asc",
 		limit_page_length=20,
 	)
 
@@ -163,7 +163,7 @@ def get_case_summary(case_name: str) -> dict:
 		summary["fee_agreements"] = frappe.get_all(
 			"Fee Agreement",
 			filters={"legal_case": case_name},
-			fields=["name", "title", "valor_total_do_acordo", "status"],
+			fields=["name", "title", "total_agreement_value", "status"],
 			limit_page_length=10,
 		)
 	else:
@@ -185,13 +185,13 @@ def get_court_costs_by_type(case_name: str) -> dict:
 	rows = frappe.get_all(
 		"Court Cost",
 		filters={"legal_case": case_name, "status": ["!=", "Cancelado"]},
-		fields=["tipo", "valor"],
+		fields=["type", "amount"],
 		limit_page_length=500,
 	)
 	totals: dict[str, float] = {}
 	for row in rows:
-		key = row.tipo or "Outros"
-		totals[key] = totals.get(key, 0) + flt(row.valor)
+		key = row.type or "Outros"
+		totals[key] = totals.get(key, 0) + flt(row.amount)
 
 	categories = [
 		{"cost_type": key, "amount": amount}
@@ -220,19 +220,19 @@ def get_financial_overview() -> dict:
 		"pending": frappe.db.count("Legal Payment", {"status": "Pendente"}),
 		"received_this_month": frappe.db.count(
 			"Legal Payment",
-			{"status": "Recebido", "data_recebimento": ["between", [mes_inicio, mes_fim]]},
+			{"status": "Recebido", "received_date": ["between", [mes_inicio, mes_fim]]},
 		),
 	}
 
 	overdue_val = frappe.db.sql(
-		"SELECT COALESCE(SUM(valor), 0) FROM `tabLegal Payment` WHERE status = 'Vencido'",
+		"SELECT COALESCE(SUM(amount), 0) FROM `tabLegal Payment` WHERE status = 'Vencido'",
 		as_list=True,
 	)
 	overview["overdue_amount"] = flt(overdue_val[0][0]) if overdue_val else 0
 
 	received_val = frappe.db.sql(
-		"""SELECT COALESCE(SUM(valor_recebido), 0) FROM `tabLegal Payment`
-		WHERE status = 'Recebido' AND data_recebimento BETWEEN %s AND %s""",
+		"""SELECT COALESCE(SUM(received_amount), 0) FROM `tabLegal Payment`
+		WHERE status = 'Recebido' AND received_date BETWEEN %s AND %s""",
 		(mes_inicio, mes_fim),
 		as_list=True,
 	)

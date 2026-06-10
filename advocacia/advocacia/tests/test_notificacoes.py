@@ -42,13 +42,13 @@ class TestNotificacoes(FrappeTestCase):
 
 	@patch("advocacia.advocacia.notification_helpers.enqueue_create_notification")
 	def test_notificar_tarefas_atrasadas(self, mock_notify):
-		create_test_legal_task(data_limite=add_days(today(), -2), status="Pendente")
+		create_test_legal_task(due_date=add_days(today(), -2), status="Pendente")
 		notificar_tarefas_atrasadas()
 		self.assertTrue(mock_notify.called)
 
 	@patch("frappe.sendmail")
 	def test_notificar_prazos_diario_envia_email(self, mock_sendmail):
-		create_test_prazo(data_prazo=add_days(today(), 1), dias_notificacao=3)
+		create_test_prazo(due_date=add_days(today(), 1), notification_days=3)
 		notificar_prazos_diario()
 		if mock_sendmail.called:
 			kwargs = mock_sendmail.call_args.kwargs
@@ -63,11 +63,11 @@ class TestNotificacoes(FrappeTestCase):
 				name="PRAZO-TEST-LONGO",
 				servico="SERV-TEST",
 				cliente="CLI-TEST",
-				data_prazo=add_days(today(), 30),
-				descricao="Prazo fora da janela",
-				prioridade="Normal",
-				responsavel=None,
-				dias_notificacao=3,
+				due_date=add_days(today(), 30),
+				description="Prazo fora da janela",
+				priority="Normal",
+				responsible=None,
+				notification_days=3,
 			)
 		]
 		notificar_prazos_diario()
@@ -75,7 +75,7 @@ class TestNotificacoes(FrappeTestCase):
 
 	@patch("frappe.sendmail")
 	def test_subject_contem_advocacia(self, mock_sendmail):
-		create_test_prazo(data_prazo=today(), dias_notificacao=5)
+		create_test_prazo(due_date=today(), notification_days=5)
 		notificar_prazos_diario()
 		if mock_sendmail.called:
 			subject = mock_sendmail.call_args.kwargs.get("subject", "")

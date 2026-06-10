@@ -26,7 +26,7 @@ frappe.query_reports["honorarios_por_cliente"] = {
 	formatter(value, row, column, data, default_formatter) {
 		value = default_formatter(value, row, column, data);
 		if (
-			["total_contratado", "total_recebido", "total_pendente", "total_vencido"].includes(
+			["total_contratado", "total_recebido", "pending_total", "total_vencido"].includes(
 				column.fieldname
 			) &&
 			flt(row[column.fieldname]) > 0

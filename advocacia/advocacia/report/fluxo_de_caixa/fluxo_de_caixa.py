@@ -17,9 +17,9 @@ def execute(filters=None):
 
 def _get_columns():
 	return [
-		{"fieldname": "data", "label": _("Data"), "fieldtype": "Date", "width": 110},
-		{"fieldname": "tipo", "label": _("Tipo"), "fieldtype": "Data", "width": 90},
-		{"fieldname": "descricao", "label": _("Descrição"), "fieldtype": "Data", "width": 220},
+		{"fieldname": "date", "label": _("Data"), "fieldtype": "Date", "width": 110},
+		{"fieldname": "type", "label": _("Tipo"), "fieldtype": "Data", "width": 90},
+		{"fieldname": "description", "label": _("Descrição"), "fieldtype": "Data", "width": 220},
 		{"fieldname": "origem", "label": _("Origem"), "fieldtype": "Data", "width": 160},
 		{"fieldname": "origem_doctype", "label": _("Origem DocType"), "fieldtype": "Data", "hidden": 1},
 		{
@@ -61,7 +61,7 @@ def _get_period_bounds(filters):
 def _get_pagamentos(filters, period_start, period_end):
 	query_filters = {
 		"status": "Recebido",
-		"data_recebimento": ["between", [period_start, period_end]],
+		"received_date": ["between", [period_start, period_end]],
 	}
 	if filters.get("client"):
 		query_filters["client"] = filters.client
@@ -69,8 +69,8 @@ def _get_pagamentos(filters, period_start, period_end):
 	return frappe.get_all(
 		"Legal Payment",
 		filters=query_filters,
-		fields=["name", "descricao", "data_recebimento", "valor", "valor_recebido"],
-		order_by="data_recebimento asc",
+		fields=["name", "description", "received_date", "amount", "received_amount"],
+		order_by="received_date asc",
 		limit_page_length=0,
 	)
 
@@ -83,10 +83,10 @@ def _get_despesas(filters, period_start, period_end):
 		"Office Expense",
 		filters={
 			"status": "Pago",
-			"data_pagamento": ["between", [period_start, period_end]],
+			"payment_date": ["between", [period_start, period_end]],
 		},
-		fields=["name", "descricao", "categoria", "data_pagamento", "valor"],
-		order_by="data_pagamento asc",
+		fields=["name", "description", "category", "payment_date", "amount"],
+		order_by="payment_date asc",
 		limit_page_length=0,
 	)
 
@@ -97,7 +97,7 @@ def _get_custas(filters, period_start, period_end):
 
 	custa_filters = {
 		"status": "Pago",
-		"data_pagamento": ["between", [period_start, period_end]],
+		"payment_date": ["between", [period_start, period_end]],
 	}
 	if filters.get("client"):
 		custa_filters["client"] = filters.client
@@ -105,8 +105,8 @@ def _get_custas(filters, period_start, period_end):
 	return frappe.get_all(
 		"Court Cost",
 		filters=custa_filters,
-		fields=["name", "descricao", "tipo", "legal_case", "data_pagamento", "valor"],
-		order_by="data_pagamento asc",
+		fields=["name", "description", "type", "legal_case", "payment_date", "amount"],
+		order_by="payment_date asc",
 		limit_page_length=0,
 	)
 
@@ -119,7 +119,7 @@ def _build_chart(transactions, period_start, meses):
 		month_totals[label] = {"entrada": 0.0, "saida": 0.0}
 
 	for row in transactions:
-		label = month_label(row["data"])
+		label = month_label(row["date"])
 		if label not in month_totals:
 			month_totals[label] = {"entrada": 0.0, "saida": 0.0}
 		month_totals[label]["entrada"] += flt(row.get("valor_entrada"))
@@ -141,12 +141,12 @@ def _get_data(filters):
 	transactions = []
 
 	for pag in _get_pagamentos(filters, period_start, period_end):
-		valor = flt(pag.valor_recebido or pag.valor)
+		valor = flt(pag.received_amount or pag.amount)
 		transactions.append(
 			{
-				"data": pag.data_recebimento,
-				"tipo": _("Entrada"),
-				"descricao": pag.descricao or pag.name,
+				"date": pag.received_date,
+				"type": _("Entrada"),
+				"description": pag.description or pag.name,
 				"origem": "Legal Payment",
 				"origem_doctype": "Legal Payment",
 				"documento": pag.name,
@@ -156,42 +156,42 @@ def _get_data(filters):
 		)
 
 	for desp in _get_despesas(filters, period_start, period_end):
-		descricao = desp.descricao or desp.name
-		if desp.categoria:
-			descricao = f"{descricao} ({desp.categoria})"
+		descricao = desp.description or desp.name
+		if desp.category:
+			descricao = f"{descricao} ({desp.category})"
 		transactions.append(
 			{
-				"data": desp.data_pagamento,
-				"tipo": _("Saída"),
-				"descricao": descricao,
+				"date": desp.payment_date,
+				"type": _("Saída"),
+				"description": descricao,
 				"origem": "Office Expense",
 				"origem_doctype": "Office Expense",
 				"documento": desp.name,
 				"valor_entrada": 0,
-				"valor_saida": flt(desp.valor),
+				"valor_saida": flt(desp.amount),
 			}
 		)
 
 	for custa in _get_custas(filters, period_start, period_end):
-		descricao = custa.descricao or custa.name
-		if custa.tipo:
-			descricao = f"{descricao} ({custa.tipo})"
+		descricao = custa.description or custa.name
+		if custa.type:
+			descricao = f"{descricao} ({custa.type})"
 		if custa.legal_case:
 			descricao = f"{descricao} - {custa.legal_case}"
 		transactions.append(
 			{
-				"data": custa.data_pagamento,
-				"tipo": _("Saída"),
-				"descricao": descricao,
+				"date": custa.payment_date,
+				"type": _("Saída"),
+				"description": descricao,
 				"origem": "Court Cost",
 				"origem_doctype": "Court Cost",
 				"documento": custa.name,
 				"valor_entrada": 0,
-				"valor_saida": flt(custa.valor),
+				"valor_saida": flt(custa.amount),
 			}
 		)
 
-	transactions.sort(key=lambda row: getdate(row["data"]))
+	transactions.sort(key=lambda row: getdate(row["date"]))
 
 	saldo = 0.0
 	total_entradas = 0.0
@@ -211,9 +211,9 @@ def _get_data(filters):
 		rows.append({})
 		rows.append(
 			{
-				"data": None,
-				"tipo": "",
-				"descricao": _("Total Entradas"),
+				"date": None,
+				"type": "",
+				"description": _("Total Entradas"),
 				"origem": "",
 				"origem_doctype": "",
 				"documento": "",
@@ -224,9 +224,9 @@ def _get_data(filters):
 		)
 		rows.append(
 			{
-				"data": None,
-				"tipo": "",
-				"descricao": _("Total Saídas"),
+				"date": None,
+				"type": "",
+				"description": _("Total Saídas"),
 				"origem": "",
 				"origem_doctype": "",
 				"documento": "",
@@ -237,9 +237,9 @@ def _get_data(filters):
 		)
 		rows.append(
 			{
-				"data": None,
-				"tipo": "",
-				"descricao": _("Saldo Líquido do Período"),
+				"date": None,
+				"type": "",
+				"description": _("Saldo Líquido do Período"),
 				"origem": "",
 				"origem_doctype": "",
 				"documento": "",

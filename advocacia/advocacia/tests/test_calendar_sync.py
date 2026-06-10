@@ -17,27 +17,27 @@ class TestCalendarSync(FrappeTestCase):
 		)
 
 	def test_hearing_cria_event(self):
-		aud = create_test_hearing(tipo="Instrução")
+		aud = create_test_hearing(type="Instrução")
 		event = self._find_event("Hearing", aud.name)
 		self.assertTrue(event)
 		self.assertIn("Instrução", event.subject)
 
 	def test_hearing_atualiza_event(self):
-		aud = create_test_hearing(tipo="Conciliação")
-		aud.tipo = "Julgamento"
+		aud = create_test_hearing(type="Conciliação")
+		aud.type = "Julgamento"
 		aud.save(ignore_permissions=True)
 		event = self._find_event("Hearing", aud.name)
 		self.assertIn("Julgamento", event.subject)
 
 	def test_hearing_cancelada_fecha_event(self):
 		aud = create_test_hearing()
-		aud.status_aud = "Cancelada"
+		aud.status = "Cancelada"
 		aud.save(ignore_permissions=True)
 		event = self._find_event("Hearing", aud.name)
 		self.assertEqual(event.status, "Closed")
 
 	def test_prazo_cria_event_all_day(self):
-		prazo = create_test_prazo(prioridade="Alta")
+		prazo = create_test_prazo(priority="Alta")
 		event = self._find_event("Deadline", prazo.name)
 		self.assertTrue(event)
 		self.assertEqual(event.all_day, 1)
@@ -51,6 +51,6 @@ class TestCalendarSync(FrappeTestCase):
 		self.assertEqual(event.status, "Closed")
 
 	def test_prazo_prioridade_media_cor_laranja(self):
-		prazo = create_test_prazo(prioridade="Média")
+		prazo = create_test_prazo(priority="Média")
 		event = self._find_event("Deadline", prazo.name)
 		self.assertEqual(event.color, "orange")

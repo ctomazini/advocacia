@@ -31,9 +31,9 @@ frappe.provide("advocacia.painel.financeiro");
 	        neutral: css.getPropertyValue("--gray-600").trim(),
 	    };
 	    (fin.grafico || []).forEach(function (g) {
-	        if (U.flt(g.valor) <= 0) return;
+	        if (U.flt(g.amount) <= 0) return;
 	        labels.push(g.label);
-	        values.push(U.flt(g.valor));
+	        values.push(U.flt(g.amount));
 	        colors.push(tone_colors[g.tone] || tone_colors.neutral);
 	    });
 	    if (!values.length) return;
@@ -57,18 +57,18 @@ frappe.provide("advocacia.painel.financeiro");
 	    if (!fin) return "";
 	    periodo_dias = U.cint(periodo_dias) || 7;
 	    var previsto =
-	        fin.previsto_periodo || fin.previsto_semana || { count: 0, valor: 0 };
+	        fin.previsto_periodo || fin.previsto_semana || { count: 0, amount: 0 };
 	    var previsto_label =
 	        periodo_dias === 1
 	            ? __("Previsto hoje")
 	            : __("Previsto ({0})", [U.painel_periodo_label(periodo_dias)]);
 	    var max_val = 1;
 	    (fin.grafico || []).forEach(function (g) {
-	        if (U.flt(g.valor) > max_val) max_val = U.flt(g.valor);
+	        if (U.flt(g.amount) > max_val) max_val = U.flt(g.amount);
 	    });
 	    var chart_rows = (fin.grafico || [])
 	        .map(function (g) {
-	            var pct = Math.max(4, Math.round((U.flt(g.valor) / max_val) * 100));
+	            var pct = Math.max(4, Math.round((U.flt(g.amount) / max_val) * 100));
 	            return (
 	                '<div class="painel-chart-row">' +
 	                '<span class="painel-chart-label">' +
@@ -80,7 +80,7 @@ frappe.provide("advocacia.painel.financeiro");
 	                pct +
 	                '%"></div></div>' +
 	                '<span class="painel-chart-amt">' +
-	                U.fmt_currency(g.valor) +
+	                U.fmt_currency(g.amount) +
 	                "</span></div>"
 	            );
 	        })
@@ -103,17 +103,17 @@ frappe.provide("advocacia.painel.financeiro");
 	        '<div class="painel-stat"><div class="painel-stat-label">' +
 	        __("Recebido no mês") +
 	        '</div><div class="painel-stat-value success">' +
-	        U.fmt_currency(fin.recebido_mes.valor) +
+	        U.fmt_currency(fin.recebido_mes.amount) +
 	        "</div></div>" +
 	        '<div class="painel-stat"><div class="painel-stat-label">' +
 	        __("Vencido") +
 	        '</div><div class="painel-stat-value danger">' +
-	        U.fmt_currency(fin.vencido.valor) +
+	        U.fmt_currency(fin.vencido.amount) +
 	        "</div></div>" +
 	        '<div class="painel-stat"><div class="painel-stat-label">' +
 	        previsto_label +
 	        '</div><div class="painel-stat-value">' +
-	        U.fmt_currency(previsto.valor) +
+	        U.fmt_currency(previsto.amount) +
 	        "</div></div>" +
 	        '<div class="painel-stat"><div class="painel-stat-label">' +
 	        __("Inadimplência") +
@@ -170,9 +170,9 @@ frappe.provide("advocacia.painel.financeiro");
 	                '<div class="painel-op-body"><div class="painel-op-title">' +
 	                frappe.utils.escape_html(p.client_nome || "—") +
 	                '</div><div class="painel-op-sub">' +
-	                U.fmt_currency(p.valor_total) +
+	                U.fmt_currency(p.total_amount) +
 	                " · " +
-	                U.fmt_date_iso(p.vencimento) +
+	                U.fmt_date_iso(p.due_date) +
 	                "</div></div>" +
 	                '<div class="painel-op-side">' +
 	                U.status_pill(p.status) +
@@ -266,10 +266,10 @@ frappe.provide("advocacia.painel.financeiro");
 	            frappe.utils.escape_html(p.client_nome || "—") +
 	            '</div><div class="painel-op-sub">' +
 	            frappe.utils.escape_html(p.legal_case_titulo || p.legal_case_tipo || "") +
-	            (p.numero_processo ? " · " + frappe.utils.escape_html(p.numero_processo) : "") +
+	            (p.case_number ? " · " + frappe.utils.escape_html(p.case_number) : "") +
 	            "</div>" +
 	            '<div class="painel-muted">' +
-	            U.fmt_date_iso(p.vencimento) +
+	            U.fmt_date_iso(p.due_date) +
 	            (prazo_txt ? " · " + prazo_txt : "") +
 	            "</div>" +
 	            U.status_pill(p.status) +
@@ -278,7 +278,7 @@ frappe.provide("advocacia.painel.financeiro");
 	            '<div class="painel-list-valor ' +
 	            (U._is_vencido(p.status) ? "danger" : "warn") +
 	            '">' +
-	            U.fmt_currency(p.valor_total) +
+	            U.fmt_currency(p.total_amount) +
 	            "</div>" +
 	            btn +
 	            "</div></div>";
@@ -332,12 +332,12 @@ frappe.provide("advocacia.painel.financeiro");
 	            '">' +
 	            '<div class="painel-schedule-main">' +
 	            '<div class="painel-op-title">' +
-	            frappe.utils.escape_html(d.descricao || d.name) +
+	            frappe.utils.escape_html(d.description || d.name) +
 	            "</div>" +
 	            '<div class="painel-op-sub">' +
-	            frappe.utils.escape_html(d.categoria || "") +
-	            (d.data_vencimento
-	                ? " · " + frappe.utils.escape_html(frappe.datetime.str_to_user(d.data_vencimento))
+	            frappe.utils.escape_html(d.category || "") +
+	            (d.due_date
+	                ? " · " + frappe.utils.escape_html(frappe.datetime.str_to_user(d.due_date))
 	                : "") +
 	            "</div>" +
 	            badge +
@@ -346,7 +346,7 @@ frappe.provide("advocacia.painel.financeiro");
 	            '<div class="painel-list-valor ' +
 	            tone +
 	            '">' +
-	            U.fmt_currency(d.valor) +
+	            U.fmt_currency(d.amount) +
 	            "</div></div></div>";
 	    });
 	    h += "</div></div></section>";
@@ -393,17 +393,17 @@ frappe.provide("advocacia.painel.financeiro");
 	            '">' +
 	            '<div class="painel-schedule-main">' +
 	            '<div class="painel-op-title">' +
-	            frappe.utils.escape_html(c.descricao || c.name) +
+	            frappe.utils.escape_html(c.description || c.name) +
 	            "</div>" +
 	            '<div class="painel-op-sub">' +
-	            frappe.utils.escape_html(c.tipo || "") +
+	            frappe.utils.escape_html(c.type || "") +
 	            (c.legal_case_titulo ? " · " + frappe.utils.escape_html(c.legal_case_titulo) : "") +
 	            "</div>" +
 	            '<span class="indicator-pill blue">' + __("Aguardando repasse") + "</span>" +
 	            "</div>" +
 	            '<div class="painel-list-side">' +
 	            '<div class="painel-list-valor warn">' +
-	            U.fmt_currency(c.valor) +
+	            U.fmt_currency(c.amount) +
 	            "</div></div></div>";
 	    });
 	    h += "</div></div></section>";

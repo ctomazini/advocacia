@@ -111,16 +111,16 @@ def _get_data(filters):
 	if filters.get("client"):
 		query_filters["client"] = filters.client
 	if period_start and period_end:
-		query_filters["data"] = ["between", [period_start, period_end]]
+		query_filters["entry_date"] = ["between", [period_start, period_end]]
 	elif period_start:
-		query_filters["data"] = [">=", period_start]
+		query_filters["entry_date"] = [">=", period_start]
 	elif period_end:
-		query_filters["data"] = ["<=", period_end]
+		query_filters["entry_date"] = ["<=", period_end]
 
 	registros = frappe.get_all(
 		"Time Entry",
 		filters=query_filters,
-		fields=["legal_case", "client", "duracao_horas", "cobravel"],
+		fields=["legal_case", "client", "duration_hours", "billable"],
 		limit_page_length=0,
 	)
 
@@ -128,7 +128,7 @@ def _get_data(filters):
 		lambda: {
 			"client": "",
 			"total": 0.0,
-			"cobravel": 0.0,
+			"billable": 0.0,
 			"nao_cobravel": 0.0,
 			"qtd_registros": 0,
 		}
@@ -140,10 +140,10 @@ def _get_data(filters):
 		b = by_servico[r.legal_case]
 		b["client"] = r.client or b["client"]
 		b["qtd_registros"] += 1
-		h = flt(r.duracao_horas)
+		h = flt(r.duration_hours)
 		b["total"] += h
-		if r.cobravel:
-			b["cobravel"] += h
+		if r.billable:
+			b["billable"] += h
 		else:
 			b["nao_cobravel"] += h
 
@@ -158,11 +158,11 @@ def _get_data(filters):
 	honorarios = {}
 	for row in frappe.get_all(
 		"Fee Agreement",
-		fields=["legal_case", "valor_total_do_acordo"],
+		fields=["legal_case", "total_agreement_value"],
 		limit_page_length=0,
 	):
 		if row.legal_case:
-			honorarios[row.legal_case] = honorarios.get(row.legal_case, 0) + flt(row.valor_total_do_acordo)
+			honorarios[row.legal_case] = honorarios.get(row.legal_case, 0) + flt(row.total_agreement_value)
 
 	rows = []
 	sum_total = sum_cobravel = sum_nao_cobravel = sum_honorarios = 0.0
@@ -176,7 +176,7 @@ def _get_data(filters):
 		titulo = servico_doc.get("title") or servico
 		valor_hon = honorarios.get(servico, 0)
 		valor_hora = valor_hon / stats["total"] if stats["total"] else 0
-		pct_cobravel = (stats["cobravel"] / stats["total"] * 100) if stats["total"] else 0
+		pct_cobravel = (stats["billable"] / stats["total"] * 100) if stats["total"] else 0
 
 		rows.append(
 			{
@@ -186,7 +186,7 @@ def _get_data(filters):
 				"area": area,
 				"qtd_registros": stats["qtd_registros"],
 				"total_horas": round(stats["total"], 2),
-				"horas_cobraveis": round(stats["cobravel"], 2),
+				"horas_cobraveis": round(stats["billable"], 2),
 				"horas_nao_cobraveis": round(stats["nao_cobravel"], 2),
 				"pct_cobravel": pct_cobravel,
 				"valor_honorarios": valor_hon,
@@ -194,7 +194,7 @@ def _get_data(filters):
 			}
 		)
 		sum_total += stats["total"]
-		sum_cobravel += stats["cobravel"]
+		sum_cobravel += stats["billable"]
 		sum_nao_cobravel += stats["nao_cobravel"]
 		sum_honorarios += valor_hon
 		sum_registros += stats["qtd_registros"]

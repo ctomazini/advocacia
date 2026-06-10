@@ -22,11 +22,11 @@ def notificar_prazos_diario():
 			"name",
 			"legal_case",
 			"client",
-			"data_prazo",
-			"descricao",
-			"prioridade",
-			"responsavel",
-			"dias_notificacao",
+			"due_date",
+			"description",
+			"priority",
+			"responsible",
+			"notification_days",
 		],
 		limit_page_length=500,
 	)
@@ -34,10 +34,10 @@ def notificar_prazos_diario():
 	prazos_urgentes = []
 
 	for prazo in prazos:
-		if not prazo.data_prazo:
+		if not prazo.due_date:
 			continue
-		dias_restantes = frappe.utils.date_diff(prazo.data_prazo, hoje)
-		dias_notif = prazo.dias_notificacao or default_days
+		dias_restantes = frappe.utils.date_diff(prazo.due_date, hoje)
+		dias_notif = prazo.notification_days or default_days
 		if dias_restantes <= dias_notif:
 			prazo["dias_restantes"] = dias_restantes
 			prazos_urgentes.append(prazo)
@@ -63,7 +63,7 @@ def notificar_prazos_diario():
 		html += "<h4 style='color:red'>{0}</h4><ul>".format(_("Prazos Vencidos"))
 		for p in vencidos:
 			html += "<li><b>{0}</b> - venceu ha {1} dia(s) - Legal Case: {2} - Client: {3}</li>".format(
-				p.descricao or p.name,
+				p.description or p.name,
 				abs(p["dias_restantes"]),
 				p.legal_case or "N/A",
 				p.client or "N/A",
@@ -80,9 +80,9 @@ def notificar_prazos_diario():
 			else:
 				label = "em {0} dias".format(p["dias_restantes"])
 			html += "<li><b>{0}</b> - vence {1} ({2}) - Legal Case: {3} - Client: {4}</li>".format(
-				p.descricao or p.name,
+				p.description or p.name,
 				label,
-				frappe.utils.formatdate(p.data_prazo, "dd/MM/yyyy"),
+				frappe.utils.formatdate(p.due_date, "dd/MM/yyyy"),
 				p.legal_case or "N/A",
 				p.client or "N/A",
 			)
@@ -123,7 +123,7 @@ def _manager_users():
 
 def _task_recipients(task):
 	users = _manager_users()
-	for field in ("responsavel", "owner"):
+	for field in ("responsible", "owner"):
 		value = task.get(field)
 		if value and value not in users:
 			users.append(value)
@@ -142,22 +142,22 @@ def notificar_tarefas_atrasadas():
 		"Legal Task",
 		filters={
 			"status": ["in", ["Pendente", "Em Andamento"]],
-			"data_limite": ["<", hoje],
+			"due_date": ["<", hoje],
 		},
-		fields=["name", "titulo", "legal_case", "responsavel", "owner", "data_limite"],
+		fields=["name", "subject", "legal_case", "responsible", "owner", "due_date"],
 		limit_page_length=500,
 	)
 	count = 0
 	for task in tarefas:
-		subject = _("Tarefa atrasada: {0}").format(task.titulo or task.name)
+		subject = _("Tarefa atrasada: {0}").format(task.subject or task.name)
 		if notification_already_sent("Legal Task", task.name, subject):
 			continue
 		message = _(
 			"A tarefa {0} (Legal Case: {1}) está atrasada desde {2}."
 		).format(
-			task.titulo or task.name,
+			task.subject or task.name,
 			task.legal_case or _("N/A"),
-			frappe.utils.formatdate(task.data_limite),
+			frappe.utils.formatdate(task.due_date),
 		)
 		send_system_notification(
 			users=_task_recipients(task),

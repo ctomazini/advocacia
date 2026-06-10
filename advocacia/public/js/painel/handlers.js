@@ -13,46 +13,46 @@
 		return {
 			audiencias_hoje: function () {
 				U.painel_goto_list("Hearing", [
-					["data_hora", "between", [hoje + " 00:00:00", hoje + " 23:59:59"]],
+					["hearing_datetime", "between", [hoje + " 00:00:00", hoje + " 23:59:59"]],
 				]);
 			},
 			audiencias_amanha: function () {
 				U.painel_goto_list("Hearing", [
-					["data_hora", "between", [amanha + " 00:00:00", amanha + " 23:59:59"]],
+					["hearing_datetime", "between", [amanha + " 00:00:00", amanha + " 23:59:59"]],
 				]);
 			},
 			audiencias_periodo: function () {
 				U.painel_goto_list("Hearing", [
-					["data_hora", "between", [hoje + " 00:00:00", periodo_fim + " 23:59:59"]],
+					["hearing_datetime", "between", [hoje + " 00:00:00", periodo_fim + " 23:59:59"]],
 				]);
 			},
 			audiencias_semana: function () {
 				U.painel_goto_list("Hearing", [
-					["data_hora", "between", [hoje + " 00:00:00", periodo_fim + " 23:59:59"]],
+					["hearing_datetime", "between", [hoje + " 00:00:00", periodo_fim + " 23:59:59"]],
 				]);
 			},
 			prazos_vencidos: function () {
 				U.painel_goto_list("Deadline", [
 					["status", "=", "Pendente"],
-					["data_prazo", "<", hoje],
+					["due_date", "<", hoje],
 				]);
 			},
 			prazos_proximos: function () {
 				U.painel_goto_list("Deadline", [
 					["status", "=", "Pendente"],
-					["data_prazo", "between", [hoje, tres_dias]],
+					["due_date", "between", [hoje, tres_dias]],
 				]);
 			},
 			prazos_criticos: function () {
 				U.painel_goto_list("Deadline", [
 					["status", "=", "Pendente"],
-					["data_prazo", "<=", tres_dias],
+					["due_date", "<=", tres_dias],
 				]);
 			},
 			tarefas_atrasadas: function () {
 				U.painel_goto_list("Legal Task", [
 					["status", "in", ["Pendente", "Em Andamento"]],
-					["data_limite", "<", hoje],
+					["due_date", "<", hoje],
 				]);
 			},
 			tarefas_pendentes: function () {
@@ -64,32 +64,32 @@
 			pagamentos_periodo: function () {
 				U.painel_goto_list("Legal Payment", [
 					["status", "=", "Pendente"],
-					["data_vencimento", "between", [hoje, periodo_fim]],
+					["due_date", "between", [hoje, periodo_fim]],
 				]);
 			},
 			payments_periodo: function () {
 				U.painel_goto_list("Legal Payment", [
 					["status", "=", "Pendente"],
-					["data_vencimento", "between", [hoje, periodo_fim]],
+					["due_date", "between", [hoje, periodo_fim]],
 				]);
 			},
 			recebimentos_periodo: function () {
 				U.painel_goto_list("Legal Payment", [
 					["status", "in", ["Recebido", "Repassado"]],
-					["data_recebimento", "between", [hoje, periodo_fim]],
+					["received_date", "between", [hoje, periodo_fim]],
 				]);
 			},
 			receita_mes: function () {
 				U.painel_goto_list("Legal Payment", [
 					["status", "in", ["Recebido", "Repassado"]],
-					["data_recebimento", "between", [mes_inicio, mes_fim]],
+					["received_date", "between", [mes_inicio, mes_fim]],
 				]);
 			},
 			honorarios_ativos: function () {
 				U.painel_goto_list("Fee Agreement", [["status", "=", "Vigente"]]);
 			},
 			horas: function () {
-				U.painel_goto_list("Time Entry", [["data", "between", [hoje, periodo_fim]]]);
+				U.painel_goto_list("Time Entry", [["entry_date", "between", [hoje, periodo_fim]]]);
 			},
 			clientes: function () {
 				U.painel_goto_list("Client", []);
@@ -103,12 +103,12 @@
 			custas_abertas: function () {
 				U.painel_goto_list("Court Cost", [
 					["status", "in", ["Pendente", "Pago"]],
-					["repassar_cliente", "=", 1],
+					["bill_to_client", "=", 1],
 				]);
 			},
 			despesas_mes: function () {
 				U.painel_goto_list("Office Expense", [
-					["data_vencimento", "between", [mes_inicio, mes_fim]],
+					["due_date", "between", [mes_inicio, mes_fim]],
 				]);
 			},
 			vencidas: function () {
@@ -117,24 +117,24 @@
 			recebido: function () {
 				U.painel_goto_list("Legal Payment", [
 					["status", "in", ["Recebido", "Repassado"]],
-					["data_recebimento", "between", [mes_inicio, mes_fim]],
+					["received_date", "between", [mes_inicio, mes_fim]],
 				]);
 			},
 			previsto: function () {
 				U.painel_goto_list("Legal Payment", [
 					["status", "=", "Pendente"],
-					["data_vencimento", "between", [mes_inicio, mes_fim]],
+					["due_date", "between", [mes_inicio, mes_fim]],
 				]);
 			},
 			audiencias: function () {
 				U.painel_goto_list("Hearing", [
-					["data_hora", "between", [hoje + " 00:00:00", hoje + " 23:59:59"]],
+					["hearing_datetime", "between", [hoje + " 00:00:00", hoje + " 23:59:59"]],
 				]);
 			},
 			prazos: function () {
 				U.painel_goto_list("Deadline", [
 					["status", "=", "Pendente"],
-					["data_prazo", "<=", tres_dias],
+					["due_date", "<=", tres_dias],
 				]);
 			},
 			servicos: function () {

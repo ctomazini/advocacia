@@ -29,7 +29,7 @@ def build_agenda_dias(hoje, periodo_dias, timeline_items):
 	days = []
 	for offset in range(min(periodo_dias, 7)):
 		day = add_days(hoje, offset)
-		day_items = [row for row in timeline_items if row.get("data") == day]
+		day_items = [row for row in timeline_items if row.get("date") == day]
 		days.append(
 			{
 				"date": day,
@@ -53,12 +53,12 @@ def build_proximo_evento(timeline_items, hoje=None, limit=2):
 	items = sorted(timeline_items or [], key=lambda row: row.get("sort_key") or "")
 	upcoming = []
 	for item in items:
-		if item.get("tipo") == "pagamento":
+		if item.get("type") == "pagamento":
 			continue
 		enriched = dict(item)
-		enriched["when_label"] = _relative_when(hoje, item.get("data"))
-		enriched["icon"] = _icon_for_tipo(item.get("tipo"))
-		enriched["type"] = item.get("tipo")
+		enriched["when_label"] = _relative_when(hoje, item.get("date"))
+		enriched["icon"] = _icon_for_tipo(item.get("type"))
+		enriched["type"] = item.get("type")
 		upcoming.append(enriched)
 		if len(upcoming) >= limit:
 			break

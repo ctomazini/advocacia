@@ -44,10 +44,10 @@ def ensure_office_settings():
 	frappe.get_doc(
 		{
 			"doctype": "Office Settings",
-			"razao_social": "Escritório de Advocacia",
-			"advogada": "Advogada(o) Responsável",
+			"company_name": "Escritório de Advocacia",
+			"lawyer_name": "Advogada(o) Responsável",
 			"oab": "000000",
-			"endereco": "Endereço profissional do escritório",
+			"address": "Endereço profissional do escritório",
 			"default_notify_days": 3,
 		}
 	).insert(ignore_permissions=True)  # setup: seed do Single de configuração

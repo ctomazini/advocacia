@@ -95,7 +95,7 @@ frappe.provide("advocacia.painel.kpis");
 	            icon: "circle-dollar-sign",
 	            count: (centro.fee_installments_vencidas && centro.fee_installments_vencidas.count) || 0,
 	            label: __("Parcelas vencidas"),
-	            meta: U.fmt_currency((centro.fee_installments_vencidas && centro.fee_installments_vencidas.valor) || 0, true),
+	            meta: U.fmt_currency((centro.fee_installments_vencidas && centro.fee_installments_vencidas.amount) || 0, true),
 	            route: "parcelas_vencidas",
 	        },
 	    ];
@@ -106,7 +106,7 @@ frappe.provide("advocacia.painel.kpis");
 	            icon: "wallet",
 	            count: (centro.payments_periodo && centro.payments_periodo.count) || 0,
 	            label: U.painel_periodo_a_receber_label(periodo_dias),
-	            meta: U.fmt_currency((centro.payments_periodo && centro.payments_periodo.valor) || 0, true),
+	            meta: U.fmt_currency((centro.payments_periodo && centro.payments_periodo.amount) || 0, true),
 	            route: "payments_periodo",
 	        },
 	        {
@@ -114,7 +114,7 @@ frappe.provide("advocacia.painel.kpis");
 	            icon: "trending-up",
 	            count: (centro.recebimentos_periodo && centro.recebimentos_periodo.count) || 0,
 	            label: U.painel_periodo_recebidos_label(periodo_dias),
-	            meta: U.fmt_currency((centro.recebimentos_periodo && centro.recebimentos_periodo.valor) || 0, true),
+	            meta: U.fmt_currency((centro.recebimentos_periodo && centro.recebimentos_periodo.amount) || 0, true),
 	            route: "recebimentos_periodo",
 	        },
 	    ];
@@ -165,7 +165,7 @@ frappe.provide("advocacia.painel.kpis");
 	        {
 	            tone: "green",
 	            icon: "banknote",
-	            count: U.fmt_currency((kpis.recebido_mes && kpis.recebido_mes.valor) || 0, true),
+	            count: U.fmt_currency((kpis.recebido_mes && kpis.recebido_mes.amount) || 0, true),
 	            label: __("Receita mês"),
 	            route: "receita_mes",
 	        },
@@ -377,21 +377,21 @@ frappe.provide("advocacia.painel.kpis");
 	        {
 	            key: "vencidas",
 	            label: __("Parcelas vencidas"),
-	            value: U.fmt_currency((k.fee_installments_vencidas && k.fee_installments_vencidas.valor) || 0),
+	            value: U.fmt_currency((k.fee_installments_vencidas && k.fee_installments_vencidas.amount) || 0),
 	            meta: __("{0} parcela(s)", [(k.fee_installments_vencidas && k.fee_installments_vencidas.count) || 0]),
 	            urgent: true,
 	        },
 	        {
 	            key: "recebido",
 	            label: __("Recebido este mês"),
-	            value: U.fmt_currency(k.recebido_mes.valor),
+	            value: U.fmt_currency(k.recebido_mes.amount),
 	            meta: __("{0} recebida(s)", [k.recebido_mes.count]),
 	            positive: true,
 	        },
 	        {
 	            key: "previsto",
 	            label: __("Previsto no mês"),
-	            value: U.fmt_currency((k.previsto_mes && k.previsto_mes.valor) || 0),
+	            value: U.fmt_currency((k.previsto_mes && k.previsto_mes.amount) || 0),
 	            meta: __("{0} pendente(s)", [(k.previsto_mes && k.previsto_mes.count) || 0]),
 	            warn: true,
 	        },
@@ -458,13 +458,13 @@ frappe.provide("advocacia.painel.kpis");
 	        { label: __("Legal Tasks pendentes"), value: String(k.legal_tasks_pendentes || 0), route: "tarefas_pendentes" },
 	        {
 	            label: __("Recebimentos do período"),
-	            value: U.fmt_currency((k.recebido_periodo && k.recebido_periodo.valor) || 0),
+	            value: U.fmt_currency((k.recebido_periodo && k.recebido_periodo.amount) || 0),
 	            positive: true,
 	            route: "recebimentos_periodo",
 	        },
 	    ];
 	    var row2 = [
-	        { label: __("Receita do mês"), value: U.fmt_currency((k.recebido_mes && k.recebido_mes.valor) || 0), positive: true, route: "receita_mes" },
+	        { label: __("Receita do mês"), value: U.fmt_currency((k.recebido_mes && k.recebido_mes.amount) || 0), positive: true, route: "receita_mes" },
 	        { label: __("Honorários ativos"), value: String(k.honorarios_ativos || 0), route: "honorarios_ativos" },
 	        { label: __("Horas registradas"), value: (horas || 0).toFixed(1) + " h", route: "horas" },
 	        { label: __("Clients ativos"), value: String(k.total_clientes || 0), route: "clientes" },

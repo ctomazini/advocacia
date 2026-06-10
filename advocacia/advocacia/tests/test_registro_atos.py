@@ -16,9 +16,9 @@ class TestRegistroAtos(FrappeTestCase):
 
 	def test_totais_calculados(self):
 		registro = create_test_registro_atos()
-		self.assertEqual(flt(registro.total_geral), 4500)
-		self.assertEqual(flt(registro.total_pendente), 4500)
-		self.assertEqual(flt(registro.total_cobrado), 0)
+		self.assertEqual(flt(registro.grand_total), 4500)
+		self.assertEqual(flt(registro.pending_total), 4500)
+		self.assertEqual(flt(registro.billed_total), 0)
 
 	def test_gerar_cobranca_cria_pagamento(self):
 		registro = create_test_registro_atos()
@@ -26,8 +26,8 @@ class TestRegistroAtos(FrappeTestCase):
 		pagamento_name = result.get("payment")
 		self.assertTrue(pagamento_name)
 		pag = frappe.get_doc("Legal Payment", pagamento_name)
-		self.assertEqual(pag.tipo_origem, "Atos Advocatícios")
-		self.assertEqual(flt(pag.valor), 4500)
+		self.assertEqual(pag.origin_type, "Atos Advocatícios")
+		self.assertEqual(flt(pag.amount), 4500)
 
 	def test_atos_marcados_cobrado(self):
 		registro = create_test_registro_atos()
@@ -41,17 +41,17 @@ class TestRegistroAtos(FrappeTestCase):
 		registro = create_test_registro_atos(
 			atos=[
 				{
-					"data": today(),
-					"tipo": "Inicial",
-					"valor": 1000,
-					"descricao": "A",
+					"act_date": today(),
+					"type": "Inicial",
+					"amount": 1000,
+					"description": "A",
 					"status": "Cobrado",
 				},
 				{
-					"data": today(),
-					"tipo": "Defesa",
-					"valor": 2000,
-					"descricao": "B",
+					"act_date": today(),
+					"type": "Defesa",
+					"amount": 2000,
+					"description": "B",
 					"status": "Pendente",
 				},
 			]
@@ -83,6 +83,6 @@ class TestRegistroAtos(FrappeTestCase):
 				{
 					"doctype": "Service Record",
 					"legal_case": servico,
-					"acts": [{"tipo": "Inicial", "valor": 100}],
+					"acts": [{"type": "Inicial", "amount": 100}],
 				}
 			).insert(ignore_permissions=True)

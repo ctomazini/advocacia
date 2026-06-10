@@ -21,30 +21,30 @@ class TestClient(FrappeTestCase):
 	def test_criar_pf_valido(self):
 		cpf = _gerar_cpf_valido()
 		cliente = create_test_client(
-			tipo_pessoa="Pessoa Física",
-			nome=f"Maria Teste {frappe.generate_hash(length=6)}",
+			person_type="Pessoa Física",
+			client_name=f"Maria Teste {frappe.generate_hash(length=6)}",
 			cpf=cpf,
 		)
-		self.assertEqual(cliente.tipo_pessoa, "Pessoa Física")
+		self.assertEqual(cliente.person_type, "Pessoa Física")
 		self.assertEqual(cliente.cpf, cpf)
 		self.assertTrue(frappe.db.exists("Client", cliente.name))
 
 	def test_criar_pj_valido(self):
 		cliente = create_test_client(
-			tipo_pessoa="Pessoa Jurídica",
-			nome=f"Empresa Teste {frappe.generate_hash(length=6)}",
+			person_type="Pessoa Jurídica",
+			client_name=f"Empresa Teste {frappe.generate_hash(length=6)}",
 			cnpj=_gerar_cnpj_valido(),
 		)
-		self.assertEqual(cliente.tipo_pessoa, "Pessoa Jurídica")
+		self.assertEqual(cliente.person_type, "Pessoa Jurídica")
 		self.assertTrue(frappe.db.exists("Client", cliente.name))
 
 	def test_pf_com_contatos(self):
 		cliente = create_test_client(
 			contacts=[
 				{
-					"nome": "Contato Teste",
-					"telefone": VALID_FIXO,
-					"celular": VALID_CELULAR,
+					"contact_name": "Contato Teste",
+					"phone": VALID_FIXO,
+					"mobile": VALID_CELULAR,
 					"email": VALID_EMAIL,
 				}
 			]
@@ -56,29 +56,29 @@ class TestClient(FrappeTestCase):
 		cliente = create_test_client(
 			addresses=[
 				{
-					"logradouro": "Rua Teste 123",
+					"street": "Rua Teste 123",
 					"cep": "01310-100",
-					"cidade": "São Paulo",
-					"estado": "SP",
+					"city": "São Paulo",
+					"state": "SP",
 				}
 			]
 		)
-		self.assertEqual(cliente.addresses[0].logradouro, "Rua Teste 123")
+		self.assertEqual(cliente.addresses[0].street, "Rua Teste 123")
 
 	def test_pj_com_representante(self):
 		cliente = create_test_client(
-			tipo_pessoa="Pessoa Jurídica",
-			representante="João Representante",
-			cpf_representante=_gerar_cpf_valido(),
+			person_type="Pessoa Jurídica",
+			representative="João Representante",
+			representative_cpf=_gerar_cpf_valido(),
 		)
-		self.assertEqual(cliente.representante, "João Representante")
+		self.assertEqual(cliente.representative, "João Representante")
 
 	def test_pf_sem_nome_falha(self):
 		with self.assertRaises((MandatoryError, ValidationError)):
 			frappe.get_doc(
 				{
 					"doctype": "Client",
-					"tipo_pessoa": "Pessoa Física",
+					"person_type": "Pessoa Física",
 					"cpf": VALID_CPF,
 				}
 			).insert(ignore_permissions=True)
@@ -94,35 +94,35 @@ class TestClient(FrappeTestCase):
 	def test_cnpj_invalido_falha(self):
 		with self.assertRaises(ValidationError):
 			create_test_client(
-				tipo_pessoa="Pessoa Jurídica",
+				person_type="Pessoa Jurídica",
 				cnpj="123",
 			)
 
 	def test_email_invalido_falha(self):
 		with self.assertRaises(ValidationError):
 			create_test_client(
-				contacts=[{"nome": "X", "email": "invalido@"}],
+				contacts=[{"contact_name": "X", "email": "invalido@"}],
 			)
 
 	def test_telefone_invalido_falha(self):
 		with self.assertRaises(ValidationError):
 			create_test_client(
-				contacts=[{"nome": "X", "telefone": "123"}],
+				contacts=[{"contact_name": "X", "phone": "123"}],
 			)
 
 	def test_cpf_duplicado_falha(self):
 		cpf_fixo = _gerar_cpf_valido()
-		create_test_client(nome=f"Client Dup A {frappe.generate_hash(length=6)}", cpf=cpf_fixo)
+		create_test_client(client_name=f"Client Dup A {frappe.generate_hash(length=6)}", cpf=cpf_fixo)
 		with self.assertRaises(ValidationError):
 			create_test_client(
-				nome=f"Client Dup B {frappe.generate_hash(length=6)}",
+				client_name=f"Client Dup B {frappe.generate_hash(length=6)}",
 				cpf=cpf_fixo,
 			)
 
 	def test_nome_duplicado_com_cpf_diferente_ok(self):
 		nome = f"Maria Silva {frappe.generate_hash(length=6)}"
-		cliente_a = create_test_client(nome=nome, cpf=_gerar_cpf_valido())
-		cliente_b = create_test_client(nome=nome, cpf=_gerar_cpf_valido())
-		self.assertEqual(cliente_a.nome, cliente_b.nome)
+		cliente_a = create_test_client(client_name=nome, cpf=_gerar_cpf_valido())
+		cliente_b = create_test_client(client_name=nome, cpf=_gerar_cpf_valido())
+		self.assertEqual(cliente_a.client_name, cliente_b.client_name)
 		self.assertNotEqual(cliente_a.name, cliente_b.name)
 		self.assertNotEqual(cliente_a.cpf, cliente_b.cpf)

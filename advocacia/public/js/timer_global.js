@@ -145,14 +145,14 @@ frappe.provide("advocacia.timer_global");
 
 	function renderWidget() {
 		var el = ensureWidget();
-		if (!state || !state.timer_inicio) {
+		if (!state || !state.timer_start) {
 			el.style.display = "none";
 			return;
 		}
 
 		el.style.display = "inline-flex";
-		var clock = formatElapsed(state.timer_inicio);
-		var label = frappe.utils.escape_html(state.atividade || state.name || "");
+		var clock = formatElapsed(state.timer_start);
+		var label = frappe.utils.escape_html(state.activity || state.name || "");
 		el.innerHTML =
 			'<span class="adv-timer-dot"></span>' +
 			'<span class="adv-timer-icon">' +
@@ -177,7 +177,7 @@ frappe.provide("advocacia.timer_global");
 	}
 
 	function applyState(data) {
-		if (data && data.name && data.timer_inicio) {
+		if (data && data.name && data.timer_start) {
 			state = data;
 			startTicking();
 		} else {

@@ -50,9 +50,9 @@ class TestAdvocaciaPermissions(FrappeTestCase):
 			{
 				"legal_case": servico.name,
 				"client": servico.client,
-				"valor": 100,
-				"data_vencimento": today(),
-				"tipo_origem": "Honorários (Parcela)",
+				"amount": 100,
+				"due_date": today(),
+				"origin_type": "Honorários (Parcela)",
 				"status": "Pendente",
 			}
 		)
@@ -69,9 +69,9 @@ class TestAdvocaciaPermissions(FrappeTestCase):
 				"legal_case": servico.name,
 				"client": servico.client,
 				"fee_agreement": acordo.name,
-				"valor": 100,
-				"data_vencimento": today(),
-				"tipo_origem": "Honorários (Parcela)",
+				"amount": 100,
+				"due_date": today(),
+				"origin_type": "Honorários (Parcela)",
 				"status": "Pendente",
 			}
 		)

@@ -12,12 +12,12 @@ class TestControlePrazos(FrappeTestCase):
 		frappe.db.rollback()
 
 	def test_prazo_futuro_pendente(self):
-		prazo = create_test_prazo(data_prazo=add_days(today(), 10))
+		prazo = create_test_prazo(due_date=add_days(today(), 10))
 		self.assertEqual(prazo.status or "Pendente", "Pendente")
 
 	def test_prioridade_alta(self):
-		prazo = create_test_prazo(prioridade="Alta")
-		self.assertEqual(prazo.prioridade, "Alta")
+		prazo = create_test_prazo(priority="Alta")
+		self.assertEqual(prazo.priority, "Alta")
 
 	def test_client_via_servico(self):
 		servico = create_test_legal_case()
@@ -26,13 +26,13 @@ class TestControlePrazos(FrappeTestCase):
 
 	def test_titulo_composto(self):
 		servico = create_test_legal_case()
-		cliente_nome = frappe.db.get_value("Client", servico.client, "nome")
-		prazo = create_test_prazo(servico=servico.name, descricao="Contestação")
+		cliente_nome = frappe.db.get_value("Client", servico.client, "client_name")
+		prazo = create_test_prazo(servico=servico.name, description="Contestação")
 		self.assertIn(prazo.name, prazo.title)
 		self.assertIn(cliente_nome, prazo.title)
 
 	def test_get_events(self):
-		prazo = create_test_prazo(data_prazo=today())
+		prazo = create_test_prazo(due_date=today())
 		events = get_events(add_days(today(), -1), add_days(today(), 1))
 		names = [e["name"] for e in events]
 		self.assertIn(prazo.name, names)
@@ -42,8 +42,8 @@ class TestControlePrazos(FrappeTestCase):
 			frappe.get_doc(
 				{
 					"doctype": "Deadline",
-					"data_prazo": today(),
-					"descricao": "Sem serviço",
+					"due_date": today(),
+					"description": "Sem serviço",
 				}
 			).insert(ignore_permissions=True)
 
@@ -54,6 +54,6 @@ class TestControlePrazos(FrappeTestCase):
 				{
 					"doctype": "Deadline",
 					"legal_case": servico,
-					"data_prazo": today(),
+					"due_date": today(),
 				}
 			).insert(ignore_permissions=True)

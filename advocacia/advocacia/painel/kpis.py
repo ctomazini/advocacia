@@ -16,52 +16,52 @@ def _build_kpis(hoje, periodo_fim, mes_inicio, mes_fim):
 	vencidos = frappe.get_all(
 		"Legal Payment",
 		filters={"status": "Vencido"},
-		fields=["valor"],
+		fields=["amount"],
 		limit_page_length=500,
 	)
 	proximos_periodo = frappe.get_all(
 		"Legal Payment",
 		filters={
 			"status": "Pendente",
-			"data_vencimento": ["between", [hoje, periodo_fim]],
+			"due_date": ["between", [hoje, periodo_fim]],
 		},
-		fields=["valor"],
+		fields=["amount"],
 		limit_page_length=500,
 	)
 	recebidos_mes = frappe.get_all(
 		"Legal Payment",
 		filters={
 			"status": ["in", ["Recebido", "Repassado"]],
-			"data_recebimento": ["between", [mes_inicio, mes_fim]],
+			"received_date": ["between", [mes_inicio, mes_fim]],
 		},
-		fields=["valor", "valor_recebido"],
+		fields=["amount", "received_amount"],
 		limit_page_length=500,
 	)
 	recebidos_periodo = frappe.get_all(
 		"Legal Payment",
 		filters={
 			"status": ["in", ["Recebido", "Repassado"]],
-			"data_recebimento": ["between", [hoje, periodo_fim]],
+			"received_date": ["between", [hoje, periodo_fim]],
 		},
-		fields=["valor", "valor_recebido"],
+		fields=["amount", "received_amount"],
 		limit_page_length=500,
 	)
 	recebidos_hoje = frappe.get_all(
 		"Legal Payment",
 		filters={
 			"status": ["in", ["Recebido", "Repassado"]],
-			"data_recebimento": hoje,
+			"received_date": hoje,
 		},
-		fields=["valor", "valor_recebido"],
+		fields=["amount", "received_amount"],
 		limit_page_length=500,
 	)
 	previsto_mes = frappe.get_all(
 		"Legal Payment",
 		filters={
 			"status": "Pendente",
-			"data_vencimento": ["between", [mes_inicio, mes_fim]],
+			"due_date": ["between", [mes_inicio, mes_fim]],
 		},
-		fields=["valor"],
+		fields=["amount"],
 		limit_page_length=500,
 	)
 
@@ -72,12 +72,12 @@ def _build_kpis(hoje, periodo_fim, mes_inicio, mes_fim):
 		"Legal Task",
 		{
 			"status": ["in", ["Pendente", "Em Andamento"]],
-			"data_limite": ["<", hoje],
+			"due_date": ["<", hoje],
 		},
 	)
 	prazos_vencidos = frappe.db.count(
 		"Deadline",
-		{"status": "Pendente", "data_prazo": ["<", hoje]},
+		{"status": "Pendente", "due_date": ["<", hoje]},
 	)
 	honorarios_ativos = frappe.db.count(
 		"Fee Agreement", {"status": "Vigente"}
@@ -85,20 +85,20 @@ def _build_kpis(hoje, periodo_fim, mes_inicio, mes_fim):
 	custas_abertas = _count_custas_abertas()
 
 	def _sum_valor(rows):
-		return sum(flt(r.valor_recebido or r.valor) for r in rows)
+		return sum(flt(r.received_amount or r.amount) for r in rows)
 
-	vencido_valor = sum(flt(p.valor) for p in vencidos)
+	vencido_valor = sum(flt(p.amount) for p in vencidos)
 	recebido_mes_valor = _sum_valor(recebidos_mes)
-	base_taxa = vencido_valor + recebido_mes_valor + sum(flt(p.valor) for p in proximos_periodo)
+	base_taxa = vencido_valor + recebido_mes_valor + sum(flt(p.amount) for p in proximos_periodo)
 	taxa_recebimento = round((recebido_mes_valor / base_taxa) * 100, 1) if base_taxa else 100
 
 	fee_installments_vencidas = {
 		"count": len(vencidos),
-		"valor": vencido_valor,
+		"amount": vencido_valor,
 	}
 	fee_installments_a_vencer_30d = {
 		"count": len(proximos_periodo),
-		"valor": sum(flt(p.valor) for p in proximos_periodo),
+		"amount": sum(flt(p.amount) for p in proximos_periodo),
 	}
 
 	return {
@@ -108,28 +108,28 @@ def _build_kpis(hoje, periodo_fim, mes_inicio, mes_fim):
 		"fee_installments_a_vencer_30d": fee_installments_a_vencer_30d,
 		"recebido_mes": {
 			"count": len(recebidos_mes),
-			"valor": recebido_mes_valor,
+			"amount": recebido_mes_valor,
 		},
 		"recebido_periodo": {
 			"count": len(recebidos_periodo),
-			"valor": _sum_valor(recebidos_periodo),
+			"amount": _sum_valor(recebidos_periodo),
 		},
 		"recebido_hoje": {
 			"count": len(recebidos_hoje),
-			"valor": _sum_valor(recebidos_hoje),
+			"amount": _sum_valor(recebidos_hoje),
 		},
 		"previsto_mes": {
 			"count": len(previsto_mes),
-			"valor": sum(flt(p.valor) for p in previsto_mes),
+			"amount": sum(flt(p.amount) for p in previsto_mes),
 		},
 		"audiencias_hoje": frappe.db.count(
 			"Hearing",
-			{"data_hora": ["between", [f"{hoje} 00:00:00", f"{hoje} 23:59:59"]]},
+			{"hearing_datetime": ["between", [f"{hoje} 00:00:00", f"{hoje} 23:59:59"]]},
 		),
 		"audiencias_amanha": frappe.db.count(
 			"Hearing",
 			{
-				"data_hora": [
+				"hearing_datetime": [
 					"between",
 					[f"{amanha} 00:00:00", f"{amanha} 23:59:59"],
 				],
@@ -137,13 +137,13 @@ def _build_kpis(hoje, periodo_fim, mes_inicio, mes_fim):
 		),
 		"audiencias_semana": frappe.db.count(
 			"Hearing",
-			{"data_hora": ["between", [f"{hoje} 00:00:00", f"{periodo_fim} 23:59:59"]]},
+			{"hearing_datetime": ["between", [f"{hoje} 00:00:00", f"{periodo_fim} 23:59:59"]]},
 		),
 		"prazos_urgentes": frappe.db.count(
 			"Deadline",
 			{
 				"status": "Pendente",
-				"data_prazo": ["<=", add_days(hoje, 3)],
+				"due_date": ["<=", add_days(hoje, 3)],
 			},
 		),
 		"prazos_vencidos": prazos_vencidos,
@@ -151,7 +151,7 @@ def _build_kpis(hoje, periodo_fim, mes_inicio, mes_fim):
 			"Deadline",
 			{
 				"status": "Pendente",
-				"data_prazo": ["between", [hoje, add_days(hoje, 3)]],
+				"due_date": ["between", [hoje, add_days(hoje, 3)]],
 			},
 		),
 		"legal_tasks_pendentes": tarefas_pendentes,
@@ -167,8 +167,8 @@ def _build_resumo(hoje, kpis, financeiro, periodo_dias=7):
 		"audiencias_hoje": kpis.get("audiencias_hoje") or 0,
 		"fee_installments_vencidas": kpis["fee_installments_vencidas"]["count"],
 		"prazos_urgentes": kpis["prazos_urgentes"],
-		"previsto_periodo_valor": financeiro["previsto_periodo"]["valor"],
-		"previsto_semana_valor": financeiro["previsto_periodo"]["valor"],
+		"previsto_periodo_valor": financeiro["previsto_periodo"]["amount"],
+		"previsto_semana_valor": financeiro["previsto_periodo"]["amount"],
 		"urgencia": "alta"
 		if kpis["fee_installments_vencidas"]["count"]
 		or kpis["prazos_urgentes"]
@@ -180,5 +180,5 @@ def _count_custas_abertas():
 		return 0
 	return frappe.db.count(
 		"Court Cost",
-		{"status": ["in", ["Pendente", "Pago"]], "repassar_cliente": 1},
+		{"status": ["in", ["Pendente", "Pago"]], "bill_to_client": 1},
 	)

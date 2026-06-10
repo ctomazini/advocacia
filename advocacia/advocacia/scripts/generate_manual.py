@@ -44,7 +44,7 @@ DOCTYPE_DESCRIPTIONS = {
 	),
 	"Deadline": (
 		"Prazos processuais com data fatal. Notificações automáticas usam "
-		"`dias_notificacao` do prazo ou o padrão de Office Settings."
+		"`notification_days` do prazo ou o padrão de Office Settings."
 	),
 	"Jurisdiction": "Divisão judiciária geográfica. Cadastro rígido para consistência.",
 	"Court Branch": "Unidade judicial dentro de uma comarca.",

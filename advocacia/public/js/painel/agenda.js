@@ -60,7 +60,7 @@ frappe.provide("advocacia.painel.agenda");
 				proximo_evento
 					.map(function (item) {
 						var headline = item.hora || item.when_label || "—";
-						var meta = [item.titulo || "", item.subtitulo || ""]
+						var meta = [item.title || "", item.subtitle || ""]
 							.filter(Boolean)
 							.join(" · ");
 						return (
@@ -79,7 +79,7 @@ frappe.provide("advocacia.painel.agenda");
 							frappe.utils.escape_html(headline) +
 							"</div>" +
 							'<div class="painel-atencao-label">' +
-							frappe.utils.escape_html(type_label(item.type || item.tipo)) +
+							frappe.utils.escape_html(type_label(item.type || item.type)) +
 							"</div>" +
 							(meta
 								? '<div class="painel-atencao-meta">' +

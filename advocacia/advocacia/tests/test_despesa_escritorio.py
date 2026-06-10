@@ -13,33 +13,33 @@ class TestDespesaEscritorio(FrappeTestCase):
 		frappe.db.rollback()
 
 	def test_despesa_simples_pendente(self):
-		desp = create_test_despesa(data_vencimento=add_days(today(), 30))
+		desp = create_test_despesa(due_date=add_days(today(), 30))
 		self.assertEqual(desp.status, "Pendente")
 
 	def test_vencimento_passado_marca_atrasado(self):
-		desp = create_test_despesa(data_vencimento=add_days(today(), -3))
+		desp = create_test_despesa(due_date=add_days(today(), -3))
 		desp.reload()
 		self.assertEqual(desp.status, "Atrasado")
 
 	def test_data_pagamento_marca_pago(self):
 		desp = create_test_despesa()
-		desp.data_pagamento = today()
+		desp.payment_date = today()
 		desp.save(ignore_permissions=True)
 		desp.reload()
 		self.assertEqual(desp.status, "Pago")
 
 	def test_recorrente_mensal_proximo_vencimento(self):
 		venc = getdate("2026-06-01")
-		desp = create_test_despesa(data_vencimento=venc, recorrente=1, frequencia="Mensal")
-		self.assertEqual(getdate(desp.proximo_vencimento), getdate("2026-07-01"))
+		desp = create_test_despesa(due_date=venc, is_recurring=1, frequency="Mensal")
+		self.assertEqual(getdate(desp.next_due_date), getdate("2026-07-01"))
 
 	def test_recorrente_trimestral(self):
 		venc = getdate("2026-06-01")
-		desp = create_test_despesa(data_vencimento=venc, recorrente=1, frequencia="Trimestral")
-		self.assertEqual(getdate(desp.proximo_vencimento), getdate("2026-09-01"))
+		desp = create_test_despesa(due_date=venc, is_recurring=1, frequency="Trimestral")
+		self.assertEqual(getdate(desp.next_due_date), getdate("2026-09-01"))
 
 	def test_scheduler_marca_atrasado(self):
-		desp = create_test_despesa(data_vencimento=add_days(today(), -2))
+		desp = create_test_despesa(due_date=add_days(today(), -2))
 		frappe.db.set_value("Office Expense", desp.name, "status", "Pendente")
 		verificar_despesas_vencidas()
 		self.assertEqual(
@@ -47,7 +47,7 @@ class TestDespesaEscritorio(FrappeTestCase):
 		)
 
 	def test_despesa_paga_nao_alterada_scheduler(self):
-		desp = create_test_despesa(data_vencimento=add_days(today(), -2))
+		desp = create_test_despesa(due_date=add_days(today(), -2))
 		frappe.db.set_value("Office Expense", desp.name, "status", "Pago")
 		verificar_despesas_vencidas()
 		self.assertEqual(
@@ -56,14 +56,14 @@ class TestDespesaEscritorio(FrappeTestCase):
 
 	def test_gerar_proxima_despesa(self):
 		venc = getdate("2026-06-01")
-		desp = create_test_despesa(data_vencimento=venc, recorrente=1, frequencia="Mensal")
+		desp = create_test_despesa(due_date=venc, is_recurring=1, frequency="Mensal")
 		nova_name = gerar_proxima_despesa(desp.name)
 		nova = frappe.get_doc("Office Expense", nova_name)
-		self.assertEqual(getdate(nova.data_vencimento), getdate("2026-07-01"))
+		self.assertEqual(getdate(nova.due_date), getdate("2026-07-01"))
 		self.assertEqual(nova.status, "Pendente")
 
 	def test_gerar_proxima_nao_recorrente_falha(self):
-		desp = create_test_despesa(recorrente=0)
+		desp = create_test_despesa(is_recurring=0)
 		with self.assertRaises(ValidationError):
 			gerar_proxima_despesa(desp.name)
 
@@ -72,12 +72,12 @@ class TestDespesaEscritorio(FrappeTestCase):
 			frappe.get_doc(
 				{
 					"doctype": "Office Expense",
-					"categoria": "Aluguel",
-					"valor": 100,
+					"category": "Aluguel",
+					"amount": 100,
 				}
 			).insert(ignore_permissions=True)
 
 	def test_categorias_validas(self):
 		for cat in ["Aluguel", "Energia", "Outros"]:
-			desp = create_test_despesa(categoria=cat)
-			self.assertEqual(desp.categoria, cat)
+			desp = create_test_despesa(category=cat)
+			self.assertEqual(desp.category, cat)

@@ -279,7 +279,7 @@ def _link_label(doctype, name):
 def _get_endereco_principal(cliente):
 	if not cliente.addresses:
 		return None
-	principal = next((row for row in cliente.addresses if row.principal), None)
+	principal = next((row for row in cliente.addresses if row.is_primary), None)
 	return principal or cliente.addresses[0]
 
 
@@ -287,7 +287,7 @@ def _get_contato_principal(cliente):
 	if not cliente.contacts:
 		return None
 	principal = next(
-		(row for row in cliente.contacts if (row.tipo or "").lower() == "principal"),
+		(row for row in cliente.contacts if (row.type or "").lower() == "principal"),
 		None,
 	)
 	return principal or cliente.contacts[0]
@@ -308,18 +308,18 @@ def _montar_endereco_completo(addr):
 	if not addr:
 		return ""
 	partes = []
-	logradouro = addr.get("logradouro") or ""
-	numero = addr.get("numero") or ""
+	logradouro = addr.get("street") or ""
+	numero = addr.get("number") or ""
 	if logradouro:
 		partes.append(f"{logradouro}{', ' + numero if numero else ''}")
-	complemento = addr.get("complemento") or ""
+	complemento = addr.get("complement") or ""
 	if complemento:
 		partes.append(complemento)
-	bairro = addr.get("bairro") or ""
+	bairro = addr.get("neighborhood") or ""
 	if bairro:
 		partes.append(f"Bairro {bairro}")
-	cidade = addr.get("cidade") or ""
-	estado = addr.get("estado") or ""
+	cidade = addr.get("city") or ""
+	estado = addr.get("state") or ""
 	if cidade or estado:
 		partes.append("/".join(filter(None, [cidade, estado])))
 	cep = _mascarar_cep(addr.get("cep"))
@@ -334,12 +334,12 @@ def _get_escritorio_context():
 	cnpj_raw = cfg.cnpj or ""
 	cnpj_fmt = _mascarar_cnpj(cnpj_raw) if _only_digits(cnpj_raw) else cnpj_raw
 	return {
-		"escritorio_razao_social": cfg.razao_social or "",
+		"escritorio_razao_social": cfg.company_name or "",
 		"escritorio_cnpj": cnpj_fmt,
 		"escritorio_oab": cfg.oab or "",
-		"escritorio_advogada": cfg.advogada or "",
-		"escritorio_endereco": cfg.endereco or "",
-		"escritorio_registro": cfg.registro_sia or "",
+		"escritorio_advogada": cfg.lawyer_name or "",
+		"escritorio_endereco": cfg.address or "",
+		"escritorio_registro": cfg.sia_registration or "",
 		"escritorio_banco": cfg.bank_name or "",
 		"escritorio_agencia": cfg.bank_agency or "",
 		"escritorio_conta": cfg.bank_account or "",
@@ -386,57 +386,57 @@ def _build_context(servico_name):
 	acordo = _get_acordo(servico.name)
 	hoje = today()
 
-	tipo_pessoa = cliente.tipo_pessoa or ""
+	tipo_pessoa = cliente.person_type or ""
 	cpf_raw = cliente.cpf or ""
 	cnpj_raw = cliente.cnpj or ""
 	cpf_fmt = _mascarar_cpf(cpf_raw) if tipo_pessoa == "Pessoa Física" else ""
 	cnpj_fmt = _mascarar_cnpj(cnpj_raw) if tipo_pessoa == "Pessoa Jurídica" else ""
 
-	celular = contato.get("celular") if contato else ""
-	telefone_fixo = contato.get("telefone") if contato else ""
+	celular = contato.get("mobile") if contato else ""
+	telefone_fixo = contato.get("phone") if contato else ""
 	telefone = celular or telefone_fixo or ""
 	email = (contato.get("email") if contato else "") or ""
 
 	context = _get_escritorio_context()
 	context.update(
 		{
-			"cliente_nome": cliente.nome or "",
+			"cliente_nome": cliente.client_name or "",
 			"cliente_tipo_pessoa": tipo_pessoa,
 			"cliente_cpf": cpf_fmt,
 			"cliente_cnpj": cnpj_fmt,
 			"cliente_rg": cliente.rg or "",
-			"cliente_nacionalidade": cliente.nacionalidade or "",
-			"cliente_estado_civil": cliente.estado_civil or "",
-			"cliente_profissao": cliente.profissao or "",
-			"cliente_representante": cliente.representante or "",
-			"cliente_cpf_representante": _mascarar_cpf(cliente.cpf_representante),
-			"cliente_cargo_representante": cliente.cargo_representante or "",
-			"cliente_nome_fantasia": cliente.nome_fantasia or "",
-			"endereco_logradouro": addr.logradouro if addr else "",
-			"endereco_numero": addr.numero if addr else "",
-			"endereco_complemento": addr.complemento if addr else "",
-			"endereco_bairro": addr.bairro if addr else "",
-			"endereco_cidade": addr.cidade if addr else "",
-			"endereco_estado": addr.estado if addr else "",
+			"cliente_nacionalidade": cliente.nationality or "",
+			"cliente_estado_civil": cliente.marital_status or "",
+			"cliente_profissao": cliente.occupation or "",
+			"cliente_representante": cliente.representative or "",
+			"cliente_cpf_representante": _mascarar_cpf(cliente.representative_cpf),
+			"cliente_cargo_representante": cliente.representative_role or "",
+			"cliente_nome_fantasia": cliente.trade_name or "",
+			"endereco_logradouro": addr.street if addr else "",
+			"endereco_numero": addr.number if addr else "",
+			"endereco_complemento": addr.complement if addr else "",
+			"endereco_bairro": addr.neighborhood if addr else "",
+			"endereco_cidade": addr.city if addr else "",
+			"endereco_estado": addr.state if addr else "",
 			"endereco_cep": _mascarar_cep(addr.cep if addr else ""),
 			"endereco_completo": _montar_endereco_completo(addr.as_dict() if addr else None),
 			"contato_telefone": _mascarar_telefone(telefone),
 			"contato_celular": _mascarar_telefone(celular),
 			"contato_email": (email or "").lower(),
-			"contato_nome": contato.get("nome") if contato else "",
+			"contato_nome": contato.get("contact_name") if contato else "",
 			"telefone_contato": _mascarar_telefone(telefone),
 			"servico_titulo": servico.title or "",
-			"servico_tipo": servico.tipo or "",
+			"servico_tipo": servico.type or "",
 			"servico_status": servico.status or "",
-			"servico_numero_processo": _mascarar_cnj(servico.numero_processo),
+			"servico_numero_processo": _mascarar_cnj(servico.case_number),
 			"servico_area": servico.area or "",
 			"servico_vara": _link_label("Court Branch", servico.court_branch_link),
 			"servico_comarca": _link_label("Jurisdiction", servico.jurisdiction),
 			"servico_tribunal": _link_label("Court", servico.court),
 			"servico_fase_processual": _link_label("Case Phase", servico.case_phase),
-			"servico_parte_contraria": servico.parte_contraria or "",
-			"servico_valor_causa": _formatar_moeda(servico.valor_causa),
-			"servico_data_abertura": _formatar_data(servico.data_abertura),
+			"servico_parte_contraria": servico.opposing_party or "",
+			"servico_valor_causa": _formatar_moeda(servico.case_value),
+			"servico_data_abertura": _formatar_data(servico.opening_date),
 			"data_hoje": formatdate(getdate(hoje), "dd/MM/yyyy"),
 			"data_hoje_extenso": _formatar_data_extenso(hoje),
 		}
@@ -460,17 +460,17 @@ def _build_context(servico_name):
 	if acordo:
 		context.update(
 			{
-				"acordo_modo_honorarios": acordo.modo_honorarios or "",
+				"acordo_modo_honorarios": acordo.fee_mode or "",
 				"acordo_status": acordo.status or "",
-				"acordo_valor_total_do_acordo": _formatar_moeda(acordo.valor_total_do_acordo),
-				"acordo_percentual_advogada": _formatar_percentual(acordo.percentual_advogada),
-				"acordo_valor_fixo_de_honorarios": _formatar_moeda(acordo.valor_fixo_de_honorarios),
-				"acordo_valor_advogada": _formatar_moeda(acordo.valor_advogada),
+				"acordo_valor_total_do_acordo": _formatar_moeda(acordo.total_agreement_value),
+				"acordo_percentual_advogada": _formatar_percentual(acordo.lawyer_percentage),
+				"acordo_valor_fixo_de_honorarios": _formatar_moeda(acordo.fixed_fee_amount),
+				"acordo_valor_advogada": _formatar_moeda(acordo.lawyer_amount),
 				"acordo_numero_de_parcelas": cint(acordo.get("installment_count") or 0) or "",
-				"acordo_data_primeira_parcela": _formatar_data(acordo.data_primeira_parcela),
-				"acordo_valor_da_parcela": _formatar_moeda(acordo.valor_da_parcela),
-				"acordo_total_advogada": _formatar_moeda(acordo.total_advogada),
-				"acordo_total_cliente": _formatar_moeda(acordo.total_cliente),
+				"acordo_data_primeira_parcela": _formatar_data(acordo.first_installment_date),
+				"acordo_valor_da_parcela": _formatar_moeda(acordo.installment_amount),
+				"acordo_total_advogada": _formatar_moeda(acordo.lawyer_total),
+				"acordo_total_cliente": _formatar_moeda(acordo.client_total),
 			}
 		)
 
@@ -517,10 +517,10 @@ def _render_and_attach(servico_name, template_doc, context):
 	except ImportError:
 		frappe.throw(_("Biblioteca docxtpl nao instalada. Contate o administrador."))
 
-	if not template_doc.arquivo:
+	if not template_doc.template_file:
 		frappe.throw(_("Template sem arquivo .docx anexado."))
 
-	file_doc = frappe.get_doc("File", {"file_url": template_doc.arquivo})
+	file_doc = frappe.get_doc("File", {"file_url": template_doc.template_file})
 	file_path = file_doc.get_full_path()
 	if not os.path.exists(file_path):
 		frappe.throw(_("Arquivo do template nao encontrado no servidor."))
@@ -535,7 +535,7 @@ def _render_and_attach(servico_name, template_doc, context):
 
 	timestamp = frappe.utils.now_datetime().strftime("%Y%m%d_%H%M%S")
 	nome_arquivo = "{0}_{1}_{2}.docx".format(
-		re.sub(r"[^\w\-]+", "_", template_doc.titulo).strip("_"),
+		re.sub(r"[^\w\-]+", "_", template_doc.title).strip("_"),
 		servico_name,
 		timestamp,
 	)
@@ -578,13 +578,13 @@ def gerar_documentos_em_lote(servico_name: str, template_names: str | list) -> d
 	for template_name in nomes:
 		try:
 			template_doc = frappe.get_doc("Document Template", template_name)
-			if not template_doc.habilitado:
+			if not template_doc.enabled:
 				raise frappe.ValidationError(_("Template desabilitado: {0}").format(template_name))
 			result = _render_and_attach(servico_name, template_doc, context)
 			gerados.append(
 				{
 					"template": template_name,
-					"titulo": template_doc.titulo,
+					"title": template_doc.title,
 					"file_name": result["file_name"],
 					"file_url": result["file_url"],
 				}
@@ -611,9 +611,9 @@ def get_templates_disponiveis() -> list[dict]:
 	frappe.has_permission("Document Template", "read", throw=True)
 	return frappe.get_all(
 		"Document Template",
-		fields=["name", "titulo", "tipo_documento", "descricao"],
-		filters={"habilitado": 1},
-		order_by="titulo",
+		fields=["name", "title", "document_type", "description"],
+		filters={"enabled": 1},
+		order_by="title",
 		limit_page_length=500,
 	)
 
@@ -624,9 +624,9 @@ def get_kits_disponiveis() -> list[dict]:
 
 	kits = frappe.get_all(
 		"Document Kit",
-		fields=["name", "titulo", "descricao"],
-		filters={"habilitado": 1},
-		order_by="titulo",
+		fields=["name", "title", "description"],
+		filters={"enabled": 1},
+		order_by="title",
 		limit_page_length=500,
 	)
 	if not kits:
@@ -637,7 +637,7 @@ def get_kits_disponiveis() -> list[dict]:
 		"Document Kit Item",
 		filters={"parent": ["in", kit_names]},
 		fields=["parent", "template", "ordem"],
-		order_by="parent asc, ordem asc, idx asc",
+		order_by="parent asc, display_order asc, idx asc",
 		limit_page_length=0,  # kits pequenos — carrega todos os itens
 	)
 	templates_por_kit = {name: [] for name in kit_names}

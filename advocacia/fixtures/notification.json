@@ -5,7 +5,7 @@
   "channel": "System Notification",
   "condition": null,
   "condition_type": "Filters",
-  "date_changed": "data_prazo",
+  "date_changed": "due_date",
   "datetime_changed": null,
   "datetime_last_run": null,
   "days_in_advance": 3,
@@ -17,7 +17,7 @@
   "filters": null,
   "from_attach_field": null,
   "is_standard": 0,
-  "message": "<p>O prazo '{{ doc.descricao }}' do servico {{ doc.servico }} vence em {{ doc.dias_notificacao or 3 }} dias ({{ frappe.utils.formatdate(doc.data_prazo) }}).</p>",
+  "message": "<p>O prazo '{{ doc.description }}' do servico {{ doc.legal_case }} vence em {{ doc.notification_days or 3 }} dias ({{ frappe.utils.formatdate(doc.due_date) }}).</p>",
   "message_type": "Markdown",
   "method": null,
   "minutes_offset": 0,
@@ -31,7 +31,7 @@
     "bcc": null,
     "cc": null,
     "condition": null,
-    "receiver_by_document_field": "responsavel",
+    "receiver_by_document_field": "responsible",
     "receiver_by_role": null
    },
    {
@@ -48,7 +48,7 @@
   "sender_email": null,
   "set_property_after_alert": null,
   "slack_webhook_url": null,
-  "subject": "Prazo vencendo: {{ doc.descricao }} - {{ doc.cliente }}",
+  "subject": "Prazo vencendo: {{ doc.description }} - {{ doc.client }}",
   "value_changed": null
  },
  {
@@ -57,7 +57,7 @@
   "channel": "System Notification",
   "condition": null,
   "condition_type": "Filters",
-  "date_changed": "data_hora",
+  "date_changed": "hearing_datetime",
   "datetime_changed": null,
   "datetime_last_run": null,
   "days_in_advance": 1,
@@ -69,7 +69,7 @@
   "filters": null,
   "from_attach_field": null,
   "is_standard": 0,
-  "message": "<p>Hearing {{ doc.tipo }} ({{ doc.modalidade }}) agendada para {{ frappe.utils.format_datetime(doc.data_hora) }}. Court Branch: {{ doc.local_vara }}.</p>",
+  "message": "<p>Hearing {{ doc.type }} ({{ doc.modality }}) agendada para {{ frappe.utils.format_datetime(doc.hearing_datetime) }}. Court Branch: {{ doc.court_branch }}.</p>",
   "message_type": "Markdown",
   "method": null,
   "minutes_offset": 0,
@@ -93,7 +93,7 @@
   "sender_email": null,
   "set_property_after_alert": null,
   "slack_webhook_url": null,
-  "subject": "Hearing amanha: {{ doc.cliente }} - {{ doc.tipo }}",
+  "subject": "Hearing amanha: {{ doc.client }} - {{ doc.type }}",
   "value_changed": null
  },
  {
@@ -103,7 +103,7 @@
   "document_type": "Legal Payment",
   "enabled": 1,
   "event": "Value Change",
-  "message": "<p>A parcela {{ doc.name }} ({{ doc.descricao or doc.title }}) venceu em {{ frappe.utils.formatdate(doc.data_vencimento) }}.</p>",
+  "message": "<p>A parcela {{ doc.name }} ({{ doc.description or doc.title }}) venceu em {{ frappe.utils.formatdate(doc.due_date) }}.</p>",
   "message_type": "Markdown",
   "module": "Advocacia",
   "name": "Advocacia - Parcela vencida",
@@ -112,30 +112,30 @@
     "receiver_by_role": "Advocacia Manager"
    }
   ],
-  "subject": "Parcela vencida: {{ doc.descricao or doc.name }}",
+  "subject": "Parcela vencida: {{ doc.description or doc.name }}",
   "value_changed": "status"
  },
  {
   "channel": "System Notification",
   "condition": "doc.status in (\"Pendente\", \"Em Andamento\")",
-  "date_changed": "data_limite",
+  "date_changed": "due_date",
   "days_in_advance": 1,
   "doctype": "Notification",
   "document_type": "Legal Task",
   "enabled": 1,
   "event": "Days After",
-  "message": "<p>A tarefa {{ doc.titulo }} ({{ doc.legal_case or \"—\" }}) está atrasada (vencimento {{ frappe.utils.formatdate(doc.data_limite) }}).</p>",
+  "message": "<p>A tarefa {{ doc.subject }} ({{ doc.legal_case or \"—\" }}) está atrasada (vencimento {{ frappe.utils.formatdate(doc.due_date) }}).</p>",
   "message_type": "Markdown",
   "module": "Advocacia",
   "name": "Advocacia - Tarefa atrasada",
   "recipients": [
    {
-    "receiver_by_document_field": "responsavel"
+    "receiver_by_document_field": "responsible"
    },
    {
     "receiver_by_role": "Advocacia Manager"
    }
   ],
-  "subject": "Tarefa atrasada: {{ doc.titulo }}"
+  "subject": "Tarefa atrasada: {{ doc.subject }}"
  }
 ]

@@ -1,5 +1,5 @@
 {% set settings = frappe.get_doc("Office Settings") %}
-{% set client_name = frappe.db.get_value("Client", doc.client, "nome") or doc.client %}
+{% set client_name = frappe.db.get_value("Client", doc.client, "client_name") or doc.client %}
 {% set case_title = frappe.db.get_value("Legal Case", doc.legal_case, "title") or doc.legal_case %}
 <style>
 	.adv-print { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 11pt; color: #222; line-height: 1.45; }
@@ -29,9 +29,9 @@
 		</div>
 		{% endif %}
 		<div class="header-info">
-			<h1>{{ settings.razao_social or "Escritório de Advocacia" }}</h1>
-			{% if settings.advogada %}
-			<div class="muted">{{ settings.advogada }}{% if settings.oab %} — OAB {{ settings.oab }}{% endif %}</div>
+			<h1>{{ settings.company_name or "Escritório de Advocacia" }}</h1>
+			{% if settings.lawyer_name %}
+			<div class="muted">{{ settings.lawyer_name }}{% if settings.oab %} — OAB {{ settings.oab }}{% endif %}</div>
 			{% endif %}
 		</div>
 		<div class="header-meta">
@@ -68,19 +68,19 @@
 	<h2>Valores</h2>
 	<div class="amount-box">
 		<div class="muted">Valor total do acordo</div>
-		<div class="amount-value">{{ frappe.utils.fmt_money(doc.valor_total_do_acordo or 0) }}</div>
+		<div class="amount-value">{{ frappe.utils.fmt_money(doc.total_agreement_value or 0) }}</div>
 	</div>
 	<div class="grid">
-		{% if doc.percentual_advogada %}
+		{% if doc.lawyer_percentage %}
 		<div class="grid-row">
 			<div class="grid-label">Percentual advogada</div>
-			<div class="grid-value">{{ doc.percentual_advogada }}%</div>
+			<div class="grid-value">{{ doc.lawyer_percentage }}%</div>
 		</div>
 		{% endif %}
-		{% if doc.valor_advogada %}
+		{% if doc.lawyer_amount %}
 		<div class="grid-row">
 			<div class="grid-label">Valor advogada</div>
-			<div class="grid-value">{{ frappe.utils.fmt_money(doc.valor_advogada) }}</div>
+			<div class="grid-value">{{ frappe.utils.fmt_money(doc.lawyer_amount) }}</div>
 		</div>
 		{% endif %}
 		{% if doc.installment_count %}
@@ -89,10 +89,10 @@
 			<div class="grid-value">{{ doc.installment_count }}</div>
 		</div>
 		{% endif %}
-		{% if doc.valor_da_parcela %}
+		{% if doc.installment_amount %}
 		<div class="grid-row">
 			<div class="grid-label">Valor da parcela</div>
-			<div class="grid-value">{{ frappe.utils.fmt_money(doc.valor_da_parcela) }}</div>
+			<div class="grid-value">{{ frappe.utils.fmt_money(doc.installment_amount) }}</div>
 		</div>
 		{% endif %}
 	</div>

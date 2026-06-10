@@ -13,27 +13,27 @@ class TestRegistroHoras(FrappeTestCase):
 	def test_crud_valido(self):
 		reg = create_test_registro_horas()
 		self.assertTrue(reg.name)
-		self.assertEqual(reg.duracao_horas, 1.0)
+		self.assertEqual(reg.duration_hours, 1.0)
 
 	def test_create_sem_duracao_para_iniciar_timer(self):
 		reg = frappe.get_doc(
 			{
 				"doctype": "Time Entry",
 				"legal_case": create_test_legal_case().name,
-				"data": frappe.utils.today(),
-				"atividade": "Atendimento inicial",
+				"entry_date": frappe.utils.today(),
+				"activity": "Atendimento inicial",
 			}
 		).insert(ignore_permissions=True)
-		self.assertEqual(reg.duracao_minutos, 0)
-		self.assertEqual(reg.duracao_horas, 0.0)
+		self.assertEqual(reg.duration_minutes, 0)
+		self.assertEqual(reg.duration_hours, 0.0)
 		reg.iniciar_timer()
 		reg.reload()
-		self.assertEqual(reg.timer_ativo, 1)
+		self.assertEqual(reg.timer_active, 1)
 
 	def test_titulo_composto(self):
 		servico = create_test_legal_case()
-		cliente_nome = frappe.db.get_value("Client", servico.client, "nome")
-		reg = create_test_registro_horas(servico=servico.name, atividade="Reunião")
+		cliente_nome = frappe.db.get_value("Client", servico.client, "client_name")
+		reg = create_test_registro_horas(servico=servico.name, activity="Reunião")
 		self.assertIn(reg.name, reg.title)
 		self.assertIn(cliente_nome, reg.title)
 
@@ -42,19 +42,19 @@ class TestRegistroHoras(FrappeTestCase):
 			{
 				"doctype": "Time Entry",
 				"legal_case": create_test_legal_case().name,
-				"data": frappe.utils.today(),
-				"atividade": "Pesquisa",
-				"hora_inicio": "09:00:00",
-				"hora_fim": "11:30:00",
+				"entry_date": frappe.utils.today(),
+				"activity": "Pesquisa",
+				"start_time": "09:00:00",
+				"end_time": "11:30:00",
 			}
 		)
 		reg.insert(ignore_permissions=True)
-		self.assertEqual(reg.duracao_minutos, 150)
-		self.assertEqual(reg.duracao_horas, 2.5)
+		self.assertEqual(reg.duration_minutes, 150)
+		self.assertEqual(reg.duration_hours, 2.5)
 
 	def test_calculo_horas_de_minutos(self):
-		reg = create_test_registro_horas(duracao_minutos=90)
-		self.assertEqual(reg.duracao_horas, 1.5)
+		reg = create_test_registro_horas(duration_minutes=90)
+		self.assertEqual(reg.duration_hours, 1.5)
 
 	def test_client_via_servico(self):
 		servico = create_test_legal_case()
@@ -67,9 +67,9 @@ class TestRegistroHoras(FrappeTestCase):
 			frappe.get_doc(
 				{
 					"doctype": "Time Entry",
-					"data": frappe.utils.today(),
-					"atividade": "Teste",
-					"duracao_minutos": 30,
+					"entry_date": frappe.utils.today(),
+					"activity": "Teste",
+					"duration_minutes": 30,
 				}
 			).insert(ignore_permissions=True)
 
@@ -79,35 +79,35 @@ class TestRegistroHoras(FrappeTestCase):
 				{
 					"doctype": "Time Entry",
 					"legal_case": create_test_legal_case().name,
-					"data": frappe.utils.today(),
-					"duracao_minutos": 30,
+					"entry_date": frappe.utils.today(),
+					"duration_minutes": 30,
 				}
 			).insert(ignore_permissions=True)
 
 	def test_iniciar_timer(self):
-		reg = create_test_registro_horas(duracao_minutos=30)
+		reg = create_test_registro_horas(duration_minutes=30)
 		result = reg.iniciar_timer()
 		reg.reload()
-		self.assertEqual(reg.timer_ativo, 1)
-		self.assertTrue(reg.timer_inicio)
-		self.assertIn("timer_inicio", result)
+		self.assertEqual(reg.timer_active, 1)
+		self.assertTrue(reg.timer_start)
+		self.assertIn("timer_start", result)
 
 	def test_parar_timer_soma_duracao(self):
-		reg = create_test_registro_horas(duracao_minutos=30)
+		reg = create_test_registro_horas(duration_minutes=30)
 		reg.iniciar_timer()
 		frappe.db.set_value(
 			"Time Entry",
 			reg.name,
-			"timer_inicio",
+			"timer_start",
 			add_to_date(now_datetime(), minutes=-10),
 		)
 		reg.reload()
 		result = reg.parar_timer()
 		reg.reload()
-		self.assertEqual(reg.timer_ativo, 0)
-		self.assertFalse(reg.timer_inicio)
-		self.assertEqual(reg.duracao_minutos, 40)
-		self.assertEqual(result["duracao_minutos"], 40)
+		self.assertEqual(reg.timer_active, 0)
+		self.assertFalse(reg.timer_start)
+		self.assertEqual(reg.duration_minutes, 40)
+		self.assertEqual(result["duration_minutes"], 40)
 
 	def test_iniciar_timer_duplicado_falha(self):
 		reg = create_test_registro_horas()
@@ -122,10 +122,10 @@ class TestRegistroHoras(FrappeTestCase):
 			reg.parar_timer()
 
 	def test_edicao_duracao_com_timer_ativo_falha(self):
-		reg = create_test_registro_horas(duracao_minutos=30)
+		reg = create_test_registro_horas(duration_minutes=30)
 		reg.iniciar_timer()
 		reg.reload()
-		reg.duracao_minutos = 60
+		reg.duration_minutes = 60
 		with self.assertRaises(ValidationError):
 			reg.save()
 
@@ -136,17 +136,17 @@ class TestRegistroHoras(FrappeTestCase):
 
 		for reg_name in frappe.get_all(
 			"Time Entry",
-			filters={"timer_ativo": 1, "owner": frappe.session.user},
+			filters={"timer_active": 1, "owner": frappe.session.user},
 			pluck="name",
 		):
 			frappe.db.set_value(
 				"Time Entry",
 				reg_name,
-				{"timer_ativo": 0, "timer_inicio": None},
+				{"timer_active": 0, "timer_start": None},
 				update_modified=False,
 			)
 
-		reg = create_test_registro_horas(duracao_minutos=30)
+		reg = create_test_registro_horas(duration_minutes=30)
 		self.assertIsNone(get_timer_ativo_usuario())
 
 		reg.iniciar_timer()
@@ -154,7 +154,7 @@ class TestRegistroHoras(FrappeTestCase):
 		active = get_timer_ativo_usuario()
 		self.assertIsNotNone(active)
 		self.assertEqual(active["name"], reg.name)
-		self.assertTrue(active["timer_inicio"])
+		self.assertTrue(active["timer_start"])
 
 		reg.parar_timer()
 		self.assertIsNone(get_timer_ativo_usuario())

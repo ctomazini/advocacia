@@ -39,7 +39,7 @@ def _get_columns():
 			"width": 140,
 		},
 		{
-			"fieldname": "total_pendente",
+			"fieldname": "pending_total",
 			"label": _("Pendente (R$)"),
 			"fieldtype": "Currency",
 			"width": 130,
@@ -79,11 +79,11 @@ def _get_data(filters):
 		"status": ["!=", "Cancelado"],
 	}
 	if de_data and ate_data:
-		query_filters["data_vencimento"] = ["between", [de_data, ate_data]]
+		query_filters["due_date"] = ["between", [de_data, ate_data]]
 	elif de_data:
-		query_filters["data_vencimento"] = [">=", de_data]
+		query_filters["due_date"] = [">=", de_data]
 	elif ate_data:
-		query_filters["data_vencimento"] = ["<=", ate_data]
+		query_filters["due_date"] = ["<=", ate_data]
 
 	if filters.get("client"):
 		query_filters["client"] = filters.client
@@ -91,7 +91,7 @@ def _get_data(filters):
 	pagamentos = frappe.get_all(
 		"Legal Payment",
 		filters=query_filters,
-		fields=["client", "fee_agreement", "legal_case", "valor", "valor_recebido", "status"],
+		fields=["client", "fee_agreement", "legal_case", "amount", "received_amount", "status"],
 		limit_page_length=0,
 	)
 
@@ -116,14 +116,14 @@ def _get_data(filters):
 	sum_contratado = sum_recebido = sum_pendente = sum_vencido = 0.0
 
 	for cliente, items in grouped.items():
-		total_contratado = sum(flt(p.valor) for p in items)
+		total_contratado = sum(flt(p.amount) for p in items)
 		total_recebido = sum(
-			flt(p.valor_recebido or p.valor)
+			flt(p.received_amount or p.amount)
 			for p in items
 			if p.status in ("Recebido", "Repassado")
 		)
-		total_pendente = sum(flt(p.valor) for p in items if p.status == "Pendente")
-		total_vencido = sum(flt(p.valor) for p in items if p.status == "Vencido")
+		total_pendente = sum(flt(p.amount) for p in items if p.status == "Pendente")
+		total_vencido = sum(flt(p.amount) for p in items if p.status == "Vencido")
 		pct = (total_recebido / total_contratado * 100) if total_contratado else 0
 
 		rows.append(
@@ -131,7 +131,7 @@ def _get_data(filters):
 				"client": cliente,
 				"total_contratado": total_contratado,
 				"total_recebido": total_recebido,
-				"total_pendente": total_pendente,
+				"pending_total": total_pendente,
 				"total_vencido": total_vencido,
 				"pct_recebido": pct,
 				"qtd_acordos": len({p.fee_agreement for p in items if p.fee_agreement}),

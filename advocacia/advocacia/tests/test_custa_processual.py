@@ -24,21 +24,21 @@ class TestCourtCost(FrappeTestCase):
 
 	def test_status_pendente_para_pago(self):
 		custa = create_test_court_cost()
-		custa.data_pagamento = today()
+		custa.payment_date = today()
 		custa.save(ignore_permissions=True)
 		custa.reload()
 		self.assertEqual(custa.status, "Pago")
 
 	def test_status_pago_para_repassado(self):
-		custa = create_test_court_cost(data_pagamento=today(), status="Pago")
-		custa.data_repasse = today()
+		custa = create_test_court_cost(payment_date=today(), status="Pago")
+		custa.transfer_date = today()
 		custa.save(ignore_permissions=True)
 		custa.reload()
 		self.assertEqual(custa.status, "Repassado")
 
 	def test_cancelado_nao_pode_alterar(self):
 		custa = create_test_court_cost(status="Cancelado")
-		custa.valor = 999
+		custa.amount = 999
 		with self.assertRaises(ValidationError):
 			custa.save(ignore_permissions=True)
 
@@ -49,16 +49,16 @@ class TestCourtCost(FrappeTestCase):
 			frappe.get_doc(
 				{
 					"doctype": "Court Cost",
-					"descricao": "Teste",
-					"tipo": "Taxa Judicial",
-					"valor": 100,
+					"description": "Teste",
+					"type": "Taxa Judicial",
+					"amount": 100,
 				}
 			).insert(ignore_permissions=True)
 
 	def test_integracao_fluxo_de_caixa(self):
 		custa = create_test_court_cost(
-			valor=750,
-			data_pagamento=today(),
+			amount=750,
+			payment_date=today(),
 			status="Pago",
 		)
 		columns, data, _msg, _chart, _summary = fluxo_execute({"meses": 1})

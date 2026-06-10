@@ -52,14 +52,14 @@ class TestValidators(FrappeTestCase):
 			validar_cnpj("123")
 
 	def test_celular_valido(self):
-		self.assertEqual(validar_telefone(VALID_CELULAR, tipo="celular"), VALID_CELULAR)
+		self.assertEqual(validar_telefone(VALID_CELULAR, phone_type="mobile"), VALID_CELULAR)
 
 	def test_fixo_valido(self):
-		self.assertEqual(validar_telefone(VALID_FIXO, tipo="fixo"), VALID_FIXO)
+		self.assertEqual(validar_telefone(VALID_FIXO, phone_type="landline"), VALID_FIXO)
 
 	def test_telefone_curto_invalido(self):
 		with self.assertRaises(ValidationError):
-			validar_telefone("123", tipo="celular")
+			validar_telefone("123", phone_type="mobile")
 
 	def test_cnj_formatado_valido(self):
 		self.assertEqual(validar_cnj(VALID_CNJ), VALID_CNJ_DIGITS)

@@ -23,7 +23,7 @@ class TestPainelApi(FrappeTestCase):
 			"list_limits",
 			"list_meta",
 			"kpis",
-			"resumo",
+			"summary",
 			"financeiro",
 			"alertas",
 			"centro_atencao",
@@ -53,7 +53,7 @@ class TestPainelApi(FrappeTestCase):
 		self.assertIsInstance(data["tarefas"], list)
 
 	def test_marcar_parcela_recebida(self):
-		acordo = create_test_acordo(num_parcelas=1, valor_total=500)
+		acordo = create_test_acordo(num_parcelas=1, total_amount=500)
 		pag_name = get_acordo_pagamentos(acordo.name)[0].name
 		result = marcar_parcela_recebida(pag_name)
 		self.assertTrue(result.get("ok"))
@@ -62,7 +62,7 @@ class TestPainelApi(FrappeTestCase):
 	def test_marcar_parcela_ja_recebida_falha(self):
 		from frappe.exceptions import ValidationError
 
-		acordo = create_test_acordo(num_parcelas=1, valor_total=500)
+		acordo = create_test_acordo(num_parcelas=1, total_amount=500)
 		pag_name = get_acordo_pagamentos(acordo.name)[0].name
 		marcar_parcela_recebida(pag_name)
 		with self.assertRaises(ValidationError):

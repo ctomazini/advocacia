@@ -43,7 +43,7 @@ class TestAgentApi(FrappeTestCase):
 
 	def test_get_court_costs_by_type(self):
 		case = create_test_legal_case()
-		create_test_court_cost(servico=case.name, valor=150, tipo="Taxa Judicial")
+		create_test_court_cost(servico=case.name, amount=150, type="Taxa Judicial")
 		result = get_court_costs_by_type(case.name)
 		self.assertEqual(result["case"], case.name)
 		self.assertGreaterEqual(result["total"], 150)

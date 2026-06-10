@@ -26,7 +26,7 @@ class TestLegalTask(FrappeTestCase):
 		tarefa = frappe.get_doc(
 			{
 				"doctype": "Legal Task",
-				"titulo": "Legal Task com serviço",
+				"subject": "Legal Task com serviço",
 				"legal_case": servico.name,
 				"status": "Pendente",
 			}
@@ -40,7 +40,7 @@ class TestLegalTask(FrappeTestCase):
 		tarefa.reload()
 		self.assertEqual(result["status"], "Concluída")
 		self.assertEqual(tarefa.status, "Concluída")
-		self.assertEqual(str(tarefa.data_conclusao), str(today()))
+		self.assertEqual(str(tarefa.completion_date), str(today()))
 
 	def test_sem_titulo_falha(self):
 		with self.assertRaises(MandatoryError):

@@ -22,21 +22,21 @@ frappe.query_reports["fluxo_de_caixa"] = {
 	],
 	formatter(value, row, column, data, default_formatter) {
 		value = default_formatter(value, row, column, data);
-		if (column.fieldname === "tipo" && row.tipo) {
-			const cls = row.tipo === __("Entrada") ? "green" : "red";
-			return `<span class="indicator-pill ${cls} filterable ellipsis">${row.tipo}</span>`;
+		if (column.fieldname === "type" && row.type) {
+			const cls = row.type === __("Entrada") ? "green" : "red";
+			return `<span class="indicator-pill ${cls} filterable ellipsis">${row.type}</span>`;
 		}
-		if (column.fieldname === "descricao" && row.descricao && !row.data) {
-			return `<strong>${row.descricao}</strong>`;
+		if (column.fieldname === "description" && row.description && !row.date) {
+			return `<strong>${row.description}</strong>`;
 		}
-		if (column.fieldname === "saldo_acumulado" && row.saldo_acumulado != null && !row.data) {
+		if (column.fieldname === "saldo_acumulado" && row.saldo_acumulado != null && !row.date) {
 			const cls = flt(row.saldo_acumulado) >= 0 ? "text-success" : "text-danger";
 			return `<strong class="${cls}">${value}</strong>`;
 		}
 		if (
 			(column.fieldname === "valor_entrada" || column.fieldname === "valor_saida") &&
-			row.descricao &&
-			!row.data
+			row.description &&
+			!row.date
 		) {
 			return `<strong>${value}</strong>`;
 		}

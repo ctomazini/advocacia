@@ -11,11 +11,11 @@ class TestReportFluxoDeCaixa(FrappeTestCase):
 		frappe.db.rollback()
 
 	def test_execute_retorna_entrada_recebida(self):
-		pag = create_test_legal_payment(valor=2500, status="Recebido")
+		pag = create_test_legal_payment(amount=2500, status="Recebido")
 		frappe.db.set_value(
 			"Legal Payment",
 			pag.name,
-			{"data_recebimento": today(), "valor_recebido": 2500},
+			{"received_date": today(), "received_amount": 2500},
 			update_modified=False,
 		)
 

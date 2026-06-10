@@ -19,7 +19,7 @@ class TestReportHonorariosPorClient(FrappeTestCase):
 		cliente = create_test_client()
 		servico = create_test_legal_case(cliente=cliente.name)
 		acordo = create_test_acordo(
-			servico=servico.name, valor_total=5000, num_parcelas=2
+			servico=servico.name, total_amount=5000, num_parcelas=2
 		)
 		pagamentos = get_acordo_pagamentos(acordo.name)
 		pendente = pagamentos[0]
@@ -27,7 +27,7 @@ class TestReportHonorariosPorClient(FrappeTestCase):
 		frappe.db.set_value(
 			"Legal Payment",
 			pendente.name,
-			{"status": "Pendente", "data_vencimento": add_days(today(), 10), "valor": 3000},
+			{"status": "Pendente", "due_date": add_days(today(), 10), "amount": 3000},
 			update_modified=False,
 		)
 		frappe.db.set_value(
@@ -35,10 +35,10 @@ class TestReportHonorariosPorClient(FrappeTestCase):
 			recebido.name,
 			{
 				"status": "Recebido",
-				"data_vencimento": add_days(today(), -1),
-				"data_recebimento": today(),
-				"valor": 2000,
-				"valor_recebido": 2000,
+				"due_date": add_days(today(), -1),
+				"received_date": today(),
+				"amount": 2000,
+				"received_amount": 2000,
 			},
 			update_modified=False,
 		)

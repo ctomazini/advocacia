@@ -78,7 +78,7 @@ def _get_data(filters):
 
 	query_filters = {
 		"status": "Vencido",
-		"data_vencimento": ["between", [de_data, ate_data]] if de_data else ["<=", ate_data],
+		"due_date": ["between", [de_data, ate_data]] if de_data else ["<=", ate_data],
 	}
 	if filters.get("client"):
 		query_filters["client"] = filters.client
@@ -86,7 +86,7 @@ def _get_data(filters):
 	pagamentos = frappe.get_all(
 		"Legal Payment",
 		filters=query_filters,
-		fields=["client", "legal_case", "valor", "data_vencimento"],
+		fields=["client", "legal_case", "amount", "due_date"],
 		limit_page_length=0,
 	)
 
@@ -100,8 +100,8 @@ def _get_data(filters):
 	soma_atraso = 0
 
 	for cliente, items in grouped.items():
-		dias_list = [max(date_diff(hoje, getdate(p.data_vencimento)), 0) for p in items]
-		total_vencido = sum(flt(p.valor) for p in items)
+		dias_list = [max(date_diff(hoje, getdate(p.due_date)), 0) for p in items]
+		total_vencido = sum(flt(p.amount) for p in items)
 		tel, email = _get_cliente_contato(cliente)
 		servicos = _format_servicos({p.legal_case for p in items if p.legal_case})
 
@@ -126,7 +126,7 @@ def _get_data(filters):
 	chart_labels = []
 	chart_values = []
 	for row in rows[:10]:
-		chart_labels.append(frappe.db.get_value("Client", row["client"], "nome") or row["client"])
+		chart_labels.append(frappe.db.get_value("Client", row["client"], "client_name") or row["client"])
 		chart_values.append(flt(row["total_vencido"]))
 
 	chart = bar_chart(
@@ -154,14 +154,14 @@ def _get_cliente_contato(cliente):
 	contatos = frappe.get_all(
 		"Client Contact",
 		filters={"parent": cliente, "parenttype": "Client"},
-		fields=["celular", "telefone", "email"],
+		fields=["mobile", "phone", "email"],
 		order_by="idx asc",
 	)
 	tel = ""
 	email = ""
 	for c in contatos:
 		if not tel:
-			tel = c.celular or c.telefone or ""
+			tel = c.mobile or c.phone or ""
 		if not email and c.email:
 			email = c.email
 		if tel and email:

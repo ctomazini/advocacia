@@ -26,7 +26,7 @@ def _get_columns():
 			"options": "Legal Case",
 			"width": 120,
 		},
-		{"fieldname": "titulo", "label": _("Título"), "fieldtype": "Data", "width": 200},
+		{"fieldname": "title", "label": _("Título"), "fieldtype": "Data", "width": 200},
 		{
 			"fieldname": "client",
 			"label": _("Cliente"),
@@ -90,8 +90,8 @@ def _get_data(filters):
 		servico_filters["client"] = filters.client
 	if filters.get("area"):
 		servico_filters["area"] = filters.area
-	if filters.get("tipo"):
-		servico_filters["tipo"] = filters.tipo
+	if filters.get("type"):
+		servico_filters["type"] = filters.type
 
 	servicos = frappe.get_all(
 		"Legal Case",
@@ -110,10 +110,10 @@ def _get_data(filters):
 		filters={
 			"legal_case": ["in", names],
 			"status": "Pendente",
-			"data_prazo": [">=", hoje],
+			"due_date": [">=", hoje],
 		},
-		fields=["legal_case", "data_prazo"],
-		order_by="data_prazo asc",
+		fields=["legal_case", "due_date"],
+		order_by="due_date asc",
 	)
 	prazo_map = {}
 	for p in prazos:
@@ -122,9 +122,9 @@ def _get_data(filters):
 
 	audiencias = frappe.get_all(
 		"Hearing",
-		filters={"legal_case": ["in", names], "data_hora": [">=", agora]},
-		fields=["legal_case", "data_hora", "tipo"],
-		order_by="data_hora asc",
+		filters={"legal_case": ["in", names], "hearing_datetime": [">=", agora]},
+		fields=["legal_case", "hearing_datetime", "type"],
+		order_by="hearing_datetime asc",
 	)
 	audiencia_map = {}
 	for a in audiencias:
@@ -134,15 +134,15 @@ def _get_data(filters):
 	pagamentos = frappe.get_all(
 		"Legal Payment",
 		filters={"legal_case": ["in", names], "status": ["not in", ["Cancelado"]]},
-		fields=["legal_case", "status", "valor"],
+		fields=["legal_case", "status", "amount"],
 		limit_page_length=0,
 	)
 	pag_map = defaultdict(lambda: {"pendente": 0.0, "vencido": 0.0})
 	for p in pagamentos:
 		if p.status == "Pendente":
-			pag_map[p.legal_case]["pendente"] += flt(p.valor)
+			pag_map[p.legal_case]["pendente"] += flt(p.amount)
 		elif p.status == "Vencido":
-			pag_map[p.legal_case]["vencido"] += flt(p.valor)
+			pag_map[p.legal_case]["vencido"] += flt(p.amount)
 
 	rows = []
 	total_valor_pendente = 0.0
@@ -159,17 +159,17 @@ def _get_data(filters):
 
 		prazo_dias = None
 		proximo_prazo = None
-		if prazo and prazo.data_prazo:
-			proximo_prazo = getdate(prazo.data_prazo)
+		if prazo and prazo.due_date:
+			proximo_prazo = getdate(prazo.due_date)
 			prazo_dias = date_diff(proximo_prazo, hoje)
 			if prazo_dias <= 7:
 				count_com_prazo_7d += 1
 
 		proxima_audiencia = None
 		audiencia_tipo = None
-		if audiencia and audiencia.data_hora:
-			proxima_audiencia = getdate(audiencia.data_hora)
-			audiencia_tipo = audiencia.tipo
+		if audiencia and audiencia.hearing_datetime:
+			proxima_audiencia = getdate(audiencia.hearing_datetime)
+			audiencia_tipo = audiencia.type
 
 		if valor_vencido > 0:
 			situacao = _("🔴 Inadimplente")
@@ -187,7 +187,7 @@ def _get_data(filters):
 		rows.append(
 			{
 				"legal_case": s.name,
-				"titulo": s.title or s.name,
+				"title": s.title or s.name,
 				"client": s.client,
 				"area": s.area or "",
 				"fase": s.case_phase or "",

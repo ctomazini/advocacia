@@ -4,12 +4,12 @@ from frappe.utils import add_to_date, get_datetime
 
 def sync_audiencia_to_event(doc, method=None):
 	"""Cria/atualiza Event do Frappe a partir de uma Audiência."""
-	if doc.status_aud == "Cancelada":
+	if doc.status == "Cancelada":
 		_cancel_linked_event(doc)
 		return
 
 	event_name = _find_linked_event("Hearing", doc.name)
-	starts_on = get_datetime(doc.data_hora)
+	starts_on = get_datetime(doc.hearing_datetime)
 	ends_on = add_to_date(starts_on, hours=2)
 
 	event_data = {
@@ -35,12 +35,12 @@ def sync_prazo_to_event(doc, method=None):
 	event_name = _find_linked_event(source_dt, doc.name)
 
 	event_data = {
-		"subject": f"PRAZO: {doc.descricao}",
-		"starts_on": doc.data_prazo,
+		"subject": f"PRAZO: {doc.description}",
+		"starts_on": doc.due_date,
 		"all_day": 1,
 		"event_type": "Public",
 		"description": _prazo_description(doc),
-		"color": _prazo_color(doc.prioridade),
+		"color": _prazo_color(doc.priority),
 		"custom_source_doctype": source_dt,
 		"custom_source_name": doc.name,
 	}
@@ -81,24 +81,24 @@ def _prazo_color(prioridade):
 
 def _audiencia_subject(doc):
 	cliente = frappe.db.get_value("Legal Case", doc.legal_case, "client") if doc.legal_case else ""
-	return f"Audiência {doc.tipo}: {cliente}"
+	return f"Audiência {doc.type}: {cliente}"
 
 
 def _audiencia_description(doc):
-	parts = [f"Tipo: {doc.tipo}", f"Serviço: {doc.legal_case}"]
-	if doc.modalidade == "Virtual" and doc.link_virtual:
+	parts = [f"Tipo: {doc.type}", f"Serviço: {doc.legal_case}"]
+	if doc.modality == "Virtual" and doc.link_virtual:
 		parts.append(f"Link: {doc.link_virtual}")
 	if doc.court_branch:
 		parts.append(f"Court Branch: {doc.court_branch}")
-	if doc.observacoes:
-		parts.append(f"Obs: {doc.observacoes}")
+	if doc.remarks:
+		parts.append(f"Obs: {doc.remarks}")
 	return "\n".join(parts)
 
 
 def _prazo_description(doc):
-	parts = [f"Serviço: {doc.legal_case}", f"Prioridade: {doc.prioridade or 'Normal'}"]
-	if doc.responsavel:
-		parts.append(f"Responsável: {doc.responsavel}")
-	if doc.observacoes:
-		parts.append(f"Obs: {doc.observacoes}")
+	parts = [f"Serviço: {doc.legal_case}", f"Prioridade: {doc.priority or 'Normal'}"]
+	if doc.responsible:
+		parts.append(f"Responsável: {doc.responsible}")
+	if doc.remarks:
+		parts.append(f"Obs: {doc.remarks}")
 	return "\n".join(parts)

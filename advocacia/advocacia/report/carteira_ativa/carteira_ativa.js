@@ -14,7 +14,7 @@ frappe.query_reports["carteira_ativa"] = {
 				"\nFamília\nTrabalhista\nCível\nPrevidenciário\nConsumidor\nTributário\nPenal\nAdministrativo",
 		},
 		{
-			fieldname: "tipo",
+			fieldname: "type",
 			label: __("Tipo"),
 			fieldtype: "Select",
 			options: "\nProcesso Judicial\nConsultoria\nAdministrativo\nExtrajudicial",

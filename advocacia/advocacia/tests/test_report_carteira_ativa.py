@@ -12,7 +12,7 @@ class TestReportCarteiraAtiva(FrappeTestCase):
 	def test_execute_lista_servico_em_andamento(self):
 		titulo = _uid("Serviço Carteira")
 		servico = create_test_legal_case(
-			tipo="Consultoria",
+			type="Consultoria",
 			status="Em andamento",
 			title=titulo,
 			area="Cível",

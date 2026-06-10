@@ -189,8 +189,8 @@ async function main() {
 		await visitNewForm(page, "Client");
 		const name = await insertDoc(page, {
 			doctype: "Client",
-			tipo_pessoa: "Pessoa Física",
-			nome: state.clientName,
+			person_type: "Pessoa Física",
+			client_name: state.clientName,
 			cpf: state.clientCpf,
 		});
 		created["Client"] = name;
@@ -202,11 +202,11 @@ async function main() {
 		state.legalCase = await insertDoc(page, {
 			doctype: "Legal Case",
 			client: created["Client"],
-			tipo: "Processo Judicial",
+			type: "Processo Judicial",
 			area: "Cível",
 			status: "Em andamento",
 			case_phase: state.casePhase,
-			observacoes: `${MARKER} processo E2E`,
+			remarks: `${MARKER} processo E2E`,
 		});
 		created["Legal Case"] = state.legalCase;
 		await visitDoc(page, "Legal Case", state.legalCase);
@@ -220,8 +220,8 @@ async function main() {
 			doctype: "Deadline",
 			legal_case: state.legalCase,
 			client: created["Client"],
-			descricao: `${MARKER} prazo`,
-			data_prazo: due,
+			description: `${MARKER} prazo`,
+			due_date: due,
 			status: "Pendente",
 		});
 		created["Deadline"] = name;
@@ -235,9 +235,9 @@ async function main() {
 			doctype: "Hearing",
 			legal_case: state.legalCase,
 			client: created["Client"],
-			tipo: "Instrução",
-			modalidade: "Virtual",
-			data_hora: when,
+			type: "Instrução",
+			modality: "Virtual",
+			hearing_datetime: when,
 			status: "Agendada",
 		});
 		created["Hearing"] = name;

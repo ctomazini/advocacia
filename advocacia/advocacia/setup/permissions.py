@@ -123,11 +123,11 @@ MANAGED_DOCTYPES = FINANCIAL | CATALOG | OPERATIONAL
 
 FINANCIAL_FIELD_PERMLEVEL = {
 	"Fee Agreement": (
-		"valor_total_do_acordo",
-		"valor_fixo_de_honorarios",
-		"valor_da_parcela",
+		"total_agreement_value",
+		"fixed_fee_amount",
+		"installment_amount",
 	),
-	"Legal Payment": ("valor", "valor_recebido"),
+	"Legal Payment": ("amount", "received_amount"),
 }
 
 

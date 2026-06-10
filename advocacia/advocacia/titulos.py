@@ -22,7 +22,7 @@ COMPOSTOS = {
 def get_cliente_nome(cliente):
 	if not cliente:
 		return ""
-	return frappe.db.get_value("Client", cliente, "nome") or cliente
+	return frappe.db.get_value("Client", cliente, "client_name") or cliente
 
 
 def join_title_parts(*parts):
@@ -35,7 +35,7 @@ def _resolver_descritor(doc, usar_descricao=False):
 		descritor = get_cliente_nome(doc.client)
 		if descritor:
 			return descritor
-	descritor = (getattr(doc, "descricao", None) or "").strip()
+	descritor = (getattr(doc, "description", None) or "").strip()
 	if descritor:
 		return descritor
 	return doc.doctype

@@ -28,7 +28,7 @@ def _nomes_lookup(doctype, names, campo_nome):
 	return {row.name: row.get(campo_nome) or row.name for row in rows}
 
 def _cliente_nome_lookup(cliente_names):
-	return _nomes_lookup("Client", cliente_names, "nome")
+	return _nomes_lookup("Client", cliente_names, "client_name")
 def _effective_list_cap(list_limit):
 	if not list_limit:
 		return LIST_LIMIT_MAX
@@ -130,7 +130,7 @@ def strip_financial_payload(data: dict) -> dict:
 		for key in _KPIS_FINANCIAL_KEYS:
 			kpis.pop(key, None)
 
-	resumo = data.get("resumo")
+	resumo = data.get("summary")
 	if isinstance(resumo, dict):
 		for key in _RESUMO_FINANCIAL_KEYS:
 			resumo.pop(key, None)

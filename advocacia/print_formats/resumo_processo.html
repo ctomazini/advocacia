@@ -1,5 +1,5 @@
 {% set settings = frappe.get_doc("Office Settings") %}
-{% set client_name = frappe.db.get_value("Client", doc.client, "nome") or doc.client %}
+{% set client_name = frappe.db.get_value("Client", doc.client, "client_name") or doc.client %}
 <style>
 	.adv-print { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 11pt; color: #222; line-height: 1.45; }
 	.adv-print h1 { font-size: 18pt; margin: 0 0 4px; font-weight: 600; }
@@ -27,7 +27,7 @@
 		</div>
 		{% endif %}
 		<div class="header-info">
-			<h1>{{ settings.razao_social or "Escritório de Advocacia" }}</h1>
+			<h1>{{ settings.company_name or "Escritório de Advocacia" }}</h1>
 			{% if settings.oab %}
 			<div class="muted">OAB {{ settings.oab }}</div>
 			{% endif %}
@@ -52,7 +52,7 @@
 		</div>
 		<div class="grid-row">
 			<div class="grid-label">Tipo</div>
-			<div class="grid-value">{{ doc.tipo or "—" }}</div>
+			<div class="grid-value">{{ doc.type or "—" }}</div>
 		</div>
 		<div class="grid-row">
 			<div class="grid-label">Área</div>
@@ -64,7 +64,7 @@
 		</div>
 		<div class="grid-row">
 			<div class="grid-label">Número CNJ</div>
-			<div class="grid-value">{{ doc.numero_processo or "—" }}</div>
+			<div class="grid-value">{{ doc.case_number or "—" }}</div>
 		</div>
 		<div class="grid-row">
 			<div class="grid-label">Tribunal</div>
@@ -80,20 +80,20 @@
 		</div>
 		<div class="grid-row">
 			<div class="grid-label">Parte contrária</div>
-			<div class="grid-value">{{ doc.parte_contraria or "—" }}</div>
+			<div class="grid-value">{{ doc.opposing_party or "—" }}</div>
 		</div>
 		<div class="grid-row">
 			<div class="grid-label">Valor da causa</div>
-			<div class="grid-value">{% if doc.valor_causa %}{{ frappe.utils.fmt_money(doc.valor_causa) }}{% else %}—{% endif %}</div>
+			<div class="grid-value">{% if doc.case_value %}{{ frappe.utils.fmt_money(doc.case_value) }}{% else %}—{% endif %}</div>
 		</div>
 		<div class="grid-row">
 			<div class="grid-label">Abertura</div>
-			<div class="grid-value">{{ frappe.utils.formatdate(doc.data_abertura) if doc.data_abertura else "—" }}</div>
+			<div class="grid-value">{{ frappe.utils.formatdate(doc.opening_date) if doc.opening_date else "—" }}</div>
 		</div>
 	</div>
 
-	{% if doc.observacoes %}
+	{% if doc.remarks %}
 	<h2>Observações</h2>
-	<p>{{ doc.observacoes }}</p>
+	<p>{{ doc.remarks }}</p>
 	{% endif %}
 </div>

@@ -17,35 +17,35 @@ class TestLegalCase(FrappeTestCase):
 		frappe.db.rollback()
 
 	def test_consultoria_salva(self):
-		servico = create_test_legal_case(tipo="Consultoria")
-		self.assertEqual(servico.tipo, "Consultoria")
+		servico = create_test_legal_case(type="Consultoria")
+		self.assertEqual(servico.type, "Consultoria")
 		self.assertEqual(servico.status, "Em andamento")
 
 	def test_processo_judicial_cnj_valido(self):
 		servico = create_test_legal_case(
-			tipo="Processo Judicial",
-			numero_processo=VALID_CNJ,
+			type="Processo Judicial",
+			case_number=VALID_CNJ,
 		)
-		self.assertEqual(servico.numero_processo, VALID_CNJ_DIGITS)
+		self.assertEqual(servico.case_number, VALID_CNJ_DIGITS)
 
 	def test_processo_judicial_sem_cnj_salva(self):
 		servico = create_test_legal_case(
-			tipo="Processo Judicial",
-			numero_processo="",
+			type="Processo Judicial",
+			case_number="",
 		)
-		self.assertIsNone(servico.numero_processo)
+		self.assertIsNone(servico.case_number)
 
 	def test_processo_legado_aceita_texto_livre(self):
 		servico = create_test_legal_case(
-			tipo="Processo Judicial",
-			numeracao_legada=1,
-			numero_processo="12345/2000",
+			type="Processo Judicial",
+			legacy_numbering=1,
+			case_number="12345/2000",
 		)
-		self.assertEqual(servico.numero_processo, "12345/2000")
+		self.assertEqual(servico.case_number, "12345/2000")
 
 	def test_sem_cliente_falha(self):
 		with self.assertRaises((MandatoryError, ValidationError)):
-			frappe.get_doc({"doctype": "Legal Case", "tipo": "Consultoria"}).insert(
+			frappe.get_doc({"doctype": "Legal Case", "type": "Consultoria"}).insert(
 				ignore_permissions=True
 			)
 
@@ -56,8 +56,8 @@ class TestLegalCase(FrappeTestCase):
 				{
 					"doctype": "Legal Case",
 					"client": cliente,
-					"tipo": "Processo Judicial",
-					"numero_processo": "1234",
+					"type": "Processo Judicial",
+					"case_number": "1234",
 				}
 			).insert(ignore_permissions=True)
 
@@ -69,7 +69,7 @@ class TestLegalCase(FrappeTestCase):
 
 	def test_acordo_vinculado_ao_servico(self):
 		servico = create_test_legal_case()
-		acordo = create_test_acordo(servico=servico.name, num_parcelas=1, valor_total=5000)
+		acordo = create_test_acordo(servico=servico.name, num_parcelas=1, total_amount=5000)
 		vinculados = frappe.get_all(
 			"Fee Agreement",
 			filters={"legal_case": servico.name},
@@ -89,7 +89,7 @@ class TestLegalCase(FrappeTestCase):
 		cliente = create_test_client()
 		servico = create_test_legal_case(cliente=cliente.name)
 		self.assertIn(servico.name, servico.title)
-		self.assertIn(cliente.nome, servico.title)
+		self.assertIn(cliente.client_name, servico.title)
 
 	def test_dashboard_links_filtram_por_servico(self):
 		meta = frappe.get_meta("Legal Case")

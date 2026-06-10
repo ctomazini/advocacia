@@ -74,7 +74,7 @@ const AdvocaciaMasks = {
 			cpf: "999.999.999-99",
 			cnpj: "99.999.999/9999-99",
 			cnj: "9999999-99.9999.9.99.9999",
-			celular: "(99) 99999-9999",
+			mobile: "(99) 99999-9999",
 			fixo: "(99) 9999-9999",
 			phone: "(99) 99999-9999",
 			cep: "99999-999",
@@ -135,17 +135,17 @@ const AdvocaciaMasks = {
 	setupClientForm(frm) {
 		if (!window.AdvocaciaMasks) return;
 
-		if (frm.doc.tipo_pessoa === "Pessoa Física") {
+		if (frm.doc.person_type === "Pessoa Física") {
 			this.bindMask(frm, "cpf", this.applyCPF, "cpf");
 			this.unbindMask(frm, "cnpj");
-			this.unbindMask(frm, "cpf_representante");
-		} else if (frm.doc.tipo_pessoa === "Pessoa Jurídica") {
+			this.unbindMask(frm, "representative_cpf");
+		} else if (frm.doc.person_type === "Pessoa Jurídica") {
 			this.bindMask(frm, "cnpj", this.applyCNPJ, "cnpj");
-			this.bindMask(frm, "cpf_representante", this.applyCPF, "cpf");
+			this.bindMask(frm, "representative_cpf", this.applyCPF, "cpf");
 			this.unbindMask(frm, "cpf");
 		}
 
-		["cpf", "cnpj", "cpf_representante"].forEach((fieldname) => {
+		["cpf", "cnpj", "representative_cpf"].forEach((fieldname) => {
 			if (frm.doc[fieldname]) {
 				const fn =
 					fieldname === "cnpj" ? this.applyCNPJ : this.applyCPF;
@@ -155,7 +155,7 @@ const AdvocaciaMasks = {
 	},
 
 	setupLegal CaseProcessoMask(frm) {
-		const field = frm.fields_dict && frm.fields_dict.numero_processo;
+		const field = frm.fields_dict && frm.fields_dict.case_number;
 		if (!field || !field.$input) return;
 
 		field.$input.off(".advocacia_mask");
@@ -163,14 +163,14 @@ const AdvocaciaMasks = {
 			field.$input.inputmask("remove");
 		}
 
-		if (frm.doc.tipo !== "Processo Judicial" || frm.doc.numeracao_legada) {
+		if (frm.doc.type !== "Processo Judicial" || frm.doc.legacy_numbering) {
 			return;
 		}
 
-		this.bindMask(frm, "numero_processo", this.applyCNJ, "cnj");
+		this.bindMask(frm, "case_number", this.applyCNJ, "cnj");
 
-		if (frm.doc.numero_processo) {
-			this.formatFormField(frm, "numero_processo", this.applyCNJ);
+		if (frm.doc.case_number) {
+			this.formatFormField(frm, "case_number", this.applyCNJ);
 		}
 	},
 };
@@ -184,7 +184,7 @@ window.advocacia_aplicar_mascara_input = function ($input, tipo) {
 		cpf: AdvocaciaMasks.applyCPF,
 		cnpj: AdvocaciaMasks.applyCNPJ,
 		cnj: AdvocaciaMasks.applyCNJ,
-		celular: AdvocaciaMasks.applyPhone,
+		mobile: AdvocaciaMasks.applyPhone,
 		fixo: AdvocaciaMasks.applyPhone,
 		phone: AdvocaciaMasks.applyPhone,
 		cep: AdvocaciaMasks.applyCEP,

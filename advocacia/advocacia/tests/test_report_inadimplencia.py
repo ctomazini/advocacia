@@ -18,14 +18,14 @@ class TestReportInadimplencia(FrappeTestCase):
 	def test_execute_retorna_colunas_e_dados(self):
 		cliente = create_test_client()
 		servico = create_test_legal_case(cliente=cliente.name)
-		acordo = create_test_acordo(servico=servico.name, valor_total=1500, num_parcelas=1)
+		acordo = create_test_acordo(servico=servico.name, total_amount=1500, num_parcelas=1)
 		pag = get_acordo_pagamentos(acordo.name)[0]
 		frappe.db.set_value(
 			"Legal Payment",
 			pag.name,
 			{
 				"status": "Vencido",
-				"data_vencimento": add_days(today(), -5),
+				"due_date": add_days(today(), -5),
 				"manual_override": 0,
 			},
 			update_modified=False,

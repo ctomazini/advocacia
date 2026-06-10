@@ -1,8 +1,8 @@
 {% set settings = frappe.get_doc("Office Settings") %}
-{% set client_name = frappe.db.get_value("Client", doc.client, "nome") or doc.client %}
+{% set client_name = frappe.db.get_value("Client", doc.client, "client_name") or doc.client %}
 {% set case_title = frappe.db.get_value("Legal Case", doc.legal_case, "title") or doc.legal_case %}
 {% set received = doc.status == "Recebido" %}
-{% set display_amount = doc.valor_recebido if received and doc.valor_recebido else doc.valor %}
+{% set display_amount = doc.received_amount if received and doc.received_amount else doc.amount %}
 <style>
 	.adv-print { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 11pt; color: #222; line-height: 1.45; }
 	.adv-print h1 { font-size: 18pt; margin: 0 0 4px; font-weight: 600; }
@@ -33,7 +33,7 @@
 		</div>
 		{% endif %}
 		<div class="header-info">
-			<h1>{{ settings.razao_social or "Escritório de Advocacia" }}</h1>
+			<h1>{{ settings.company_name or "Escritório de Advocacia" }}</h1>
 			{% if settings.oab %}
 			<div class="muted">OAB {{ settings.oab }}</div>
 			{% endif %}
@@ -73,18 +73,18 @@
 		{% endif %}
 		<div class="grid-row">
 			<div class="grid-label">Vencimento</div>
-			<div class="grid-value">{{ frappe.utils.formatdate(doc.data_vencimento) if doc.data_vencimento else "—" }}</div>
+			<div class="grid-value">{{ frappe.utils.formatdate(doc.due_date) if doc.due_date else "—" }}</div>
 		</div>
-		{% if doc.data_recebimento %}
+		{% if doc.received_date %}
 		<div class="grid-row">
 			<div class="grid-label">Recebimento</div>
-			<div class="grid-value">{{ frappe.utils.formatdate(doc.data_recebimento) }}</div>
+			<div class="grid-value">{{ frappe.utils.formatdate(doc.received_date) }}</div>
 		</div>
 		{% endif %}
-		{% if doc.descricao %}
+		{% if doc.description %}
 		<div class="grid-row">
 			<div class="grid-label">Descrição</div>
-			<div class="grid-value">{{ doc.descricao }}</div>
+			<div class="grid-value">{{ doc.description }}</div>
 		</div>
 		{% endif %}
 	</div>
@@ -119,8 +119,8 @@
 	</div>
 	{% endif %}
 
-	{% if doc.observacoes %}
+	{% if doc.remarks %}
 	<h2>Observações</h2>
-	<p>{{ doc.observacoes }}</p>
+	<p>{{ doc.remarks }}</p>
 	{% endif %}
 </div>

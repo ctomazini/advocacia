@@ -16,17 +16,17 @@ frappe.provide("advocacia.painel.audiencias");
 	    var found = [];
 	    if (timeline && timeline.length) {
 	        for (var i = 0; i < timeline.length && found.length < limit; i++) {
-	            if (timeline[i].tipo !== "audiencia") continue;
+	            if (timeline[i].type !== "audiencia") continue;
 	            found.push({
 	                name: timeline[i].docname,
-	                tipo: timeline[i].titulo,
-	                cliente: timeline[i].subtitulo,
+	                type: timeline[i].title,
+	                cliente: timeline[i].subtitle,
 	                servico: timeline[i].detalhe,
-	                data: timeline[i].data,
+	                date: timeline[i].date,
 	                hora: timeline[i].hora,
-	                dias_restantes: U.painel_day_diff(timeline[i].data),
+	                dias_restantes: U.painel_day_diff(timeline[i].date),
 	                vara_label: timeline[i].detalhe,
-	                modalidade: "Presencial",
+	                modality: "Presencial",
 	                link_virtual: "",
 	            });
 	        }
@@ -35,7 +35,7 @@ frappe.provide("advocacia.painel.audiencias");
 	}
 
 	AP.painel_audiencia_modalidade_html = function(a) {
-	    var mod = a.modalidade || "Presencial";
+	    var mod = a.modality || "Presencial";
 	    var icon = mod === "Virtual" ? "video" : mod === "Híbrida" ? "monitor" : "map-pin";
 	    var cls =
 	        mod === "Virtual" ? "virtual" : mod === "Híbrida" ? "hibrida" : "presencial";
@@ -50,7 +50,7 @@ frappe.provide("advocacia.painel.audiencias");
 	}
 
 	AP.painel_audiencia_entrar_html = function(a) {
-	    var mod = a.modalidade || "Presencial";
+	    var mod = a.modality || "Presencial";
 	    if (mod !== "Virtual" && mod !== "Híbrida") {
 	        return "";
 	    }
@@ -75,8 +75,8 @@ frappe.provide("advocacia.painel.audiencias");
 	}
 
 	AP.render_proxima_audiencia_card = function(a, ordem) {
-	    var when = U.painel_timeline_when_label(a.data, a.hora, a.dias_restantes);
-	    var mod = a.modalidade || "Presencial";
+	    var when = U.painel_timeline_when_label(a.date, a.hora, a.dias_restantes);
+	    var mod = a.modality || "Presencial";
 	    var local =
 	        a.court_branch_link_label ||
 	        (mod === "Presencial" || mod === "Híbrida" ? a.court_branch || "" : "");
@@ -98,7 +98,7 @@ frappe.provide("advocacia.painel.audiencias");
 	        A.painel_audiencia_modalidade_html(a) +
 	        "</div>" +
 	        '<div class="painel-prox-tipo">' +
-	        frappe.utils.escape_html(a.tipo || __("Audiência")) +
+	        frappe.utils.escape_html(a.type || __("Audiência")) +
 	        "</div>" +
 	        '<div class="painel-prox-meta">' +
 	        '<div class="painel-prox-row"><span class="painel-prox-row-label">' +
@@ -160,11 +160,11 @@ frappe.provide("advocacia.painel.audiencias");
 	    if (!audiencias || !audiencias.length) return "";
 	    return audiencias
 	        .map(function (a) {
-	            var parts = U.painel_date_parts(a.data);
+	            var parts = U.painel_date_parts(a.date);
 	            var card_cls = "painel-schedule-card";
 	            if (a.dias_restantes === 0) card_cls += " painel-schedule-card--today";
 	            var btn = "";
-	            if (a.modalidade === "Virtual") {
+	            if (a.modality === "Virtual") {
 	                if (a.link_virtual) {
 	                    btn =
 	                        '<a class="painel-btn-entrar" href="' +
@@ -203,11 +203,11 @@ frappe.provide("advocacia.painel.audiencias");
 	                frappe.utils.escape_html(a.client_nome || a.client || "—") +
 	                "</div>" +
 	                '<div class="painel-schedule-sub">' +
-	                frappe.utils.escape_html(a.tipo || __("Audiência")) +
+	                frappe.utils.escape_html(a.type || __("Audiência")) +
 	                (a.court_branch_link_label ? " · " + frappe.utils.escape_html(a.court_branch_link_label) : "") +
 	                "</div></div>" +
 	                '<div class="painel-schedule-meta">' +
-	                U.status_pill(a.modalidade || "Presencial") +
+	                U.status_pill(a.modality || "Presencial") +
 	                btn +
 	                "</div></div>"
 	            );

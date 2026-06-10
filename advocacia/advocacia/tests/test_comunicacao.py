@@ -24,9 +24,9 @@ class TestCaseCommunication(FrappeTestCase):
 			{
 				"doctype": "Case Communication",
 				"legal_case": servico.name,
-				"assunto": "Teste via serviço",
-				"tipo": "Telefone",
-				"data": frappe.utils.now_datetime(),
+				"subject": "Teste via serviço",
+				"type": "Telefone",
+				"communication_date": frappe.utils.now_datetime(),
 			}
 		)
 		com.insert(ignore_permissions=True)
@@ -34,13 +34,13 @@ class TestCaseCommunication(FrappeTestCase):
 
 	def test_gerar_tarefa_automatica(self):
 		com = create_test_case_communication(
-			gerar_tarefa=1,
-			proximos_passos="Retornar ligação amanhã",
+			generate_task=1,
+			next_steps="Retornar ligação amanhã",
 		)
 		com.reload()
 		self.assertTrue(com.legal_task)
 		tarefa = frappe.get_doc("Legal Task", com.legal_task)
-		self.assertIn("Follow-up:", tarefa.titulo)
+		self.assertIn("Follow-up:", tarefa.subject)
 
 	def test_sem_assunto_falha(self):
 		with self.assertRaises(MandatoryError):
@@ -48,8 +48,8 @@ class TestCaseCommunication(FrappeTestCase):
 				{
 					"doctype": "Case Communication",
 					"client": create_test_client().name,
-					"tipo": "Telefone",
-					"data": frappe.utils.now_datetime(),
+					"type": "Telefone",
+					"communication_date": frappe.utils.now_datetime(),
 				}
 			).insert(ignore_permissions=True)
 
@@ -61,26 +61,26 @@ class TestCaseCommunication(FrappeTestCase):
 				{
 					"doctype": "Case Communication",
 					"client": create_test_client().name,
-					"assunto": "Teste",
-					"tipo": "",
-					"data": frappe.utils.now_datetime(),
+					"subject": "Teste",
+					"type": "",
+					"communication_date": frappe.utils.now_datetime(),
 				}
 			).insert(ignore_permissions=True)
 
 	def test_gerar_tarefa_sem_proximos_passos_nao_cria(self):
-		com = create_test_case_communication(gerar_tarefa=1, proximos_passos=None)
+		com = create_test_case_communication(generate_task=1, next_steps=None)
 		com.reload()
 		self.assertFalse(com.legal_task)
 
 	def test_gerar_tarefa_apos_primeiro_save(self):
-		com = create_test_case_communication(proximos_passos="Ligar na segunda-feira")
+		com = create_test_case_communication(next_steps="Ligar na segunda-feira")
 		self.assertFalse(com.legal_task)
-		com.gerar_tarefa = 1
+		com.generate_task = 1
 		com.save(ignore_permissions=True)
 		com.reload()
 		self.assertTrue(com.legal_task)
 		tarefa = frappe.get_doc("Legal Task", com.legal_task)
 		self.assertEqual(
-			frappe.utils.getdate(tarefa.data_limite),
+			frappe.utils.getdate(tarefa.due_date),
 			frappe.utils.getdate(frappe.utils.add_days(frappe.utils.today(), 3)),
 		)

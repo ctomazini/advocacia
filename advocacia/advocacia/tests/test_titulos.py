@@ -32,7 +32,7 @@ class TestTitulosIdClient(FrappeTestCase):
 		self.assertNotEqual(a1.title, a2.title)
 		self.assertTrue(a1.title.startswith(a1.name))
 		self.assertTrue(a2.title.startswith(a2.name))
-		self.assertIn(cliente.nome, a1.title)
+		self.assertIn(cliente.client_name, a1.title)
 
 	def test_registro_atos_after_insert_preenche_titulo(self):
 		registro = create_test_registro_atos()
@@ -56,7 +56,7 @@ class TestTitulosIdClient(FrappeTestCase):
 				"doctype": "Service Record",
 				"legal_case": servico.name,
 				"title": descritor,
-				"acts": [{"data": today(), "tipo": "Inicial", "valor": 100}],
+				"acts": [{"act_date": today(), "type": "Inicial", "amount": 100}],
 			}
 		).insert(ignore_permissions=True)
 		self.assertEqual(registro.title, _titulo_composto(registro, descritor))
@@ -65,11 +65,11 @@ class TestTitulosIdClient(FrappeTestCase):
 		servico = create_test_legal_case()
 		a1 = create_test_hearing(
 			servico=servico.name,
-			data_hora=get_datetime("2026-03-15 10:00:00"),
+			hearing_datetime=get_datetime("2026-03-15 10:00:00"),
 		)
 		a2 = create_test_hearing(
 			servico=servico.name,
-			data_hora=get_datetime("2026-03-15 10:00:00"),
+			hearing_datetime=get_datetime("2026-03-15 10:00:00"),
 		)
 		self.assertNotEqual(a1.title, a2.title)
 		self.assertTrue(a1.title.startswith(a1.name))
@@ -83,7 +83,7 @@ class TestTitulosIdClient(FrappeTestCase):
 		self.assertEqual(aud.title, _titulo_composto(aud, descritor))
 
 	def test_legal_payment_titulo_distintivo_por_id(self):
-		acordo = create_test_acordo(num_parcelas=2, valor_total=1000)
+		acordo = create_test_acordo(num_parcelas=2, total_amount=1000)
 		pagamentos = get_acordo_pagamentos(acordo.name)
 		self.assertGreaterEqual(len(pagamentos), 2)
 		p1 = frappe.get_doc("Legal Payment", pagamentos[0].name)
@@ -109,6 +109,6 @@ class TestTitulosIdClient(FrappeTestCase):
 
 	def test_legal_case_titulo_id_cliente(self):
 		cliente = create_test_client()
-		servico = create_test_legal_case(cliente=cliente.name, tipo="Consultoria")
+		servico = create_test_legal_case(cliente=cliente.name, type="Consultoria")
 		self.assertIn(servico.name, servico.title)
-		self.assertIn(cliente.nome, servico.title)
+		self.assertIn(cliente.client_name, servico.title)
