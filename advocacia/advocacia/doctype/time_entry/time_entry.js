@@ -1,7 +1,7 @@
 frappe.ui.form.on("Time Entry", {
 	refresh(frm) {
 		if (!frm.is_new()) {
-			if (frm.doc.timer_ativo) {
+			if (frm.doc.timer_active) {
 				frm.add_custom_button(__("⏹ Parar Timer"), () => frm.events.parar_timer(frm));
 				frm.change_custom_button_type(__("⏹ Parar Timer"), null, "danger");
 				frm.events._start_visual_timer(frm);
@@ -15,7 +15,7 @@ frappe.ui.form.on("Time Entry", {
 		} else {
 			frm.events._stop_visual_timer(frm);
 			frm.events._disable_beforeunload(frm);
-			if (frm.doc.legal_case && frm.doc.atividade) {
+			if (frm.doc.legal_case && frm.doc.activity) {
 				frm.add_custom_button(
 					__("Salvar e Iniciar Timer"),
 					() => frm.events.salvar_e_iniciar_timer(frm),
@@ -27,8 +27,8 @@ frappe.ui.form.on("Time Entry", {
 	},
 
 	salvar_e_iniciar_timer(frm) {
-		if (!frm.doc.duracao_minutos) {
-			frm.set_value("duracao_minutos", 0);
+		if (!frm.doc.duration_minutes) {
+			frm.set_value("duration_minutes", 0);
 		}
 		frm.save().then(function () {
 			frm.events.iniciar_timer(frm);
@@ -86,11 +86,11 @@ frappe.ui.form.on("Time Entry", {
 		}
 
 		var wrapper = frm.fields_dict.timer_display && frm.fields_dict.timer_display.$wrapper;
-		if (!wrapper || !frm.doc.timer_inicio) {
+		if (!wrapper || !frm.doc.timer_start) {
 			return;
 		}
 
-		var start = frappe.datetime.str_to_obj(frm.doc.timer_inicio);
+		var start = frappe.datetime.str_to_obj(frm.doc.timer_start);
 
 		function pad(n) {
 			return String(n).padStart(2, "0");

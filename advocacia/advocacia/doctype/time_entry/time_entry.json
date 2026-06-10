@@ -8,26 +8,26 @@
  "field_order": [
   "informacoes_section",
   "title",
-  "servico",
-  "cliente",
+  "legal_case",
+  "client",
   "column_break_info",
-  "data",
-  "responsavel",
+  "entry_date",
+  "responsible",
   "tempo_section",
-  "hora_inicio",
-  "hora_fim",
+  "start_time",
+  "end_time",
   "column_break_tempo",
-  "duracao_minutos",
-  "duracao_horas",
+  "duration_minutes",
+  "duration_hours",
   "atividade_section",
-  "atividade",
-  "categoria",
-  "descricao",
-  "cobravel",
+  "activity",
+  "category",
+  "description",
+  "billable",
   "timer_section",
   "timer_display",
-  "timer_inicio",
-  "timer_ativo"
+  "timer_start",
+  "timer_active"
  ],
  "fields": [
   {
@@ -54,7 +54,7 @@
    "options": "Client",
    "label": "Client",
    "read_only": 1,
-   "fetch_from": "servico.cliente",
+   "fetch_from": "legal_case.client",
    "in_list_view": 0,
    "description": "Preenchido automaticamente a partir do serviço.",
    "idx": 3
@@ -65,7 +65,7 @@
    "idx": 4
   },
   {
-   "fieldname": "data",
+   "fieldname": "entry_date",
    "fieldtype": "Date",
    "label": "Data",
    "reqd": 1,
@@ -77,7 +77,7 @@
    "idx": 5
   },
   {
-   "fieldname": "responsavel",
+   "fieldname": "responsible",
    "fieldtype": "Link",
    "options": "User",
    "label": "Responsável",
@@ -92,14 +92,14 @@
    "idx": 7
   },
   {
-   "fieldname": "hora_inicio",
+   "fieldname": "start_time",
    "fieldtype": "Time",
    "label": "Hora Início",
    "description": "Hora de início (timer).",
    "idx": 8
   },
   {
-   "fieldname": "hora_fim",
+   "fieldname": "end_time",
    "fieldtype": "Time",
    "label": "Hora Fim",
    "description": "Hora de término (timer).",
@@ -111,7 +111,7 @@
    "idx": 10
   },
   {
-   "fieldname": "duracao_minutos",
+   "fieldname": "duration_minutes",
    "fieldtype": "Int",
    "label": "Duração (min)",
    "default": "0",
@@ -119,7 +119,7 @@
    "idx": 11
   },
   {
-   "fieldname": "duracao_horas",
+   "fieldname": "duration_hours",
    "fieldtype": "Float",
    "label": "Duração (horas)",
    "read_only": 1,
@@ -134,7 +134,7 @@
    "idx": 13
   },
   {
-   "fieldname": "atividade",
+   "fieldname": "activity",
    "fieldtype": "Data",
    "label": "Atividade",
    "reqd": 1,
@@ -144,7 +144,7 @@
    "idx": 14
   },
   {
-   "fieldname": "categoria",
+   "fieldname": "category",
    "fieldtype": "Select",
    "label": "Categoria",
    "options": "Estudo/Pesquisa\nRedação\nAudiência\nReunião\nDeslocamento\nAtendimento\nAdministrativo\nOutro",
@@ -153,14 +153,14 @@
    "idx": 15
   },
   {
-   "fieldname": "descricao",
+   "fieldname": "description",
    "fieldtype": "Small Text",
    "label": "Detalhes",
    "description": "Detalhamento complementar da atividade.",
    "idx": 16
   },
   {
-   "fieldname": "cobravel",
+   "fieldname": "billable",
    "fieldtype": "Check",
    "label": "Cobrável",
    "default": "1",
@@ -181,7 +181,7 @@
    "idx": 19
   },
   {
-   "fieldname": "timer_inicio",
+   "fieldname": "timer_start",
    "fieldtype": "Datetime",
    "hidden": 1,
    "label": "Início do Timer",
@@ -190,7 +190,7 @@
    "idx": 20
   },
   {
-   "fieldname": "timer_ativo",
+   "fieldname": "timer_active",
    "fieldtype": "Check",
    "default": "0",
    "hidden": 1,
@@ -258,8 +258,8 @@
  "autoname": "format:HRS-{YYYY}-{####}",
  "naming_rule": "Expression",
  "title_field": "title",
- "search_fields": "atividade,cliente,data",
- "sort_field": "data",
+ "search_fields": "activity,client,entry_date",
+ "sort_field": "entry_date",
  "sort_order": "DESC",
  "quick_entry": 1,
  "track_changes": 1,
