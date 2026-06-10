@@ -25,7 +25,7 @@ frappe.provide("advocacia.painel.timeline");
 	        titulo +
 	        "</h2>" +
 	        '<p class="painel-section-sub">' +
-	        subtitulo +
+	        subtitle +
 	        "</p></div>" +
 	        '<div class="painel-section-head-actions">' +
 	        U.render_list_limit_controls("timeline", list_limit) +
