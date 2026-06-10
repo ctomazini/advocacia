@@ -1,0 +1,181 @@
+/* Script Reports Advocacia — visual alinhado ao painel */
+
+:root {
+	--adv-rpt-radius: 8px;
+	--adv-rpt-shadow: 0 1px 3px color-mix(in srgb, var(--gray-900) 4%, transparent),
+		0 4px 12px color-mix(in srgb, var(--gray-900) 6%, transparent);
+	--adv-rpt-gap: 12px;
+}
+
+#page-query-report.adv-report-page .layout-main-section-wrapper {
+	background: var(--bg-color);
+}
+
+#page-query-report.adv-report-page .report-summary {
+	background: var(--card-bg);
+	border: 1px solid var(--border-color);
+	border-radius: var(--adv-rpt-radius);
+	box-shadow: var(--adv-rpt-shadow);
+	margin: 1rem 1rem 0;
+	padding: 16px;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+	gap: var(--adv-rpt-gap);
+	border-bottom: none;
+	justify-content: stretch;
+}
+
+#page-query-report.adv-report-page .report-summary .summary-item {
+	background: var(--control-bg);
+	border-radius: var(--adv-rpt-radius);
+	padding: 14px 12px;
+	margin: 0;
+	min-width: unset;
+	max-width: unset;
+	width: 100%;
+	height: auto;
+	border: 1px solid transparent;
+	transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+#page-query-report.adv-report-page .report-summary .summary-item:hover {
+	border-color: var(--border-color);
+	transform: translateY(-1px);
+}
+
+#page-query-report.adv-report-page .report-summary .summary-label {
+	font-size: var(--text-xs);
+	text-transform: uppercase;
+	letter-spacing: 0.3px;
+	color: var(--text-muted);
+}
+
+#page-query-report.adv-report-page .report-summary .summary-value {
+	font-size: var(--text-xl);
+	font-weight: 700;
+	padding-top: 8px;
+}
+
+#page-query-report.adv-report-page .chart-wrapper {
+	background: var(--card-bg);
+	border: 1px solid var(--border-color);
+	border-radius: var(--adv-rpt-radius);
+	box-shadow: var(--adv-rpt-shadow);
+	margin: var(--adv-rpt-gap) 1rem;
+	padding: 16px 12px 8px;
+}
+
+#page-query-report.adv-report-page .report-wrapper {
+	width: 100%;
+	box-sizing: border-box;
+	margin: 0 1rem 1.5rem;
+	background: var(--card-bg);
+	border: 1px solid var(--border-color);
+	border-radius: var(--adv-rpt-radius);
+	box-shadow: var(--adv-rpt-shadow);
+	padding: 8px 4px 4px;
+}
+
+#page-query-report.adv-report-page .report-wrapper .datatable {
+	width: 100%;
+}
+
+#page-query-report.adv-report-page .dt-scrollable {
+	border-radius: 6px;
+}
+
+#page-query-report.adv-report-page .dt-row-header .dt-cell {
+	background: var(--control-bg);
+	font-weight: 600;
+	font-size: var(--text-sm);
+	text-transform: uppercase;
+	letter-spacing: 0.02em;
+	color: var(--text-muted);
+}
+
+#page-query-report.adv-report-page .dt-row .dt-cell {
+	font-size: var(--text-sm);
+}
+
+#page-query-report.adv-report-page .dt-row:hover .dt-cell {
+	background: color-mix(in srgb, var(--primary) 4%, var(--card-bg));
+}
+
+#page-query-report .report-wrapper {
+	width: 100%;
+	box-sizing: border-box;
+}
+
+#page-query-report .report-wrapper .datatable {
+	width: 100%;
+}
+
+.adv-rpt-num {
+	text-align: right;
+	font-weight: 600;
+	font-feature-settings: "tnum";
+}
+
+.adv-rpt-desc {
+	max-width: 280px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.adv-report-badge {
+	display: inline-flex;
+	align-items: center;
+	padding: 2px 8px;
+	border-radius: 999px;
+	font-size: var(--text-xs);
+	font-weight: 600;
+	line-height: 1.35;
+	border: 1px solid transparent;
+}
+
+.adv-report-badge--green {
+	color: var(--green-700);
+	background: color-mix(in srgb, var(--green-500) 12%, var(--card-bg));
+	border-color: color-mix(in srgb, var(--green-500) 25%, var(--border-color));
+}
+
+.adv-report-badge--red {
+	color: var(--red-700);
+	background: color-mix(in srgb, var(--red-500) 12%, var(--card-bg));
+	border-color: color-mix(in srgb, var(--red-500) 25%, var(--border-color));
+}
+
+.adv-report-badge--orange {
+	color: var(--orange-700);
+	background: color-mix(in srgb, var(--orange-500) 12%, var(--card-bg));
+	border-color: color-mix(in srgb, var(--orange-500) 25%, var(--border-color));
+}
+
+.adv-report-badge--blue {
+	color: var(--blue-700);
+	background: color-mix(in srgb, var(--blue-500) 12%, var(--card-bg));
+	border-color: color-mix(in srgb, var(--blue-500) 25%, var(--border-color));
+}
+
+.adv-report-badge--gray {
+	color: var(--gray-700);
+	background: color-mix(in srgb, var(--gray-500) 10%, var(--card-bg));
+	border-color: color-mix(in srgb, var(--gray-500) 20%, var(--border-color));
+}
+
+@media print {
+	#page-query-report.adv-report-page .layout-side-section,
+	#page-query-report.adv-report-page .page-head,
+	#page-query-report.adv-report-page .filter-section,
+	#page-query-report.adv-report-page .chart-wrapper {
+		display: none !important;
+	}
+
+	#page-query-report.adv-report-page .report-wrapper {
+		box-shadow: none;
+		border: none;
+		margin: 0;
+		padding: 0;
+	}
+}
