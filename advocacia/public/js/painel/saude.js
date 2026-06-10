@@ -4,8 +4,10 @@ frappe.provide("advocacia.painel.saude");
 (function (AP) {
 	var U = advocacia.painel.utils;
 
-	AP.render = function (saude) {
+	AP.render = function (saude, options) {
+		options = options || {};
 		saude = saude || {};
+		var compact = !!options.compact;
 		var score = saude.score != null ? saude.score : 0;
 		var tone = saude.tone || "green";
 		var label = saude.label || __("Saudável");
@@ -31,7 +33,9 @@ frappe.provide("advocacia.painel.saude");
 			.join("");
 
 		return (
-			'<div class="painel-saude-card" id="painel-saude-operacional">' +
+			'<div class="painel-saude-card' +
+			(compact ? " painel-saude-card--finance" : "") +
+			'" id="painel-saude-operacional">' +
 			'<div class="painel-saude-head">' +
 			'<span class="painel-saude-badge tone-' +
 			tone +
@@ -42,7 +46,6 @@ frappe.provide("advocacia.painel.saude");
 			__("Saúde Operacional") +
 			"</h3></div>" +
 			'<div class="painel-saude-body">' +
-			'<div class="painel-saude-score-wrap">' +
 			'<div class="painel-saude-ring">' +
 			'<svg viewBox="0 0 88 88" aria-hidden="true">' +
 			'<circle class="painel-saude-ring-bg" cx="44" cy="44" r="' +

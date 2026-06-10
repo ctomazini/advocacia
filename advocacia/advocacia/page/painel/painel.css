@@ -1868,3 +1868,266 @@
     font-weight: 800;
     color: var(--text-color);
 }
+
+/* P0 — zona financeira */
+.painel-zona-financeira {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    min-width: 0;
+    margin-top: 4px;
+}
+
+.painel-zona-financeira__head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.painel-zona-financeira__head .painel-section-title {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+.painel-zona-financeira__head .painel-section-sub {
+    margin: 4px 0 0;
+    font-size: 13px;
+}
+
+.painel-finance-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    min-width: 0;
+}
+
+.painel-finance-stack__health,
+.painel-finance-stack__kpis,
+.painel-finance-block {
+    width: 100%;
+    min-width: 0;
+}
+
+.painel-saude-card--finance {
+    margin-bottom: 0;
+}
+
+.painel-saude-card--finance .painel-saude-body {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 16px 20px;
+    align-items: center;
+    padding: 14px 18px 18px;
+}
+
+.painel-saude-card--finance .painel-saude-ring {
+    position: relative;
+    width: 88px;
+    height: 88px;
+}
+
+.painel-saude-card--finance .painel-saude-score-text {
+    position: absolute;
+    inset: 0;
+}
+
+.painel-saude-card--finance .painel-saude-breakdown {
+    margin-top: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.painel-finance-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    width: 100%;
+}
+
+.painel-finance-kpi {
+    background: var(--card-bg);
+    border: 1px solid color-mix(in srgb, var(--border-color) 70%, transparent);
+    border-radius: 12px;
+    padding: 14px 16px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    box-shadow: var(--painel-shadow);
+}
+
+.painel-finance-kpi__icon {
+    display: flex;
+    align-items: center;
+    color: var(--text-muted);
+    opacity: 0.75;
+}
+
+.painel-finance-kpi__icon .icon {
+    width: 1.1rem;
+    height: 1.1rem;
+}
+
+.painel-finance-kpi__label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    line-height: 1.35;
+}
+
+.painel-finance-kpi__value {
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    color: var(--text-color);
+    font-variant-numeric: tabular-nums;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.painel-finance-kpi__meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.35;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.painel-finance-kpi--red .painel-finance-kpi__value { color: var(--red-600); }
+.painel-finance-kpi--orange .painel-finance-kpi__value { color: var(--orange-600); }
+.painel-finance-kpi--green .painel-finance-kpi__value { color: var(--green-600); }
+.painel-finance-kpi--blue .painel-finance-kpi__value { color: var(--blue-600); }
+.painel-finance-kpi--yellow .painel-finance-kpi__value { color: var(--orange-600); }
+
+.painel-finance-block .painel-section-head {
+    margin-bottom: 12px;
+}
+
+.painel-finance-composition-panel {
+    padding: 16px 18px;
+}
+
+.painel-finance-lists {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    min-width: 0;
+}
+
+.painel-finance-lists .painel-duo-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 0;
+    width: 100%;
+}
+
+.painel-finance-lists .painel-section--nested {
+    margin-bottom: 0;
+    min-width: 0;
+}
+
+#painel-finance-composition {
+    margin-bottom: 0;
+}
+
+.painel-kpi-grid--finance {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.painel-kpi--orange::before { background: color-mix(in srgb, var(--orange-500) 70%, transparent); }
+.painel-kpi--red::before { background: color-mix(in srgb, var(--red-500) 70%, transparent); }
+.painel-kpi--blue::before { background: color-mix(in srgb, var(--blue-500) 70%, transparent); }
+.painel-kpi--yellow::before { background: color-mix(in srgb, var(--orange-500) 55%, transparent); }
+.painel-kpi--green::before { background: color-mix(in srgb, var(--green-500) 70%, transparent); }
+
+.painel-kpi-icon {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    opacity: 0.45;
+}
+
+.painel-kpi-grid--finance .painel-kpi {
+    min-height: 96px;
+    padding: 16px 14px 14px;
+    cursor: default;
+}
+
+.painel-kpi-grid--finance .painel-kpi:hover {
+    transform: none;
+}
+
+.painel-op-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    text-align: left;
+    padding: 10px 12px;
+    margin-bottom: 6px;
+    border: 1px solid color-mix(in srgb, var(--border-color) 60%, transparent);
+    border-radius: var(--painel-radius-sm);
+    background: var(--card-bg);
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.painel-op-row:hover {
+    border-color: color-mix(in srgb, var(--primary) 25%, var(--border-color));
+    box-shadow: var(--painel-shadow);
+}
+
+.painel-op-row__title {
+    font-weight: 600;
+    font-size: var(--text-sm);
+    color: var(--text-color);
+}
+
+.painel-op-row__sub {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.painel-finance-grid--bars-only {
+    grid-template-columns: 1fr 1fr;
+}
+
+@media (max-width: 900px) {
+    .painel-finance-kpi-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .painel-finance-lists .painel-duo-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .painel-finance-kpi-grid {
+        grid-template-columns: 1fr;
+    }
+    .painel-saude-card--finance .painel-saude-body {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        text-align: center;
+    }
+    .painel-saude-card--finance .painel-saude-breakdown {
+        width: 100%;
+        text-align: left;
+    }
+}

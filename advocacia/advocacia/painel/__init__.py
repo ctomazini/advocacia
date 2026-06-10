@@ -9,6 +9,7 @@ from advocacia.advocacia.painel import timeline as painel_timeline
 from advocacia.advocacia.painel import agenda as painel_agenda
 from advocacia.advocacia.painel import atencao as painel_atencao
 from advocacia.advocacia.painel import saude as painel_saude
+from advocacia.advocacia.painel import operational as painel_operational
 from advocacia.advocacia.painel._helpers import (
 	LIST_LIMIT_MAX,
 	_list_cap,
@@ -46,12 +47,12 @@ def get(
 		hoje, periodo_fim, mes_inicio, mes_fim, kpis, periodo_dias
 	)
 	resumo = painel_kpis._build_resumo(hoje, kpis, financeiro, periodo_dias)
-	alertas = painel_prazos._build_alertas(hoje, periodo_fim)
 	parcelas_cap = _list_cap(list_limits, "fee_installments")
 	despesas_cap = _list_cap(list_limits, "despesas")
 	custas_cap = _list_cap(list_limits, "custas")
 	comunicacoes_cap = _list_cap(list_limits, "comunicacoes")
 	timeline_cap = _list_cap(list_limits, "timeline")
+	active_cases_cap = _list_cap(list_limits, "active_cases")
 	tarefas_cap = timeline_cap
 
 	parcelas_all = painel_financeiro._get_pagamentos_operacao(
@@ -87,8 +88,9 @@ def get(
 	atencao = painel_atencao.build_attention_tiles(
 		hoje, kpis, financeiro, include_financial=is_manager
 	)
-	agenda_dias = painel_agenda.build_agenda_dias(hoje, periodo_dias, timeline_full)
 	proximo_evento = painel_agenda.build_proximo_evento(timeline_full, hoje=hoje)
+	active_cases_all = painel_operational.get_active_cases_enriched(LIST_LIMIT_MAX)
+	active_cases = active_cases_all[:active_cases_cap]
 
 	list_meta = {
 		"timeline": {"showing": len(timeline), "total": len(timeline_full)},
@@ -96,6 +98,7 @@ def get(
 		"fee_installments": {"showing": len(parcelas), "total": len(parcelas_all)},
 		"despesas": {"showing": len(despesas_pendentes), "total": len(despesas_all)},
 		"custas": {"showing": len(custas_pendentes_repasse), "total": len(custas_all)},
+		"active_cases": {"showing": len(active_cases), "total": len(active_cases_all)},
 	}
 
 	return strip_financial_payload(
@@ -104,16 +107,15 @@ def get(
 			"list_limit": list_limit,
 			"list_limits": list_limits,
 			"list_meta": list_meta,
+			"is_manager": is_manager,
 			"kpis": kpis,
 			"summary": resumo,
 			"financeiro": financeiro,
-			"alertas": alertas,
-			"centro_atencao": centro_atencao,
 			"saude_operacional": saude_operacional,
 			"atencao": atencao,
-			"agenda_dias": agenda_dias,
 			"proximo_evento": proximo_evento,
 			"timeline": timeline,
+			"active_cases": active_cases,
 			"fee_installments": parcelas,
 			"despesas_pendentes": despesas_pendentes,
 			"total_despesas_mes": total_despesas_mes,
@@ -123,8 +125,5 @@ def get(
 			"ultimas_comunicacoes": ultimas_comunicacoes,
 			"horas_semana": horas_semana,
 			"horas_periodo": horas_periodo,
-			"audiencias": audiencias[:timeline_cap],
-			"prazos": prazos[:timeline_cap],
-			"tarefas": tarefas,
 		}
 	)

@@ -8,6 +8,7 @@ frappe.provide("advocacia.painel.utils");
 	    "fee_installments",
 	    "despesas",
 	    "custas",
+	    "active_cases",
 	];
 	
 
@@ -95,6 +96,7 @@ frappe.provide("advocacia.painel.utils");
 	        fee_installments: 5,
 	        despesas: 5,
 	        custas: 5,
+	        active_cases: 5,
 	    };
 	}
 

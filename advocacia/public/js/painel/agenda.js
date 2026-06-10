@@ -17,33 +17,6 @@ frappe.provide("advocacia.painel.agenda");
 		return __("Compromisso");
 	}
 
-	AP.render_day_strip = function (agenda_dias) {
-		agenda_dias = agenda_dias || [];
-		if (!agenda_dias.length) {
-			return "";
-		}
-		var days = agenda_dias
-			.map(function (day) {
-				return (
-					'<div class="painel-agenda-day tone-' +
-					(day.tone || "gray") +
-					'">' +
-					'<span class="painel-agenda-day-label">' +
-					frappe.utils.escape_html(day.label || "") +
-					"</span>" +
-					'<span class="painel-agenda-day-count">' +
-					frappe.utils.escape_html(String(day.count || 0)) +
-					"</span></div>"
-				);
-			})
-			.join("");
-		return (
-			'<div class="painel-agenda-strip" id="painel-agenda-dias">' +
-			days +
-			"</div>"
-		);
-	};
-
 	AP.render_proximo_evento = function (proximo_evento) {
 		proximo_evento = proximo_evento || [];
 		var bodyHtml;
@@ -106,10 +79,6 @@ frappe.provide("advocacia.painel.agenda");
 			bodyHtml +
 			"</section>"
 		);
-	};
-
-	AP.render = function (agenda_dias, proximo_evento) {
-		return AP.render_day_strip(agenda_dias) + AP.render_proximo_evento(proximo_evento);
 	};
 
 	AP.bind = function ($root) {

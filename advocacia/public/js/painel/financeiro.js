@@ -2,145 +2,63 @@
 frappe.provide("advocacia.painel.financeiro");
 (function (AP) {
 	var U = advocacia.painel.utils;
-	var H = advocacia.painel.hero;
-	var K = advocacia.painel.kpis;
-	var A = advocacia.painel.audiencias;
-	var T = advocacia.painel.timeline;
 	var F = advocacia.painel.financeiro;
 
-	AP.painel_init_finance_chart = function($root, fin, page) {
-	    if (!fin || !fin.grafico || typeof frappe.Chart === "undefined") return;
-	    var $el = $root.find("#painel-finance-donut");
-	    if (!$el.length) return;
-	    if (page && page.painel_finance_chart) {
-	        try {
-	            page.painel_finance_chart.destroy();
-	        } catch (e) {
-	            /* ignore */
-	        }
-	        page.painel_finance_chart = null;
-	    }
-	    var labels = [];
-	    var values = [];
-	    var colors = [];
-	    var css = getComputedStyle(document.documentElement);
-	    var tone_colors = {
-	        danger: css.getPropertyValue("--red-500").trim(),
-	        success: css.getPropertyValue("--green-500").trim(),
-	        warning: css.getPropertyValue("--orange-500").trim(),
-	        neutral: css.getPropertyValue("--gray-600").trim(),
-	    };
-	    (fin.grafico || []).forEach(function (g) {
-	        if (U.flt(g.amount) <= 0) return;
-	        labels.push(g.label);
-	        values.push(U.flt(g.amount));
-	        colors.push(tone_colors[g.tone] || tone_colors.neutral);
-	    });
-	    if (!values.length) return;
-	    page.painel_finance_chart = new frappe.Chart($el[0], {
-	        type: "donut",
-	        height: 220,
-	        data: {
-	            labels: labels,
-	            datasets: [{ values: values }],
-	        },
-	        colors: colors,
-	        tooltipOptions: {
-	            formatTooltipY: function (d) {
-	                return format_currency(d, "BRL");
-	            },
-	        },
-	    });
-	}
+	AP.render_composition = function (fin, periodo_dias) {
+		if (!fin) return "";
+		periodo_dias = U.cint(periodo_dias) || 7;
+		var max_val = 1;
+		(fin.grafico || []).forEach(function (g) {
+			if (U.flt(g.amount) > max_val) max_val = U.flt(g.amount);
+		});
+		var chart_rows = (fin.grafico || [])
+			.map(function (g) {
+				var pct = Math.max(4, Math.round((U.flt(g.amount) / max_val) * 100));
+				return (
+					'<div class="painel-chart-row">' +
+					'<span class="painel-chart-label">' +
+					frappe.utils.escape_html(g.label) +
+					"</span>" +
+					'<div class="painel-chart-track"><div class="painel-chart-fill ' +
+					(g.tone || "neutral") +
+					'" style="width:' +
+					pct +
+					'%"></div></div>' +
+					'<span class="painel-chart-amt">' +
+					U.fmt_currency(g.amount) +
+					"</span></div>"
+				);
+			})
+			.join("");
+		var taxa = fin.taxa_recebimento || 0;
+		return (
+			'<div class="painel-finance-block" id="painel-finance-composition">' +
+			'<div class="painel-section-head"><div><h2 class="painel-section-title">' +
+			__("Composição") +
+			"</h2>" +
+			'<p class="painel-section-sub">' +
+			__("Recebíveis do mês · {0}", [U.painel_periodo_enunciado(periodo_dias)]) +
+			"</p></div></div>" +
+			'<div class="painel-panel painel-finance-composition-panel">' +
+			'<div class="painel-chart painel-chart--percent">' +
+			'<div class="painel-chart-row">' +
+			'<span class="painel-chart-label">' +
+			__("Recebido") +
+			"</span>" +
+			'<div class="painel-chart-track"><div class="painel-chart-fill success" style="width:' +
+			Math.max(4, Math.min(100, taxa)) +
+			'%"></div></div>' +
+			'<span class="painel-chart-amt">' +
+			taxa +
+			"%</span></div>" +
+			chart_rows +
+			"</div></div></div>"
+		);
+	};
 
-	AP.render_financeiro = function(fin, periodo_dias) {
-	    if (!fin) return "";
-	    periodo_dias = U.cint(periodo_dias) || 7;
-	    var previsto =
-	        fin.previsto_periodo || fin.previsto_semana || { count: 0, amount: 0 };
-	    var previsto_label =
-	        periodo_dias === 1
-	            ? __("Previsto hoje")
-	            : __("Previsto ({0})", [U.painel_periodo_label(periodo_dias)]);
-	    var max_val = 1;
-	    (fin.grafico || []).forEach(function (g) {
-	        if (U.flt(g.amount) > max_val) max_val = U.flt(g.amount);
-	    });
-	    var chart_rows = (fin.grafico || [])
-	        .map(function (g) {
-	            var pct = Math.max(4, Math.round((U.flt(g.amount) / max_val) * 100));
-	            return (
-	                '<div class="painel-chart-row">' +
-	                '<span class="painel-chart-label">' +
-	                frappe.utils.escape_html(g.label) +
-	                "</span>" +
-	                '<div class="painel-chart-track"><div class="painel-chart-fill ' +
-	                (g.tone || "neutral") +
-	                '" style="width:' +
-	                pct +
-	                '%"></div></div>' +
-	                '<span class="painel-chart-amt">' +
-	                U.fmt_currency(g.amount) +
-	                "</span></div>"
-	            );
-	        })
-	        .join("");
-	    var taxa = fin.taxa_recebimento || 0;
-	    return (
-	        '<section class="painel-section painel-priority-low" id="painel-financeiro"><div class="painel-section-head">' +
-	        "<div><h2 class='painel-section-title'>" +
-	        __("Financeiro") +
-	        "</h2>" +
-	        '<p class="painel-section-sub">' +
-	        __("Recebíveis e projeção {0}", [U.painel_periodo_enunciado(periodo_dias)]) +
-	        "</p></div>" +
-	        '<div class="painel-section-head-actions">' +
-	        '<span class="painel-section-link" data-route-list="Legal Payment">' +
-	        __("Ver pagamentos") +
-	        "</span></div></div>" +
-	        '<div class="painel-finance-grid">' +
-	        '<div class="painel-panel"><div class="painel-finance-stats">' +
-	        '<div class="painel-stat"><div class="painel-stat-label">' +
-	        __("Recebido no mês") +
-	        '</div><div class="painel-stat-value success">' +
-	        U.fmt_currency(fin.recebido_mes.amount) +
-	        "</div></div>" +
-	        '<div class="painel-stat"><div class="painel-stat-label">' +
-	        __("Vencido") +
-	        '</div><div class="painel-stat-value danger">' +
-	        U.fmt_currency(fin.vencido.amount) +
-	        "</div></div>" +
-	        '<div class="painel-stat"><div class="painel-stat-label">' +
-	        previsto_label +
-	        '</div><div class="painel-stat-value">' +
-	        U.fmt_currency(previsto.amount) +
-	        "</div></div>" +
-	        '<div class="painel-stat"><div class="painel-stat-label">' +
-	        __("Inadimplência") +
-	        '</div><div class="painel-stat-value danger">' +
-	        (fin.taxa_inadimplencia || 0) +
-	        "%</div></div>" +
-	        "</div></div>" +
-	        '<div class="painel-panel"><div class="painel-panel-head">' +
-	        __("Distribuição") +
-	        '</div><div id="painel-finance-donut" class="painel-finance-donut-wrap"></div>' +
-	        '<div class="painel-panel-head painel-panel-head--sub">' +
-	        __("Taxa de recebimento") +
-	        '</div><div class="painel-chart painel-chart--percent">' +
-	        '<div class="painel-chart-row">' +
-	        '<span class="painel-chart-label">' +
-	        __("Recebido") +
-	        "</span>" +
-	        '<div class="painel-chart-track"><div class="painel-chart-fill success" style="width:' +
-	        Math.max(4, Math.min(100, taxa)) +
-	        '%"></div></div>' +
-	        '<span class="painel-chart-amt">' +
-	        taxa +
-	        "%</span></div>" +
-	        chart_rows +
-	        "</div></div></div></section>"
-	    );
-	}
+	AP.render_financeiro = function (fin, periodo_dias) {
+		return AP.render_composition(fin, periodo_dias);
+	};
 
 	AP.build_parcelas_criticas = function(parcelas, limit) {
 	    if (!parcelas || !parcelas.length) return "";
@@ -414,7 +332,7 @@ frappe.provide("advocacia.painel.financeiro");
 	    periodo_dias = U.cint(periodo_dias) || 7;
 	    return (
 	        '<section class="painel-section' +
-	        (compact ? " painel-section--nested painel-priority-low" : " painel-section--inline painel-priority-low") +
+	        (compact ? " painel-section--nested painel-priority-low" : " painel-priority-low") +
 	        '" id="painel-horas">' +
 	        '<div class="painel-section-head"><div><h2 class="painel-section-title">' +
 	        __("Horas") +

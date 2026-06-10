@@ -64,7 +64,6 @@
 
 	AP.patch_period_sections = function ($container, d, page) {
 		var U = advocacia.painel.utils;
-		var F = advocacia.painel.financeiro;
 		var periodo = d.periodo_dias || page.painel_periodo || 7;
 		page.painel_list_limits = d.list_limits || U.painel_merge_list_limits(page);
 		page.painel_data = d;
@@ -74,13 +73,12 @@
 		var sections = [
 			{ sel: "#painel-hero", key: "hero" },
 			{ sel: ".painel-zona-critica-host", key: "centro_atencao" },
-			{ sel: ".painel-agenda-strip-host", key: "agenda_dias" },
 			{ sel: "#painel-proximo-evento", key: "proximo_evento" },
-			{ sel: ".painel-saude-host", key: "saude_operacional" },
 			{ sel: "#painel-timeline", key: "timeline" },
+			{ sel: "#painel-active_cases", key: "active_cases" },
 			{ sel: "#painel-comunicacoes", key: "comunicacoes" },
-			{ sel: "#painel-indicadores", key: "indicadores" },
-			{ sel: "#painel-financeiro", key: "financeiro" },
+			{ sel: ".painel-finance-stack", key: "finance_head" },
+			{ sel: "#painel-finance-composition", key: "finance_composition" },
 			{ sel: "#painel-duo-financeiro", key: "duo_financeiro" },
 			{ sel: "#painel-duo-secundario", key: "duo_secundario" },
 		];
@@ -88,6 +86,11 @@
 		var missing = false;
 		sections.forEach(function (s) {
 			var html = AP._period_section_html(s.key, d, page);
+			if (!html) {
+				if (s.key === "finance_head" || s.key === "finance_composition") {
+					return;
+				}
+			}
 			if (!html || !AP._replace_section($container, s.sel, html)) {
 				missing = true;
 			}
@@ -95,10 +98,7 @@
 
 		if (missing) {
 			AP.render($container, d, page, { animate: false });
-			return;
 		}
-
-		F.painel_init_finance_chart($container, d.financeiro, page);
 	};
 
 	AP.patch_list_section = function ($container, list_key, d, page) {

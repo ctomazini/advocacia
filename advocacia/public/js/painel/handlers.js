@@ -243,6 +243,12 @@ $(document).on("click", ".painel-schedule-card[data-dt]", function (e) {
 	if (dt && dn) frappe.set_route("Form", dt, dn);
 });
 
+$(document).on("click", ".painel-op-row[data-dt]", function (e) {
+	var dt = $(this).attr("data-dt");
+	var dn = $(this).attr("data-dn");
+	if (dt && dn) frappe.set_route("Form", dt, dn);
+});
+
 $(document).on("click", ".painel-op-item[data-dt]", function (e) {
 	if ($(e.target).closest(".painel-btn-recebida, .painel-btn-entrar").length) return;
 	var dt = $(this).attr("data-dt");

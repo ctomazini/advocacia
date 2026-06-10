@@ -18,6 +18,7 @@ DEFAULT_LIST_LIMIT_KEYS = (
 	"fee_installments",
 	"despesas",
 	"custas",
+	"active_cases",
 )
 def _nomes_lookup(doctype, names, campo_nome):
 	"""Retorna dict {name: nome_legivel} para uma lista de IDs."""
@@ -122,6 +123,7 @@ def strip_financial_payload(data: dict) -> dict:
 		"total_despesas_mes",
 		"custas_pendentes_repasse",
 		"total_custas_mes",
+		"saude_operacional",
 	):
 		data.pop(key, None)
 

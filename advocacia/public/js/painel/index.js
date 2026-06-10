@@ -36,9 +36,9 @@ advocacia.painel.init = function (wrapper) {
 	var SA = advocacia.painel.saude;
 	var AT = advocacia.painel.atencao;
 	var AG = advocacia.painel.agenda;
-	var A = advocacia.painel.audiencias;
 	var T = advocacia.painel.timeline;
 	var F = advocacia.painel.financeiro;
+	var OP = advocacia.painel.operational;
 
 	AP.load = function (page, options) {
 		options = options || {};
@@ -109,54 +109,63 @@ advocacia.painel.init = function (wrapper) {
 			'<div class="painel-proximo-evento-host">' +
 			AG.render_proximo_evento(d.proximo_evento) +
 			"</div>";
-		html += "</div>";
-		var agendaStrip = AG.render_day_strip(d.agenda_dias);
-		if (agendaStrip) {
-			html +=
-				'<div class="painel-agenda-strip-host painel-dashboard-card">' +
-				agendaStrip +
-				"</div>";
-		}
-		html += '<div class="painel-saude-host painel-dashboard-card">';
-		html += SA.render(d.saude_operacional);
 		html += "</div></div>";
 		html += T.render_timeline(d.timeline, periodo, meta.timeline, limits.timeline);
+		html += OP.render(d.active_cases, meta.active_cases, limits.active_cases);
 		html += T.render_comunicacoes_pendentes(
 			d.comunicacoes_pendentes || d.ultimas_comunicacoes,
 			periodo,
 			meta.comunicacoes,
 			limits.comunicacoes
 		);
-		html += K.render_indicadores_painel(
-			d.centro_atencao,
-			d.kpis,
-			d.financeiro,
-			horas,
-			d.total_despesas_mes,
-			periodo
-		);
-		html += '<div class="painel-zona-secundaria">';
-		html += F.render_financeiro(d.financeiro, periodo);
-		html += F.render_duo_honorarios_despesas(
-			d.fee_installments,
-			d.despesas_pendentes,
-			d.total_despesas_mes,
-			meta.fee_installments,
-			meta.despesas,
-			limits.fee_installments,
-			limits.despesas
-		);
-		html += F.render_duo_custas_horas(
-			d.custas_pendentes_repasse,
-			d.total_custas_mes,
-			horas,
-			meta.custas,
-			periodo,
-			limits.custas
-		);
-		html += "</div>";
+		if (d.financeiro) {
+			html += '<div class="painel-zona-financeira painel-zona-secundaria">';
+			html +=
+				'<div class="painel-zona-financeira__head">' +
+				"<div><h2 class=\"painel-section-title\">" +
+				__("Financeiro") +
+				"</h2>" +
+				'<p class="painel-section-sub">' +
+				__("Saúde, indicadores e pendências") +
+				"</p></div>" +
+				'<span class="painel-section-link" data-route-list="Legal Payment">' +
+				__("Ver pagamentos") +
+				"</span></div>";
+			html += '<div class="painel-finance-stack">';
+			html += '<div class="painel-finance-stack__health">';
+			html += SA.render(d.saude_operacional, { compact: true });
+			html += "</div>";
+			html += '<div class="painel-finance-stack__kpis">';
+			html += K.render_financial_kpis(
+				d.kpis,
+				d.financeiro,
+				d.total_despesas_mes,
+				d.total_custas_mes
+			);
+			html += "</div>";
+			html += F.render_composition(d.financeiro, periodo);
+			html += "</div>";
+			html += '<div class="painel-finance-lists">';
+			html += F.render_duo_honorarios_despesas(
+				d.fee_installments,
+				d.despesas_pendentes,
+				d.total_despesas_mes,
+				meta.fee_installments,
+				meta.despesas,
+				limits.fee_installments,
+				limits.despesas
+			);
+			html += F.render_duo_custas_horas(
+				d.custas_pendentes_repasse,
+				d.total_custas_mes,
+				horas,
+				meta.custas,
+				periodo,
+				limits.custas
+			);
+			html += "</div></div>";
+		}
 		html += "</div>";
 		$container.html(html);
-		F.painel_init_finance_chart($container, d.financeiro, page);
 	};
 })(advocacia.painel);

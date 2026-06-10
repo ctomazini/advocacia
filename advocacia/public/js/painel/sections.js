@@ -6,9 +6,9 @@
 	var SA = advocacia.painel.saude;
 	var AT = advocacia.painel.atencao;
 	var AG = advocacia.painel.agenda;
-	var A = advocacia.painel.audiencias;
 	var T = advocacia.painel.timeline;
 	var F = advocacia.painel.financeiro;
+	var OP = advocacia.painel.operational;
 
 	AP._period_section_html = function (list_key, d, page) {
 		var periodo = d.periodo_dias || page.painel_periodo || 7;
@@ -21,24 +21,32 @@
 				return H.render_header(d.summary, d.kpis, periodo, d.financeiro);
 			case "centro_atencao":
 				return AT.render(d.atencao);
-			case "agenda_dias":
-				return (
-					'<div class="painel-agenda-strip-host painel-dashboard-card">' +
-					AG.render_day_strip(d.agenda_dias) +
-					"</div>"
-				);
 			case "proximo_evento":
 				return AG.render_proximo_evento(d.proximo_evento);
-			case "prox_audiencia":
-				return AG.render_proximo_evento(d.proximo_evento);
-			case "saude_operacional":
+			case "finance_head":
+				if (!d.financeiro) {
+					return "";
+				}
 				return (
-					'<div class="painel-saude-host painel-dashboard-card">' +
-					SA.render(d.saude_operacional) +
+					'<div class="painel-finance-stack">' +
+					'<div class="painel-finance-stack__health">' +
+					SA.render(d.saude_operacional, { compact: true }) +
+					"</div>" +
+					'<div class="painel-finance-stack__kpis">' +
+					K.render_financial_kpis(
+						d.kpis,
+						d.financeiro,
+						d.total_despesas_mes,
+						d.total_custas_mes
+					) +
+					"</div>" +
+					F.render_composition(d.financeiro, periodo) +
 					"</div>"
 				);
 			case "timeline":
 				return T.render_timeline(d.timeline, periodo, meta.timeline, limits.timeline);
+			case "active_cases":
+				return OP.render(d.active_cases, meta.active_cases, limits.active_cases);
 			case "comunicacoes":
 				return T.render_comunicacoes_pendentes(
 					d.comunicacoes_pendentes || d.ultimas_comunicacoes,
@@ -46,17 +54,10 @@
 					meta.comunicacoes,
 					limits.comunicacoes
 				);
-			case "indicadores":
-				return K.render_indicadores_painel(
-					d.centro_atencao,
-					d.kpis,
-					d.financeiro,
-					horas,
-					d.total_despesas_mes,
-					periodo
-				);
+			case "finance_composition":
+				return F.render_composition(d.financeiro, periodo);
 			case "financeiro":
-				return F.render_financeiro(d.financeiro, periodo);
+				return F.render_composition(d.financeiro, periodo);
 			case "duo_financeiro":
 				return F.render_duo_honorarios_despesas(
 					d.fee_installments,
@@ -88,6 +89,7 @@
 		switch (list_key) {
 			case "timeline":
 			case "comunicacoes":
+			case "active_cases":
 				return AP._period_section_html(list_key, d, page);
 			case "fee_installments":
 				return F.render_parcelas(
