@@ -2,7 +2,7 @@
 
 **Page:** `painel` (`advocacia/advocacia/page/painel/`)  
 **Backend:** `advocacia/painel/` · **Facade:** `painel_api.py`  
-**Frontend modular:** `public/js/painel/` · **Data:** 2026-06-07 · **Versão app:** 0.7.0
+**Frontend modular:** `public/js/painel/` · **Data:** 2026-06-09 · **Versão app:** 0.7.0
 
 ---
 
@@ -11,55 +11,80 @@
 ### Camadas
 
 ```
-painel.js (shell, 13 linhas)
-    └── advocacia.painel.init()  →  public/js/painel/index.js
-            ├── utils.js      — caps, formatação, CSS vars, list limits
-            ├── hero.js       — cabeçalho, período, ações rápidas
-            ├── kpis.js       — tiles KPI + resumo
-            ├── audiencias.js — alertas, centro de atenção
-            ├── timeline.js   — agenda unificada
-            └── financeiro.js — parcelas, despesas, custas, gráficos
+page/painel/painel.js (shell + PAINEL_ASSETS)
+    └── frappe.require → public/js/painel/
+            ├── utils.js       — caps, formatação, CSS vars, list limits
+            ├── hero.js        — cabeçalho, período, ações rápidas
+            ├── kpis.js        — KPIs financeiros (zona financeira)
+            ├── saude.js       — saúde operacional (compact)
+            ├── atencao.js     — tiles de atenção
+            ├── agenda.js      — próximo evento
+            ├── timeline.js    — agenda unificada, comunicações
+            ├── financeiro.js  — composição, duos, parcelas, despesas, custas
+            ├── operational.js — processos ativos
+            ├── refresh.js     — skeleton, soft refresh, patch seções
+            ├── sections.js    — HTML parcial para patch
+            ├── handlers.js    — filtros, rotas, marcar parcela
+            ├── main.js        — load() + render() (orquestrador)
+            └── index.js       — init() bootstrap da Page
 
 xcall → advocacia.advocacia.painel_api.get_painel_data
             └── painel/__init__.py::get()
                     ├── kpis.py
                     ├── financeiro.py
                     ├── prazos.py
-                    └── timeline.py
+                    ├── timeline.py
+                    ├── agenda.py
+                    ├── atencao.py
+                    ├── saude.py
+                    └── operational.py
 ```
 
-**Evolução:** o monolito `painel.js` (~4.100 linhas, jun/2026) foi dividido em 7 módulos JS (~2.480 linhas) + shell mínimo. Backend já era modular desde a auditoria anterior.
+**Evolução:** monolito `painel.js` (~4.100 linhas, jun/2026) → módulos JS + backend modular. P2 (jun/2026): `main.js` extraído de `index.js`; `audiencias.js` removido (código morto — funções migradas para `atencao.js` / `agenda.js`).
+
+**Assets:** carregados via `frappe.require(PAINEL_ASSETS)` na Page — **não** em `hooks.py` global.
+
+**CSS:** `page/painel/painel.css` (~2.130 linhas), co-localizado com a Page.
 
 ### Módulos backend e linhas
 
 | Módulo | Linhas | Responsabilidade |
 |---|---:|---|
-| `__init__.py` | 113 | Orquestrador `get()`, monta payload estável |
-| `_helpers.py` | 143 | Caps, normalização, lookups batch, `strip_financial_payload` |
-| `kpis.py` | 181 | KPIs agregados, resumo operacional |
+| `__init__.py` | 129 | Orquestrador `get()`, monta payload estável |
+| `_helpers.py` | 145 | Caps, normalização, lookups batch, `strip_financial_payload` |
+| `kpis.py` | 184 | KPIs agregados, `summary` |
 | `financeiro.py` | 274 | Parcelas, despesas, custas, fluxo, `marcar_parcela` |
-| `prazos.py` | 177 | Audiências, prazos, alertas, centro de atenção |
+| `prazos.py` | 177 | Audiências, prazos, centro de atenção (interno) |
 | `timeline.py` | 249 | Legal Tasks, comunicações, horas, timeline |
+| `agenda.py` | 45 | `proximo_evento` |
+| `atencao.py` | 115 | Tiles de atenção |
+| `saude.py` | 55 | Saúde operacional |
+| `operational.py` | 107 | Processos ativos enriquecidos |
 | `painel_api.py` | 30 | Facade whitelisted (único path de `xcall`) |
 
-**Total backend painel:** ~1.167 linhas.
+**Total backend painel:** ~1.480 linhas.
 
 ### Módulos frontend e linhas
 
 | Módulo | Linhas | Responsabilidade |
 |---|---:|---|
-| `index.js` | 362 | Bootstrap, load, erro, skeleton |
-| `utils.js` | 292 | Helpers, limites 5/10/15, polish chrome |
-| `hero.js` | 209 | Header, filtro período (1/7/15/30 dias) |
-| `kpis.js` | 519 | Render KPIs e resumo |
-| `audiencias.js` | 218 | Centro de atenção, alertas |
-| `timeline.js` | 427 | Agenda, tarefas, comunicações |
-| `financeiro.js` | 453 | Zona financeira (Manager only) |
-| `painel.js` (page) | 13 | Shell Frappe Page |
+| `utils.js` | 294 | Helpers, limites 5/10/15, polish chrome |
+| `hero.js` | 207 | Header, filtro período (1/7/15/30 dias), ações rápidas |
+| `kpis.js` | 96 | KPIs financeiros (zona financeira) |
+| `saude.js` | 75 | Saúde operacional |
+| `atencao.js` | 105 | Tiles de atenção |
+| `agenda.js` | 97 | Próximo evento |
+| `timeline.js` | 427 | Timeline, comunicações |
+| `financeiro.js` | 379 | Zona financeira (Manager only) |
+| `operational.js` | 81 | Processos ativos |
+| `refresh.js` | 119 | Soft refresh, skeleton, patch |
+| `sections.js` | 121 | HTML parcial por seção |
+| `handlers.js` | 318 | Eventos, rotas, marcar parcela |
+| `main.js` | 141 | `load()` + `render()` |
+| `index.js` | 31 | `init()` bootstrap |
+| `painel.js` (page) | 33 | Shell Frappe Page + ordem de assets |
 
-**Total frontend painel:** ~2.493 linhas (+ `painel.css`).
-
-**Assets:** registrados em `hooks.py` → `app_include_js` (7 módulos painel + utils globais).
+**Total frontend painel:** ~2.490 linhas (+ `painel.css`).
 
 ---
 
@@ -78,18 +103,20 @@ xcall → advocacia.advocacia.painel_api.get_painel_data
 
 | Chave | Origem | Manager | User |
 |---|---|---|---|
-| `periodo_dias`, `list_limits`, `list_meta` | `__init__` | ✅ | ✅ |
+| `periodo_dias`, `list_limits`, `list_meta`, `is_manager` | `__init__` | ✅ | ✅ |
 | `kpis` | kpis.py | completo | sem chaves financeiras |
-| `resumo` | kpis.py | completo | sem valores financeiros |
-| `financeiro` | financeiro.py | ✅ | ❌ omitido |
-| `alertas`, `centro_atencao` | prazos.py | ✅ | ✅ |
-| `timeline`, `tarefas` | timeline.py | ✅ | ✅ |
-| `parcelas` | financeiro.py | ✅ | ❌ |
+| `summary` | kpis.py | completo | sem valores financeiros |
+| `financeiro` | financeiro.py | ✅ | ❌ omitido (`strip_financial_payload`) |
+| `saude_operacional` | saude.py | ✅ | ❌ omitido |
+| `atencao` | atencao.py | ✅ | ✅ |
+| `proximo_evento` | agenda.py | ✅ | ✅ |
+| `timeline` | timeline.py + prazos.py | ✅ | ✅ |
+| `active_cases` | operational.py | ✅ | ✅ |
+| `fee_installments` | financeiro.py | ✅ | ❌ |
 | `despesas_pendentes`, `total_despesas_mes` | financeiro.py | ✅ | ❌ |
 | `custas_pendentes_repasse`, `total_custas_mes` | financeiro.py | ✅ | ❌ |
 | `comunicacoes_pendentes`, `ultimas_comunicacoes` | timeline.py | ✅ | ✅* |
 | `horas_semana`, `horas_periodo` | timeline.py | ✅ | ✅* |
-| `audiencias`, `prazos` | prazos.py | ✅ | ✅ |
 
 \*Comunicações e horas exigem read no DocType — retorna lista vazia se negado.
 
@@ -122,7 +149,7 @@ user_is_advocacia_manager() → Advocacia Manager
 
 **N+1:** evitado via `_servico_lookup`, `_cliente_nome_lookup`, `_user_nome_lookup` — uma query em lote por lookup.
 
-**Nomes legíveis:** satélites exibem `title` do Serviço/Client, não IDs crus.
+**Nomes legíveis:** satélites exibem `title` do Legal Case/Client, não IDs crus.
 
 ---
 
@@ -131,17 +158,19 @@ user_is_advocacia_manager() → Advocacia Manager
 | Componente | Manager | User |
 |---|---|---|
 | Hero + filtro período | ✅ | ✅ |
-| KPIs operacionais (clientes, serviços, audiências) | ✅ | ✅ |
+| KPIs operacionais (clientes, casos, audiências) | ✅ | ✅ |
 | KPIs financeiros (honorários, taxa recebimento) | ✅ | Ocultos (backend + JS) |
-| Centro de atenção | ✅ | ✅ |
+| Tiles de atenção + próximo evento | ✅ | ✅ |
 | Timeline / agenda | ✅ | ✅ |
-| Zona financeira (parcelas, gráfico, despesas) | ✅ | Removida do DOM |
+| Processos ativos | ✅ | ✅ |
+| Comunicações pendentes | ✅ | ✅ |
+| Zona financeira (saúde, KPIs, composição, listas) | ✅ | Removida do DOM |
 | Marcar parcela recebida | ✅ | Botão ausente |
 | Navegação `list_nav.goto` | ✅ | ✅ |
 
-**Cores:** Chart.js e cards usam CSS variables Frappe — sem hex hardcoded no JS de produção.
+**Cores:** charts e cards usam CSS variables Frappe — sem hex hardcoded no JS de produção.
 
-**Refresh:** botão ↺ Atualizar; limites 5/10/15 e filtro de período recarregam payload via xcall **sem reload total** da page (soft refresh, jun/2026).
+**Refresh:** botão ↺ Atualizar; limites 5/10/15 e filtro de período recarregam payload via xcall **sem reload total** da page (soft refresh).
 
 ---
 
@@ -167,8 +196,9 @@ frappe.xcall("advocacia.advocacia.painel_api.get_painel_data", {...})
 | Item | Severidade | Nota |
 |---|---|---|
 | `limit_page_length` no backend | 🟡 | Migrar para `limit` (v17) |
-| Engenharia tem `attention.py`/`health.py` separados | 🟢 | Advocacia usa `centro_atencao` em `prazos.py` — equivalente funcional |
-| E2E browser automatizado | 🟡 | `test_painel_api.py` + script Playwright `tests/e2e/playwright_flow.py` (manual) |
+| Nomenclatura PT backend (`financeiro`, `prazos`) vs EN eng (`financial`, `deadlines`) | 🟢 | Intencional — brownfield advocacia |
+| CSS em `page/painel/` vs eng `public/css/dashboard.css` | 🟢 | Padrões diferentes, ambos funcionais |
+| E2E browser automatizado | 🟡 | `test_painel_api.py` + `test_painel_modulos.py` + Playwright manual |
 
 ---
 
@@ -176,10 +206,10 @@ frappe.xcall("advocacia.advocacia.painel_api.get_painel_data", {...})
 
 - [ ] `bench build --app advocacia` após editar `public/js/painel/`
 - [ ] `bench --site advocacia.local clear-cache`
-- [ ] `bench --site advocacia.local run-tests --app advocacia` — `test_painel_api.py` verde
+- [ ] `bench --site advocacia.local run-tests --app advocacia` — testes painel verdes
 - [ ] Smoke manual: soft refresh ao mudar período/limites
 - [ ] Smoke manual: User sem financeiro · Manager com gráfico
 
 ---
 
-*Painel modular desde v0.7.0. Referência de padrão para app irmão: `engenharia/public/js/dashboard/`.*
+*Painel modular desde v0.7.0. Referência estrutural: `engenharia/dashboard/` + `engenharia/public/js/dashboard/`.*
