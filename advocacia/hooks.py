@@ -66,6 +66,7 @@ app_include_js = [
     "/assets/advocacia/js/list_filters.js",
     "/assets/advocacia/js/cliente_from_servico.js",
     "/assets/advocacia/js/timer_global.js",
+    "/assets/advocacia/js/adv_case_nav.js",
     "/assets/advocacia/js/case_hub.js",
     "/assets/advocacia/js/reports_common.js",
 ]

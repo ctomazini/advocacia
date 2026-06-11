@@ -74,7 +74,7 @@ function adv_hub_render_hearings(frm, hearings) {
 			_adv_hub_empty("⚖️", __("Nenhuma audiência cadastrada"), __("+ Audiência"), "new-hearing")
 		);
 		$w.find('[data-hub-action="new-hearing"]').on("click", () => {
-			frappe.new_doc("Hearing", {
+			adv_case_nav_new_doc("Hearing", {
 				legal_case: frm.doc.name,
 				client: frm.doc.client,
 			});
@@ -121,7 +121,7 @@ function adv_hub_render_hearings(frm, hearings) {
 	</div>`);
 
 	$w.find('[data-hub-action="new-hearing"]').on("click", () => {
-		frappe.new_doc("Hearing", { legal_case: frm.doc.name, client: frm.doc.client });
+		adv_case_nav_new_doc("Hearing", { legal_case: frm.doc.name, client: frm.doc.client });
 	});
 	_adv_hub_bind_routes($w);
 }
@@ -135,7 +135,7 @@ function adv_hub_render_deadlines(frm, deadlines) {
 			_adv_hub_empty("📅", __("Nenhum prazo cadastrado"), __("+ Prazo"), "new-deadline")
 		);
 		$w.find('[data-hub-action="new-deadline"]').on("click", () => {
-			frappe.new_doc("Deadline", { legal_case: frm.doc.name, client: frm.doc.client });
+			adv_case_nav_new_doc("Deadline", { legal_case: frm.doc.name, client: frm.doc.client });
 		});
 		return;
 	}
@@ -194,7 +194,7 @@ function adv_hub_render_deadlines(frm, deadlines) {
 	</div>`);
 
 	$w.find('[data-hub-action="new-deadline"]').on("click", () => {
-		frappe.new_doc("Deadline", { legal_case: frm.doc.name, client: frm.doc.client });
+		adv_case_nav_new_doc("Deadline", { legal_case: frm.doc.name, client: frm.doc.client });
 	});
 	_adv_hub_bind_routes($w);
 }
@@ -208,7 +208,7 @@ function adv_hub_render_tasks(frm, tasks) {
 			_adv_hub_empty("✅", __("Nenhuma tarefa pendente"), __("+ Tarefa"), "new-task")
 		);
 		$w.find('[data-hub-action="new-task"]').on("click", () => {
-			frappe.new_doc("Legal Task", { legal_case: frm.doc.name, client: frm.doc.client });
+			adv_case_nav_new_doc("Legal Task", { legal_case: frm.doc.name, client: frm.doc.client });
 		});
 		return;
 	}
@@ -243,7 +243,7 @@ function adv_hub_render_tasks(frm, tasks) {
 	</div>`);
 
 	$w.find('[data-hub-action="new-task"]').on("click", () => {
-		frappe.new_doc("Legal Task", { legal_case: frm.doc.name, client: frm.doc.client });
+		adv_case_nav_new_doc("Legal Task", { legal_case: frm.doc.name, client: frm.doc.client });
 	});
 	_adv_hub_bind_routes($w);
 }
@@ -262,7 +262,7 @@ function adv_hub_render_communications(frm, communications) {
 			)
 		);
 		$w.find('[data-hub-action="new-comm"]').on("click", () => {
-			frappe.new_doc("Case Communication", {
+			adv_case_nav_new_doc("Case Communication", {
 				legal_case: frm.doc.name,
 				client: frm.doc.client,
 			});
@@ -303,7 +303,7 @@ function adv_hub_render_communications(frm, communications) {
 	</div>`);
 
 	$w.find('[data-hub-action="new-comm"]').on("click", () => {
-		frappe.new_doc("Case Communication", {
+		adv_case_nav_new_doc("Case Communication", {
 			legal_case: frm.doc.name,
 			client: frm.doc.client,
 		});
@@ -320,7 +320,7 @@ function adv_hub_render_service_records(frm, records) {
 			_adv_hub_empty("📝", __("Nenhum registro de atos"), __("+ Registro"), "new-record")
 		);
 		$w.find('[data-hub-action="new-record"]').on("click", () => {
-			frappe.new_doc("Service Record", { legal_case: frm.doc.name, client: frm.doc.client });
+			adv_case_nav_new_doc("Service Record", { legal_case: frm.doc.name, client: frm.doc.client });
 		});
 		return;
 	}
@@ -357,7 +357,7 @@ function adv_hub_render_service_records(frm, records) {
 	</div>`);
 
 	$w.find('[data-hub-action="new-record"]').on("click", () => {
-		frappe.new_doc("Service Record", { legal_case: frm.doc.name, client: frm.doc.client });
+		adv_case_nav_new_doc("Service Record", { legal_case: frm.doc.name, client: frm.doc.client });
 	});
 	_adv_hub_bind_routes($w);
 }
@@ -374,7 +374,7 @@ function adv_hub_render_time_entries(frm, payload) {
 			_adv_hub_empty("⏱️", __("Nenhum registro de horas"), __("+ Horas"), "new-time")
 		);
 		$w.find('[data-hub-action="new-time"]').on("click", () => {
-			frappe.new_doc("Time Entry", { legal_case: frm.doc.name, client: frm.doc.client });
+			adv_case_nav_new_doc("Time Entry", { legal_case: frm.doc.name, client: frm.doc.client });
 		});
 		return;
 	}
@@ -412,7 +412,7 @@ function adv_hub_render_time_entries(frm, payload) {
 	</div>`);
 
 	$w.find('[data-hub-action="new-time"]').on("click", () => {
-		frappe.new_doc("Time Entry", { legal_case: frm.doc.name, client: frm.doc.client });
+		adv_case_nav_new_doc("Time Entry", { legal_case: frm.doc.name, client: frm.doc.client });
 	});
 	_adv_hub_bind_routes($w);
 }
@@ -519,7 +519,7 @@ function adv_hub_render_documents(frm, documents) {
 
 function _adv_hub_bind_document_actions(frm, $w) {
 	$w.find('[data-hub-action="new-document"]').on("click", () => {
-		frappe.new_doc("Case Document", {
+		adv_case_nav_new_doc("Case Document", {
 			legal_case: frm.doc.name,
 			client: frm.doc.client,
 		});
@@ -667,11 +667,10 @@ function _adv_hub_render_financial_summary(frm, financial) {
 	</div>`);
 
 	$w.find("[data-route]").on("click", function () {
-		const parts = $(this).attr("data-route").split("/");
-		frappe.set_route(parts[0], parts[1], parts[2]);
+		adv_case_nav_follow_route($(this).attr("data-route"));
 	});
 	$w.find('[data-hub-action="new-agreement"]').on("click", () => {
-		frappe.new_doc("Fee Agreement", {
+		adv_case_nav_new_doc("Fee Agreement", {
 			legal_case: frm.doc.name,
 			client: frm.doc.client,
 		});
@@ -721,7 +720,7 @@ function _adv_hub_render_installments(frm, installments) {
 	</div>`);
 
 	$w.find('[data-hub-action="list-agreements"]').on("click", () => {
-		frappe.set_route("List", "Fee Agreement", { legal_case: frm.doc.name });
+		adv_case_nav_set_route("List", "Fee Agreement", { legal_case: frm.doc.name });
 	});
 	_adv_hub_bind_routes($w);
 }
@@ -735,7 +734,7 @@ function _adv_hub_render_payments(frm, payments) {
 			_adv_hub_empty("💵", __("Nenhum pagamento registrado"), __("+ Pagamento"), "new-payment")
 		);
 		$w.find('[data-hub-action="new-payment"]').on("click", () => {
-			frappe.new_doc("Legal Payment", {
+			adv_case_nav_new_doc("Legal Payment", {
 				legal_case: frm.doc.name,
 				client: frm.doc.client,
 			});
@@ -774,7 +773,7 @@ function _adv_hub_render_payments(frm, payments) {
 	</div>`);
 
 	$w.find('[data-hub-action="new-payment"]').on("click", () => {
-		frappe.new_doc("Legal Payment", { legal_case: frm.doc.name, client: frm.doc.client });
+		adv_case_nav_new_doc("Legal Payment", { legal_case: frm.doc.name, client: frm.doc.client });
 	});
 	_adv_hub_bind_routes($w);
 }
@@ -788,7 +787,7 @@ function _adv_hub_render_court_costs(frm, costs) {
 			_adv_hub_empty("🏛️", __("Nenhuma custa registrada"), __("+ Custa"), "new-cost")
 		);
 		$w.find('[data-hub-action="new-cost"]').on("click", () => {
-			frappe.new_doc("Court Cost", { legal_case: frm.doc.name, client: frm.doc.client });
+			adv_case_nav_new_doc("Court Cost", { legal_case: frm.doc.name, client: frm.doc.client });
 		});
 		return;
 	}
@@ -826,7 +825,7 @@ function _adv_hub_render_court_costs(frm, costs) {
 	</div>`);
 
 	$w.find('[data-hub-action="new-cost"]').on("click", () => {
-		frappe.new_doc("Court Cost", { legal_case: frm.doc.name, client: frm.doc.client });
+		adv_case_nav_new_doc("Court Cost", { legal_case: frm.doc.name, client: frm.doc.client });
 	});
 	_adv_hub_bind_routes($w);
 }
@@ -982,10 +981,10 @@ function adv_hub_render_summary_bar(frm, counts) {
 		const fieldname = $(this).attr("data-fieldname");
 		const isCatalog = $(this).attr("data-catalog") === "1";
 		if (isCatalog || !fieldname) {
-			frappe.set_route("List", doctype);
+			adv_case_nav_set_route("List", doctype);
 			return;
 		}
-		frappe.set_route("List", doctype, { [fieldname]: caseName });
+		adv_case_nav_set_route("List", doctype, { [fieldname]: caseName });
 	});
 
 	$w.find(".adv-hub-summary-pill__add").on("click", function (e) {
@@ -996,14 +995,14 @@ function adv_hub_render_summary_bar(frm, counts) {
 		const listOnly = $(this).attr("data-list-only") === "1";
 
 		if (isCatalog) {
-			frappe.set_route("List", doctype);
+			adv_case_nav_set_route("List", doctype);
 			return;
 		}
 		if (listOnly || !fieldname) {
-			frappe.set_route("List", doctype, { [fieldname]: caseName });
+			adv_case_nav_set_route("List", doctype, { [fieldname]: caseName });
 			return;
 		}
-		frappe.new_doc(doctype, {
+		adv_case_nav_new_doc(doctype, {
 			[fieldname]: caseName,
 			client: frm.doc.client,
 		});
@@ -1012,8 +1011,7 @@ function adv_hub_render_summary_bar(frm, counts) {
 
 function _adv_hub_bind_routes($w) {
 	$w.find("[data-route]").on("click", function () {
-		const parts = $(this).attr("data-route").split("/");
-		frappe.set_route(parts[0], parts[1], parts[2]);
+		adv_case_nav_follow_route($(this).attr("data-route"));
 	});
 }
 
