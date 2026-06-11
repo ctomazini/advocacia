@@ -16,6 +16,7 @@ SIDEBAR_LINK_ORDER = (
 	("Clientes", "Client", "DocType"),
 	("Registro de Horas", "Time Entry", "DocType"),
 	("Registro de Atos", "Service Record", "DocType"),
+	("Documentos do Processo", "Case Document", "DocType"),
 	("Custas Processuais", "Court Cost", "DocType"),
 	# Financeiro
 	("Pagamentos", "Legal Payment", "DocType"),
@@ -35,6 +36,7 @@ SIDEBAR_LINK_ORDER = (
 	("Vara", "Court Branch", "DocType"),
 	("Tribunal", "Court", "DocType"),
 	("Fase Processual", "Case Phase", "DocType"),
+	("Categoria de Documento", "Document Category", "DocType"),
 	("Escritório", "Office Settings", "DocType"),
 )
 

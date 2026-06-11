@@ -24,6 +24,14 @@ def _uid(prefix="Teste"):
 	return f"{prefix} {frappe.generate_hash(length=8)}"
 
 
+def ensure_test_document_category(category_name="Petição"):
+	if not frappe.db.exists("Document Category", category_name):
+		frappe.get_doc(
+			{"doctype": "Document Category", "category_name": category_name}
+		).insert(ignore_permissions=True)
+	return category_name
+
+
 def _gerar_cpf_valido():
 	while True:
 		base = "".join(str(random.randint(0, 9)) for _ in range(9))

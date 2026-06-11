@@ -170,6 +170,12 @@
    "link_doctype": "Legal Task",
    "link_fieldname": "legal_case",
    "idx": 9
+  },
+  {
+   "group": "Documentos",
+   "link_doctype": "Case Document",
+   "link_fieldname": "legal_case",
+   "idx": 10
   }
  ],
  "fields": [

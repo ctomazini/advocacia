@@ -111,6 +111,7 @@ OPERATIONAL = frozenset(
 	{
 		"Legal Case",
 		"Client",
+		"Case Document",
 		"Hearing",
 		"Case Communication",
 		"Deadline",

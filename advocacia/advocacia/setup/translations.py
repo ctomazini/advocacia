@@ -21,6 +21,8 @@ DOCTYPE_LABELS = {
 	"Court Branch": "Vara",
 	"Court": "Tribunal",
 	"Case Phase": "Fase Processual",
+	"Document Category": "Categoria de Documento",
+	"Case Document": "Documentos do Processo",
 	"Fee Installment": "Parcelas de Honorários",
 }
 

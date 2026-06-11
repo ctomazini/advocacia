@@ -109,6 +109,7 @@ class TestLegalCase(FrappeTestCase):
 			"Time Entry": "legal_case",
 			"Legal Task": "legal_case",
 			"Legal Payment": "legal_case",
+			"Case Document": "legal_case",
 		}
 		self.assertEqual(linked, expected)
 		self.assertEqual(dashboard.fieldname, "legal_case")
