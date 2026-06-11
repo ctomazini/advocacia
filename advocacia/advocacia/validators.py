@@ -27,6 +27,50 @@ def limpar_numerico(valor):
 	return re.sub(r"\D", "", str(valor))
 
 
+def formatar_cpf(cpf):
+	"""Exibição mascarada; aceita valor já limpo do banco."""
+	cpf = limpar_numerico(cpf)
+	if len(cpf) != 11:
+		return cpf
+	return f"{cpf[:3]}.{cpf[3:6]}.{cpf[6:9]}-{cpf[9:]}"
+
+
+def formatar_cnpj(cnpj):
+	"""Exibição mascarada; aceita valor já limpo do banco."""
+	cnpj = limpar_numerico(cnpj)
+	if len(cnpj) != 14:
+		return cnpj
+	return f"{cnpj[:2]}.{cnpj[2:5]}.{cnpj[5:8]}/{cnpj[8:12]}-{cnpj[12:]}"
+
+
+def formatar_telefone(numero):
+	"""Exibição mascarada; infere fixo (10) ou celular (11) pelo tamanho."""
+	numero = limpar_numerico(numero)
+	if len(numero) == 11:
+		return f"({numero[:2]}) {numero[2:7]}-{numero[7:]}"
+	if len(numero) == 10:
+		return f"({numero[:2]}) {numero[2:6]}-{numero[6:]}"
+	return numero
+
+
+def formatar_cep(cep):
+	cep = limpar_numerico(cep)
+	if len(cep) != 8:
+		return cep
+	return f"{cep[:5]}-{cep[5:]}"
+
+
+def formatar_cnj(numero):
+	"""Exibição mascarada do número CNJ (20 dígitos)."""
+	numero = limpar_numerico(numero)
+	if len(numero) != 20:
+		return numero
+	return (
+		f"{numero[0:7]}-{numero[7:9]}.{numero[9:13]}.{numero[13]}."
+		f"{numero[14:16]}.{numero[16:20]}"
+	)
+
+
 def _sequencia_repetida(digitos):
 	return len(set(digitos)) == 1
 

@@ -8,6 +8,14 @@ import frappe
 from frappe import _
 from frappe.utils import cint, flt, formatdate, fmt_money, getdate, today
 
+from advocacia.advocacia.validators import (
+	formatar_cep,
+	formatar_cnj,
+	formatar_cnpj,
+	formatar_cpf,
+	formatar_telefone,
+)
+
 LEGACY_PLACEHOLDERS = [
 	"nome",
 	"cpf",
@@ -182,51 +190,6 @@ def get_document_placeholder_keys() -> set[str]:
 	return keys
 
 
-def _only_digits(value):
-	if not value:
-		return ""
-	return re.sub(r"\D", "", str(value))
-
-
-def _mascarar_cpf(valor):
-	digits = _only_digits(valor)
-	if len(digits) != 11:
-		return valor or ""
-	return f"{digits[0:3]}.{digits[3:6]}.{digits[6:9]}-{digits[9:11]}"
-
-
-def _mascarar_cnpj(valor):
-	digits = _only_digits(valor)
-	if len(digits) != 14:
-		return valor or ""
-	return f"{digits[0:2]}.{digits[2:5]}.{digits[5:8]}/{digits[8:12]}-{digits[12:14]}"
-
-
-def _mascarar_cep(valor):
-	digits = _only_digits(valor)
-	if len(digits) != 8:
-		return valor or ""
-	return f"{digits[0:5]}-{digits[5:8]}"
-
-
-def _mascarar_cnj(valor):
-	digits = _only_digits(valor)
-	if len(digits) != 20:
-		return valor or ""
-	return (
-		f"{digits[0:7]}-{digits[7:9]}.{digits[9:13]}.{digits[13]}.{digits[14:16]}.{digits[16:20]}"
-	)
-
-
-def _mascarar_telefone(valor):
-	digits = _only_digits(valor)
-	if len(digits) == 11:
-		return f"({digits[0:2]}) {digits[2:7]}-{digits[7:11]}"
-	if len(digits) == 10:
-		return f"({digits[0:2]}) {digits[2:6]}-{digits[6:10]}"
-	return valor or ""
-
-
 def _formatar_moeda(valor):
 	if valor in (None, ""):
 		return ""
@@ -322,7 +285,7 @@ def _montar_endereco_completo(addr):
 	estado = addr.get("state") or ""
 	if cidade or estado:
 		partes.append("/".join(filter(None, [cidade, estado])))
-	cep = _mascarar_cep(addr.get("cep"))
+	cep = formatar_cep(addr.get("cep"))
 	if cep:
 		partes.append(f"CEP {cep}")
 	return " — ".join(partes)
@@ -332,7 +295,7 @@ def _get_escritorio_context():
 	"""Lê dados do escritório do Single DocType (somente banco, nunca hardcoded)."""
 	cfg = frappe.get_single("Office Settings")
 	cnpj_raw = cfg.cnpj or ""
-	cnpj_fmt = _mascarar_cnpj(cnpj_raw) if _only_digits(cnpj_raw) else cnpj_raw
+	cnpj_fmt = formatar_cnpj(cnpj_raw) if cnpj_raw else ""
 	return {
 		"escritorio_razao_social": cfg.company_name or "",
 		"escritorio_cnpj": cnpj_fmt,
@@ -389,8 +352,8 @@ def _build_context(servico_name):
 	tipo_pessoa = cliente.person_type or ""
 	cpf_raw = cliente.cpf or ""
 	cnpj_raw = cliente.cnpj or ""
-	cpf_fmt = _mascarar_cpf(cpf_raw) if tipo_pessoa == "Pessoa Física" else ""
-	cnpj_fmt = _mascarar_cnpj(cnpj_raw) if tipo_pessoa == "Pessoa Jurídica" else ""
+	cpf_fmt = formatar_cpf(cpf_raw) if tipo_pessoa == "Pessoa Física" else ""
+	cnpj_fmt = formatar_cnpj(cnpj_raw) if tipo_pessoa == "Pessoa Jurídica" else ""
 
 	celular = contato.get("mobile") if contato else ""
 	telefone_fixo = contato.get("phone") if contato else ""
@@ -409,7 +372,7 @@ def _build_context(servico_name):
 			"cliente_estado_civil": cliente.marital_status or "",
 			"cliente_profissao": cliente.occupation or "",
 			"cliente_representante": cliente.representative or "",
-			"cliente_cpf_representante": _mascarar_cpf(cliente.representative_cpf),
+			"cliente_cpf_representante": formatar_cpf(cliente.representative_cpf),
 			"cliente_cargo_representante": cliente.representative_role or "",
 			"cliente_nome_fantasia": cliente.trade_name or "",
 			"endereco_logradouro": addr.street if addr else "",
@@ -418,17 +381,17 @@ def _build_context(servico_name):
 			"endereco_bairro": addr.neighborhood if addr else "",
 			"endereco_cidade": addr.city if addr else "",
 			"endereco_estado": addr.state if addr else "",
-			"endereco_cep": _mascarar_cep(addr.cep if addr else ""),
+			"endereco_cep": formatar_cep(addr.cep if addr else ""),
 			"endereco_completo": _montar_endereco_completo(addr.as_dict() if addr else None),
-			"contato_telefone": _mascarar_telefone(telefone),
-			"contato_celular": _mascarar_telefone(celular),
+			"contato_telefone": formatar_telefone(telefone),
+			"contato_celular": formatar_telefone(celular),
 			"contato_email": (email or "").lower(),
 			"contato_nome": contato.get("contact_name") if contato else "",
-			"telefone_contato": _mascarar_telefone(telefone),
+			"telefone_contato": formatar_telefone(telefone),
 			"servico_titulo": servico.title or "",
 			"servico_tipo": servico.type or "",
 			"servico_status": servico.status or "",
-			"servico_numero_processo": _mascarar_cnj(servico.case_number),
+			"servico_numero_processo": formatar_cnj(servico.case_number),
 			"servico_area": servico.area or "",
 			"servico_vara": _link_label("Court Branch", servico.court_branch_link),
 			"servico_comarca": _link_label("Jurisdiction", servico.jurisdiction),
