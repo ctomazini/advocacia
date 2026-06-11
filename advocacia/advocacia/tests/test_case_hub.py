@@ -1,6 +1,6 @@
 import frappe
 from frappe.tests.utils import FrappeTestCase
-from frappe.utils import add_days, today
+from frappe.utils import add_days, flt, today
 
 from advocacia.advocacia.case_hub import get_case_counts, get_case_hub_data
 from advocacia.advocacia.tests.test_setup import (
@@ -152,6 +152,20 @@ class TestCaseHub(FrappeTestCase):
 
 		self.assertEqual(counts["installments"], 3)
 		self.assertGreaterEqual(counts["fee_agreements"], 1)
+
+	def test_financial_includes_services_unbilled(self):
+		if "Advocacia Manager" not in frappe.get_roles():
+			return
+
+		case = create_test_legal_case()
+		create_test_registro_atos(servico=case.name)
+
+		data = get_case_hub_data(case.name)
+		summary = data["financial"]["summary"]
+
+		self.assertGreater(flt(summary["total_services_unbilled"]), 0)
+		self.assertIn("service_billings", data["financial"])
+		self.assertGreaterEqual(len(data["financial"]["service_billings"]), 1)
 
 
 def _uid_suffix():

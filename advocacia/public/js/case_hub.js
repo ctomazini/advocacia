@@ -610,10 +610,39 @@ function _adv_hub_render_financial_summary(frm, financial) {
 
 	const summary = financial.summary || {};
 	const agreement = financial.agreement;
-	const total = summary.total_contract || 1;
-	const pctReceived = total
-		? Math.min(100, Math.round((summary.total_received / total) * 100))
+	const pctReceived = summary.total_contract
+		? Math.min(100, Math.round((summary.total_received / summary.total_contract) * 100))
 		: 0;
+
+	const pendingBillings = (financial.service_billings || []).filter(
+		(row) => flt(row.pending_total) > 0
+	);
+	const billingRows = pendingBillings
+		.map((row) => {
+			return `<div class="adv-hub-list-row" data-route="Form/Service Record/${frappe.utils.escape_html(
+				row.name
+			)}">
+			<div class="adv-hub-list-row__main">
+				${frappe.utils.escape_html(row.title || row.name)}
+				<span class="adv-hub-list-row__secondary">${format_currency(row.pending_total)} ${__(
+					"a faturar"
+				)}</span>
+			</div>
+			${_adv_hub_status_badge(row.status)}
+		</div>`;
+		})
+		.join("");
+	const billingSection = pendingBillings.length
+		? `<div class="adv-hub-subsection">
+			<div class="adv-hub-subsection__header">
+				<strong>${__("Cobranças de serviços em aberto")}</strong>
+				<button type="button" class="adv-hub-panel__action" data-hub-action="list-service-records">${__(
+					"Ver todas"
+				)}</button>
+			</div>
+			${billingRows}
+		</div>`
+		: "";
 
 	$w.html(`<div class="adv-hub-panel">
 		<div class="adv-hub-panel__header">
@@ -631,12 +660,15 @@ function _adv_hub_render_financial_summary(frm, financial) {
 					  )}</button>`
 			}
 		</div>
+		<p class="adv-hub-panel__hint">${__(
+			"Honorários: contrato parcelado do caso. Cobrança de serviços: itens avulsos a faturar ou já emitidos em pagamento."
+		)}</p>
 		<div class="adv-hub-kpi-row">
 			<div class="adv-hub-kpi">
 				<div class="adv-hub-kpi__value" style="color:var(--blue-500)">${format_currency(
 					summary.total_contract
 				)}</div>
-				<div class="adv-hub-kpi__label">${__("Contratado")}</div>
+				<div class="adv-hub-kpi__label">${__("Honorários contratados")}</div>
 			</div>
 			<div class="adv-hub-kpi">
 				<div class="adv-hub-kpi__value" style="color:var(--green-600)">${format_currency(
@@ -646,9 +678,15 @@ function _adv_hub_render_financial_summary(frm, financial) {
 			</div>
 			<div class="adv-hub-kpi">
 				<div class="adv-hub-kpi__value" style="color:var(--orange-500)">${format_currency(
-					summary.total_pending
+					summary.total_pending_honorarios
 				)}</div>
-				<div class="adv-hub-kpi__label">${__("Pendente")}</div>
+				<div class="adv-hub-kpi__label">${__("Parcelas pendentes")}</div>
+			</div>
+			<div class="adv-hub-kpi">
+				<div class="adv-hub-kpi__value" style="color:var(--purple-500)">${format_currency(
+					summary.total_services_unbilled
+				)}</div>
+				<div class="adv-hub-kpi__label">${__("A faturar (serviços)")}</div>
 			</div>
 			<div class="adv-hub-kpi">
 				<div class="adv-hub-kpi__value" style="color:var(--red-500)">${format_currency(
@@ -657,9 +695,18 @@ function _adv_hub_render_financial_summary(frm, financial) {
 				<div class="adv-hub-kpi__label">${__("Custas")}</div>
 			</div>
 		</div>
-		<div class="adv-hub-stacked-bar" title="${__("{0}% recebido", [pctReceived])}">
+		${
+			summary.total_pending_service_payments
+				? `<p class="adv-hub-panel__hint">${__(
+						"Cobranças de serviços já emitidas e aguardando recebimento: {0}",
+						[format_currency(summary.total_pending_service_payments)]
+				  )}</p>`
+				: ""
+		}
+		<div class="adv-hub-stacked-bar" title="${__("{0}% recebido dos honorários contratados", [pctReceived])}">
 			<div class="adv-hub-stacked-bar__segment" style="width:${pctReceived}%;background:var(--green-500)"></div>
 		</div>
+		${billingSection}
 	</div>`);
 
 	$w.find("[data-route]").on("click", function () {
@@ -670,6 +717,9 @@ function _adv_hub_render_financial_summary(frm, financial) {
 			legal_case: frm.doc.name,
 			client: frm.doc.client,
 		});
+	});
+	$w.find('[data-hub-action="list-service-records"]').on("click", () => {
+		adv_case_nav_set_route("List", "Service Record", { legal_case: frm.doc.name });
 	});
 }
 

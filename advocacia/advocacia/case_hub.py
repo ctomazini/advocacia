@@ -12,6 +12,9 @@ HUB_LIMIT_SMALL = 20
 
 DONE_DEADLINE_STATUSES = frozenset({"Concluído", "Concluida", "Cumprido", "Cancelado"})
 RECEIVED_PAYMENT_STATUSES = frozenset({"Recebido", "Repassado"})
+OPEN_PAYMENT_STATUSES = frozenset({"Pendente", "Vencido"})
+ORIGIN_HONORARIOS = "Honorários (Parcela)"
+ORIGIN_SERVICES = "Atos Advocatícios"
 
 
 def _is_manager() -> bool:
@@ -384,13 +387,33 @@ def get_financial(case_name: str) -> dict:
 	for row in installments + payments + court_costs:
 		row["status_color"] = _status_color(row.get("status"))
 
+	service_billings = frappe.get_all(
+		"Service Record",
+		filters={"legal_case": case_name},
+		fields=["name", "title", "status", "pending_total", "billed_total"],
+		order_by="modified desc",
+		limit=HUB_LIMIT_SMALL,
+	)
+	for row in service_billings:
+		row["status_color"] = _status_color(row.status)
+
 	total_contract = flt(agreement.total_agreement_value if agreement else 0)
 	total_received = sum(
 		flt(p.received_amount or p.amount)
 		for p in payments
 		if p.status in RECEIVED_PAYMENT_STATUSES
 	)
-	total_pending = sum(flt(p.amount) for p in payments if p.status in ("Pendente", "Vencido"))
+	open_payments = [p for p in payments if p.status in OPEN_PAYMENT_STATUSES]
+	total_pending = sum(flt(p.amount) for p in open_payments)
+	total_pending_honorarios = sum(
+		flt(p.amount)
+		for p in open_payments
+		if (p.origin_type or ORIGIN_HONORARIOS) != ORIGIN_SERVICES
+	)
+	total_pending_service_payments = sum(
+		flt(p.amount) for p in open_payments if p.origin_type == ORIGIN_SERVICES
+	)
+	total_services_unbilled = sum(flt(row.pending_total) for row in service_billings)
 	total_costs = sum(flt(c.amount) for c in court_costs)
 
 	return {
@@ -398,10 +421,14 @@ def get_financial(case_name: str) -> dict:
 		"installments": installments,
 		"payments": payments,
 		"court_costs": court_costs,
+		"service_billings": service_billings,
 		"summary": {
 			"total_contract": total_contract,
 			"total_received": total_received,
 			"total_pending": total_pending,
+			"total_pending_honorarios": total_pending_honorarios,
+			"total_pending_service_payments": total_pending_service_payments,
+			"total_services_unbilled": total_services_unbilled,
 			"total_costs": total_costs,
 			"net_margin": total_received - total_costs,
 		},

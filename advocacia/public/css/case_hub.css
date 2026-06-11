@@ -115,6 +115,28 @@
 	justify-content: flex-end;
 }
 
+.adv-hub-panel__hint {
+	margin: 0 0 14px;
+	font-size: var(--text-sm);
+	color: var(--text-muted);
+	line-height: 1.45;
+}
+
+.adv-hub-subsection {
+	margin-top: 16px;
+	padding-top: 14px;
+	border-top: 1px solid var(--border-color);
+}
+
+.adv-hub-subsection__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	margin-bottom: 10px;
+	font-size: var(--text-sm);
+}
+
 .adv-hub-empty__actions {
 	display: flex;
 	flex-wrap: wrap;
