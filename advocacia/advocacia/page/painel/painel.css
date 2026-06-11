@@ -875,12 +875,24 @@
     .painel-op-item {
         flex-wrap: wrap;
     }
-    .painel-op-side {
+    .painel-op-item .painel-op-side {
         width: 100%;
         flex-direction: row;
         align-items: center;
         justify-content: flex-start;
         margin-top: 4px;
+    }
+    .painel-op-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+    .painel-op-row .painel-op-side {
+        width: auto;
+        max-width: none;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
     }
     .painel-parcela-card {
         flex-direction: column;
@@ -2087,6 +2099,11 @@
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+.painel-op-row > div:first-child {
+    flex: 1;
+    min-width: 0;
+}
+
 .painel-op-row:hover {
     border-color: color-mix(in srgb, var(--primary) 25%, var(--border-color));
     box-shadow: var(--painel-shadow);
@@ -2096,12 +2113,16 @@
     font-weight: 600;
     font-size: var(--text-sm);
     color: var(--text-color);
+    line-height: 1.35;
+    word-break: break-word;
 }
 
 .painel-op-row__sub {
     font-size: var(--text-xs);
     color: var(--text-muted);
     margin-top: 2px;
+    line-height: 1.4;
+    word-break: break-word;
 }
 
 .painel-finance-grid--bars-only {
