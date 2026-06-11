@@ -68,6 +68,7 @@ class TestDocumentos(FrappeTestCase):
 		context = _build_context(servico.name)
 		self.assertEqual(context["escritorio_advogada"], "Advogada Teste")
 		self.assertEqual(context["escritorio_razao_social"], "Escritorio Teste Advocacia")
+		self.assertEqual(context["escritorio_cnpj"], "11.222.333/0001-81")
 		self.assertEqual(context["escritorio_banco"], "Banco Documentos")
 		self.assertEqual(context["escritorio_pix"], "52998224725")
 		self.assertTrue(context["cliente_nome"])
