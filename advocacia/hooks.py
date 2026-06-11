@@ -62,6 +62,7 @@ app_include_css = [
 app_include_js = [
     "/assets/advocacia/js/masks.js",
     "/assets/advocacia/js/documentos_placeholders.js",
+    "/assets/advocacia/js/documentos_generate_dialog.js",
     "/assets/advocacia/js/list_nav.js",
     "/assets/advocacia/js/list_filters.js",
     "/assets/advocacia/js/cliente_from_servico.js",
