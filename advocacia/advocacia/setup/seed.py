@@ -10,6 +10,20 @@ DEFAULT_CASE_PHASES = (
 	{"case_phase_name": "Arquivado", "sort_order": 50},
 )
 
+DEFAULT_DOCUMENT_CATEGORIES = (
+	"Petição",
+	"Procuração",
+	"Certidão",
+	"Decisão",
+	"Contrato",
+	"Acordo",
+	"Substabelecimento",
+	"Comprovante",
+	"Protocolo",
+	"Laudo",
+	"Outro",
+)
+
 
 def _ensure_case_phase(phase_def):
 	name = phase_def["case_phase_name"]
@@ -29,9 +43,19 @@ def _ensure_case_phase(phase_def):
 	).insert(ignore_permissions=True)  # setup: seed idempotente
 
 
+def _ensure_document_category(category_name):
+	if frappe.db.exists("Document Category", category_name):
+		return
+	frappe.get_doc(
+		{"doctype": "Document Category", "category_name": category_name}
+	).insert(ignore_permissions=True)  # setup: seed idempotente
+
+
 def ensure_seed_data():
 	"""Cadastros auxiliares universais — idempotente no migrate."""
 	for phase_def in DEFAULT_CASE_PHASES:
 		_ensure_case_phase(phase_def)
+	for category_name in DEFAULT_DOCUMENT_CATEGORIES:
+		_ensure_document_category(category_name)
 
 	frappe.db.commit()  # setup: seed idempotente no migrate

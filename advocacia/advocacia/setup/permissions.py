@@ -100,6 +100,7 @@ CATALOG = frozenset(
 		"Court Branch",
 		"Court",
 		"Case Phase",
+		"Document Category",
 		"Document Kit",
 		"Document Template",
 		"Office Settings",
