@@ -16,6 +16,45 @@ from advocacia.advocacia.validators import (
 	formatar_telefone,
 )
 
+TEMPLATE_CATEGORY_MAP = {
+	"procuracao": "Procuração",
+	"procuração": "Procuração",
+	"mandato": "Procuração",
+	"contrato": "Contrato",
+	"honorario": "Contrato",
+	"honorários": "Contrato",
+	"acordo": "Acordo",
+	"peticao": "Petição",
+	"petição": "Petição",
+	"inicial": "Petição",
+	"contestacao": "Petição",
+	"contestação": "Petição",
+	"recurso": "Petição",
+	"substabelecimento": "Substabelecimento",
+	"declaracao": "Outro",
+	"declaração": "Outro",
+	"certidao": "Certidão",
+	"certidão": "Certidão",
+	"decisao": "Decisão",
+	"decisão": "Decisão",
+	"sentenca": "Decisão",
+	"sentença": "Decisão",
+	"comprovante": "Comprovante",
+	"recibo": "Comprovante",
+	"protocolo": "Protocolo",
+	"requerimento": "Protocolo",
+	"laudo": "Laudo",
+}
+
+DOCUMENT_TYPE_CATEGORY_MAP = {
+	"Contrato": "Contrato",
+	"Declaracao": "Outro",
+	"Recibo": "Comprovante",
+	"Carta": "Outro",
+	"Ficha de Atendimento": "Outro",
+	"Outro": "Outro",
+}
+
 LEGACY_PLACEHOLDERS = [
 	"nome",
 	"cpf",
@@ -518,6 +557,52 @@ def _render_and_attach(servico_name, template_doc, context):
 	return {"file_url": anexo.file_url, "file_name": nome_arquivo}
 
 
+def _infer_category(template_doc) -> str:
+	search_text = " ".join(
+		part
+		for part in (
+			template_doc.title,
+			template_doc.document_type,
+			template_doc.description,
+		)
+		if part
+	).lower()
+	for keyword, category in TEMPLATE_CATEGORY_MAP.items():
+		if keyword in search_text:
+			return category
+	doc_type = (template_doc.document_type or "").strip()
+	return DOCUMENT_TYPE_CATEGORY_MAP.get(doc_type, "Outro")
+
+
+def _ensure_document_category(category_name: str) -> str:
+	if not frappe.db.exists("Document Category", category_name):
+		frappe.get_doc(
+			{"doctype": "Document Category", "category_name": category_name}
+		).insert(ignore_permissions=True)  # registro filho — categoria inferida do template
+	return category_name
+
+
+def _create_generated_case_document(
+	servico_name: str,
+	template_doc,
+	file_url: str,
+) -> str:
+	category = _ensure_document_category(_infer_category(template_doc))
+	doc = frappe.get_doc(
+		{
+			"doctype": "Case Document",
+			"legal_case": servico_name,
+			"category": category,
+			"status": "Rascunho",
+			"source": "Gerado pelo App",
+			"file": file_url,
+			"version_label": "v1",
+		}
+	)
+	doc.insert(ignore_permissions=True)  # registro filho — write no serviço já validada
+	return doc.name
+
+
 def _parse_template_names(template_names):
 	if isinstance(template_names, str):
 		template_names = json.loads(template_names or "[]")
@@ -544,12 +629,18 @@ def gerar_documentos_em_lote(servico_name: str, template_names: str | list) -> d
 			if not template_doc.enabled:
 				raise frappe.ValidationError(_("Template desabilitado: {0}").format(template_name))
 			result = _render_and_attach(servico_name, template_doc, context)
+			case_document = _create_generated_case_document(
+				servico_name,
+				template_doc,
+				result["file_url"],
+			)
 			gerados.append(
 				{
 					"template": template_name,
 					"title": template_doc.title,
 					"file_name": result["file_name"],
 					"file_url": result["file_url"],
+					"case_document": case_document,
 				}
 			)
 		except Exception as exc:

@@ -8,6 +8,7 @@ from frappe.tests.utils import FrappeTestCase
 from advocacia.advocacia.documentos import (
 	_build_context,
 	_formatar_data_extenso,
+	_infer_category,
 	gerar_documentos_em_lote,
 	get_document_placeholder_keys,
 	get_kits_disponiveis,
@@ -124,3 +125,29 @@ class TestDocumentos(FrappeTestCase):
 		self.assertTrue(result["success"])
 		self.assertEqual(result["data"]["total"], 2)
 		self.assertEqual(len(result["data"]["gerados"]), 2)
+
+		case_docs = frappe.get_all(
+			"Case Document",
+			filters={"legal_case": servico.name, "source": "Gerado pelo App"},
+			fields=["name", "category", "status", "file", "version_label"],
+		)
+		self.assertEqual(len(case_docs), 2)
+		for row in case_docs:
+			self.assertEqual(row.status, "Rascunho")
+			self.assertEqual(row.version_label, "v1")
+			self.assertTrue(row.file)
+
+		generated_by_url = {item["file_url"]: item for item in result["data"]["gerados"]}
+		for row in case_docs:
+			self.assertEqual(generated_by_url[row.file]["case_document"], row.name)
+
+	def test_infer_category(self):
+		cases = (
+			({"title": "Procuracao Ad Judicia", "document_type": "Outro", "description": ""}, "Procuração"),
+			({"title": "Contrato Honorarios", "document_type": "Contrato", "description": ""}, "Contrato"),
+			({"title": "Modelo generico", "document_type": "Recibo", "description": ""}, "Comprovante"),
+			({"title": "Doc qualquer", "document_type": "Outro", "description": "peticao inicial"}, "Petição"),
+		)
+		for fields, expected in cases:
+			template = frappe._dict(fields)
+			self.assertEqual(_infer_category(template), expected, msg=fields["title"])
