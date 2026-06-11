@@ -1,7 +1,7 @@
 frappe.listview_settings["Client"] = {
 	hide_name_column: true,
 	formatters: {
-		tipo_pessoa(value, _df, doc) {
+		person_type(value, _df, doc) {
 			const tipo = frappe.utils.escape_html(value || "");
 			const id = frappe.utils.escape_html(doc.name || "");
 			const badge = id

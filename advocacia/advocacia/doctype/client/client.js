@@ -4,7 +4,7 @@ frappe.ui.form.on("Client", {
 			AdvocaciaMasks.setupClientForm(frm);
 		}
 	},
-	tipo_pessoa(frm) {
+	person_type(frm) {
 		if (window.AdvocaciaMasks) {
 			AdvocaciaMasks.setupClientForm(frm);
 		}
@@ -19,7 +19,7 @@ frappe.ui.form.on("Client", {
 			AdvocaciaMasks.formatFormField(frm, "cnpj", AdvocaciaMasks.applyCNPJ);
 		}
 	},
-	cpf_representante(frm) {
+	representative_cpf(frm) {
 		if (window.AdvocaciaMasks) {
 			AdvocaciaMasks.formatFormField(
 				frm,
@@ -36,7 +36,7 @@ frappe.ui.form.on("Client Contact", {
 		AdvocaciaMasks.bindMask(frm, "phone", AdvocaciaMasks.applyPhone, "fixo");
 		AdvocaciaMasks.bindMask(frm, "mobile", AdvocaciaMasks.applyPhone, "mobile");
 	},
-	telefone(frm, cdt, cdn) {
+	phone(frm, cdt, cdn) {
 		if (window.AdvocaciaMasks) {
 			AdvocaciaMasks.formatChildField(
 				cdt,
@@ -46,7 +46,7 @@ frappe.ui.form.on("Client Contact", {
 			);
 		}
 	},
-	celular(frm, cdt, cdn) {
+	mobile(frm, cdt, cdn) {
 		if (window.AdvocaciaMasks) {
 			AdvocaciaMasks.formatChildField(
 				cdt,

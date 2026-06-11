@@ -1,10 +1,11 @@
 frappe.ui.form.on("Office Settings", {
 	refresh(frm) {
-		if (!window.AdvocaciaMasks) {
-			return;
+		if (window.AdvocaciaMasks) {
+			AdvocaciaMasks.setupOfficeSettingsForm(frm);
 		}
-		AdvocaciaMasks.bindMask(frm, "cnpj", AdvocaciaMasks.applyCNPJ, "cnpj");
-		if (frm.doc.cnpj) {
+	},
+	cnpj(frm) {
+		if (window.AdvocaciaMasks) {
 			AdvocaciaMasks.formatFormField(frm, "cnpj", AdvocaciaMasks.applyCNPJ);
 		}
 	},
