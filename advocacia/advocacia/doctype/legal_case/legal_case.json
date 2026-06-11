@@ -1502,16 +1502,28 @@
    "idx": 49
   },
   {
+   "fieldname": "sec_case_documents",
+   "fieldtype": "Section Break",
+   "label": "Documentos do Processo",
+   "idx": 50
+  },
+  {
+   "fieldname": "documents_panel",
+   "fieldtype": "HTML",
+   "label": "Documentos do Processo",
+   "idx": 51
+  },
+  {
    "fieldname": "sec_document_kits",
    "fieldtype": "Section Break",
    "label": "Kits de Documentos",
-   "idx": 50
+   "idx": 52
   },
   {
    "fieldname": "document_kits_panel",
    "fieldtype": "HTML",
    "label": "Kits de Documentos",
-   "idx": 51
+   "idx": 53
   }
  ],
  "states": [
@@ -1583,6 +1595,8 @@
   "sec_time_entries",
   "time_entries_panel",
   "tab_documents",
+  "sec_case_documents",
+  "documents_panel",
   "sec_document_kits",
   "document_kits_panel"
  ]

@@ -81,6 +81,7 @@ def get_case_hub_data(case: str) -> dict:
 		"service_records": get_service_records(case),
 		"time_entries": get_time_entries(case),
 		"document_kits": get_document_kits(case),
+		"documents": get_case_documents(case),
 		"financial": get_financial(case) if _is_manager() else None,
 	}
 	return data
@@ -102,6 +103,7 @@ def get_case_counts(case: str) -> dict:
 		"communications": frappe.db.count("Case Communication", {"legal_case": case}),
 		"service_records": frappe.db.count("Service Record", {"legal_case": case}),
 		"time_entries": frappe.db.count("Time Entry", {"legal_case": case}),
+		"documents": frappe.db.count("Case Document", {"legal_case": case}),
 		"document_kits": frappe.db.count("Document Kit", {"enabled": 1}),
 		"installments": _count_installments(case),
 		"payments": frappe.db.count("Legal Payment", {"legal_case": case}),
@@ -291,6 +293,28 @@ def get_document_kits(case_name: str) -> list[dict]:
 		order_by="title asc",
 		limit=HUB_LIMIT,
 	)
+
+
+def get_case_documents(case_name: str) -> list[dict]:
+	rows = frappe.get_all(
+		"Case Document",
+		filters={"legal_case": case_name},
+		fields=[
+			"name",
+			"title",
+			"category",
+			"status",
+			"source",
+			"version_label",
+			"file",
+			"creation",
+		],
+		order_by="creation desc",
+		limit=HUB_LIMIT_SMALL,
+	)
+	for row in rows:
+		row["status_color"] = _status_color(row.status)
+	return rows
 
 
 def get_financial(case_name: str) -> dict:

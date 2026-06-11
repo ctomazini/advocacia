@@ -29,6 +29,7 @@ function adv_hub_load(frm) {
 			adv_hub_render_communications(frm, data.communications || []);
 			adv_hub_render_service_records(frm, data.service_records || []);
 			adv_hub_render_time_entries(frm, data.time_entries || {});
+			adv_hub_render_documents(frm, data.documents || []);
 			adv_hub_render_document_kits(frm, data.document_kits || []);
 			adv_hub_render_financial(frm, data.financial);
 		},
@@ -416,6 +417,122 @@ function adv_hub_render_time_entries(frm, payload) {
 	_adv_hub_bind_routes($w);
 }
 
+function adv_hub_render_documents(frm, documents) {
+	const $w = frm.fields_dict.documents_panel?.$wrapper;
+	if (!$w) return;
+
+	const headerActions = `<div class="adv-hub-panel__actions">
+		<button type="button" class="adv-hub-panel__action" data-hub-action="new-document">
+			${__("+ Enviar")}
+		</button>
+		<button type="button" class="adv-hub-panel__action" data-hub-action="generate-docs">
+			${__("Gerar .docx")}
+		</button>
+	</div>`;
+
+	if (!documents.length) {
+		$w.html(`<div class="adv-hub-panel">
+			<div class="adv-hub-panel__header">
+				<h3 class="adv-hub-panel__title">
+					<span class="adv-hub-panel__title-icon">📄</span>
+					${__("Documentos do Processo")}
+					<span class="adv-hub-panel__count">0</span>
+				</h3>
+				${headerActions}
+			</div>
+			<div class="adv-hub-empty">
+				<div class="adv-hub-empty__icon">📄</div>
+				<div>${__("Nenhum documento registrado")}</div>
+				<button type="button" class="adv-hub-empty__action" data-hub-action="new-document">
+					${__("+ Enviar documento")}
+				</button>
+			</div>
+		</div>`);
+		_adv_hub_bind_document_actions(frm, $w);
+		return;
+	}
+
+	const statusMap = {
+		Rascunho: "gray",
+		Assinado: "blue",
+		Protocolado: "orange",
+		Juntado: "green",
+		Substituído: "gray",
+	};
+	const sourceIcons = {
+		"Gerado pelo App": "⚙️",
+		"Upload Manual": "📤",
+		Digitalizado: "🖨️",
+	};
+
+	const rows = documents
+		.map((doc) => {
+			const badge = `<span class="adv-hub-badge adv-hub-badge--${
+				statusMap[doc.status] || "gray"
+			}">${frappe.utils.escape_html(doc.status || "")}</span>`;
+			const sourceIcon = sourceIcons[doc.source] || "📄";
+			const version = doc.version_label
+				? `<span class="adv-hub-list-row__secondary">${frappe.utils.escape_html(
+						doc.version_label
+				  )}</span>`
+				: "";
+			const fileLink = doc.file
+				? `<a href="${frappe.utils.escape_html(
+						doc.file
+				  )}" target="_blank" class="adv-hub-doc-file" title="${__("Abrir arquivo")}">📎</a>`
+				: "";
+			return `<div class="adv-hub-list-row" data-route="Form/Case Document/${frappe.utils.escape_html(
+				doc.name
+			)}">
+			<div class="adv-hub-list-row__icon">${sourceIcon}</div>
+			<div class="adv-hub-list-row__main">
+				${frappe.utils.escape_html(doc.title || doc.name)}
+				<span class="adv-hub-list-row__secondary">${frappe.utils.escape_html(
+					doc.category || ""
+				)}</span>
+				${version}
+			</div>
+			${fileLink}
+			${badge}
+		</div>`;
+		})
+		.join("");
+
+	$w.html(`<div class="adv-hub-panel">
+		<div class="adv-hub-panel__header">
+			<h3 class="adv-hub-panel__title">
+				<span class="adv-hub-panel__title-icon">📄</span>
+				${__("Documentos do Processo")}
+				<span class="adv-hub-panel__count">${documents.length}</span>
+			</h3>
+			${headerActions}
+		</div>
+		${rows}
+	</div>`);
+
+	_adv_hub_bind_document_actions(frm, $w);
+	_adv_hub_bind_routes($w);
+	$w.find(".adv-hub-doc-file").on("click", (event) => {
+		event.stopPropagation();
+	});
+}
+
+function _adv_hub_bind_document_actions(frm, $w) {
+	$w.find('[data-hub-action="new-document"]').on("click", () => {
+		frappe.new_doc("Case Document", {
+			legal_case: frm.doc.name,
+			client: frm.doc.client,
+		});
+	});
+	$w.find('[data-hub-action="generate-docs"]').on("click", () => {
+		if (typeof abrir_dialog_gerar_documentos === "function") {
+			abrir_dialog_gerar_documentos(frm);
+			return;
+		}
+		frappe.msgprint(__("Use o botão Gerar Documentos na barra de ações."));
+	});
+}
+
 function adv_hub_render_document_kits(frm, kits) {
 	const $w = frm.fields_dict.document_kits_panel?.$wrapper;
 	if (!$w) return;
@@ -438,7 +555,7 @@ function adv_hub_render_document_kits(frm, kits) {
 	$w.html(`<div class="adv-hub-panel">
 		<div class="adv-hub-panel__header">
 			<h3 class="adv-hub-panel__title">
-				<span class="adv-hub-panel__title-icon">📄</span>
+				<span class="adv-hub-panel__title-icon">📦</span>
 				${__("Kits de Documentos")}
 				<span class="adv-hub-panel__count">${(kits || []).length}</span>
 			</h3>
@@ -772,6 +889,13 @@ function adv_hub_render_summary_bar(frm, counts) {
 		},
 		{
 			icon: "📄",
+			label: __("Documentos"),
+			count: counts.documents,
+			doctype: "Case Document",
+			fieldname: "legal_case",
+		},
+		{
+			icon: "📦",
 			label: __("Kits"),
 			count: counts.document_kits,
 			doctype: "Document Kit",

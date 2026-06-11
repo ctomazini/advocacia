@@ -9,6 +9,7 @@ from advocacia.advocacia.tests.test_setup import (
 	create_test_legal_case,
 	create_test_prazo,
 	create_test_registro_atos,
+	ensure_test_document_category,
 )
 
 
@@ -30,6 +31,7 @@ class TestCaseHub(FrappeTestCase):
 			"communications",
 			"service_records",
 			"time_entries",
+			"documents",
 			"document_kits",
 		):
 			self.assertIn(key, data)
@@ -87,6 +89,36 @@ class TestCaseHub(FrappeTestCase):
 		self.assertEqual(len(data["service_records"]), 1)
 		self.assertGreaterEqual(data["service_records"][0]["act_count"], 1)
 
+	def test_hub_documents_match_db(self):
+		case = create_test_legal_case()
+		ensure_test_document_category("Petição")
+		file_doc = frappe.get_doc(
+			{
+				"doctype": "File",
+				"file_name": f"hub_doc_{frappe.generate_hash(length=6)}.txt",
+				"content": b"test",
+				"is_private": 1,
+			}
+		)
+		file_doc.save(ignore_permissions=True)
+		frappe.get_doc(
+			{
+				"doctype": "Case Document",
+				"legal_case": case.name,
+				"category": "Petição",
+				"status": "Rascunho",
+				"source": "Upload Manual",
+				"file": file_doc.file_url,
+			}
+		).insert(ignore_permissions=True)
+
+		data = get_case_hub_data(case.name)
+		counts = get_case_counts(case.name)
+
+		self.assertEqual(len(data["documents"]), 1)
+		self.assertEqual(data["documents"][0]["category"], "Petição")
+		self.assertEqual(counts["documents"], 1)
+
 	def test_get_case_counts_returns_keys(self):
 		case = create_test_legal_case()
 		counts = get_case_counts(case.name)
@@ -99,6 +131,7 @@ class TestCaseHub(FrappeTestCase):
 			"communications",
 			"service_records",
 			"time_entries",
+			"documents",
 			"document_kits",
 		]
 		for key in base_keys:
