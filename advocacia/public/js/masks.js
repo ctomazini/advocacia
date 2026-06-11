@@ -49,6 +49,21 @@ const AdvocaciaMasks = {
 		return v;
 	},
 
+	listFormatters: {
+		cpf(value) {
+			return AdvocaciaMasks.applyCPF(value) || "";
+		},
+		cnpj(value) {
+			return AdvocaciaMasks.applyCNPJ(value) || "";
+		},
+		phone(value) {
+			return AdvocaciaMasks.applyPhone(value) || "";
+		},
+		cep(value) {
+			return AdvocaciaMasks.applyCEP(value) || "";
+		},
+	},
+
 	_bindInput($input, maskFn) {
 		if (!$input || !$input.length) return;
 
@@ -82,6 +97,16 @@ const AdvocaciaMasks = {
 		return patterns[tipo] || "";
 	},
 
+	_refreshDisplay(field, maskFn) {
+		if (!field || !field.$input) return;
+		const raw = field.get_value && field.get_value();
+		if (!raw) return;
+		const masked = maskFn.call(this, raw);
+		if (field.$input.val() !== masked) {
+			field.$input.val(masked);
+		}
+	},
+
 	bindMask(frm, fieldname, maskFn, inputmaskTipo) {
 		const field = frm.fields_dict && frm.fields_dict[fieldname];
 		if (!field || !field.$input) return;
@@ -97,13 +122,7 @@ const AdvocaciaMasks = {
 			this._bindInput(field.$input, maskFn);
 		}
 
-		const current = field.get_value && field.get_value();
-		if (current) {
-			const masked = maskFn.call(this, current);
-			if (current !== masked) {
-				field.set_value(masked);
-			}
-		}
+		this._refreshDisplay(field, maskFn);
 	},
 
 	unbindMask(frm, fieldname) {
@@ -116,11 +135,9 @@ const AdvocaciaMasks = {
 	},
 
 	formatFormField(frm, fieldname, maskFn) {
-		if (!frm.doc[fieldname]) return;
-		const masked = maskFn.call(this, frm.doc[fieldname]);
-		if (frm.doc[fieldname] !== masked) {
-			frm.set_value(fieldname, masked);
-		}
+		const field = frm.fields_dict && frm.fields_dict[fieldname];
+		if (!field || !frm.doc[fieldname]) return;
+		this._refreshDisplay(field, maskFn);
 	},
 
 	formatChildField(cdt, cdn, fieldname, maskFn) {
@@ -130,6 +147,21 @@ const AdvocaciaMasks = {
 		if (row[fieldname] !== masked) {
 			frappe.model.set_value(cdt, cdn, fieldname, masked);
 		}
+	},
+
+	setupGridMaskFormatters(frm, tableFieldname, specs) {
+		const grid = frm.fields_dict[tableFieldname] && frm.fields_dict[tableFieldname].grid;
+		if (!grid) return;
+
+		specs.forEach(({ fieldname, maskFn }) => {
+			const df = grid.get_docfield(fieldname);
+			if (!df) return;
+			df.formatter = (value) => {
+				if (!value) return "";
+				return frappe.utils.escape_html(maskFn.call(AdvocaciaMasks, value));
+			};
+		});
+		grid.refresh();
 	},
 
 	setupClientForm(frm) {
@@ -146,12 +178,22 @@ const AdvocaciaMasks = {
 		}
 
 		["cpf", "cnpj", "representative_cpf"].forEach((fieldname) => {
-			if (frm.doc[fieldname]) {
-				const fn =
-					fieldname === "cnpj" ? this.applyCNPJ : this.applyCPF;
-				this.formatFormField(frm, fieldname, fn);
-			}
+			if (!frm.doc[fieldname]) return;
+			const fn = fieldname === "cnpj" ? this.applyCNPJ : this.applyCPF;
+			this.formatFormField(frm, fieldname, fn);
 		});
+
+		this.setupGridMaskFormatters(frm, "contacts", [
+			{ fieldname: "phone", maskFn: this.applyPhone },
+			{ fieldname: "mobile", maskFn: this.applyPhone },
+		]);
+		this.setupGridMaskFormatters(frm, "addresses", [{ fieldname: "cep", maskFn: this.applyCEP }]);
+	},
+
+	setupOfficeSettingsForm(frm) {
+		if (!window.AdvocaciaMasks) return;
+		this.bindMask(frm, "cnpj", this.applyCNPJ, "cnpj");
+		this.formatFormField(frm, "cnpj", this.applyCNPJ);
 	},
 
 	setupLegalCaseProcessoMask(frm) {
