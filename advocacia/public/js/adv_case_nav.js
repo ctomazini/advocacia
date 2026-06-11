@@ -1,7 +1,7 @@
 /* Navegação hub ↔ satélites: breadcrumb do serviço, voltar e restaurar aba. */
 (function () {
-	const ADV_CASE_NAV_VERSION = 1;
-	const BREADCRUMB_PATCH_VERSION = 1;
+	const ADV_CASE_NAV_VERSION = 2;
+	const BREADCRUMB_PATCH_VERSION = 2;
 	const RENDER_FORM_PATCH_VERSION = 1;
 	const BREADCRUMB_WIDTH_PATCH_VERSION = 1;
 	const HUB_CONTEXT_KEY = "adv_hub_return_context";
@@ -39,20 +39,24 @@
 
 	function get_case_name(frm, route) {
 		route = route || frappe.get_route();
-		const docname = get_route_docname(route);
-		let doc = frm?.doc;
-
-		if (docname && (!doc || doc.name !== docname)) {
-			doc = frappe.get_doc(frm.doctype, docname) || doc;
-		}
-
-		if (!doc) {
+		if (!frm) {
 			return null;
 		}
 		if (frm.doctype === CASE_DOCTYPE) {
-			return doc.name;
+			return frm.doc?.name || null;
 		}
-		return doc[get_case_fieldname(frm.doctype)] || null;
+
+		const fieldname = get_case_fieldname(frm.doctype);
+		if (frm.doc?.[fieldname]) {
+			return frm.doc[fieldname];
+		}
+
+		const docname = get_route_docname(route);
+		let doc = frm.doc;
+		if (docname && (!doc || doc.name !== docname)) {
+			doc = frappe.get_doc(frm.doctype, docname) || doc;
+		}
+		return doc?.[fieldname] || null;
 	}
 
 	function get_case_title(case_name) {
@@ -79,7 +83,7 @@
 
 		return {
 			route: case_form_route(case_name),
-			label: get_case_title(case_name),
+			label: case_name,
 			css_classes: "adv-hub-case-crumb",
 			parent_class: "ellipsis",
 		};
@@ -99,12 +103,21 @@
 			return null;
 		}
 
-		const doctype_layout = frappe.router.doctype_layout || route[1];
-		const frm = frappe.views.formview?.[doctype_layout]?.frm;
-		if (frm) {
-			return frm;
+		const docname = get_route_docname(route);
+		if (
+			cur_frm &&
+			cur_frm.doctype === route[1] &&
+			(!docname || cur_frm.doc?.name === docname || cur_frm.is_new())
+		) {
+			return cur_frm;
 		}
-		return cur_frm?.doctype === route[1] ? cur_frm : null;
+
+		const doctype_layout = frappe.router.doctype_layout || route[1];
+		return (
+			frappe.views.formview?.[doctype_layout]?.frm ||
+			frappe.views.formview?.[route[1]]?.frm ||
+			null
+		);
 	}
 
 	function is_active_form_route(frm, route) {
@@ -124,10 +137,35 @@
 	}
 
 	function get_form_breadcrumb_ul(frm) {
-		if (!frm?.page?.$title_area?.length) {
-			return $();
+		if (frm?.page?.$title_area?.length) {
+			const $in_title = frm.page.$title_area.find("ul.navbar-breadcrumbs").first();
+			if ($in_title.length) {
+				return $in_title;
+			}
 		}
-		return frm.page.$title_area.find("ul.navbar-breadcrumbs").first();
+
+		const $visible = $(frappe.container?.page).find("ul.navbar-breadcrumbs").first();
+		if ($visible.length) {
+			return $visible;
+		}
+
+		return $(".navbar-breadcrumbs").first();
+	}
+
+	function bind_breadcrumb_clicks($ul) {
+		if (!$ul?.length) {
+			return;
+		}
+
+		$ul.find("a[href^='/desk/']").off("click.adv_case_nav").on("click.adv_case_nav", function (event) {
+			event.preventDefault();
+			const href = $(this).attr("href") || "";
+			const path = href.replace(/^\/desk\/?/, "");
+			if (!path) {
+				return;
+			}
+			frappe.set_route(path.split("/"));
+		});
 	}
 
 	function build_workspace_crumb() {
@@ -188,8 +226,6 @@
 		let docname_title;
 		if (docname.startsWith("new-" + doctype.toLowerCase().replace(/ /g, "-"))) {
 			docname_title = __("New {0}", [__(doctype)]);
-		} else if (doc?.title && doctype !== CASE_DOCTYPE) {
-			docname_title = doc.title;
 		} else {
 			docname_title = doc?.name || docname;
 		}
@@ -288,6 +324,7 @@
 		}
 
 		render_breadcrumb_items($ul, build_breadcrumb_trail(frm, route));
+		bind_breadcrumb_clicks($ul);
 	}
 
 	function sync_form_breadcrumbs(frm) {
@@ -306,7 +343,7 @@
 			existing.forEach((timer_id) => clearTimeout(timer_id));
 		}
 
-		const timers = [0, 60, 200].map((delay) =>
+		const timers = [0, 60, 200, 500].map((delay) =>
 			setTimeout(() => sync_form_breadcrumbs(frm), delay)
 		);
 		breadcrumb_sync_timers.set(frm, timers);
@@ -335,20 +372,17 @@
 		if (!frappe.breadcrumbs) {
 			return;
 		}
-		if (frappe.breadcrumbs.__adv_case_nav_version >= BREADCRUMB_PATCH_VERSION) {
+		if (frappe.breadcrumbs.__adv_case_nav_patched) {
 			return;
 		}
 
-		if (!frappe.breadcrumbs.__adv_case_nav_original_update) {
-			frappe.breadcrumbs.__adv_case_nav_original_update =
-				frappe.breadcrumbs.update.bind(frappe.breadcrumbs);
-		}
-		const original_update = frappe.breadcrumbs.__adv_case_nav_original_update;
+		const original_update = frappe.breadcrumbs.update.bind(frappe.breadcrumbs);
+		const original_clear = frappe.breadcrumbs.clear.bind(frappe.breadcrumbs);
 
 		frappe.breadcrumbs.clear = function () {
 			const route = frappe.get_route();
 			if (route[0] === "Form" && route[1] && is_hub_nav_doctype(route[1])) {
-				const frm = get_frm_for_route(route);
+				const frm = get_frm_for_route(route) || cur_frm;
 				this.$breadcrumbs = frm ? get_form_breadcrumb_ul(frm) : $();
 				if (this.$breadcrumbs?.length) {
 					this.$breadcrumbs.empty();
@@ -356,15 +390,14 @@
 				}
 			}
 
-			const $visible = $(frappe.container?.page).find("ul.navbar-breadcrumbs").first();
-			if ($visible.length) {
-				this.$breadcrumbs = $visible.empty();
-			} else {
-				this.$breadcrumbs = $(".navbar-breadcrumbs").empty();
-			}
+			return original_clear.call(this);
 		};
 
 		frappe.breadcrumbs.append_breadcrumb_element = function (route, label, css_classes) {
+			if (!this.$breadcrumbs?.length) {
+				const frm = get_frm_for_route() || cur_frm;
+				this.$breadcrumbs = frm ? get_form_breadcrumb_ul(frm) : $();
+			}
 			if (!this.$breadcrumbs?.length) {
 				const $visible = $(frappe.container?.page).find("ul.navbar-breadcrumbs").first();
 				this.$breadcrumbs = $visible.length ? $visible : $(".navbar-breadcrumbs").first();
@@ -384,21 +417,27 @@
 			a.innerHTML = label;
 			el.appendChild(a);
 			this.$breadcrumbs.eq(0).append(el);
+			bind_breadcrumb_clicks(this.$breadcrumbs);
 		};
 
 		frappe.breadcrumbs.update = function () {
 			const route = frappe.get_route();
 			if (route[0] === "Form" && route[1] && is_hub_nav_doctype(route[1])) {
-				const frm = get_frm_for_route(route);
-				if (frm) {
+				const frm = get_frm_for_route(route) || cur_frm;
+				if (frm && frm.doctype === route[1]) {
 					ensure_breadcrumb_registry(route[1]);
-					render_form_breadcrumb_trail(frm, route);
-					this.toggle(true);
-					return;
+					const $ul = get_form_breadcrumb_ul(frm);
+					if ($ul.length) {
+						this.$breadcrumbs = $ul;
+						render_form_breadcrumb_trail(frm, route);
+						this.toggle(true);
+						return;
+					}
+					queue_breadcrumb_sync(frm);
 				}
 			}
 
-			original_update();
+			return original_update.call(this);
 		};
 
 		frappe.breadcrumbs.__adv_case_nav_version = BREADCRUMB_PATCH_VERSION;
@@ -532,6 +571,7 @@
 			frappe.ui.form.on(doctype, {
 				refresh(frm) {
 					add_back_to_case_button(frm);
+					queue_breadcrumb_sync(frm);
 				},
 			});
 		});
@@ -539,6 +579,7 @@
 		frappe.ui.form.on(CASE_DOCTYPE, {
 			refresh(frm) {
 				restore_hub_tab(frm);
+				queue_breadcrumb_sync(frm);
 			},
 		});
 	}
@@ -571,11 +612,32 @@
 			get_case_name,
 			get_case_title,
 			get_frm_for_route,
+			get_form_breadcrumb_ul,
 			save_hub_context,
 			restore_hub_tab,
 			sync_form_breadcrumbs,
 			render_form_breadcrumb_trail,
 			is_satellite_doctype,
+			debug_breadcrumbs() {
+				const route = frappe.get_route();
+				const frm = get_frm_for_route(route) || cur_frm;
+				const $ul = frm ? get_form_breadcrumb_ul(frm) : $();
+				const info = {
+					version: ADV_CASE_NAV_VERSION,
+					route: route.join("/"),
+					frm: frm?.doctype,
+					ul_count: $ul.length,
+					li_count: $ul.find("li").length,
+					case_name: frm ? get_case_name(frm, route) : null,
+				};
+				console.log("[adv_case_nav]", info);
+				if (frm) {
+					sync_form_breadcrumbs(frm);
+					info.li_after_render = get_form_breadcrumb_ul(frm).find("li").length;
+					console.log("[adv_case_nav] after render", info.li_after_render);
+				}
+				return info;
+			},
 		};
 	}
 
