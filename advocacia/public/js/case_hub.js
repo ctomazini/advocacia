@@ -919,13 +919,6 @@ function adv_hub_render_summary_bar(frm, counts) {
 			fieldname: "legal_case",
 		},
 		{
-			icon: "📝",
-			label: __("Cobranças"),
-			count: counts.service_records,
-			doctype: "Service Record",
-			fieldname: "legal_case",
-		},
-		{
 			icon: "⏱️",
 			label: __("Horas"),
 			count: counts.time_entries,
@@ -974,6 +967,13 @@ function adv_hub_render_summary_bar(frm, counts) {
 				fieldname: "legal_case",
 			},
 			{
+				icon: "📝",
+				label: __("Cobranças"),
+				count: counts.service_records,
+				doctype: "Service Record",
+				fieldname: "legal_case",
+			},
+			{
 				icon: "🏛️",
 				label: __("Custas"),
 				count: counts.court_costs,
@@ -981,6 +981,14 @@ function adv_hub_render_summary_bar(frm, counts) {
 				fieldname: "legal_case",
 			}
 		);
+	} else {
+		items.push({
+			icon: "📝",
+			label: __("Cobranças"),
+			count: counts.service_records,
+			doctype: "Service Record",
+			fieldname: "legal_case",
+		});
 	}
 
 	const pills = items

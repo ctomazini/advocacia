@@ -75,9 +75,9 @@ Abas conhecidas no Legal Case:
 | --- | --- |
 | `tab_details` | Dados gerais |
 | `tab_progress` | Fases e audiências |
-| `tab_financial` | Financeiro (honorários, cobranças, KPIs) |
+| `tab_financial` | Financeiro (honorários, pagamentos, cobranças de serviços, custas) |
 | `tab_deadlines` | Prazos e tarefas |
-| `tab_records` | Cobranças de serviços e registro de horas |
+| `tab_records` | Comunicações e registro de horas |
 | `tab_documents` | Documentos e kits |
 
 Default se nenhuma aba detectada: `tab_details`.

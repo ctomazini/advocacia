@@ -130,7 +130,7 @@
    "idx": 2
   },
   {
-   "group": "Cobrança de serviços",
+   "group": "Financeiro",
    "link_doctype": "Service Record",
    "link_fieldname": "legal_case",
    "idx": 3
@@ -1424,6 +1424,18 @@
    "idx": 36
   },
   {
+   "fieldname": "sec_service_records",
+   "fieldtype": "Section Break",
+   "label": "Cobranças",
+   "idx": 37
+  },
+  {
+   "fieldname": "service_records_panel",
+   "fieldtype": "HTML",
+   "label": "Cobrança de serviços",
+   "idx": 38
+  },
+  {
    "fieldname": "tab_deadlines",
    "fieldtype": "Tab Break",
    "label": "Prazos e Tarefas",
@@ -1470,18 +1482,6 @@
    "fieldtype": "HTML",
    "label": "Comunicações",
    "idx": 44
-  },
-  {
-   "fieldname": "sec_service_records",
-   "fieldtype": "Section Break",
-   "label": "Cobranças",
-   "idx": 45
-  },
-  {
-   "fieldname": "service_records_panel",
-   "fieldtype": "HTML",
-   "label": "Cobrança de serviços",
-   "idx": 46
   },
   {
    "fieldname": "sec_time_entries",
@@ -1582,6 +1582,8 @@
   "payments_panel",
   "sec_court_costs",
   "court_costs_panel",
+  "sec_service_records",
+  "service_records_panel",
   "tab_deadlines",
   "sec_deadlines",
   "deadlines_panel",
@@ -1590,8 +1592,6 @@
   "tab_records",
   "sec_communications",
   "communications_panel",
-  "sec_service_records",
-  "service_records_panel",
   "sec_time_entries",
   "time_entries_panel",
   "tab_documents",

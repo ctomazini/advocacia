@@ -15,12 +15,12 @@ SIDEBAR_LINK_ORDER = (
 	("Serviços", "Legal Case", "DocType"),
 	("Clientes", "Client", "DocType"),
 	("Registro de Horas", "Time Entry", "DocType"),
-	("Cobrança de serviços", "Service Record", "DocType"),
 	("Documentos do Processo", "Case Document", "DocType"),
 	("Custas Processuais", "Court Cost", "DocType"),
 	# Financeiro
 	("Pagamentos", "Legal Payment", "DocType"),
 	("Honorários", "Fee Agreement", "DocType"),
+	("Cobrança de serviços", "Service Record", "DocType"),
 	("Despesas", "Office Expense", "DocType"),
 	("Modelos Word", "Document Template", "DocType"),
 	("Kits de Documentos", "Document Kit", "DocType"),

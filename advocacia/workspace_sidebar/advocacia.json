@@ -127,18 +127,6 @@
   {
    "child": 1,
    "collapsible": 0,
-   "icon": "clipboard",
-   "indent": 0,
-   "keep_closed": 0,
-   "label": "Cobrança de serviços",
-   "link_to": "Service Record",
-   "link_type": "DocType",
-   "show_arrow": 0,
-   "type": "Link"
-  },
-  {
-   "child": 1,
-   "collapsible": 0,
    "icon": "file-text",
    "indent": 0,
    "keep_closed": 0,
@@ -191,6 +179,18 @@
    "keep_closed": 0,
    "label": "Honorários",
    "link_to": "Fee Agreement",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 1,
+   "collapsible": 0,
+   "icon": "clipboard",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Cobrança de serviços",
+   "link_to": "Service Record",
    "link_type": "DocType",
    "show_arrow": 0,
    "type": "Link"
