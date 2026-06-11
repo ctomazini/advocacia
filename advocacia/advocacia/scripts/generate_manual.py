@@ -17,7 +17,7 @@ DOCTYPE_ORDER = [
 		"Acompanhamento Processual",
 		["Hearing", "Deadline", "Legal Task", "Case Communication"],
 	),
-	("Registro de Atividades", ["Service Record", "Time Entry"]),
+	("Cobrança e produtividade", ["Service Record", "Time Entry"]),
 	(
 		"Documentos",
 		["Document Category", "Case Document", "Document Template", "Document Kit"],
@@ -85,7 +85,7 @@ def _render_placeholders_section() -> list[str]:
 		"### Placeholders para templates .docx",
 		"",
 		"Sintaxe **docxtpl**: `{{ nome_do_campo }}`. "
-		"Grupos *condicionais* só têm valor quando há acordo de honorários vinculado. "
+		"Grupos *condicionais* só têm valor quando há honorários vinculados ao serviço. "
 		"A logo usa `{{ escritorio_logo }}` como imagem inline.",
 		"",
 	]
@@ -169,7 +169,7 @@ def _render_case_documents_and_hub_guides() -> list[str]:
 		"### Breadcrumb",
 		"",
 		"Ao abrir um registro satélite (prazo, documento, audiência, etc.) a partir do serviço, "
-		"o topo do formulário exibe: **Serviço → Tipo de documento → Registro atual**.",
+		"o topo do formulário exibe: **Serviço (ID)** → **DocType** → **ID do registro**.",
 		"",
 		"### Voltar ao Serviço",
 		"",
@@ -291,7 +291,7 @@ def generate():
 			"### Novo Processo",
 			"1. Cadastre o **Client**",
 			"2. Crie um **Serviço** com vara, comarca e tribunal",
-			"3. Defina **Acordo de Honorários** com parcelas",
+			"3. Defina **Honorários** com parcelas",
 			"4. Cadastre **Audiências** e **Prazos**",
 			"",
 			"### Recebimento",

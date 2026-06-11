@@ -3,7 +3,7 @@ window.advocacia_render_placeholders_referencia = function (blocos) {
 	html +=
 		'<p class="text-muted small" style="margin-bottom:12px;">' +
 		__(
-			"Sintaxe docxtpl: <code>{{ placeholder }}</code>. Grupos marcados como <em>condicional</em> só têm valor quando há acordo de honorários vinculado. A logo usa <code>{{ escritorio_logo }}</code> como imagem inline."
+			"Sintaxe docxtpl: <code>{{ placeholder }}</code>. Grupos marcados como <em>condicional</em> só têm valor quando há honorários vinculados ao serviço. A logo usa <code>{{ escritorio_logo }}</code> como imagem inline."
 		) +
 		"</p>";
 

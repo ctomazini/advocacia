@@ -126,7 +126,7 @@ function controlar_campos(frm) {
     frm.set_df_property(
         'total_agreement_value',
         'label',
-        direto ? 'Valor Total do Contrato' : 'Valor Total do Acordo'
+        __('Valor total contratado')
     );
 
     // --- Campos de divisão (ocultos no modo Direto) ---
@@ -329,9 +329,7 @@ function gerar_tabela_parcelas(frm) {
         return;
     }
     if (!total) {
-        frappe.msgprint(
-            direto ? 'Preencha o valor total do contrato.' : 'Preencha o valor total do acordo.'
-        );
+        frappe.msgprint(__('Preencha o valor total contratado.'));
         return;
     }
 

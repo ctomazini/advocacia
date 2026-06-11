@@ -12,7 +12,7 @@ frappe.ui.form.on("Service Record", {
 
 function configurar_botoes_cobranca(frm) {
 	if (frm.doc.last_payment && !frm.is_new()) {
-		frm.add_custom_button(__("Ver Legal Payment"), function () {
+		frm.add_custom_button(__("Ver pagamento"), function () {
 			frappe.set_route("Form", "Legal Payment", frm.doc.last_payment);
 		});
 	}
@@ -144,13 +144,13 @@ function gerar_cobranca_atos(frm) {
 				callback: function (r) {
 					if (!r.message) return;
 					var msg = r.message;
-					var titulo = msg.criado ? __("Legal Payment criado") : __("Legal Payment atualizado");
+					var titulo = msg.criado ? __("Pagamento criado") : __("Pagamento atualizado");
 					frappe.msgprint({
 						title: titulo,
 						message:
 							(msg.criado
-								? __("Legal Payment {0} criado com sucesso.", [msg.payment])
-								: __("Legal Payment {0} atualizado.", [msg.payment])) +
+								? __("Pagamento {0} criado com sucesso.", [msg.payment])
+								: __("Pagamento {0} atualizado.", [msg.payment])) +
 							"<br>" +
 							__("Total: R$ {0} · {1} ato(s)", [
 								(msg.total || 0).toFixed(2),

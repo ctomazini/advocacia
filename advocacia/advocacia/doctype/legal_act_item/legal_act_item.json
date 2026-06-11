@@ -446,7 +446,7 @@
   },
   {
    "fieldname": "payment",
-   "label": "Legal Payment",
+   "label": "Pagamento",
    "fieldtype": "Link",
    "options": "Legal Payment",
    "read_only": 1,
@@ -455,7 +455,7 @@
    "parentfield": "fields",
    "parenttype": "DocType",
    "doctype": "DocField",
-   "description": "Legal Payment vinculado quando o ato foi faturado.",
+   "description": "Pagamento vinculado quando o item foi faturado.",
    "idx": 6
   }
  ],

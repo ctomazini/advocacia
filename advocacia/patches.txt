@@ -28,3 +28,4 @@ advocacia.patches.v16_0.rename_fields_time_entry
 advocacia.patches.v16_0.migrar_pagamentos
 advocacia.patches.v16_0.preencher_tipo_origem_pagamento
 advocacia.patches.v16_0.vincular_pagamento_parcelas
+advocacia.patches.v16_0.migrar_fee_mode_divisao

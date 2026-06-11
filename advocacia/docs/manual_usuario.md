@@ -151,12 +151,12 @@ Define honorários contratados com o cliente, parcelas e vencimentos. O sistema 
 
 | Campo | Tipo | Obrigatório | Descrição |
 |-------|------|:-----------:|-----------|
-| Serviço | Link | ✅ | Serviço ou processo vinculado ao acordo. |
+| Serviço | Link | ✅ | Serviço ou processo vinculado ao contrato de honorários. |
 | Client | Link |  | Preenchido automaticamente a partir do serviço. |
-| Modo | Select | ✅ | Honorários Diretos ou Repasse de Sucumbência. |
+| Modo | Select | ✅ | Honorários Diretos ou Divisão advogada/cliente (repasse ao cliente). |
 | Status | Select |  | Vigente, Quitado ou Cancelado. |
-| Valor Total do Acordo | Currency |  | Valor total acordado entre as partes. |
-| Percentual Advogada (%) | Percent |  | Percentual da advogada sobre o total (modo repasse). |
+| Valor total contratado | Currency |  | Valor total contratado entre as partes. |
+| Percentual Advogada (%) | Percent |  | Percentual da advogada sobre o total (modo divisão). |
 | Valor Fixo de Honorários | Currency |  | Valor fixo de honorários (modo misto). |
 | Valor Advogada | Currency |  | Parcela destinada à advogada. |
 | Tipo de cobrança | Select | ✅ | Forma de cálculo: valor fixo, percentual ou misto. |
@@ -170,7 +170,7 @@ Define honorários contratados com o cliente, parcelas e vencimentos. O sistema 
 | Data Primeira Parcela | Date |  | Vencimento da primeira parcela. |
 | Valor da Parcela | Currency |  | Valor médio por parcela (referência). |
 | Gerar Parcelas | Button |  |  |
-|  | Table |  | Parcelas do acordo. Ao salvar, o sistema gera ou atualiza os pagamentos. |
+|  | Table |  | Parcelas do contrato. Ao salvar, o sistema gera ou atualiza os pagamentos. |
 | Total Advogada | Currency |  | Soma das parcelas da advogada. Calculado automaticamente. |
 | Total Client | Currency |  | Soma das parcelas do cliente. Calculado automaticamente. |
 | Observações | Text Editor |  | Observações contratuais e anotações internas. |
@@ -188,14 +188,14 @@ Registro operacional de recebimento. Diferente da Parcela (contratual), registra
 
 | Campo | Tipo | Obrigatório | Descrição |
 |-------|------|:-----------:|-----------|
-| Origem | Select |  | Honorários (Parcela) ou Atos Advocatícios. |
-| Acordo | Link |  | Acordo de honorários que originou este pagamento (parcelas). |
-| Service Record | Link |  | Registro de atos vinculado (cobrança de atos). |
+| Origem | Select |  | Honorários (Parcela) ou Cobrança de serviços. |
+| Honorários | Link |  | Contrato de honorários que originou este pagamento (parcelas). |
+| Cobrança de serviços | Link |  | Cobrança de serviços vinculada. |
 | Serviço | Link | ✅ | Serviço ou processo relacionado. |
-| Client | Link | ✅ | Preenchido automaticamente a partir do serviço ou acordo. |
-| Nº Parcela | Int |  | Número sequencial da parcela no acordo. |
+| Client | Link | ✅ | Preenchido automaticamente a partir do serviço ou honorários. |
+| Nº Parcela | Int |  | Número sequencial da parcela no contrato de honorários. |
 | Descrição | Small Text |  | Descrição exibida na parcela e nos relatórios. |
-| ID Origem | Data |  | Identificador interno para sincronização com parcelas do acordo. |
+| ID Origem | Data |  | Identificador interno para sincronização com parcelas de honorários. |
 | Sincronizado em | Datetime |  | Data e hora da última sincronização automática. |
 | Edição manual (não sincronizar) | Check |  | Quando marcado, o sistema não sobrescreve este pagamento na sincronização. |
 | Valor | Currency | ✅ | Valor previsto da parcela ou cobrança. |
@@ -350,7 +350,7 @@ Prazos processuais com data fatal. Notificações automáticas usam `notificatio
 
 ---
 
-## Registro de Atividades
+## Cobrança e produtividade
 
 ### Service Record
 
@@ -358,18 +358,18 @@ Prazos processuais com data fatal. Notificações automáticas usam `notificatio
 
 | Campo | Tipo | Obrigatório | Descrição |
 |-------|------|:-----------:|-----------|
-| Serviço | Link | ✅ | Serviço ou processo vinculado aos atos. |
+| Serviço | Link | ✅ | Serviço ou processo vinculado à cobrança. |
 | Client | Link |  | Preenchido automaticamente a partir do serviço. |
 | Status | Select |  | Em aberto, Parcialmente cobrado ou Cobrado. |
-| Data de Abertura | Date |  | Data de abertura do registro de atos. |
-|  | Table |  | Atos advocatícios acumulados para cobrança. |
-| Total Pendente | Currency |  | Soma dos atos pendentes. Calculado automaticamente. |
-| Total Cobrado | Currency |  | Soma dos atos já cobrados. Calculado automaticamente. |
-| Total Geral | Currency |  | Total geral dos atos. Calculado automaticamente. |
-| Vencimento da Cobrança | Date |  | Vencimento sugerido ao gerar cobrança dos atos pendentes. |
-| Último Legal Payment | Link |  | Último pagamento de atos vinculado a este registro. |
+| Data de Abertura | Date |  | Data de abertura da cobrança de serviços. |
+|  | Table |  | Itens de serviço acumulados para cobrança. |
+| Total Pendente | Currency |  | Soma dos itens pendentes. Calculado automaticamente. |
+| Total Cobrado | Currency |  | Soma dos itens já cobrados. Calculado automaticamente. |
+| Total Geral | Currency |  | Total geral dos itens. Calculado automaticamente. |
+| Vencimento da Cobrança | Date |  | Vencimento sugerido ao sincronizar cobrança dos itens pendentes. |
+| Último pagamento | Link |  | Último pagamento vinculado a esta cobrança. |
 | Sincronizar Cobrança | Button |  |  |
-| Observações | Text Editor |  | Observações sobre o registro de atos. |
+| Observações | Text Editor |  | Observações sobre a cobrança de serviços. |
 | Título | Data |  | Título automático no formato ID — descritor. |
 
 **Permissões:** Advocacia Manager (completo); Advocacia User conforme DocType.
@@ -477,7 +477,7 @@ Conjunto de templates para geração em lote.
 
 ### Placeholders para templates .docx
 
-Sintaxe **docxtpl**: `{{ nome_do_campo }}`. Grupos *condicionais* só têm valor quando há acordo de honorários vinculado. A logo usa `{{ escritorio_logo }}` como imagem inline.
+Sintaxe **docxtpl**: `{{ nome_do_campo }}`. Grupos *condicionais* só têm valor quando há honorários vinculados ao serviço. A logo usa `{{ escritorio_logo }}` como imagem inline.
 
 #### Escritório
 
@@ -553,13 +553,13 @@ Sintaxe **docxtpl**: `{{ nome_do_campo }}`. Grupos *condicionais* só têm valor
 | `{{ servico_valor_causa }}` | Valor da causa (R$) | `{{ valor_causa }}` |
 | `{{ servico_data_abertura }}` | Data de abertura | `{{ data_abertura }}` |
 
-#### Acordo de honorários *(condicional)*
+#### Honorários (condicional) *(condicional)*
 
 | Placeholder | Descrição | Alias legado |
 |-------------|-----------|--------------|
 | `{{ acordo_modo_honorarios }}` | Modo de honorários | — |
-| `{{ acordo_status }}` | Status do acordo | — |
-| `{{ acordo_valor_total_do_acordo }}` | Valor total do acordo (R$) | — |
+| `{{ acordo_status }}` | Status dos honorários | — |
+| `{{ acordo_valor_total_do_acordo }}` | Valor total contratado (R$) | — |
 | `{{ acordo_percentual_advogada }}` | Percentual da advogada (%) | — |
 | `{{ acordo_valor_fixo_de_honorarios }}` | Valor fixo de honorários (R$) | — |
 | `{{ acordo_valor_advogada }}` | Valor da advogada (R$) | — |
@@ -637,7 +637,7 @@ Documentação técnica: [case_documents.md](./case_documents.md)
 
 ### Breadcrumb
 
-Ao abrir um registro satélite (prazo, documento, audiência, etc.) a partir do serviço, o topo do formulário exibe: **Serviço → Tipo de documento → Registro atual**.
+Ao abrir um registro satélite (prazo, documento, audiência, etc.) a partir do serviço, o topo do formulário exibe: **Serviço (ID)** → **DocType** → **ID do registro**.
 
 ### Voltar ao Serviço
 
@@ -658,7 +658,7 @@ Documentação técnica: [hub_navigation.md](./hub_navigation.md)
 ### Novo Processo
 1. Cadastre o **Client**
 2. Crie um **Serviço** com vara, comarca e tribunal
-3. Defina **Acordo de Honorários** com parcelas
+3. Defina **Honorários** com parcelas
 4. Cadastre **Audiências** e **Prazos**
 
 ### Recebimento

@@ -186,12 +186,12 @@ PLACEHOLDER_REFERENCIA = [
 		],
 	},
 	{
-		"grupo": "Acordo de honorários",
+		"grupo": "Honorários (condicional)",
 		"condicional": True,
 		"items": [
 			{"placeholder": "acordo_modo_honorarios", "label": "Modo de honorários"},
-			{"placeholder": "acordo_status", "label": "Status do acordo"},
-			{"placeholder": "acordo_valor_total_do_acordo", "label": "Valor total do acordo (R$)"},
+			{"placeholder": "acordo_status", "label": "Status dos honorários"},
+			{"placeholder": "acordo_valor_total_do_acordo", "label": "Valor total contratado (R$)"},
 			{"placeholder": "acordo_percentual_advogada", "label": "Percentual da advogada (%)"},
 			{"placeholder": "acordo_valor_fixo_de_honorarios", "label": "Valor fixo de honorários (R$)"},
 			{"placeholder": "acordo_valor_advogada", "label": "Valor da advogada (R$)"},
@@ -690,7 +690,7 @@ def get_kits_disponiveis() -> list[dict]:
 	item_rows = frappe.get_all(
 		"Document Kit Item",
 		filters={"parent": ["in", kit_names]},
-		fields=["parent", "template", "ordem"],
+		fields=["parent", "template", "display_order"],
 		order_by="parent asc, display_order asc, idx asc",
 		limit_page_length=0,  # kits pequenos — carrega todos os itens
 	)

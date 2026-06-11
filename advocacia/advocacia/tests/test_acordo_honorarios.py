@@ -130,7 +130,7 @@ class TestAcordoHonorarios(FrappeTestCase):
 				"doctype": "Fee Agreement",
 				"legal_case": servico,
 				"client": cliente,
-				"fee_mode": "Acordo com Divisão",
+				"fee_mode": "Divisão advogada/cliente",
 				"billing_type": "Percentual do acordo",
 				"lawyer_percentage": 30,
 				"client_percentage": 70,

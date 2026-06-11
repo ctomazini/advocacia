@@ -34,7 +34,7 @@ frappe.provide("advocacia.painel.kpis");
 			{
 				label: __("Honorários ativos"),
 				value: U.cint(kpis.honorarios_ativos || 0),
-				sub: __("acordos vigentes"),
+				sub: __("contratos vigentes"),
 				tone: "blue",
 				icon: "file-text",
 				plain: true,

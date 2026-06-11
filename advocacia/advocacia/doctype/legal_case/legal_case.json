@@ -130,7 +130,7 @@
    "idx": 2
   },
   {
-   "group": "Atos",
+   "group": "Cobrança de serviços",
    "link_doctype": "Service Record",
    "link_fieldname": "legal_case",
    "idx": 3
@@ -1474,13 +1474,13 @@
   {
    "fieldname": "sec_service_records",
    "fieldtype": "Section Break",
-   "label": "Atos",
+   "label": "Cobranças",
    "idx": 45
   },
   {
    "fieldname": "service_records_panel",
    "fieldtype": "HTML",
-   "label": "Registro de Atos",
+   "label": "Cobrança de serviços",
    "idx": 46
   },
   {

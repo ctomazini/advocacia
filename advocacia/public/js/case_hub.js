@@ -317,7 +317,7 @@ function adv_hub_render_service_records(frm, records) {
 
 	if (!records.length) {
 		$w.html(
-			_adv_hub_empty("📝", __("Nenhum registro de atos"), __("+ Registro"), "new-record")
+			_adv_hub_empty("📝", __("Nenhuma cobrança de serviços"), __("+ Cobrança"), "new-record")
 		);
 		$w.find('[data-hub-action="new-record"]').on("click", () => {
 			adv_case_nav_new_doc("Service Record", { legal_case: frm.doc.name, client: frm.doc.client });
@@ -346,11 +346,11 @@ function adv_hub_render_service_records(frm, records) {
 		<div class="adv-hub-panel__header">
 			<h3 class="adv-hub-panel__title">
 				<span class="adv-hub-panel__title-icon">📝</span>
-				${__("Registro de Atos")}
+				${__("Cobrança de serviços")}
 				<span class="adv-hub-panel__count">${records.length}</span>
 			</h3>
 			<button type="button" class="adv-hub-panel__action" data-hub-action="new-record">
-				${__("+ Registro")}
+				${__("+ Cobrança")}
 			</button>
 		</div>
 		${rows}
@@ -525,11 +525,9 @@ function _adv_hub_bind_document_actions(frm, $w) {
 		});
 	});
 	$w.find('[data-hub-action="generate-docs"]').on("click", () => {
-		if (typeof abrir_dialog_gerar_documentos === "function") {
-			abrir_dialog_gerar_documentos(frm);
-			return;
+		if (window.advocacia?.openGenerateDocumentsDialog) {
+			advocacia.openGenerateDocumentsDialog(frm);
 		}
-		frappe.msgprint(__("Use o botão Gerar Documentos na barra de ações."));
 	});
 }
 
@@ -572,15 +570,13 @@ function adv_hub_render_document_kits(frm, kits) {
 	</div>`);
 
 	$w.find('[data-hub-action="generate-docs"]').on("click", () => {
-		if (typeof abrir_dialog_gerar_documentos === "function") {
-			abrir_dialog_gerar_documentos(frm);
-			return;
+		if (window.advocacia?.openGenerateDocumentsDialog) {
+			advocacia.openGenerateDocumentsDialog(frm);
 		}
-		frappe.msgprint(__("Use o botão Gerar Documentos na barra de ações."));
 	});
 	$w.find(".adv-hub-kit-card").on("click", () => {
-		if (typeof abrir_dialog_gerar_documentos === "function") {
-			abrir_dialog_gerar_documentos(frm);
+		if (window.advocacia?.openGenerateDocumentsDialog) {
+			advocacia.openGenerateDocumentsDialog(frm);
 		}
 	});
 }
@@ -629,9 +625,9 @@ function _adv_hub_render_financial_summary(frm, financial) {
 				agreement
 					? `<button type="button" class="adv-hub-panel__action" data-route="Form/Fee Agreement/${frappe.utils.escape_html(
 							agreement.name
-					  )}">${__("Ver Acordo")}</button>`
+					  )}">${__("Ver honorários")}</button>`
 					: `<button type="button" class="adv-hub-panel__action" data-hub-action="new-agreement">${__(
-							"+ Acordo"
+							"+ Honorários"
 					  )}</button>`
 			}
 		</div>
@@ -713,7 +709,7 @@ function _adv_hub_render_installments(frm, installments) {
 				<span class="adv-hub-panel__count">${installments.length}</span>
 			</h3>
 			<button type="button" class="adv-hub-panel__action" data-hub-action="list-agreements">
-				${__("Ver Acordos")}
+				${__("Ver honorários")}
 			</button>
 		</div>
 		${rows}
@@ -874,7 +870,7 @@ function adv_hub_render_summary_bar(frm, counts) {
 		},
 		{
 			icon: "📝",
-			label: __("Atos"),
+			label: __("Cobranças"),
 			count: counts.service_records,
 			doctype: "Service Record",
 			fieldname: "legal_case",
@@ -907,7 +903,7 @@ function adv_hub_render_summary_bar(frm, counts) {
 		items.push(
 			{
 				icon: "📑",
-				label: __("Acordos"),
+				label: __("Honorários"),
 				count: counts.fee_agreements,
 				doctype: "Fee Agreement",
 				fieldname: "legal_case",

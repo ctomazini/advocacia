@@ -12,7 +12,7 @@ frappe.ui.form.on("Legal Payment", {
 							"Legal Payment cancelado — registro imutável. Os atos foram liberados; você pode excluir este pagamento se desejar."
 					  )
 					: __(
-							"Legal Payment cancelado — registro imutável. A parcela no acordo foi atualizada; você pode excluir este pagamento se desejar."
+							"Pagamento cancelado — registro imutável. A parcela em honorários foi atualizada; você pode excluir este pagamento se desejar."
 					  );
 			frm.set_intro(intro, "blue");
 			return;
@@ -28,7 +28,7 @@ frappe.ui.form.on("Legal Payment", {
 
 function configurar_botoes_atos(frm) {
 	if (frm.doc.service_record) {
-		frm.add_custom_button(__("Ver Service Record"), function () {
+		frm.add_custom_button(__("Ver cobrança de serviços"), function () {
 			frappe.set_route("Form", "Service Record", frm.doc.service_record);
 		});
 	}
@@ -64,7 +64,7 @@ function configurar_botoes_atos(frm) {
 
 function configurar_botoes_honorarios(frm) {
 	if (frm.doc.fee_agreement) {
-		frm.add_custom_button(__("Ver Acordo"), function () {
+		frm.add_custom_button(__("Ver honorários"), function () {
 			frappe.set_route("Form", "Fee Agreement", frm.doc.fee_agreement);
 		});
 	}
@@ -94,10 +94,10 @@ function configurar_botoes_honorarios(frm) {
 			const msg_recebido =
 				frm.doc.status === "Recebido" || frm.doc.status === "Repassado"
 					? __(
-							"Cancelar pagamento já recebido? A parcela no acordo voltará para <strong>Cancelado</strong> e o acordo deixará de constar como quitado se aplicável."
+							"Cancelar pagamento já recebido? A parcela em honorários voltará para <strong>Cancelado</strong> e o contrato deixará de constar como quitado se aplicável."
 					  )
 					: __(
-							"Cancelar este pagamento? A parcela correspondente no acordo será marcada como <strong>Cancelado</strong>."
+							"Cancelar este pagamento? A parcela correspondente em honorários será marcada como <strong>Cancelado</strong>."
 					  );
 
 			frappe.confirm(msg_recebido, function () {
