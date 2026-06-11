@@ -1,6 +1,6 @@
 # Documentação — App Advocacia
 
-**Versão:** 1.0.0 · **Branch:** `main` · **Atualizado:** 2026-06-10
+**Versão:** 1.0.0 · **Branch:** `main` · **Atualizado:** 2026-06-09
 
 ---
 
@@ -8,9 +8,11 @@
 
 | Público | Documento | Conteúdo |
 | --- | --- | --- |
-| Operador do escritório | [manual_usuario.md](./manual_usuario.md) | Fluxos, campos, painel, placeholders, listas |
+| Operador do escritório | [manual_usuario.md](./manual_usuario.md) | Fluxos, campos, painel, placeholders, hub, documentos |
 | Desenvolvedor / deploy | [REGRAS_ADVOCACIA.md](../../REGRAS_ADVOCACIA.md) | Checklist normativo pré-deploy |
 | Cross-pollination engenharia | [CROSS_POLLINATION_ENGENHARIA.md](./CROSS_POLLINATION_ENGENHARIA.md) | Plano e prompt Agent para port de features |
+| Documentos do processo | [case_documents.md](./case_documents.md) | Case Document, geração .docx, categorias |
+| Navegação hub | [hub_navigation.md](./hub_navigation.md) | adv_case_nav.js, satélites, sessionStorage |
 | Inventário técnico | [CODEBASE.md](../../CODEBASE.md) | DocTypes, hooks, API, árvore de arquivos |
 | Instalação rápida | [README.md](../../README.md) | Bench, testes, seed-demo, E2E |
 
@@ -22,7 +24,7 @@ Relatórios de conformidade. Consultar junto com [audit-deploy-ready.md](./audit
 
 | Arquivo | Foco | Status jun/2026 |
 | --- | --- | --- |
-| [audit_code.md](./audit_code.md) | Python, whitelists, testes | ✅ 283 testes (jun/2026) |
+| [audit_code.md](./audit_code.md) | Python, whitelists, testes | ✅ 297 testes (jun/2026) |
 | [audit_dashboard.md](./audit_dashboard.md) | Painel backend/frontend modular | ✅ P2 jun/2026 |
 | [audit_data_integrity.md](./audit_data_integrity.md) | CPF/CNPJ/CNJ, sync financeiro | ✅ |
 | [audit_google_calendar.md](./audit_google_calendar.md) | Audiência/Prazo → Event → Google | ✅ |
@@ -72,6 +74,8 @@ Relatórios de conformidade. Consultar junto com [audit-deploy-ready.md](./audit
 | **Office Settings** | Logo, dados bancários, `default_notify_days` |
 | **Documentos** | Placeholders; logo inline docx |
 | **IA** | `agent_api.py` — 4 endpoints read-only |
+| **Documentos do processo** | Case Document, Document Category, hub documentos, geração → registro |
+| **Navegação hub** | adv_case_nav.js — breadcrumb, voltar ao serviço, restaurar aba |
 | **Sidebar / workspace** | Labels PT; traduções de DocType na UI |
 
 ---
@@ -80,7 +84,7 @@ Relatórios de conformidade. Consultar junto com [audit-deploy-ready.md](./audit
 
 ```bash
 bench --site advocacia.local set-config allow_tests true
-bench --site advocacia.local run-tests --app advocacia   # 283 testes (jun/2026)
+bench --site advocacia.local run-tests --app advocacia   # 297 testes (jun/2026)
 ```
 
 E2E browser (opcional, fora da suite Frappe): ver [e2e_playwright.md](./e2e_playwright.md).

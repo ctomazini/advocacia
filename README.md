@@ -1,6 +1,6 @@
 # Advocacia
 
-Aplicativo Frappe v16 para gestão jurídica de escritórios de advocacia no Brasil: clientes, serviços/processos, honorários, pagamentos, atos, prazos, audiências, despesas operacionais, painel operacional, geração de documentos (.docx) e API read-only para agentes IA.
+Aplicativo Frappe v16 para gestão jurídica de escritórios de advocacia no Brasil: clientes, serviços/processos, honorários, pagamentos, atos, prazos, audiências, documentos do processo, despesas operacionais, painel operacional, geração de documentos (.docx) e API read-only para agentes IA.
 
 **Versão:** 1.0.0 · **Branch:** `main`
 
@@ -32,7 +32,11 @@ bench --site seu-site.local set-config allow_tests true
 bench --site seu-site.local run-tests --app advocacia
 ```
 
-Suíte atual: **283 testes** (`bench run-tests --app advocacia`, jun/2026).
+Suíte atual: **297 testes** (`bench run-tests --app advocacia`, jun/2026).
+
+## DocTypes do app
+
+Cadastros: Client, Jurisdiction, Court Branch, Court, Case Phase, Document Category · Hub: Legal Case · Processual: Hearing, Deadline, Legal Task, Case Communication · Financeiro: Fee Agreement, Legal Payment, Court Cost, Office Expense · Atividades: Service Record, Time Entry · Documentos: Case Document, Document Template, Document Kit · Config: Office Settings · Tabelas filhas: Client Contact, Client Address, Fee Installment, Legal Act Item, Document Kit Item.
 
 E2E browser (opcional): [advocacia/docs/e2e_playwright.md](./advocacia/docs/e2e_playwright.md)
 

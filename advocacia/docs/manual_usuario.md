@@ -1,6 +1,6 @@
 # Manual do Usuário — Advocacia
 
-**Gerado em:** 2026-06-07
+**Gerado em:** 2026-06-11
 **Versão do app:** 0.7.0
 
 ---
@@ -287,7 +287,7 @@ Audiências judiciais vinculadas a um serviço. Sincroniza com o calendário Fra
 
 ### Deadline
 
-Prazos processuais com data fatal. Notificações automáticas usam `dias_notificacao` do prazo ou o padrão de Office Settings.
+Prazos processuais com data fatal. Notificações automáticas usam `notification_days` do prazo ou o padrão de Office Settings.
 
 **Código automático:** `format:PRAZO-{YYYY}-{####}`
 
@@ -392,8 +392,8 @@ Prazos processuais com data fatal. Notificações automáticas usam `dias_notifi
 | Duração (horas) | Float |  | Duração convertida em horas. Calculada automaticamente. |
 | Atividade | Data | ✅ | Descrição curta da atividade realizada. |
 | Categoria | Select |  | Categoria da atividade: Reunião, Petição, Pesquisa, etc. |
-| Detalhes | Small Text |  | Detalhamento complementar da atividade. |
 | Cobrável | Check |  | Marque se o tempo deve entrar em relatórios de cobrança. |
+| Detalhes | Small Text |  | Detalhamento complementar da atividade. |
 | Título | Data |  | Título automático no formato ID — descritor. |
 
 **Permissões:** Advocacia Manager (completo); Advocacia User conforme DocType.
@@ -402,11 +402,48 @@ Prazos processuais com data fatal. Notificações automáticas usam `dias_notifi
 
 ## Documentos
 
+### Document Category
+
+Categoria documental rígida (Petição, Procuração, Contrato, etc.). Usada para organizar **Case Document** e relatórios.
+
+**Código automático:** `field:category_name`
+
+| Campo | Tipo | Obrigatório | Descrição |
+|-------|------|:-----------:|-----------|
+| Categoria | Data | ✅ | Nome único da categoria documental (ex.: Petição, Procuração, Laudo). |
+
+**Permissões:** Advocacia Manager (completo); Advocacia User conforme DocType.
+
+---
+
+### Case Document
+
+Arquivo do processo vinculado a um **Serviço**. Pode ser enviado manualmente ou criado automaticamente ao gerar documentos Word.
+
+**Código automático:** `format:DOC-{YYYY}-{####}`
+
+| Campo | Tipo | Obrigatório | Descrição |
+|-------|------|:-----------:|-----------|
+| Serviço | Link | ✅ | Serviço (processo ou consultoria) ao qual este documento pertence. |
+| Cliente | Link |  | Preenchido automaticamente a partir do serviço. |
+| Categoria | Link | ✅ | Tipo documental para organização e relatórios. |
+| Status | Select | ✅ | Situação do documento no fluxo do processo. |
+| Origem | Select |  | Como o arquivo entrou no sistema. |
+| Título | Data |  | Composto automaticamente: {Categoria} — {Serviço}[ — {Versão}]. |
+| Versão / Revisão | Data |  | Ex.: Rev 01, v2 assinada. |
+| Arquivo | Attach | ✅ | Arquivo anexado (PDF, DOCX, imagem, etc.). |
+| Prazo Relacionado | Link |  | Prazo vinculado a este documento (opcional). |
+| Observações | Small Text |  | Notas internas sobre o documento. |
+
+**Permissões:** Advocacia Manager (completo); Advocacia User conforme DocType.
+
+---
+
 ### Document Template
 
 Modelo .docx com placeholders para geração automática. Use o botão **Ver Placeholders Disponíveis** para a lista completa.
 
-**Código automático:** `field:titulo`
+**Código automático:** `field:title`
 
 | Campo | Tipo | Obrigatório | Descrição |
 |-------|------|:-----------:|-----------|
@@ -425,7 +462,7 @@ Modelo .docx com placeholders para geração automática. Use o botão **Ver Pla
 
 Conjunto de templates para geração em lote.
 
-**Código automático:** `field:titulo`
+**Código automático:** `field:title`
 
 | Campo | Tipo | Obrigatório | Descrição |
 |-------|------|:-----------:|-----------|
@@ -563,6 +600,56 @@ Dados institucionais do escritório: OAB, CNPJ, endereço, logo, dados bancário
 | Chave PIX | Data |  | Chave PIX para recebimentos. |
 
 **Permissões:** Advocacia Manager (completo); Advocacia User conforme DocType.
+
+---
+
+## Gestão de Documentos do Processo
+
+### Upload manual
+
+1. Abra o **Serviço** (Legal Case) ou use **+ Enviar** na aba **Documentos** do hub.
+2. Preencha **Categoria**, **Status** e anexe o **Arquivo**.
+3. Opcional: **Versão / Revisão** e **Prazo relacionado** (do mesmo serviço).
+
+### Categorias disponíveis
+
+Petição, Procuração, Certidão, Decisão, Contrato, Acordo, Substabelecimento, Comprovante, Protocolo, Laudo, Outro — cadastro em **Document Category**.
+
+### Status e ciclo de vida
+
+`Rascunho` → `Assinado` → `Protocolado` → `Juntado` (ou `Substituído` quando houver nova versão).
+
+### Geração automática (.docx)
+
+No **Serviço**, use **Gerar Documentos** ou **Gerar .docx** na aba Documentos. O sistema gera o Word, anexa ao serviço e cria um **Case Document** com origem **Gerado pelo App** e categoria inferida do nome do template.
+
+### Onde localizar documentos
+
+- **Hub do Serviço** — aba Documentos, pill 📄 Documentos na barra de resumo
+- **Lista Case Document** — filtro por serviço ou cliente
+- **Busca global** — pelo título composto ou ID `DOC-YYYY-####`
+
+Documentação técnica: [case_documents.md](./case_documents.md)
+
+---
+
+## Navegação do Hub
+
+### Breadcrumb
+
+Ao abrir um registro satélite (prazo, documento, audiência, etc.) a partir do serviço, o topo do formulário exibe: **Serviço → Tipo de documento → Registro atual**.
+
+### Voltar ao Serviço
+
+Botão primário **Voltar ao Serviço** retorna ao Legal Case de origem.
+
+### Abas e contagens
+
+A barra de resumo no serviço mostra pills com contagem (audiências, prazos, documentos, …). Clique na pill para abrir a lista filtrada; use **+** para criar um novo registro.
+
+Ao voltar de um satélite aberto pelo hub, a **mesma aba** (ex.: Documentos) é restaurada.
+
+Documentação técnica: [hub_navigation.md](./hub_navigation.md)
 
 ---
 

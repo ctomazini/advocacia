@@ -18,7 +18,10 @@ DOCTYPE_ORDER = [
 		["Hearing", "Deadline", "Legal Task", "Case Communication"],
 	),
 	("Registro de Atividades", ["Service Record", "Time Entry"]),
-	("Documentos", ["Document Template", "Document Kit"]),
+	(
+		"Documentos",
+		["Document Category", "Case Document", "Document Template", "Document Kit"],
+	),
 	("Configuração", ["Office Settings"]),
 ]
 
@@ -50,6 +53,14 @@ DOCTYPE_DESCRIPTIONS = {
 	"Court Branch": "Unidade judicial dentro de uma comarca.",
 	"Court": "Court de justiça competente (ex.: TJRS, TRF4).",
 	"Case Phase": "Fase do processo no fluxo (Distribuído, Sentenciado, etc.).",
+	"Document Category": (
+		"Categoria documental rígida (Petição, Procuração, Contrato, etc.). "
+		"Usada para organizar **Case Document** e relatórios."
+	),
+	"Case Document": (
+		"Arquivo do processo vinculado a um **Serviço**. Pode ser enviado manualmente "
+		"ou criado automaticamente ao gerar documentos Word."
+	),
 	"Document Template": (
 		"Modelo .docx com placeholders para geração automática. "
 		"Use o botão **Ver Placeholders Disponíveis** para a lista completa."
@@ -116,6 +127,66 @@ def _auto_describe(field: dict) -> str:
 	if fetch_from:
 		return f"Preenchido automaticamente a partir de `{fetch_from}`."
 	return ""
+
+
+def _render_case_documents_and_hub_guides() -> list[str]:
+	return [
+		"## Gestão de Documentos do Processo",
+		"",
+		"### Upload manual",
+		"",
+		"1. Abra o **Serviço** (Legal Case) ou use **+ Enviar** na aba **Documentos** do hub.",
+		"2. Preencha **Categoria**, **Status** e anexe o **Arquivo**.",
+		"3. Opcional: **Versão / Revisão** e **Prazo relacionado** (do mesmo serviço).",
+		"",
+		"### Categorias disponíveis",
+		"",
+		"Petição, Procuração, Certidão, Decisão, Contrato, Acordo, Substabelecimento, "
+		"Comprovante, Protocolo, Laudo, Outro — cadastro em **Document Category**.",
+		"",
+		"### Status e ciclo de vida",
+		"",
+		"`Rascunho` → `Assinado` → `Protocolado` → `Juntado` (ou `Substituído` quando houver nova versão).",
+		"",
+		"### Geração automática (.docx)",
+		"",
+		"No **Serviço**, use **Gerar Documentos** ou **Gerar .docx** na aba Documentos. "
+		"O sistema gera o Word, anexa ao serviço e cria um **Case Document** com origem "
+		"**Gerado pelo App** e categoria inferida do nome do template.",
+		"",
+		"### Onde localizar documentos",
+		"",
+		"- **Hub do Serviço** — aba Documentos, pill 📄 Documentos na barra de resumo",
+		"- **Lista Case Document** — filtro por serviço ou cliente",
+		"- **Busca global** — pelo título composto ou ID `DOC-YYYY-####`",
+		"",
+		"Documentação técnica: [case_documents.md](./case_documents.md)",
+		"",
+		"---",
+		"",
+		"## Navegação do Hub",
+		"",
+		"### Breadcrumb",
+		"",
+		"Ao abrir um registro satélite (prazo, documento, audiência, etc.) a partir do serviço, "
+		"o topo do formulário exibe: **Serviço → Tipo de documento → Registro atual**.",
+		"",
+		"### Voltar ao Serviço",
+		"",
+		"Botão primário **Voltar ao Serviço** retorna ao Legal Case de origem.",
+		"",
+		"### Abas e contagens",
+		"",
+		"A barra de resumo no serviço mostra pills com contagem (audiências, prazos, documentos, …). "
+		"Clique na pill para abrir a lista filtrada; use **+** para criar um novo registro.",
+		"",
+		"Ao voltar de um satélite aberto pelo hub, a **mesma aba** (ex.: Documentos) é restaurada.",
+		"",
+		"Documentação técnica: [hub_navigation.md](./hub_navigation.md)",
+		"",
+		"---",
+		"",
+	]
 
 
 def _load_field_descriptions() -> dict[str, dict[str, str]]:
@@ -212,6 +283,7 @@ def generate():
 		if section_title == "Documentos":
 			lines.extend(_render_placeholders_section())
 
+	lines.extend(_render_case_documents_and_hub_guides())
 	lines.extend(
 		[
 			"## Fluxos Comuns",
