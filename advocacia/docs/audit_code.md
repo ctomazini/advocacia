@@ -10,7 +10,7 @@
 | Item | Status | Detalhes |
 |---|---|---|
 | DocTypes `custom: 0` | 🟢 OK | 24/24 JSONs declaram `"custom": 0`, módulo `Advocacia`. |
-| DocType names PT congelados | 🟢 OK | Brownfield — nomes em português não renomeados (ex.: `Legal Case`, `Fee Agreement`). |
+| DocType names PT congelados | 🟢 OK | **Supersedido v1.0.0** — DocTypes EN (`Legal Case`, `Fee Agreement`, …); labels PT |
 | Fieldnames `snake_case` | 🟢 OK | Maioria em PT/EN misto funcional (`cliente`, `servico`, `data_vencimento`). Labels UI em português. |
 | Zero Server/Client Script no banco | 🟢 OK | Lógica em controllers Python; fixtures exportam Workspace, Notification, Custom Field em `Event`. |
 | naming + autoname + title + search | 🟢 OK | Transacionais: `format:PREFIX-{YYYY}-{####}` + `title_field: title` + `show_title_field_in_link: 1`. |

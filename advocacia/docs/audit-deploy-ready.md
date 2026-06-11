@@ -29,6 +29,7 @@
 | Item histórico | Status jun/2026 |
 | --- | --- |
 | DocTypes em português (`Servico`, `Audiencia`, …) | ✅ **Resolvido** — v1.0.0 renomeou 24 DocTypes para EN |
+| Política «PT congelado» em REGRAS/Cursor | ✅ **Alinhada jun/2026** — tratar como EN funcional + labels PT + fieldnames majoritariamente EN |
 | Server Scripts / Client Scripts no banco | ✅ **Zero** em `advocacia.local` |
 | `custom: 1` em DocTypes do app | ✅ **Zero** |
 | `frappe.db.commit()` em handlers de request/scheduler | ✅ **Removido** de `documentos`, `painel`, `financeiro`, `tasks`, `notificacoes` |

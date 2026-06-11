@@ -9,9 +9,9 @@ alwaysApply: true
 
 1. **ENGENHARIA READ-ONLY**: NUNCA modificar NENHUM arquivo em `apps/engenharia/`. Nenhum. Zero. Se precisar referenciar, apenas LEIA.
 
-2. **DocType names PT CONGELADOS**: NUNCA renomear DocTypes. Os 24 nomes em português são definitivos.
+2. **DocType names (EN, v1.0.0+):** NUNCA renomear DocTypes (`Legal Case`, `Client`, …) sem patch de migração, `bench migrate` e suíte de testes verde. Labels UI permanecem em português.
 
-3. **Sem Server Script / Client Script no banco**: Toda lógica vive em controllers Python + JS físicos no app.
+3. **Nomenclatura funcional:** DocTypes e pastas em **inglês**; labels e `_()` em **português**; `fieldname` majoritariamente **inglês** (mapa em `patches/v16_0/rename_fields_pt_en.py`). Toda lógica vive em controllers Python + JS físicos no app.
 
 4. **Sem `frappe.db.commit()`** em handlers, whitelisted, doc_events, schedulers. Exceção: setup/patches/seed com comentário.
 

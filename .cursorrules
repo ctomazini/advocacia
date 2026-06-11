@@ -4,130 +4,64 @@
 - Frappe v16.19.0 (nativo, sem Docker)
 - Bench: /home/frappe/frappe-bench
 - Site: advocacia.local (porta 8000)
-- User OS: frappe
 - App path: /home/frappe/frappe-bench/apps/advocacia/advocacia/
 
-## Estrutura do App
+## Nomenclatura (v1.0.0+)
+- **DocTypes:** inglês Title Case (`Legal Case`, `Client`, `Fee Agreement`, …)
+- **Fieldnames:** snake_case, preferencialmente inglês (`legal_case`, `client`, `opening_date`, …)
+- **Labels UI:** português brasileiro
+- **Hub:** `Legal Case` (não usar nomes legados PT em código ou paths)
 
-advocacia/                          # repo root
-├── pyproject.toml
-├── advocacia/                      # Python package
-│   ├── hooks.py                    # Hooks principal
-│   ├── modules.txt
-│   ├── patches.txt
-│   ├── advocacia/                  # Módulo "Advocacia"
-│   │   ├── doctype/                # DocTypes (json + py + js)
-│   │   │   ├── servico/
-│   │   │   ├── acordo_de_honorarios_processuais/
-│   │   │   ├── parcela_de_honorarios/
-│   │   │   ├── ato_advocaticio/
-│   │   │   ├── registro_de_atos/
-│   │   │   ├── audiencia/
-│   │   │   ├── controle_de_prazos/
-│   │   │   ├── template_documento/
-│   │   │   ├── comarca/            # Auxiliar: cadastro rígido
-│   │   │   ├── vara/               # Auxiliar: cadastro rígido
-│   │   │   ├── tribunal/           # Auxiliar: cadastro rígido
-│   │   │   └── fase_processual/    # Auxiliar: cadastro rígido
-│   │   ├── page/
-│   │   │   └── painel/             # Page custom (painel.js + painel.json)
-│   │   ├── workspace/
-│   │   │   └── advocacia/          # Workspace JSON
-│   │   ├── painel_api.py           # API whitelisted do painel
-│   │   ├── documentos.py           # Gerador docx
-│   │   └── notificacoes.py         # Scheduler prazos
-│   ├── fixtures/                   # Custom Fields, Server Scripts exportados
-│   └── public/
-│       └── js/                     # JS global (app_include_js)
+## Estrutura do App (resumo)
 
-## Arquitetura de Dados
+advocacia/
+├── advocacia/advocacia/doctype/     # 24 DocTypes EN
+├── advocacia/advocacia/painel/       # Backend painel modular
+├── advocacia/public/js/painel/       # Frontend painel
+├── advocacia/advocacia/page/painel/  # Page custom
+├── advocacia/advocacia/documentos.py
+├── advocacia/public/js/case_hub.js
+└── advocacia/advocacia/case_hub.py
 
-### DocTypes Principais
-- Servico: hub central (processo judicial, consultoria)
-- Acordo de Honorarios Processuais: contrato de honorários
-- Parcela de Honorarios: tabela filha do Acordo
-- Ato Advocaticio: tabela filha do Registro de Atos
-- Registro de Atos: atos acumulados para cobrança
-- Audiencia: agenda de audiências
-- Controle de Prazos: prazos processuais
-- Template Documento: templates .docx com placeholders
+## Arquitetura de Dados (hub)
 
-### DocTypes Auxiliares (cadastro rígido)
-Estes DocTypes existem para garantir consistência — NUNCA usar texto livre para estes dados:
-- Comarca: name (autoname), uf (Select 27 UFs), cidade (Data)
-- Vara: name (autoname), comarca (Link → Comarca), tipo (Select: Cível, Criminal, Família, Trabalho, Federal, Juizado Especial)
-- Tribunal: name (autoname), sigla (Data, ex: TJRS), esfera (Select: Estadual, Federal, Trabalho, Superior, Militar)
-- Fase Processual: name (autoname), ordem (Int para ordenação no fluxo)
+### DocTypes principais
+- **Legal Case:** hub central (processo / consultoria)
+- **Fee Agreement**, **Fee Installment**, **Legal Payment**
+- **Deadline**, **Hearing**, **Legal Task**, **Case Communication**
+- **Document Template**, **Document Kit** — geração Word (docxtpl)
+- **Service Record** — registro de atos (ATOS-)
 
-### Campos que DEVEM ser Link (nunca texto livre)
-- Comarca → Link para DocType Comarca
-- Vara → Link para DocType Vara
-- Tribunal → Link para DocType Tribunal
-- Fase processual → Link para DocType Fase Processual
-- Cliente → Link para Customer (nativo ERPNext)
-- Serviço → Link para DocType Servico
+### Cadastros auxiliares
+- **Jurisdiction**, **Court**, **Court Branch**, **Case Phase**
+- **Client**, **Client Address**, **Client Contact**
 
-### Campos que DEVEM ser Select (opções fixas, finitas)
-- UF/Estado: AC,AL,AM,AP,BA,CE,DF,ES,GO,MA,MG,MS,MT,PA,PB,PE,PI,PR,RJ,RN,RO,RR,RS,SC,SE,SP,TO
-- Modalidade de audiência: Presencial, Virtual, Híbrida
-- Status: usar opções finitas por DocType
-- Prioridade: Baixa, Média, Alta, Urgente
-- Tipo de honorário: Percentual, Fixo, Misto, Sucumbência
-
-### Regra de ouro para novos campos
-Ao encontrar campo Data ou Small Text que armazena dado repetitivo (mesmo valor aparece em múltiplos registros), DEVE sugerir migração para Link field com DocType auxiliar. Texto livre só para dados verdadeiramente únicos (observações, descrições, notas).
+### Campos Link (nunca texto livre repetitivo)
+- comarca / vara / tribunal → cadastros auxiliares
+- Satélites → `legal_case` (Link → Legal Case)
 
 ## Convenções OBRIGATÓRIAS
 
 ### Nomenclatura
-- Campos (fieldname), variáveis, funções: inglês, snake_case
-- Classes Python: inglês, CamelCase
-- Labels na UI: português brasileiro
-- Nomes de DocType: podem ser em português (já existentes)
+- DocType names: **inglês** (definitivos desde v1.0.0)
+- fieldname / variáveis / funções: **inglês**, snake_case
+- Labels: **português**
 
-### Backend (Python)
-- Campos de ID (CPF, CNPJ, OAB, CNJ, telefones): salvar APENAS dígitos puros no banco
-- Emails: .lower() antes de salvar
-- Validações pesadas no .py do DocType com frappe.throw()
-- CPF/CNPJ: calcular dígitos verificadores reais (Receita Federal)
-- CNJ: validar Módulo 97 Base 10 (Resolução 65/2008)
-- Telefones: validar DDD + regras ANATEL
-- Cronologia: Data Fato <= Distribuição <= Intimação < Prazo Fatal
-- Nunca alterar core do Frappe/ERPNext — usar Custom Fields ou Hooks
-- Exportar fixtures: bench export-fixtures --app advocacia
+### Backend / Frontend
+- Ver `REGRAS_ADVOCACIA.md` e `.cursor/rules/advocacia-predeploy.mdc`
+- ENGINHARIA: read-only em `apps/engenharia/`
 
-### Frontend (JavaScript)
-- JS exclusivamente para UX: máscaras, show/hide de campos
-- Máscaras com jquery.inputmask no evento refresh:
-  - CNJ: 9999999-99.9999.9.99.9999
-  - CPF: 999.999.999-99
-  - CNPJ: 99.999.999/9999-99
-  - Celular: (99) 99999-9999
-  - Fixo: (99) 9999-9999
+## Cross-pollination (engenharia)
+- Plano e prompt: `advocacia/docs/CROSS_POLLINATION_ENGENHARIA.md`
+- Referência funcional: app `engenharia` (Construction Project hub, Project Document, eng_hub_nav, …)
 
 ## Comandos Bench
 
-bench --site advocacia.local migrate           # após mudar DocType JSON
-bench --site advocacia.local clear-cache        # após mudar JS/CSS
-bench build --app advocacia                     # rebuild assets JS/CSS
-bench restart                                   # reiniciar workers
-bench --site advocacia.local console            # shell Python interativo
-bench export-fixtures --app advocacia           # exportar fixtures pro Git
+bench --site advocacia.local migrate
+bench --site advocacia.local clear-cache
+bench build --app advocacia
+bench --site advocacia.local run-tests --app advocacia
 
 ## Git
-- Branch: frappe-v16
-- Remote: git@github.com:ctomazini/advocacia.git
-- Convenção: Conventional Commits (feat:, fix:, refactor:, chore:)
-- Sempre exportar fixtures ANTES de commitar
-
-## Regras para o Agent
-1. Ao editar DocType JSON: rodar bench migrate depois
-2. Ao editar JS de DocType: rodar bench clear-cache depois
-3. Ao editar JS público (public/js/): rodar bench build --app advocacia depois
-4. Ao criar novo DocType: criar pasta com __init__.py, JSON e .py mínimo
-5. Nunca criar arquivos fora de /home/frappe/frappe-bench/apps/advocacia/
-6. Para testar Python: bench --site advocacia.local console e importar módulo
-7. Antes de alterações destrutivas: avisar para fazer Snapshot no Proxmox
-8. Ao encontrar campo de texto que armazena dado repetitivo: sugerir Link field + DocType auxiliar
-9. Ao criar DocType auxiliar: incluir na seção "DocTypes Auxiliares" deste arquivo
-10. Todo DocType novo deve ter autoname, module = Advocacia, custom = 0
+- Conventional Commits
+- Branch: main

@@ -10,6 +10,7 @@
 | --- | --- | --- |
 | Operador do escritório | [manual_usuario.md](./manual_usuario.md) | Fluxos, campos, painel, placeholders, listas |
 | Desenvolvedor / deploy | [REGRAS_ADVOCACIA.md](../../REGRAS_ADVOCACIA.md) | Checklist normativo pré-deploy |
+| Cross-pollination engenharia | [CROSS_POLLINATION_ENGENHARIA.md](./CROSS_POLLINATION_ENGENHARIA.md) | Plano e prompt Agent para port de features |
 | Inventário técnico | [CODEBASE.md](../../CODEBASE.md) | DocTypes, hooks, API, árvore de arquivos |
 | Instalação rápida | [README.md](../../README.md) | Bench, testes, seed-demo, E2E |
 

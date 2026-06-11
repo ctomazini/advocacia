@@ -1,7 +1,9 @@
 # REGRAS_ADVOCACIA.md
 
-**App:** `advocacia` · **Frappe v16** (sem ERPNext) · **Versão:** 0.7.0 · **Data:** 2026-06-07  
+**App:** `advocacia` · **Frappe v16** (sem ERPNext) · **Versão:** 0.7.1 · **Data:** 2026-06-11  
 **Branch:** `main` · **Objetivo:** checklist operacional fechado para deploy.
+
+> **Nomenclatura (desde v1.0.0, jun/2026):** DocTypes em **inglês** Title Case (`Legal Case`, `Client`, …); **labels** e mensagens UI em **português**; **`fieldname`** em `snake_case` **majoritariamente inglês** (patches `rename_fields_pt_en.py` — resíduos PT cosméticos documentados em auditorias). **Não** renomear DocTypes sem patch + migrate + testes.
 
 > `ENGENHARIA_STANDARDS.md` governa o app **engenharia**, não este repositório.
 
@@ -12,10 +14,10 @@
 | Decisão | Regra |
 | --- | --- |
 | DocTypes | 24, todos `custom: 0`, módulo `Advocacia` |
-| Nomes DocType | **Português congelado** — não renomear |
-| Fieldnames | `snake_case`; labels UI em português |
-| Hub | `Legal Case` — 9 satélites com campo `servico` |
-| Testes | 255 (`run-tests --app advocacia`) |
+| Nomes DocType | **Inglês** Title Case singular — definitivos desde **v1.0.0** (ex.: `Legal Case`, `Fee Agreement`) |
+| Fieldnames | `snake_case`, **preferencialmente inglês**; labels UI em português |
+| Hub | `Legal Case` — satélites com link `legal_case` (ou equivalente documentado) |
+| Testes | `bench --site advocacia.local run-tests --app advocacia` (ver `CODEBASE.md` / auditorias para contagem vigente) |
 
 ---
 
@@ -206,7 +208,7 @@ npm test
 
 ## 10. Proibido
 
-- Renomear DocTypes para inglês
+- Renomear DocTypes ou `fieldname` **sem** patch idempotente + `migrate` + testes verdes
 - Usar `ENGENHARIA_STANDARDS.md` como norma deste app
 - `commit()` em hooks de sync ou API
 - Texto livre para cadastros rígidos (comarca/vara/tribunal)

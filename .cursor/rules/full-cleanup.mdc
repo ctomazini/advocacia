@@ -12,6 +12,6 @@ alwaysApply: true
 3. **Sem `frappe.db.commit()`** em handlers/whitelisted/doc_events/schedulers.
 4. **Sem `ignore_permissions=True`** sem comentário justificativo.
 5. **Sem N+1**: get_doc/get_value em loop proibido.
-6. **Labels PT**: Labels UI e mensagens `_()` permanecem em português. Só nomes internos (DocType, fieldname, pasta, classe) migram para EN.
+6. **Labels PT**: Labels UI e mensagens `_()` permanecem em português. DocTypes e fieldnames internos estão em **inglês** desde v1.0.0 (brownfield migrado — ver `REGRAS_ADVOCACIA.md` §1).
 7. **Testes**: Cada fase termina com `bench --site advocacia.local run-tests --app advocacia`.
 8. **Commits**: Conventional Commits, um por fase.
