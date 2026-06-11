@@ -45,9 +45,9 @@ Renderizado no `<ul class="navbar-breadcrumbs">` do formulário ativo (patch de 
 
 Cadeia típica em satélite:
 
-`Home → Workspace → {Título do serviço} → {DocType} → {Registro}`
+`Home → Workspace → {ID serviço} → {DocType} → {ID documento}`
 
-- Crumb do serviço usa o **título** composto do Legal Case (não só o ID).
+- Crumbs do serviço e do registro usam **somente o ID** (`SERV-…`, `DOC-…`), não o título composto.
 - Formulário do próprio Legal Case não exibe crumb duplicado do serviço.
 
 ### Voltar ao Serviço
@@ -75,9 +75,9 @@ Abas conhecidas no Legal Case:
 | --- | --- |
 | `tab_details` | Dados gerais |
 | `tab_progress` | Fases e audiências |
-| `tab_financial` | Financeiro |
+| `tab_financial` | Financeiro (honorários, cobranças, KPIs) |
 | `tab_deadlines` | Prazos e tarefas |
-| `tab_records` | Atos e horas |
+| `tab_records` | Cobranças de serviços e registro de horas |
 | `tab_documents` | Documentos e kits |
 
 Default se nenhuma aba detectada: `tab_details`.
@@ -106,6 +106,19 @@ Objeto exposto: `window.adv_case_nav` (`VERSION`, `HUB_CONTEXT_KEY`, `SATELLITE_
 - Criação de audiências, prazos, documentos, etc.
 
 Assim, ao abrir um Case Document pela aba Documentos e voltar, o serviço reabre em **tab_documents**.
+
+### Aba Financeiro (`tab_financial`)
+
+KPIs e listas carregados por `case_hub.py` / `case_hub.js`:
+
+| Elemento | Significado |
+| --- | --- |
+| Honorários contratados | Valor do **Fee Agreement** do serviço |
+| Parcelas pendentes | Pagamentos de honorários ainda não recebidos |
+| A faturar (serviços) | Itens em **Service Record** ainda não sincronizados |
+| Cobranças de serviços em aberto | Cobranças com pagamento emitido e saldo pendente |
+
+Guia operador: seção *Honorários vs Cobrança de serviços* em [manual_usuario.md](./manual_usuario.md).
 
 ---
 

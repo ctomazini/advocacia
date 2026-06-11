@@ -139,6 +139,18 @@
   {
    "child": 1,
    "collapsible": 0,
+   "icon": "file-text",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Documentos do Processo",
+   "link_to": "Case Document",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 1,
+   "collapsible": 0,
    "icon": "circle-dollar-sign",
    "indent": 0,
    "keep_closed": 0,
@@ -357,6 +369,18 @@
    "keep_closed": 0,
    "label": "Fase Processual",
    "link_to": "Case Phase",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 1,
+   "collapsible": 0,
+   "icon": "tags",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Categoria de Documento",
+   "link_to": "Document Category",
    "link_type": "DocType",
    "show_arrow": 0,
    "type": "Link"

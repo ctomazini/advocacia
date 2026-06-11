@@ -9,7 +9,7 @@
 
 O sistema **Advocacia** centraliza clientes, processos, audiências, prazos, honorários, pagamentos e documentos para escritórios de advocacia brasileiros.
 
-O **Serviço** funciona como hub: audiências, prazos, pagamentos e atos orbitam um serviço.
+O **Serviço** funciona como hub: audiências, prazos, honorários, cobranças de serviços e documentos orbitam um serviço.
 
 ### Painel
 
@@ -145,7 +145,7 @@ O **Serviço** é o DocType central (hub) do sistema. Representa um processo jud
 
 ### Fee Agreement
 
-Define honorários contratados com o cliente, parcelas e vencimentos. O sistema sincroniza parcelas com registros de Legal Payment.
+Contrato de **honorários** do caso: valor contratado, modo (Diretos ou Divisão advogada/cliente), parcelas e vencimentos. Ao salvar, sincroniza **Pagamentos**.
 
 **Código automático:** `format:ACOR-{YYYY}-{####}`
 
@@ -182,7 +182,7 @@ Define honorários contratados com o cliente, parcelas e vencimentos. O sistema 
 
 ### Legal Payment
 
-Registro operacional de recebimento. Diferente da Parcela (contratual), registra o dinheiro que efetivamente entrou no escritório.
+Registro de recebimento no caixa do escritório. Origem: parcela de **Honorários** ou **Cobrança de serviços**. Honorários vêm da sync automática; serviços, da cobrança manual.
 
 **Código automático:** `format:PAG-{YYYY}-{####}`
 
@@ -353,6 +353,8 @@ Prazos processuais com data fatal. Notificações automáticas usam `notificatio
 ## Cobrança e produtividade
 
 ### Service Record
+
+**Cobrança de serviços** — itens avulsos a faturar (consulta, petição, diligência). Use **Sincronizar cobrança** para emitir pagamento total ou parcial.
 
 **Código automático:** `format:ATOS-{YYYY}-{####}`
 
@@ -653,17 +655,54 @@ Documentação técnica: [hub_navigation.md](./hub_navigation.md)
 
 ---
 
+## Honorários vs Cobrança de serviços
+
+| Conceito | Onde cadastrar | Quando usar |
+| --- | --- | --- |
+| **Honorários** (contrato parcelado) | **Honorários** (`Fee Agreement`) | Valor fechado do caso com parcelas programadas |
+| **Cobrança de serviços** (itens avulsos) | **Cobrança de serviços** (`Service Record`) | Cobrar consultas, petições, diligências por evento |
+| **Registro de horas** | **Time Entry** | Produtividade interna; não gera pagamento automaticamente |
+| **Caixa unificado** | **Pagamentos** (`Legal Payment`) | Todo recebimento (honorários ou serviços) |
+
+### Modo Divisão advogada/cliente
+
+Dentro de **Honorários**, o modo **Divisão advogada/cliente** reparte o valor entre advogada e cliente (ex.: sucumbência). Continua sendo honorários contratuais — não confundir com Cobrança de serviços.
+
+### Cobrança parcial de serviços
+
+1. Abra **Cobrança de serviços** e cadastre **Itens cobráveis** com valor.
+2. Clique **Sincronizar cobrança**.
+3. Marque os itens desejados e informe **Valor a cobrar** (pode ser menor que o total).
+4. O sistema aloca na ordem da lista; se o valor for menor que um item, divide automaticamente.
+
+Exemplo: R$ 10.000 em um item → cobrar R$ 7.000 agora deixa R$ 3.000 pendente na mesma cobrança.
+
+### Hub financeiro (aba Financeiro do Serviço)
+
+- **Honorários contratados** — valor do contrato de honorários
+- **Parcelas pendentes** — pagamentos de honorários ainda não recebidos
+- **A faturar (serviços)** — itens em cobrança de serviços ainda não sincronizados
+- Lista **Cobranças de serviços em aberto** — atalho para faturar
+
+---
+
 ## Fluxos Comuns
 
 ### Novo Processo
 1. Cadastre o **Client**
 2. Crie um **Serviço** com vara, comarca e tribunal
-3. Defina **Honorários** com parcelas
+3. Defina **Honorários** com parcelas (contrato do caso)
 4. Cadastre **Audiências** e **Prazos**
 
+### Cobrança avulsa de serviços
+1. Crie **Cobrança de serviços** vinculada ao serviço
+2. Adicione **Itens cobráveis** com valor
+3. **Sincronizar cobrança** — selecione itens e valor parcial se necessário
+4. Registre recebimento em **Pagamentos** quando o cliente pagar
+
 ### Recebimento
-1. Registre **Legal Payment** quando o cliente pagar
-2. O painel atualiza KPIs financeiros
+1. Marque **Pagamentos** como recebido (honorários ou cobrança de serviços)
+2. O painel e o hub financeiro atualizam os KPIs
 
 ---
 
