@@ -1,3 +1,5 @@
+import json
+
 import frappe
 from frappe import _
 from frappe.utils import add_days, cstr, flt, getdate, now_datetime, today
@@ -402,49 +404,70 @@ def bulk_delete_pagamentos(names: str | list) -> dict:
 
 
 @frappe.whitelist()
-def gerar_pagamento_atos(registro_name: str, due_date: str | None = None) -> dict:
-	"""Sincroniza atos pendentes com o Legal Payment aberto do registro (idempotente)."""
+def gerar_pagamento_atos(
+	registro_name: str,
+	due_date: str | None = None,
+	act_names: list[str] | str | None = None,
+	billing_amount: float | str | None = None,
+) -> dict:
+	"""Sincroniza itens pendentes com o Legal Payment aberto do registro (idempotente)."""
 	frappe.has_permission("Service Record", "write", doc=registro_name, throw=True)
-	return sincronizar_pagamento_atos(registro_name, due_date)
+	return sincronizar_pagamento_atos(registro_name, due_date, act_names, billing_amount)
 
 
 @frappe.whitelist()
-def sincronizar_pagamento_atos(registro_name: str, due_date: str | None = None) -> dict:
-	"""Upsert: atualiza Legal Payment Atos aberto ou cria um novo lote fechado."""
+def sincronizar_pagamento_atos(
+	registro_name: str,
+	due_date: str | None = None,
+	act_names: list[str] | str | None = None,
+	billing_amount: float | str | None = None,
+) -> dict:
+	"""Upsert: atualiza Legal Payment aberto ou cria lote; suporta seleção parcial e valor parcial."""
 	frappe.has_permission("Service Record", "write", throw=True)
+
+	act_names = _normalize_act_names(act_names)
+	billing_amount = _normalize_billing_amount(billing_amount)
 
 	registro = frappe.get_doc("Service Record", registro_name)
 	vencimento = getdate(due_date or registro.billing_due_date or add_days(today(), 30))
 
 	pagamento_aberto = _get_pagamento_atos_aberto(registro.name)
 	criado = False
+	incluidos = []
 
 	if pagamento_aberto:
 		pagamento = frappe.get_doc("Legal Payment", pagamento_aberto)
-		incluidos, novos = _classificar_atos_para_sync(registro, pagamento.name)
-		if not novos and not incluidos:
-			frappe.throw(_("Não há atos para sincronizar na cobrança."))
-		atos_faturados = incluidos + novos
-	else:
-		novos = [
-			ato
-			for ato in registro.acts or []
-			if ato.status == "Pendente" and flt(ato.amount) > 0
-		]
-		if not novos:
-			frappe.throw(_("Não há atos pendentes para cobrar."))
-		atos_faturados = novos
-		pagamento = None
-
-	total = sum(flt(ato.amount) for ato in atos_faturados)
-	observacoes = _montar_observacoes_atos(atos_faturados)
-
-	if pagamento:
 		if pagamento.status not in ("Pendente", "Vencido"):
 			frappe.throw(
 				_("Legal Payment {0} não está aberto para sincronização.").format(pagamento.name)
 			)
-		pagamento.amount = total
+		incluidos, _pendentes_abertos = _classificar_atos_para_sync(registro, pagamento.name)
+	else:
+		pagamento = None
+
+	candidatos = _pendentes_elegiveis(registro, act_names)
+	if not candidatos:
+		frappe.throw(_("Não há itens pendentes selecionados para cobrar."))
+
+	max_cobranca = sum(flt(row.amount) for row in candidatos)
+	if billing_amount is None:
+		billing_amount = max_cobranca
+	elif billing_amount <= 0:
+		frappe.throw(_("Informe um valor a cobrar maior que zero."))
+	elif billing_amount - max_cobranca > 0.009:
+		frappe.throw(
+			_("Valor a cobrar ({0}) excede o total dos itens selecionados ({1}).").format(
+				frappe.format_value(billing_amount, {"fieldtype": "Currency"}),
+				frappe.format_value(max_cobranca, {"fieldtype": "Currency"}),
+			)
+		)
+
+	allocations = _alocar_valor_cobranca(candidatos, billing_amount)
+	total_pagamento = sum(flt(row.amount) for row in incluidos) + billing_amount
+
+	if pagamento:
+		observacoes = _montar_observacoes_alocacao(incluidos, allocations)
+		pagamento.amount = total_pagamento
 		pagamento.remarks = observacoes
 		pagamento.due_date = vencimento
 		pagamento.synced_at = now_datetime()
@@ -452,6 +475,7 @@ def sincronizar_pagamento_atos(registro_name: str, due_date: str | None = None) 
 	else:
 		criado = True
 		origem_id = _gerar_parcela_origem_id_atos(registro.name)
+		observacoes = _montar_observacoes_alocacao([], allocations)
 		pagamento = frappe.get_doc(
 			{
 				"doctype": "Legal Payment",
@@ -460,8 +484,8 @@ def sincronizar_pagamento_atos(registro_name: str, due_date: str | None = None) 
 				"legal_case": registro.legal_case,
 				"client": registro.client,
 				"installment_origin_id": origem_id,
-				"description": _("Atos — {0}").format(registro.name)[:140],
-				"amount": total,
+				"description": _("Cobrança — {0}").format(registro.name)[:140],
+				"amount": total_pagamento,
 				"due_date": vencimento,
 				"status": "Pendente",
 				"remarks": observacoes,
@@ -469,9 +493,8 @@ def sincronizar_pagamento_atos(registro_name: str, due_date: str | None = None) 
 		)
 		pagamento.insert(ignore_permissions=True)
 
-	for ato in novos:
-		ato.status = "Cobrado"
-		ato.payment = pagamento.name
+	novos_faturados = _aplicar_cobranca_linhas(registro, allocations, pagamento.name)
+	atos_faturados = incluidos + novos_faturados
 
 	registro.last_payment = pagamento.name
 	registro._calcular_totais()
@@ -485,8 +508,13 @@ def sincronizar_pagamento_atos(registro_name: str, due_date: str | None = None) 
 
 	acao = "criado" if criado else "atualizado"
 	frappe.logger().info(
-		"Cobrança atos {0} {1}: pagamento {2}, {3} ato(s), R$ {4}".format(
-			registro.name, acao, pagamento.name, len(atos_faturados), total
+		"Cobrança atos {0} {1}: pagamento {2}, {3} item(ns), R$ {4} (lote R$ {5})".format(
+			registro.name,
+			acao,
+			pagamento.name,
+			len(atos_faturados),
+			total_pagamento,
+			billing_amount,
 		)
 	)
 
@@ -494,10 +522,113 @@ def sincronizar_pagamento_atos(registro_name: str, due_date: str | None = None) 
 		"success": True,
 		"criado": criado,
 		"payment": pagamento.name,
-		"total": total,
+		"total": total_pagamento,
+		"billing_amount": billing_amount,
 		"qtd_atos": len(atos_faturados),
-		"qtd_novos": len(novos),
+		"qtd_novos": len(novos_faturados),
 	}
+
+
+def _normalize_act_names(act_names):
+	if not act_names:
+		return None
+	if isinstance(act_names, str):
+		act_names = json.loads(act_names)
+	if not isinstance(act_names, (list, tuple)):
+		frappe.throw(_("Seleção de itens inválida."))
+	return [cstr(name) for name in act_names if name]
+
+
+def _normalize_billing_amount(billing_amount):
+	if billing_amount in (None, ""):
+		return None
+	return flt(billing_amount)
+
+
+def _pendentes_elegiveis(registro, act_names=None):
+	pending = [
+		row
+		for row in registro.acts or []
+		if row.status == "Pendente" and flt(row.amount) > 0
+	]
+	if act_names is None:
+		return pending
+
+	valid_names = {row.name for row in pending if row.name}
+	selected = set(act_names)
+	invalid = selected - valid_names
+	if invalid:
+		frappe.throw(_("Itens selecionados inválidos ou não estão pendentes."))
+
+	order = {name: idx for idx, name in enumerate(act_names)}
+	return sorted(
+		[row for row in pending if row.name in selected],
+		key=lambda row: order.get(row.name, 9999),
+	)
+
+
+def _alocar_valor_cobranca(rows, billing_amount):
+	remaining = flt(billing_amount)
+	allocations = []
+	for row in rows:
+		if remaining <= 0.009:
+			break
+		row_amount = flt(row.amount)
+		if row_amount <= 0:
+			continue
+		bill = min(row_amount, remaining)
+		allocations.append((row, bill))
+		remaining -= bill
+	if remaining > 0.009:
+		frappe.throw(_("Não foi possível alocar o valor informado nos itens selecionados."))
+	return allocations
+
+
+def _aplicar_cobranca_linhas(registro, allocations, pagamento_name):
+	faturados = []
+	for row, bill_amount in allocations:
+		row_amount = flt(row.amount)
+		if bill_amount >= row_amount - 0.009:
+			row.status = "Cobrado"
+			row.payment = pagamento_name
+			faturados.append(row)
+			continue
+
+		remainder = row_amount - bill_amount
+		row.amount = bill_amount
+		row.status = "Cobrado"
+		row.payment = pagamento_name
+		faturados.append(row)
+		registro.append(
+			"acts",
+			{
+				"act_date": row.act_date,
+				"type": row.type,
+				"description": row.description,
+				"amount": remainder,
+				"status": "Pendente",
+			},
+		)
+	return faturados
+
+
+def _montar_observacoes_alocacao(incluidos, allocations):
+	linhas = list(incluidos)
+	for row, bill_amount in allocations:
+		linhas.append(_LinhaObservacao(row, bill_amount))
+	return _montar_observacoes_atos(linhas)
+
+
+class _LinhaObservacao:
+	"""Adaptador para montar observações com valor parcial antes do split persistir."""
+
+	def __init__(self, row, amount):
+		self.type = row.type
+		self.description = row.description
+		self.amount = amount
+
+	def get(self, key, default=None):
+		return getattr(self, key, default)
 
 
 def _get_pagamento_atos_aberto(registro_name):

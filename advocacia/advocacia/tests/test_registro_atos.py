@@ -6,6 +6,7 @@ from frappe.utils import flt, today
 from advocacia.advocacia.financeiro import (
 	cancelar_cobranca_pagamento_atos,
 	gerar_pagamento_atos,
+	sincronizar_pagamento_atos,
 )
 from advocacia.advocacia.tests.test_setup import create_test_registro_atos, create_test_legal_case
 
@@ -86,3 +87,68 @@ class TestRegistroAtos(FrappeTestCase):
 					"acts": [{"type": "Inicial", "amount": 100}],
 				}
 			).insert(ignore_permissions=True)
+
+	def test_sync_parcial_por_valor_split(self):
+		registro = create_test_registro_atos(
+			atos=[
+				{
+					"act_date": today(),
+					"type": "Consulta",
+					"amount": 10000,
+					"description": "Honorários avulsos",
+				}
+			]
+		)
+		registro.reload()
+		act_name = registro.acts[0].name
+		result = sincronizar_pagamento_atos(
+			registro.name, act_names=[act_name], billing_amount=7000
+		)
+		self.assertEqual(flt(result["billing_amount"]), 7000)
+		pag = frappe.get_doc("Legal Payment", result["payment"])
+		self.assertEqual(flt(pag.amount), 7000)
+		registro.reload()
+		self.assertEqual(registro.status, "Parcialmente cobrado")
+		cobrado = [row for row in registro.acts if row.status == "Cobrado"]
+		pendente = [row for row in registro.acts if row.status == "Pendente"]
+		self.assertEqual(len(cobrado), 1)
+		self.assertEqual(flt(cobrado[0].amount), 7000)
+		self.assertEqual(len(pendente), 1)
+		self.assertEqual(flt(pendente[0].amount), 3000)
+
+	def test_sync_parcial_apenas_primeiro_item(self):
+		registro = create_test_registro_atos()
+		registro.reload()
+		first_name = registro.acts[0].name
+		result = sincronizar_pagamento_atos(registro.name, act_names=[first_name])
+		self.assertEqual(flt(result["billing_amount"]), 3000)
+		registro.reload()
+		self.assertEqual(registro.status, "Parcialmente cobrado")
+		self.assertEqual(
+			sum(flt(row.amount) for row in registro.acts if row.status == "Pendente"), 1500
+		)
+
+	def test_sync_resto_apos_parcial(self):
+		registro = create_test_registro_atos(
+			atos=[
+				{
+					"act_date": today(),
+					"type": "Consulta",
+					"amount": 10000,
+					"description": "Total",
+				}
+			]
+		)
+		registro.reload()
+		act_name = registro.acts[0].name
+		sincronizar_pagamento_atos(registro.name, act_names=[act_name], billing_amount=7000)
+		registro.reload()
+		pendente = next(row for row in registro.acts if row.status == "Pendente")
+		result = sincronizar_pagamento_atos(
+			registro.name, act_names=[pendente.name], billing_amount=3000
+		)
+		registro.reload()
+		self.assertEqual(registro.status, "Cobrado")
+		self.assertEqual(flt(result["billing_amount"]), 3000)
+		self.assertEqual(flt(result["total"]), 10000)
+		self.assertTrue(all(row.status == "Cobrado" for row in registro.acts))

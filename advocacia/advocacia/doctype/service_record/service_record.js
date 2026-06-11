@@ -90,59 +90,125 @@ function gerar_cobranca_atos(frm) {
 		return;
 	}
 	if (!frm.doc.acts || frm.doc.acts.length === 0) {
-		frappe.msgprint(__("Não há atos cadastrados."));
+		frappe.msgprint(__("Não há itens cadastrados."));
 		return;
 	}
-	var pendentes = [];
-	(frm.doc.acts || []).forEach(function (row) {
-		if (row.status === "Pendente" && (row.amount || 0) > 0) {
-			pendentes.push(row);
-		}
+
+	var pendentes = (frm.doc.acts || []).filter(function (row) {
+		return row.status === "Pendente" && (row.amount || 0) > 0 && row.name;
 	});
 	if (pendentes.length === 0) {
-		frappe.msgprint(__("Não há atos pendentes para cobrar."));
+		frappe.msgprint(__("Não há itens pendentes para cobrar."));
 		return;
 	}
-	var total = 0;
-	var descricao_itens = [];
-	pendentes.forEach(function (row) {
-		total += row.amount || 0;
-		descricao_itens.push(
-			(row.type || __("Ato")) +
-				": " +
-				(row.description || row.description || "") +
-				" (R$ " +
-				(row.amount || 0).toFixed(2) +
-				")"
-		);
-	});
 
 	var vencimento_default =
 		frm.doc.billing_due_date || frappe.datetime.add_days(frappe.datetime.get_today(), 30);
 
-	frappe.confirm(
-		"<strong>" +
-			__("Sincronizar cobrança com {0} ato(s) pendente(s)?", [pendentes.length]) +
-			"</strong><br><br>" +
-			descricao_itens.join("<br>") +
-			"<br><br><strong>" +
-			__("Total: R$ {0}", [total.toFixed(2)]) +
-			"</strong><br><small>" +
-			__(
-				"Atos novos entram no pagamento aberto existente. Um novo pagamento só é criado após receber ou cancelar o anterior."
-			) +
-			"</small>",
-		function () {
+	var rows_html = pendentes
+		.map(function (row) {
+			var desc = row.description || "";
+			return (
+				"<label style='display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;'>" +
+				"<input type='checkbox' class='act-sync-check' data-act-name='" +
+				frappe.utils.escape_html(row.name) +
+				"' data-act-amount='" +
+				(row.amount || 0) +
+				"' checked style='margin-top:3px'>" +
+				"<span><strong>" +
+				frappe.utils.escape_html(row.type || __("Item")) +
+				"</strong>" +
+				(desc ? " — " + frappe.utils.escape_html(desc) : "") +
+				"<br><span style='color:var(--text-muted)'>" +
+				format_currency(row.amount || 0) +
+				"</span></span></label>"
+			);
+		})
+		.join("");
+
+	var d = new frappe.ui.Dialog({
+		title: __("Sincronizar cobrança"),
+		fields: [
+			{
+				fieldtype: "HTML",
+				fieldname: "items_html",
+				options:
+					"<p style='margin-bottom:12px;color:var(--text-muted)'>" +
+					__(
+						"Selecione os itens e informe quanto cobrar agora. O valor é alocado na ordem da lista."
+					) +
+					"</p>" +
+					rows_html,
+			},
+			{
+				fieldtype: "Currency",
+				fieldname: "billing_amount",
+				label: __("Valor a cobrar"),
+				reqd: 1,
+				default: pendentes.reduce(function (sum, row) {
+					return sum + (row.amount || 0);
+				}, 0),
+			},
+			{
+				fieldtype: "Date",
+				fieldname: "due_date",
+				label: __("Vencimento"),
+				reqd: 1,
+				default: vencimento_default,
+			},
+			{
+				fieldtype: "Small Text",
+				fieldname: "sync_hint",
+				label: __("Observação"),
+				read_only: 1,
+				default: __(
+					"Itens novos entram no pagamento aberto existente. Um novo pagamento só é criado após receber ou cancelar o anterior."
+				),
+			},
+		],
+		primary_action_label: __("Sincronizar"),
+		primary_action: function (values) {
+			var selected = [];
+			var selected_total = 0;
+			d.$wrapper.find(".act-sync-check:checked").each(function () {
+				selected.push($(this).data("act-name"));
+				selected_total += flt($(this).data("act-amount"));
+			});
+
+			if (!selected.length) {
+				frappe.msgprint(__("Selecione ao menos um item pendente."));
+				return;
+			}
+
+			if (flt(values.billing_amount) <= 0) {
+				frappe.msgprint(__("Informe um valor a cobrar maior que zero."));
+				return;
+			}
+
+			if (flt(values.billing_amount) - selected_total > 0.009) {
+				frappe.msgprint(
+					__(
+						"Valor a cobrar ({0}) excede o total dos itens selecionados ({1}).",
+						[format_currency(values.billing_amount), format_currency(selected_total)]
+					)
+				);
+				return;
+			}
+
 			frappe.call({
 				method: "advocacia.advocacia.financeiro.sincronizar_pagamento_atos",
 				args: {
 					registro_name: frm.doc.name,
-					due_date: vencimento_default,
+					due_date: values.due_date,
+					act_names: selected,
+					billing_amount: values.billing_amount,
 				},
 				freeze: true,
 				freeze_message: __("Sincronizando cobrança..."),
 				callback: function (r) {
-					if (!r.message) return;
+					if (!r.message) {
+						return;
+					}
 					var msg = r.message;
 					var titulo = msg.criado ? __("Pagamento criado") : __("Pagamento atualizado");
 					frappe.msgprint({
@@ -152,15 +218,27 @@ function gerar_cobranca_atos(frm) {
 								? __("Pagamento {0} criado com sucesso.", [msg.payment])
 								: __("Pagamento {0} atualizado.", [msg.payment])) +
 							"<br>" +
-							__("Total: R$ {0} · {1} ato(s)", [
-								(msg.total || 0).toFixed(2),
-								msg.qtd_atos || 0,
+							__("Cobrado agora: {0} · Total do pagamento: {1}", [
+								format_currency(msg.billing_amount || 0),
+								format_currency(msg.total || 0),
 							]),
 						indicator: "green",
 					});
+					d.hide();
 					frm.reload_doc();
 				},
 			});
-		}
-	);
+		},
+	});
+
+	function atualizar_valor_selecionado() {
+		var total = 0;
+		d.$wrapper.find(".act-sync-check:checked").each(function () {
+			total += flt($(this).data("act-amount"));
+		});
+		d.set_value("billing_amount", total);
+	}
+
+	d.$wrapper.on("change", ".act-sync-check", atualizar_valor_selecionado);
+	d.show();
 }
