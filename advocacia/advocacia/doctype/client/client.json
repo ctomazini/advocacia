@@ -72,6 +72,22 @@
    "idx": 6
   },
   {
+   "fieldname": "birth_date",
+   "label": "Data de Nascimento",
+   "fieldtype": "Date",
+   "depends_on": "eval:doc.person_type=='Pessoa Física'",
+   "description": "Data de nascimento (pessoa física).",
+   "idx": 6
+  },
+  {
+   "fieldname": "rg_issuer",
+   "label": "Órgão Emissor do RG",
+   "fieldtype": "Data",
+   "depends_on": "eval:doc.person_type=='Pessoa Física'",
+   "description": "Ex.: SSP/RS, SJS/RS.",
+   "idx": 6
+  },
+  {
    "fieldname": "cnpj",
    "label": "CNPJ",
    "fieldtype": "Data",
@@ -308,6 +324,8 @@
   "col_break_1",
   "cpf",
   "rg",
+  "birth_date",
+  "rg_issuer",
   "cnpj",
   "sec_pf",
   "nationality",

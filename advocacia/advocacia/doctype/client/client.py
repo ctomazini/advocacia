@@ -22,6 +22,8 @@ class Client(Document):
 		else:
 			self.cpf = None
 			self.rg = None
+			self.birth_date = None
+			self.rg_issuer = None
 			self.marital_status = None
 			self.occupation = None
 			self.nationality = None

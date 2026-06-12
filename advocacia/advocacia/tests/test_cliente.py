@@ -126,3 +126,21 @@ class TestClient(FrappeTestCase):
 		self.assertEqual(cliente_a.client_name, cliente_b.client_name)
 		self.assertNotEqual(cliente_a.name, cliente_b.name)
 		self.assertNotEqual(cliente_a.cpf, cliente_b.cpf)
+
+	def test_birth_date_and_rg_issuer(self):
+		cliente_pf = create_test_client(
+			cpf=_gerar_cpf_valido(),
+			birth_date="1990-06-15",
+			rg_issuer="SSP/RS",
+		)
+		self.assertEqual(str(cliente_pf.birth_date), "1990-06-15")
+		self.assertEqual(cliente_pf.rg_issuer, "SSP/RS")
+
+		cliente_pj = create_test_client(
+			person_type="Pessoa Jurídica",
+			cnpj=_gerar_cnpj_valido(),
+			birth_date="1990-06-15",
+			rg_issuer="SSP/RS",
+		)
+		self.assertIsNone(cliente_pj.birth_date)
+		self.assertIsNone(cliente_pj.rg_issuer)
