@@ -58,9 +58,10 @@ def _gerar_cnj_valido():
 	return VALID_CNJ_DIGITS
 
 
-def _parcela_row(vencimento, valor_total, idx=1):
+def _parcela_row(vencimento, valor_total, idx=1, **kwargs):
 	return {
 		"doctype": "Fee Installment",
+		"payment_condition": "Data fixa",
 		"due_date": vencimento,
 		"total_amount": flt(valor_total),
 		"lawyer_amount": 0,
@@ -68,6 +69,7 @@ def _parcela_row(vencimento, valor_total, idx=1):
 		"contingency_amount": 0,
 		"status": "Pendente",
 		"description": f"Parcela {idx}",
+		**kwargs,
 	}
 
 

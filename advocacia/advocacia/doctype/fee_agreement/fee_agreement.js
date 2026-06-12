@@ -72,6 +72,12 @@ frappe.ui.form.on('Fee Agreement', {
 });
 
 frappe.ui.form.on('Fee Installment', {
+	payment_condition(frm, cdt, cdn) {
+		const row = locals[cdt][cdn];
+		if (row.payment_condition && row.payment_condition !== 'Data fixa') {
+			frappe.model.set_value(cdt, cdn, 'due_date', null);
+		}
+	},
     total_amount: function(frm, cdt, cdn) {
         if (!eh_direto(frm)) {
             return;
@@ -186,6 +192,7 @@ function controlar_grid_parcelas(frm) {
     grid.update_docfield_property('lawyer_amount', 'hidden', direto ? 1 : 0);
     grid.update_docfield_property('client_amount', 'hidden', direto ? 1 : 0);
     grid.update_docfield_property('contingency_amount', 'hidden', direto ? 1 : 0);
+    grid.update_docfield_property('payment_condition', 'hidden', 0);
     grid.update_docfield_property('payment', 'formatter', function(value) {
         if (!value) {
             return '';
@@ -340,6 +347,7 @@ function gerar_tabela_parcelas(frm) {
         for (var i = 0; i < parcelas; i++) {
             var dt = frappe.datetime.add_months(data_inicio, i);
             var row = frm.add_child('fee_installments');
+            row.payment_condition = 'Data fixa';
             row.due_date = dt;
             row.lawyer_amount = 0;
             row.client_amount = 0;
@@ -375,6 +383,7 @@ function gerar_tabela_parcelas(frm) {
         for (var i = 0; i < parcelas; i++) {
             var dt = frappe.datetime.add_months(data_inicio, i);
             var row = frm.add_child('fee_installments');
+            row.payment_condition = 'Data fixa';
             row.due_date = dt;
             row.lawyer_amount = parcela_adv;
             row.client_amount = parcela_cli;

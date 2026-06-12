@@ -33,7 +33,11 @@ class FeeAgreement(Document):
 			frappe.throw(_("Valor total do acordo deve ser maior que zero."))
 
 		if self.get("installment_count") and flt(self.installment_count) > 0:
-			if not self.first_installment_date:
+			parcelas_cfg = self.get("fee_installments") or []
+			has_fixed_date = any(
+				(row.payment_condition or "Data fixa") == "Data fixa" for row in parcelas_cfg
+			)
+			if has_fixed_date and not self.first_installment_date:
 				frappe.throw(_("Informe a data da primeira parcela."))
 			if total_acordo <= 0:
 				frappe.throw(_("Valor total do acordo deve ser maior que zero para gerar parcelas."))
@@ -89,6 +93,17 @@ class FeeAgreement(Document):
 		erros = []
 		data_primeira = getdate(self.first_installment_date) if self.first_installment_date else None
 
+		for p in parcelas:
+			condition = p.payment_condition or "Data fixa"
+			if condition == "Data fixa" and not p.due_date:
+				erros.append(
+					_("Parcela {0}: informe vencimento para condição Data fixa.").format(p.idx)
+				)
+			if data_primeira and p.due_date and getdate(p.due_date) < data_primeira:
+				erros.append(
+					_("Parcela {0}: vencimento anterior à data da primeira parcela.").format(p.idx)
+				)
+
 		if self._eh_direto():
 			total_parcelas = sum(flt(p.total_amount) for p in parcelas)
 			total_acordo = flt(self.total_agreement_value)
@@ -118,10 +133,6 @@ class FeeAgreement(Document):
 					)
 				if flt(p.client_amount) < 0:
 					erros.append(_("Parcela {0}: valor do cliente negativo.").format(p.idx))
-				if data_primeira and p.due_date and getdate(p.due_date) < data_primeira:
-					erros.append(
-						_("Parcela {0}: vencimento anterior à data da primeira parcela.").format(p.idx)
-					)
 				total_adv_tabela += flt(p.lawyer_amount)
 				total_cli_tabela += flt(p.client_amount)
 				total_suc_tabela += flt(p.get("contingency_amount"))

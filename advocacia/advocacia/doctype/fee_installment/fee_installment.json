@@ -85,6 +85,16 @@
  "links": [],
  "fields": [
   {
+   "default": "Data fixa",
+   "fieldname": "payment_condition",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Condição",
+   "options": "Data fixa\nNa conclusão\nNa sentença\nA definir",
+   "description": "Quando a parcela deve ser paga. Se não for 'Data fixa', o vencimento fica opcional.",
+   "idx": 1
+  },
+  {
    "name": "fnb7vt717s",
    "creation": "2026-05-24 21:08:55.542269",
    "modified": "2026-05-26 18:10:18.683204",
@@ -108,7 +118,7 @@
    "allow_in_quick_entry": 0,
    "print_hide": 0,
    "report_hide": 0,
-   "reqd": 1,
+   "reqd": 0,
    "bold": 0,
    "in_global_search": 0,
    "collapsible": 0,
@@ -118,7 +128,7 @@
    "show_preview_popup": 0,
    "trigger": null,
    "collapsible_depends_on": null,
-   "mandatory_depends_on": null,
+   "mandatory_depends_on": "eval:doc.payment_condition=='Data fixa' || !doc.payment_condition",
    "read_only_depends_on": null,
    "depends_on": null,
    "permlevel": 0,

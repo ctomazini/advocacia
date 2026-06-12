@@ -175,3 +175,34 @@ class TestAcordoHonorarios(FrappeTestCase):
 		soma = sum(flt(p.total_amount) for p in doc.fee_installments)
 		self.assertAlmostEqual(soma, valor_acordo + sucumbencia, places=2)
 		self.assertAlmostEqual(flt(doc.lawyer_amount) + flt(doc.client_amount), valor_acordo, places=2)
+
+	def test_installment_without_due_date(self):
+		"""Parcela com condição != Data fixa pode omitir vencimento e sincronizar pagamento."""
+		acordo = create_test_acordo(
+			total_amount=8000,
+			num_parcelas=2,
+			parcelas=[
+				{
+					"payment_condition": "Data fixa",
+					"due_date": today(),
+					"total_amount": 500,
+					"status": "Pendente",
+					"description": "Entrada",
+				},
+				{
+					"payment_condition": "Na conclusão",
+					"total_amount": 7500,
+					"status": "Pendente",
+					"description": "Saldo final",
+				},
+			],
+		)
+		self.assertEqual(len(acordo.fee_installments), 2)
+		self.assertFalse(acordo.fee_installments[1].due_date)
+		self.assertEqual(acordo.fee_installments[1].payment_condition, "Na conclusão")
+
+		pagamentos = get_acordo_pagamentos(acordo.name)
+		self.assertEqual(len(pagamentos), 2)
+		saldo = frappe.get_doc("Legal Payment", pagamentos[1]["name"])
+		self.assertFalse(saldo.due_date)
+		self.assertEqual(flt(saldo.amount), 7500)
