@@ -125,7 +125,25 @@ Frontend: `public/js/case_hub.js` → painel `documents_panel` no Legal Case.
 
 Fonte de verdade: `PLACEHOLDER_REFERENCIA` em `documentos.py`.
 
-Grupos: Escritório, Cliente, Endereço, Contato, Serviço/processo, Acordo de honorários (condicional), Data, Legados.
+Grupos: Escritório, Cliente, Endereço, Contato, Serviço/processo, Honorários (condicional), Parcela do acordo (loop), Data, Legados.
+
+Campos novos relevantes:
+
+| Placeholder | Uso |
+| --- | --- |
+| `cliente_data_nascimento` | Data de nascimento do cliente PF |
+| `cliente_rg_emissor` | Órgão emissor do RG |
+| `acordo_valor_extenso` | Valor total contratado por extenso |
+| `acordo_narrativa_pagamento` | Texto agrupado das parcelas (honorários) |
+| `acordo_parcelas` | Lista para loop Jinja |
+
+Exemplo de loop de parcelas:
+
+```jinja
+{% for p in acordo_parcelas %}
+{{ p.description }} — {{ p.lawyer_amount_fmt }} — venc. {{ p.due_date_fmt }}
+{% endfor %}
+```
 
 UI: botão **Ver Placeholders Disponíveis** no Document Template · módulo `documentos_placeholders.js`.
 

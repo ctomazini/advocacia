@@ -9,13 +9,15 @@ from advocacia.advocacia.documentos import (
 	_build_context,
 	_formatar_data_extenso,
 	_infer_category,
+	_montar_narrativa_pagamento,
+	_valor_por_extenso,
 	gerar_documentos_em_lote,
 	get_document_placeholder_keys,
 	get_kits_disponiveis,
 	get_placeholders_referencia,
 	get_templates_disponiveis,
 )
-from advocacia.advocacia.tests.test_setup import create_test_legal_case
+from advocacia.advocacia.tests.test_setup import create_test_acordo, create_test_legal_case
 
 
 def _ensure_test_escritorio_config(lawyer_name="Advogada Teste"):
@@ -51,6 +53,55 @@ class TestDocumentos(FrappeTestCase):
 		self.assertIn("Escritório", grupos)
 		self.assertIn("Cliente", grupos)
 		self.assertIn("Serviço / processo", grupos)
+
+	def test_valor_por_extenso(self):
+		result = _valor_por_extenso(8000)
+		self.assertIn("oito mil", result)
+		self.assertIn("reais", result)
+		self.assertEqual(_valor_por_extenso(0), "")
+		self.assertEqual(_valor_por_extenso(None), "")
+
+	def test_narrativa_pagamento_agrupada(self):
+		installments = [
+			{"payment_condition": "Data fixa", "due_date": "2026-06-10", "amount": 500, "status": "Pendente", "description": "Parcela 1 de 10"},
+			{"payment_condition": "Data fixa", "due_date": "2026-07-10", "amount": 500, "status": "Pendente", "description": "Parcela 2 de 10"},
+			{"payment_condition": "Data fixa", "due_date": "2026-08-10", "amount": 500, "status": "Pendente", "description": "Parcela 3 de 10"},
+			{"payment_condition": "Data fixa", "due_date": "2026-09-10", "amount": 929, "status": "Pendente", "description": "Parcela 4 de 10"},
+			{"payment_condition": "Data fixa", "due_date": "2026-10-10", "amount": 929, "status": "Pendente", "description": "Parcela 5 de 10"},
+			{"payment_condition": "Data fixa", "due_date": "2026-11-10", "amount": 929, "status": "Pendente", "description": "Parcela 6 de 10"},
+			{"payment_condition": "Data fixa", "due_date": "2026-12-10", "amount": 929, "status": "Pendente", "description": "Parcela 7 de 10"},
+			{"payment_condition": "Data fixa", "due_date": "2027-01-10", "amount": 929, "status": "Pendente", "description": "Parcela 8 de 10"},
+			{"payment_condition": "Data fixa", "due_date": "2027-02-10", "amount": 929, "status": "Pendente", "description": "Parcela 9 de 10"},
+			{"payment_condition": "Data fixa", "due_date": "2027-03-10", "amount": 926, "status": "Pendente", "description": "Parcela 10 de 10"},
+		]
+		result = _montar_narrativa_pagamento(installments)
+		self.assertIn("03 (três) parcelas", result)
+		self.assertIn("07 (sete) parcelas", result)
+		self.assertIn("última parcela", result)
+		self.assertIn("dia 10", result)
+
+	def test_narrativa_pagamento_mista(self):
+		installments = [
+			{"payment_condition": "Data fixa", "due_date": "2026-06-10", "amount": 2000, "status": "Pendente", "description": "Entrada"},
+			{"payment_condition": "Na conclusão", "due_date": "", "amount": 6000, "status": "Pendente", "description": "Saldo final"},
+		]
+		result = _montar_narrativa_pagamento(installments)
+		self.assertIn("dois mil reais", result)
+		self.assertIn("conclusão do serviço", result)
+		self.assertIn("saldo final", result.lower())
+
+	def test_narrativa_pagamento_vazia(self):
+		self.assertEqual(_montar_narrativa_pagamento([]), "")
+		self.assertEqual(_montar_narrativa_pagamento([{"status": "Cancelado", "amount": 100}]), "")
+
+	def test_build_context_acordo_narrativa(self):
+		_ensure_test_escritorio_config()
+		servico = create_test_legal_case()
+		create_test_acordo(servico=servico.name, total_amount=8000, num_parcelas=2)
+		context = _build_context(servico.name)
+		self.assertTrue(context["acordo_valor_extenso"])
+		self.assertTrue(context["acordo_parcelas"])
+		self.assertEqual(len(context["acordo_parcelas"]), 2)
 
 	def test_placeholders_referencia_cobre_contexto(self):
 		_ensure_test_escritorio_config()

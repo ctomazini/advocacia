@@ -15,6 +15,7 @@ from advocacia.advocacia.validators import (
 	formatar_cpf,
 	formatar_telefone,
 )
+from num2words import num2words as _num2words
 
 TEMPLATE_CATEGORY_MAP = {
 	"procuracao": "Procuração",
@@ -115,6 +116,8 @@ PLACEHOLDER_REFERENCIA = [
 			{"placeholder": "cliente_cpf", "label": "CPF (mascarado)", "alias": "cpf"},
 			{"placeholder": "cliente_cnpj", "label": "CNPJ (mascarado)", "alias": "cnpj"},
 			{"placeholder": "cliente_rg", "label": "RG", "alias": "rg"},
+			{"placeholder": "cliente_data_nascimento", "label": "Data de nascimento (dd/MM/yyyy)"},
+			{"placeholder": "cliente_rg_emissor", "label": "Órgão emissor do RG"},
 			{"placeholder": "cliente_nacionalidade", "label": "Nacionalidade", "alias": "nacionalidade"},
 			{"placeholder": "cliente_estado_civil", "label": "Estado civil", "alias": "estado_civil"},
 			{"placeholder": "cliente_profissao", "label": "Profissão", "alias": "profissao"},
@@ -200,6 +203,35 @@ PLACEHOLDER_REFERENCIA = [
 			{"placeholder": "acordo_valor_da_parcela", "label": "Valor da parcela (R$)"},
 			{"placeholder": "acordo_total_advogada", "label": "Total advogada (R$)"},
 			{"placeholder": "acordo_total_cliente", "label": "Total cliente (R$)"},
+			{"placeholder": "acordo_valor_extenso", "label": "Valor total contratado por extenso"},
+			{
+				"placeholder": "acordo_narrativa_pagamento",
+				"label": "Narrativa agrupada das parcelas (parágrafos separados por linha em branco)",
+			},
+			{
+				"placeholder": "acordo_parcelas",
+				"label": "Lista de parcelas (use {% for p in acordo_parcelas %})",
+			},
+		],
+	},
+	{
+		"grupo": "Parcela do acordo (loop)",
+		"condicional": True,
+		"condicional_motivo": "Campos dentro de {% for p in acordo_parcelas %}",
+		"items": [
+			{"placeholder": "payment_condition", "label": "Condição de pagamento", "loop_only": True, "loop_var": "p"},
+			{"placeholder": "due_date", "label": "Vencimento", "loop_only": True, "loop_var": "p"},
+			{"placeholder": "due_date_fmt", "label": "Vencimento formatado", "loop_only": True, "loop_var": "p"},
+			{"placeholder": "lawyer_amount", "label": "Valor advogada (R$)", "loop_only": True, "loop_var": "p"},
+			{"placeholder": "lawyer_amount_fmt", "label": "Valor advogada formatado", "loop_only": True, "loop_var": "p"},
+			{"placeholder": "total_amount", "label": "Valor total da parcela (R$)", "loop_only": True, "loop_var": "p"},
+			{"placeholder": "total_amount_fmt", "label": "Valor total formatado", "loop_only": True, "loop_var": "p"},
+			{"placeholder": "client_amount", "label": "Valor cliente (R$)", "loop_only": True, "loop_var": "p"},
+			{"placeholder": "contingency_amount", "label": "Valor sucumbência (R$)", "loop_only": True, "loop_var": "p"},
+			{"placeholder": "status", "label": "Status", "loop_only": True, "loop_var": "p"},
+			{"placeholder": "description", "label": "Descrição", "loop_only": True, "loop_var": "p"},
+			{"placeholder": "received_date", "label": "Data de recebimento", "loop_only": True, "loop_var": "p"},
+			{"placeholder": "received_date_fmt", "label": "Data de recebimento formatada", "loop_only": True, "loop_var": "p"},
 		],
 	},
 	{
@@ -268,6 +300,171 @@ def _formatar_data_extenso(data_str):
 	else:
 		dt = data_str
 	return f"{dt.day} de {meses[dt.month]} de {dt.year}"
+
+
+def _valor_por_extenso(value) -> str:
+	amount = flt(value)
+	if not amount:
+		return ""
+	try:
+		return _num2words(amount, lang="pt_BR", to="currency")
+	except Exception:
+		return ""
+
+
+def _contagem_por_extenso(n: int) -> str:
+	if n == 1:
+		return "uma"
+	if n == 2:
+		return "duas"
+	return _num2words(n, lang="pt_BR")
+
+
+def _parcela_valor_principal(parcela) -> float:
+	valor = flt(getattr(parcela, "lawyer_amount", None))
+	if not valor:
+		valor = flt(getattr(parcela, "total_amount", None))
+	return valor
+
+
+def _linha_parcela_narrativa(parcela) -> dict:
+	return {
+		"payment_condition": getattr(parcela, "payment_condition", None) or "Data fixa",
+		"due_date": getattr(parcela, "due_date", None) or "",
+		"amount": _parcela_valor_principal(parcela),
+		"status": getattr(parcela, "status", None) or "",
+		"description": getattr(parcela, "description", None) or "",
+	}
+
+
+def _montar_narrativa_pagamento(installments: list[dict]) -> str:
+	if not installments:
+		return ""
+
+	active = [row for row in installments if row.get("status") != "Cancelado"]
+	if not active:
+		return ""
+
+	fixed = [
+		row
+		for row in active
+		if (row.get("payment_condition") or "Data fixa") == "Data fixa" and row.get("due_date")
+	]
+	non_fixed = [row for row in active if row not in fixed]
+	parts = []
+
+	if fixed:
+		groups = []
+		current_group = [fixed[0]]
+		for i in range(1, len(fixed)):
+			prev_amount = flt(current_group[0]["amount"])
+			curr_amount = flt(fixed[i]["amount"])
+			amounts_match = abs(curr_amount - prev_amount) <= 0.02
+			if amounts_match:
+				current_group.append(fixed[i])
+			else:
+				is_last = i == len(fixed) - 1
+				diff_pct = abs(curr_amount - prev_amount) / prev_amount * 100 if prev_amount else 100
+				if is_last and diff_pct <= 5 and len(current_group) >= 2:
+					current_group.append(fixed[i])
+				else:
+					groups.append(current_group)
+					current_group = [fixed[i]]
+		groups.append(current_group)
+
+		for group in groups:
+			count = len(group)
+			main_amount = flt(group[0]["amount"])
+			start_date = group[0]["due_date"]
+			try:
+				day = getdate(start_date).day
+			except Exception:
+				day = None
+			last_amount = flt(group[-1]["amount"])
+			has_adjustment = count > 1 and abs(last_amount - main_amount) > 0.02
+			count_display = f"{count:02d}" if count < 100 else str(count)
+			count_words = _contagem_por_extenso(count)
+			amount_fmt = _formatar_moeda(main_amount)
+			amount_words = _valor_por_extenso(main_amount)
+			start_date_fmt = _formatar_data(start_date)
+			if count == 1:
+				line = f"{count_display} ({count_words}) parcela de {amount_fmt} ({amount_words})"
+				if day:
+					line += f", com vencimento em {start_date_fmt}"
+			else:
+				line = f"{count_display} ({count_words}) parcelas de {amount_fmt} ({amount_words})"
+				line += " mensais e consecutivas"
+				if day:
+					line += f" com pagamento todo dia {day:02d}"
+				line += f", a iniciar em {start_date_fmt}"
+			if has_adjustment:
+				adj_fmt = _formatar_moeda(last_amount)
+				adj_words = _valor_por_extenso(last_amount)
+				line += f", sendo a última parcela no valor de {adj_fmt} ({adj_words})"
+			line += "."
+			parts.append(line)
+
+	condition_text = {
+		"Na conclusão": "a ser paga na conclusão do serviço",
+		"Na sentença": "a ser paga na prolação da sentença",
+		"A definir": "com data a definir",
+	}
+	for row in non_fixed:
+		amount = flt(row["amount"])
+		amount_fmt = _formatar_moeda(amount)
+		amount_words = _valor_por_extenso(amount)
+		condition = row.get("payment_condition") or "A definir"
+		suffix = condition_text.get(condition, "com data a definir")
+		desc = row.get("description")
+		if desc:
+			line = f"01 (uma) parcela de {amount_fmt} ({amount_words}) referente a {desc.lower()}, {suffix}."
+		else:
+			line = f"01 (uma) parcela de {amount_fmt} ({amount_words}), {suffix}."
+		parts.append(line)
+
+	return "\n\n".join(parts)
+
+
+def _linha_parcela_acordo(parcela) -> dict:
+	lawyer_amount = _parcela_valor_principal(parcela)
+	total_amount = flt(getattr(parcela, "total_amount", None))
+	client_amount = flt(getattr(parcela, "client_amount", None))
+	contingency_amount = flt(getattr(parcela, "contingency_amount", None))
+	received_date = getattr(parcela, "received_date", None)
+	return {
+		"payment_condition": getattr(parcela, "payment_condition", None) or "Data fixa",
+		"due_date": getattr(parcela, "due_date", None) or "",
+		"due_date_fmt": _formatar_data(getattr(parcela, "due_date", None)),
+		"lawyer_amount": lawyer_amount,
+		"lawyer_amount_fmt": _formatar_moeda(lawyer_amount),
+		"total_amount": total_amount,
+		"total_amount_fmt": _formatar_moeda(total_amount),
+		"client_amount": client_amount,
+		"contingency_amount": contingency_amount,
+		"status": getattr(parcela, "status", None) or "",
+		"description": getattr(parcela, "description", None) or "",
+		"received_date": received_date or "",
+		"received_date_fmt": _formatar_data(received_date),
+	}
+
+
+def _contexto_acordo(acordo) -> dict:
+	empty = {
+		"acordo_valor_extenso": "",
+		"acordo_narrativa_pagamento": "",
+		"acordo_parcelas": [],
+	}
+	if not acordo:
+		return empty
+
+	parcelas = sorted(acordo.fee_installments or [], key=lambda row: row.due_date or "")
+	linhas = [_linha_parcela_acordo(row) for row in parcelas]
+	narrativa_rows = [_linha_parcela_narrativa(row) for row in parcelas]
+	return {
+		"acordo_valor_extenso": _valor_por_extenso(acordo.total_agreement_value),
+		"acordo_narrativa_pagamento": _montar_narrativa_pagamento(narrativa_rows),
+		"acordo_parcelas": linhas,
+	}
 
 
 def _link_label(doctype, name):
@@ -407,6 +604,8 @@ def _build_context(servico_name):
 			"cliente_cpf": cpf_fmt,
 			"cliente_cnpj": cnpj_fmt,
 			"cliente_rg": cliente.rg or "",
+			"cliente_data_nascimento": _formatar_data(cliente.birth_date),
+			"cliente_rg_emissor": cliente.rg_issuer or "",
 			"cliente_nacionalidade": cliente.nationality or "",
 			"cliente_estado_civil": cliente.marital_status or "",
 			"cliente_profissao": cliente.occupation or "",
@@ -456,6 +655,9 @@ def _build_context(servico_name):
 		"acordo_valor_da_parcela": "",
 		"acordo_total_advogada": "",
 		"acordo_total_cliente": "",
+		"acordo_valor_extenso": "",
+		"acordo_narrativa_pagamento": "",
+		"acordo_parcelas": [],
 	}
 	context.update(acordo_defaults)
 
@@ -475,6 +677,7 @@ def _build_context(servico_name):
 				"acordo_total_cliente": _formatar_moeda(acordo.client_total),
 			}
 		)
+		context.update(_contexto_acordo(acordo))
 
 	context.update(
 		{
