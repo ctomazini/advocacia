@@ -7,6 +7,7 @@ from frappe.tests.utils import FrappeTestCase
 
 from advocacia.advocacia.documentos import (
 	_build_context,
+	_contexto_acordo,
 	_formatar_data_extenso,
 	_infer_category,
 	_montar_narrativa_pagamento,
@@ -18,6 +19,7 @@ from advocacia.advocacia.documentos import (
 	get_templates_disponiveis,
 )
 from advocacia.advocacia.tests.test_setup import create_test_acordo, create_test_legal_case
+from frappe.utils import getdate
 
 
 def _ensure_test_escritorio_config(lawyer_name="Advogada Teste"):
@@ -60,6 +62,14 @@ class TestDocumentos(FrappeTestCase):
 		self.assertIn("reais", result)
 		self.assertEqual(_valor_por_extenso(0), "")
 		self.assertEqual(_valor_por_extenso(None), "")
+
+	def test_contexto_acordo_mixed_due_date_types(self):
+		acordo = create_test_acordo(num_parcelas=2)
+		acordo.fee_installments[0].due_date = "2026-06-10"
+		acordo.fee_installments[1].due_date = getdate("2026-07-10")
+		context = _contexto_acordo(acordo)
+		self.assertEqual(len(context["acordo_parcelas"]), 2)
+		self.assertEqual(context["acordo_parcelas"][0]["due_date"], "2026-06-10")
 
 	def test_narrativa_pagamento_agrupada(self):
 		installments = [

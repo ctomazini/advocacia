@@ -448,6 +448,13 @@ def _linha_parcela_acordo(parcela) -> dict:
 	}
 
 
+def _parcela_due_date_sort_key(due_date) -> tuple:
+	"""Ordena parcelas por vencimento; vazias por último; normaliza str/date."""
+	if not due_date:
+		return (1, getdate("9999-12-31"))
+	return (0, getdate(due_date))
+
+
 def _contexto_acordo(acordo) -> dict:
 	empty = {
 		"acordo_valor_extenso": "",
@@ -457,7 +464,10 @@ def _contexto_acordo(acordo) -> dict:
 	if not acordo:
 		return empty
 
-	parcelas = sorted(acordo.fee_installments or [], key=lambda row: row.due_date or "")
+	parcelas = sorted(
+		acordo.fee_installments or [],
+		key=lambda row: _parcela_due_date_sort_key(row.due_date),
+	)
 	linhas = [_linha_parcela_acordo(row) for row in parcelas]
 	narrativa_rows = [_linha_parcela_narrativa(row) for row in parcelas]
 	return {
