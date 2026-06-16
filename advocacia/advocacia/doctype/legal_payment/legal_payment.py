@@ -3,7 +3,12 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.utils import flt
 
-from advocacia.advocacia.financeiro import TIPO_ATOS, TIPO_HONORARIOS, is_pagamento_atos
+from advocacia.advocacia.financeiro import (
+	TIPO_ATOS,
+	TIPO_HONORARIOS,
+	effective_open_status,
+	is_pagamento_atos,
+)
 from advocacia.advocacia.titulos import aplicar_titulo_pos_insert, recompor_titulo_se_vazio
 
 
@@ -61,6 +66,8 @@ class LegalPayment(Document):
 			frappe.throw(_("Não é permitido criar pagamento já cancelado."))
 		if is_pagamento_atos(self):
 			self.manual_override = 0
+		if not self.manual_override and self.status in ("Pendente", "Vencido"):
+			self.status = effective_open_status(self.status, self.due_date)
 
 	def on_trash(self):
 		from advocacia.advocacia.financeiro import liberar_vinculos_pagamento_atos

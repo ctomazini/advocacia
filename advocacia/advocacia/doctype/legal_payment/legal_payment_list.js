@@ -2,7 +2,26 @@ frappe.listview_settings["Legal Payment"] = {
 	hide_name_column: true,
 	add_fields: ["status", "due_date", "client", "legal_case", "amount", "origin_type", "fee_agreement", "service_record"],
 	formatters: {
-		tipo_origem(value, _df, doc) {
+		title(value, _df, doc) {
+			const subject = value || doc.name || "";
+			const meta = [];
+			if (doc.due_date) {
+				meta.push(__("Venc.") + " " + frappe.datetime.str_to_user(doc.due_date));
+			}
+			if (doc.amount != null && doc.amount !== "") {
+				meta.push(frappe.format(doc.amount, { fieldtype: "Currency" }, null, doc));
+			}
+			if (!meta.length) {
+				return frappe.utils.escape_html(subject);
+			}
+			return (
+				frappe.utils.escape_html(subject) +
+				'<div class="text-muted small">' +
+				frappe.utils.escape_html(meta.join(" · ")) +
+				"</div>"
+			);
+		},
+		origin_type(value, _df, doc) {
 			const origem = (value || "").trim();
 			if (!origem) return "";
 
@@ -27,6 +46,7 @@ frappe.listview_settings["Legal Payment"] = {
 		},
 	},
 	get_indicator(doc) {
+		const hoje = frappe.datetime.get_today();
 		if (doc.status === "Vencido") {
 			return [__("Vencido"), "red", "status,=,Vencido"];
 		}
@@ -34,8 +54,10 @@ frappe.listview_settings["Legal Payment"] = {
 			return [__(doc.status), "green", "status,=," + doc.status];
 		}
 		if (doc.status === "Pendente" && doc.due_date) {
-			const hoje = frappe.datetime.get_today();
 			const diff = frappe.datetime.get_day_diff(doc.due_date, hoje);
+			if (diff < 0) {
+				return [__("Vencido"), "red", "status,=,Vencido"];
+			}
 			if (diff >= 0 && diff <= 7) {
 				return [__("Próximo vencimento"), "orange", "status,=,Pendente"];
 			}
@@ -49,22 +71,25 @@ frappe.listview_settings["Legal Payment"] = {
 		const hoje = frappe.datetime.get_today();
 		const sete = frappe.datetime.add_days(hoje, 7);
 
+		function apply_filters(filters) {
+			listview.filter_area.clear().then(() => {
+				listview.filter_area.add(filters);
+			});
+		}
+
 		listview.page.add_inner_button(__("Vencidos"), () => {
-			listview.filter_area.clear();
-			listview.filter_area.add([[listview.doctype, "status", "=", "Vencido"]]);
+			apply_filters([[listview.doctype, "status", "=", "Vencido"]]);
 		});
 
 		listview.page.add_inner_button(__("Próximos 7 dias"), () => {
-			listview.filter_area.clear();
-			listview.filter_area.add([
+			apply_filters([
 				[listview.doctype, "status", "=", "Pendente"],
 				[listview.doctype, "due_date", "between", [hoje, sete]],
 			]);
 		});
 
 		listview.page.add_inner_button(__("Recebidos hoje"), () => {
-			listview.filter_area.clear();
-			listview.filter_area.add([
+			apply_filters([
 				[listview.doctype, "status", "in", ["Recebido", "Repassado"]],
 				[listview.doctype, "received_date", "=", hoje],
 			]);

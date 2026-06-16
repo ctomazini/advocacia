@@ -34,6 +34,16 @@ TIPO_HONORARIOS = "Honorários (Parcela)"
 TIPO_ATOS = "Atos Advocatícios"
 
 
+def effective_open_status(status, due_date, as_of=None):
+	"""Pendente com vencimento anterior a as_of contabiliza como Vencido."""
+	if status not in ("Pendente", "Vencido") or not due_date:
+		return status
+	reference = getdate(as_of) if as_of else getdate(today())
+	if status == "Pendente" and getdate(due_date) < reference:
+		return "Vencido"
+	return status
+
+
 def is_pagamento_atos(pagamento):
 	return (pagamento.get("origin_type") or "") == TIPO_ATOS
 
@@ -194,7 +204,10 @@ def sync_pagamento_from_parcela(parcela):
 		_vincular_pagamento_na_parcela(parcela.installment_origin_id, pagamento_name)
 		return
 
-	new_status = STATUS_PARCELA_TO_PAGAMENTO.get(parcela.status or "Pendente", "Pendente")
+	new_status = effective_open_status(
+		STATUS_PARCELA_TO_PAGAMENTO.get(parcela.status or "Pendente", "Pendente"),
+		parcela.get("due_date") or pagamento.due_date,
+	)
 	updates = {}
 	if pagamento.status != new_status and pagamento.status in ("Pendente", "Vencido"):
 		updates["status"] = new_status
@@ -817,7 +830,10 @@ def _gerar_parcela_origem_id():
 
 def _parcela_to_pagamento_payload(acordo, parcela, idx, cliente, servico):
 	descricao = parcela.get("description") or parcela.get("description") or ""
-	status = STATUS_PARCELA_TO_PAGAMENTO.get(parcela.status or "Pendente", "Pendente")
+	status = effective_open_status(
+		STATUS_PARCELA_TO_PAGAMENTO.get(parcela.status or "Pendente", "Pendente"),
+		parcela.due_date,
+	)
 	valor_recebido = flt(parcela.total_amount) if status in ("Recebido", "Repassado") else 0
 
 	return {
@@ -868,9 +884,14 @@ def _apply_pagamento_payload(pagamento, payload):
 		if pagamento.get(field) != payload.get(field):
 			pagamento.set(field, payload.get(field))
 			changed = True
-	if pagamento.status != payload.get("status") and pagamento.status in ("Pendente", "Vencido"):
-		pagamento.status = payload.get("status")
-		changed = True
+	payload_status = effective_open_status(
+		payload.get("status"),
+		payload.get("due_date") or pagamento.due_date,
+	)
+	if pagamento.status != payload_status and pagamento.status in ("Pendente", "Vencido"):
+		if not (pagamento.status == "Vencido" and payload_status == "Pendente"):
+			pagamento.status = payload_status
+			changed = True
 	pagamento.synced_at = now_datetime()
 	return changed
 
@@ -880,7 +901,10 @@ def _sync_status_from_parcela(pagamento, parcela):
 		return
 	if pagamento.status == "Cancelado":
 		return
-	new_status = STATUS_PARCELA_TO_PAGAMENTO.get(parcela.status or "Pendente", "Pendente")
+	new_status = effective_open_status(
+		STATUS_PARCELA_TO_PAGAMENTO.get(parcela.status or "Pendente", "Pendente"),
+		parcela.get("due_date") or pagamento.due_date,
+	)
 	if pagamento.status != new_status and pagamento.status in ("Pendente", "Vencido"):
 		pagamento.status = new_status
 		pagamento.synced_at = now_datetime()

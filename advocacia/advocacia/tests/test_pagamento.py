@@ -44,6 +44,60 @@ class TestLegalPayment(FrappeTestCase):
 		verificar_parcelas_vencidas()
 		self.assertEqual(frappe.db.get_value("Legal Payment", pag_name, "status"), "Vencido")
 
+	def test_sync_acordo_marca_vencido_por_data(self):
+		from advocacia.advocacia.financeiro import sincronizar_pagamentos_do_acordo
+
+		acordo = create_test_acordo(num_parcelas=1, total_amount=500)
+		pag_name = get_acordo_pagamentos(acordo.name)[0].name
+		parcela_name = frappe.get_all(
+			"Fee Installment",
+			filters={"parent": acordo.name},
+			pluck="name",
+		)[0]
+		past = add_days(today(), -5)
+		frappe.db.set_value(
+			"Legal Payment",
+			pag_name,
+			{"due_date": past, "status": "Pendente"},
+		)
+		frappe.db.set_value(
+			"Fee Installment",
+			parcela_name,
+			{"due_date": past, "status": "Pendente"},
+		)
+
+		doc = frappe.get_doc("Fee Agreement", acordo.name)
+		sincronizar_pagamentos_do_acordo(doc)
+
+		self.assertEqual(frappe.db.get_value("Legal Payment", pag_name, "status"), "Vencido")
+
+	def test_sync_acordo_nao_reverte_vencido(self):
+		from advocacia.advocacia.financeiro import sincronizar_pagamentos_do_acordo
+
+		acordo = create_test_acordo(num_parcelas=1, total_amount=500)
+		pag_name = get_acordo_pagamentos(acordo.name)[0].name
+		parcela_name = frappe.get_all(
+			"Fee Installment",
+			filters={"parent": acordo.name},
+			pluck="name",
+		)[0]
+		past = add_days(today(), -5)
+		frappe.db.set_value(
+			"Legal Payment",
+			pag_name,
+			{"due_date": past, "status": "Vencido"},
+		)
+		frappe.db.set_value(
+			"Fee Installment",
+			parcela_name,
+			{"due_date": past, "status": "Pendente"},
+		)
+
+		doc = frappe.get_doc("Fee Agreement", acordo.name)
+		sincronizar_pagamentos_do_acordo(doc)
+
+		self.assertEqual(frappe.db.get_value("Legal Payment", pag_name, "status"), "Vencido")
+
 	def test_cancelado_imutavel(self):
 		acordo = create_test_acordo(num_parcelas=1, total_amount=500)
 		pag = frappe.get_doc("Legal Payment", get_acordo_pagamentos(acordo.name)[0].name)
