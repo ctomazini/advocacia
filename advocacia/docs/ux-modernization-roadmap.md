@@ -3,7 +3,7 @@
 Documento permanente de acompanhamento do projeto de modernização de experiência do usuário.
 
 **Criado:** 2026-06-09
-**Última atualização:** 2026-06-09 (Etapa 01 — auditoria de aderência)
+**Última atualização:** 2026-06-09 (Etapa 02 — drift estrutural sidebar)
 **App:** `advocacia` (Frappe v16)
 
 ---
@@ -239,7 +239,45 @@ Despesas judiciais vinculadas ao processo: taxas judiciais, custas de perícia, 
 
 **Pendências:** —
 
-**Próximas etapas:** Etapa 02 — aplicar glossário em `translations.py` e navegação
+**Próximas etapas:** Etapa 03 — labels JSON DocTypes (campos EN)
+
+---
+
+### Etapa 02 — Corrigir drift estrutural sidebar
+
+**Status:** Concluída
+**Data:** 2026-06-09
+**Branch:** `ux/step-02-sidebar-sync`
+**Responsável:** Sessão Agent / projeto Advocacia
+
+**Objetivo:** Eliminar inconsistências estruturais entre `sidebar.py` e `workspace_sidebar/advocacia.json` (sem alterar labels).
+
+**Diagnóstico (Fase 0):**
+- `sidebar.py`: **28 links**, **5 seções**
+- `workspace_sidebar/advocacia.json`: **28 links**, **5 seções** — paridade perfeita label/`link_to`/`link_type`
+- `workspace/advocacia/advocacia.json` e `fixtures/workspace.json`: **28 links** — `link_to`/`link_type` idênticos; divergência de label apenas em #20 (Fluxo de Caixa vs Fluxo de Caixa Projetado) — **fora do escopo** (label, Etapa posterior)
+- Targets órfãos: **nenhum** (todos DocTypes/Reports/Page existem no app)
+- Docstring obsoleta em `_validate_sidebar_links`: citava **26 links** (drift documental)
+
+**Mudanças realizadas:**
+- Corrigida docstring de `_validate_sidebar_links` (26 → 28 links)
+- Criado `tests/test_sidebar_json.py` (paridade links, seções, targets no disco)
+- Nenhuma alteração necessária em `workspace_sidebar/advocacia.json` (já sincronizado)
+
+**Arquivos modificados:**
+- `advocacia/advocacia/setup/sidebar.py`
+- `advocacia/advocacia/tests/test_sidebar_json.py` (novo)
+- `docs/ux-modernization-roadmap.md`
+
+**Contagem links:** antes 28 / depois 28 (paridade confirmada; drift era apenas docstring + ausência de teste)
+
+**Testes:** 311 + 3 = **314** verdes (`test_sidebar_json` × 3)
+
+**Resultado:** Guardrail estrutural permanente; sidebar JSON e Python alinhados.
+
+**Pendências:** Etapa 03+ (labels/glossário) — não misturar nesta branch
+
+**Próximas etapas:** Etapa 03 — `translations.py` e labels de campos JSON
 
 ---
 
@@ -430,7 +468,7 @@ Inventário read-only (Etapa 01). **47 itens** agrupados por área. Risco: **V**
 | Área | Divergências | Arquivos estimados | Etapa alvo sugerida | Risco dominante |
 |------|:------------:|:------------------:|--------------------|-----------------|
 | `translations.py` | 8 | 1 | 02 | V |
-| Sidebar + workspace_sidebar + workspace JSON + fixtures | 9 | 4 | 02 | V |
+| Sidebar + workspace_sidebar + workspace JSON + fixtures | 9 | 4 | 02 ✅ | V |
 | Labels JSON DocTypes (campo Link/Data) | 21 | 15+ | 03–05 | V |
 | Hub `legal_case.json` + `case_hub.js` | 6 | 2 | 06 | A |
 | Painel `public/js/painel/*` | 6 | 4 | 07 | A |
@@ -447,7 +485,7 @@ Inventário read-only (Etapa 01). **47 itens** agrupados por área. Risco: **V**
 
 | ID | Descrição | Severidade | Etapa sugerida |
 |----|-----------|------------|----------------|
-| DT-01 | Dois mapas de labels (`translations.py` e `adv_case_nav.DOCTYPE_NAV_LABELS`) divergem e duplicam manutenção | Média | 02 — unificar fonte |
+| DT-01 | Dois mapas de labels (`translations.py` e `adv_case_nav.DOCTYPE_NAV_LABELS`) divergem e duplicam manutenção | Média | 03 — unificar fonte |
 | DT-02 | Notificação `Advocacia - Hearing amanha` com subject/body em inglês (“Hearing amanha”, “Court Branch”) | Baixa | Backlog |
 | DT-03 | Custom Fields Event (`Source DocType`, `Source Name`) visíveis ao admin — fora do glossário jurídico | Baixa | Backlog |
 | DT-04 | `manual_usuario.md` e `generate_manual.py` ainda usam “Serviço”, “Pagamento”, nomes EN de DocType | Média | 11 (docs) |
