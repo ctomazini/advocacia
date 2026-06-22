@@ -12,7 +12,7 @@ frappe.ui.form.on("Service Record", {
 
 function configurar_botoes_cobranca(frm) {
 	if (frm.doc.last_payment && !frm.is_new()) {
-		frm.add_custom_button(__("Ver pagamento"), function () {
+		frm.add_custom_button(__("Ver recebimento"), function () {
 			frappe.set_route("Form", "Legal Payment", frm.doc.last_payment);
 		});
 	}
@@ -162,7 +162,7 @@ function gerar_cobranca_atos(frm) {
 				label: __("Observação"),
 				read_only: 1,
 				default: __(
-					"Itens novos entram no pagamento aberto existente. Um novo pagamento só é criado após receber ou cancelar o anterior."
+					"Itens novos entram no recebimento aberto existente. Um novo recebimento só é criado após receber ou cancelar o anterior."
 				),
 			},
 		],
@@ -210,15 +210,15 @@ function gerar_cobranca_atos(frm) {
 						return;
 					}
 					var msg = r.message;
-					var titulo = msg.criado ? __("Pagamento criado") : __("Pagamento atualizado");
+					var titulo = msg.criado ? __("Recebimento criado") : __("Recebimento atualizado");
 					frappe.msgprint({
 						title: titulo,
 						message:
 							(msg.criado
-								? __("Pagamento {0} criado com sucesso.", [msg.payment])
-								: __("Pagamento {0} atualizado.", [msg.payment])) +
+								? __("Recebimento {0} criado com sucesso.", [msg.payment])
+								: __("Recebimento {0} atualizado.", [msg.payment])) +
 							"<br>" +
-							__("Cobrado agora: {0} · Total do pagamento: {1}", [
+							__("Cobrado agora: {0} · Total do recebimento: {1}", [
 								format_currency(msg.billing_amount || 0),
 								format_currency(msg.total || 0),
 							]),

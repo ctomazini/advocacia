@@ -100,7 +100,7 @@ frappe.listview_settings["Legal Payment"] = {
 				method: "advocacia.advocacia.financeiro.bulk_delete_pagamentos",
 				args: { names: names },
 				freeze: true,
-				freeze_message: __("Excluindo {0} pagamento(s)...", [names.length]),
+				freeze_message: __("Excluindo {0} recebimento(s)...", [names.length]),
 				callback(r) {
 					if (!r.message) {
 						if (done) {
@@ -114,7 +114,7 @@ frappe.listview_settings["Legal Payment"] = {
 					let indicator = "green";
 
 					if (res.excluidos && res.excluidos.length > 0) {
-						msg += __("<b>{0}</b> pagamento(s) excluído(s).", [res.excluidos.length]);
+						msg += __("<b>{0}</b> recebimento(s) excluído(s).", [res.excluidos.length]);
 						frappe.utils.play_sound("delete");
 					}
 					if (res.ignorados && res.ignorados.length > 0) {
@@ -154,9 +154,9 @@ frappe.listview_settings["Legal Payment"] = {
 							fieldtype: "HTML",
 							options:
 								'<p style="margin-bottom:10px;">' +
-								__("Você está prestes a excluir <b>{0} pagamentos</b>.", [names.length]) +
+								__("Você está prestes a excluir <b>{0} recebimentos</b>.", [names.length]) +
 								"<br>" +
-								__("Legal Payments com status Recebido, Repassado ou Vencido serão ignorados.") +
+								__("Recebimentos com status Recebido, Repassado ou Vencido serão ignorados.") +
 								"</p>" +
 								"<p>" +
 								__("Digite <b>EXCLUIR</b> para confirmar:") +
@@ -195,7 +195,7 @@ frappe.listview_settings["Legal Payment"] = {
 
 			frappe.confirm(
 				__(
-					"Excluir {0} pagamento(s)? Recebidos, Repassados e Vencidos serão ignorados.",
+					"Excluir {0} recebimento(s)? Recebidos, Repassados e Vencidos serão ignorados.",
 					[names.length]
 				),
 				function () {

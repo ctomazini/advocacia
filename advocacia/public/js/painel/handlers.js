@@ -292,7 +292,7 @@ $(document).on("click", ".painel-btn-recebida", function (e) {
 	var pagamento = btn.attr("data-pagamento") || btn.attr("data-parcela");
 	if (!pagamento) return;
 
-	frappe.confirm(__("Marcar pagamento como recebido hoje?"), function () {
+	frappe.confirm(__("Marcar recebimento como recebido hoje?"), function () {
 		btn.prop("disabled", true).text("...");
 		frappe
 			.xcall("advocacia.advocacia.painel_api.marcar_parcela_recebida", {
@@ -300,7 +300,7 @@ $(document).on("click", ".painel-btn-recebida", function (e) {
 			})
 			.then(function () {
 				frappe.show_alert({
-					message: __("Legal Payment marcado como Recebido"),
+					message: __("Recebimento marcado como Recebido"),
 					indicator: "green",
 				});
 				var page =

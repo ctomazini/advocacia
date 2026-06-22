@@ -280,8 +280,8 @@ def on_pagamento_trash(doc, method=None):
 
 	if doc.status in ("Recebido", "Repassado"):
 		frappe.throw(
-			_("Não é possível excluir Legal Payment de honorários com status '{0}'. "
-			  "Cancele o pagamento primeiro.").format(doc.status),
+			_("Não é possível excluir recebimento de honorários com status '{0}'. "
+			  "Cancele o recebimento primeiro.").format(doc.status),
 			title=_("Exclusão Bloqueada"),
 		)
 
@@ -376,7 +376,7 @@ def bulk_delete_pagamentos(names: str | list) -> dict:
 	if isinstance(names, str):
 		names = json.loads(names)
 	if not names:
-		frappe.throw(_("Nenhum pagamento selecionado."))
+		frappe.throw(_("Nenhum recebimento selecionado."))
 	frappe.has_permission("Legal Payment", "delete", throw=True)
 
 	excluidos = []
@@ -452,7 +452,7 @@ def sincronizar_pagamento_atos(
 		pagamento = frappe.get_doc("Legal Payment", pagamento_aberto)
 		if pagamento.status not in ("Pendente", "Vencido"):
 			frappe.throw(
-				_("Legal Payment {0} não está aberto para sincronização.").format(pagamento.name)
+				_("Recebimento {0} não está aberto para sincronização.").format(pagamento.name)
 			)
 		incluidos, _pendentes_abertos = _classificar_atos_para_sync(registro, pagamento.name)
 	else:
@@ -757,14 +757,14 @@ def cancelar_cobranca_pagamento_atos(pagamento_name: str) -> dict:
 
 	pagamento = frappe.get_doc("Legal Payment", pagamento_name)
 	if not is_pagamento_atos(pagamento):
-		frappe.throw(_("Este pagamento não é de origem Atos Advocatícios."))
+		frappe.throw(_("Este recebimento não é de origem Atos Advocatícios."))
 
 	if pagamento.status == "Cancelado":
-		frappe.throw(_("Legal Payment já está cancelado."))
+		frappe.throw(_("Recebimento já está cancelado."))
 
 	if pagamento.status in ("Recebido", "Repassado"):
 		frappe.throw(
-			_("Legal Payment recebido não pode ser cancelado. Estorne manualmente se necessário."),
+			_("Recebimento recebido não pode ser cancelado. Estorne manualmente se necessário."),
 			title=_("Operação não permitida"),
 		)
 
@@ -785,10 +785,10 @@ def cancelar_pagamento_honorarios(pagamento_name: str) -> dict:
 
 	pagamento = frappe.get_doc("Legal Payment", pagamento_name)
 	if is_pagamento_atos(pagamento):
-		frappe.throw(_("Este pagamento é de Atos Advocatícios. Use o botão Cancelar Legal Payment no form de Atos."))
+		frappe.throw(_("Este recebimento é de Atos Advocatícios. Use o botão Cancelar Recebimento no form de Atos."))
 
 	if pagamento.status == "Cancelado":
-		frappe.throw(_("Legal Payment já está cancelado."))
+		frappe.throw(_("Recebimento já está cancelado."))
 
 	pagamento.status = "Cancelado"
 	pagamento.save(ignore_permissions=False)

@@ -9,10 +9,10 @@ frappe.ui.form.on("Legal Payment", {
 			const intro =
 				frm.doc.origin_type === "Atos Advocatícios"
 					? __(
-							"Legal Payment cancelado — registro imutável. Os atos foram liberados; você pode excluir este pagamento se desejar."
+							"Recebimento cancelado — registro imutável. Os atos foram liberados; você pode excluir este recebimento se desejar."
 					  )
 					: __(
-							"Pagamento cancelado — registro imutável. A parcela em honorários foi atualizada; você pode excluir este pagamento se desejar."
+							"Recebimento cancelado — registro imutável. A parcela em honorários foi atualizada; você pode excluir este recebimento se desejar."
 					  );
 			frm.set_intro(intro, "blue");
 			return;
@@ -28,29 +28,29 @@ frappe.ui.form.on("Legal Payment", {
 
 function configurar_botoes_atos(frm) {
 	if (frm.doc.service_record) {
-		frm.add_custom_button(__("Ver cobrança de serviços"), function () {
+		frm.add_custom_button(__("Ver Cobrança de Serviço"), function () {
 			frappe.set_route("Form", "Service Record", frm.doc.service_record);
 		});
 	}
 
 	if (["Pendente", "Vencido"].includes(frm.doc.status)) {
-		frm.add_custom_button(__("Cancelar Legal Payment"), function () {
+		frm.add_custom_button(__("Cancelar Recebimento"), function () {
 			frappe.confirm(
 				__(
-					"Cancelar este pagamento e liberar os atos vinculados para nova cobrança?<br><br>Os atos voltam para <strong>Pendente</strong>."
+					"Cancelar este recebimento e liberar os atos vinculados para nova cobrança?<br><br>Os atos voltam para <strong>Pendente</strong>."
 				),
 				function () {
 					frappe.call({
 						method: "advocacia.advocacia.financeiro.cancelar_cobranca_pagamento_atos",
 						args: { pagamento_name: frm.doc.name },
 						freeze: true,
-						freeze_message: __("Cancelando pagamento..."),
+						freeze_message: __("Cancelando recebimento..."),
 						callback: function (r) {
 							if (!r.message) {
 								return;
 							}
 							frappe.show_alert({
-								message: __("Legal Payment cancelado. Atos liberados."),
+								message: __("Recebimento cancelado. Atos liberados."),
 								indicator: "green",
 							});
 							frm.reload_doc();
@@ -71,7 +71,7 @@ function configurar_botoes_honorarios(frm) {
 
 	if (["Pendente", "Vencido"].includes(frm.doc.status)) {
 		frm.add_custom_button(__("Marcar como Recebido"), function () {
-			frappe.confirm(__("Marcar este pagamento como recebido hoje?"), function () {
+			frappe.confirm(__("Marcar este recebimento como recebido hoje?"), function () {
 				frappe.call({
 					method: "advocacia.advocacia.painel_api.marcar_parcela_recebida",
 					args: { parcela_name: frm.doc.name },
@@ -79,7 +79,7 @@ function configurar_botoes_honorarios(frm) {
 					freeze_message: __("Registrando recebimento..."),
 					callback: function () {
 						frappe.show_alert({
-							message: __("Legal Payment marcado como recebido."),
+							message: __("Recebimento marcado como recebido."),
 							indicator: "green",
 						});
 						frm.reload_doc();
@@ -90,14 +90,14 @@ function configurar_botoes_honorarios(frm) {
 	}
 
 	if (["Pendente", "Vencido", "Recebido", "Repassado"].includes(frm.doc.status)) {
-		frm.add_custom_button(__("Cancelar Legal Payment"), function () {
+		frm.add_custom_button(__("Cancelar Recebimento"), function () {
 			const msg_recebido =
 				frm.doc.status === "Recebido" || frm.doc.status === "Repassado"
 					? __(
-							"Cancelar pagamento já recebido? A parcela em honorários voltará para <strong>Cancelado</strong> e o contrato deixará de constar como quitado se aplicável."
+							"Cancelar recebimento já recebido? A parcela em honorários voltará para <strong>Cancelado</strong> e o contrato deixará de constar como quitado se aplicável."
 					  )
 					: __(
-							"Cancelar este pagamento? A parcela correspondente em honorários será marcada como <strong>Cancelado</strong>."
+							"Cancelar este recebimento? A parcela correspondente em honorários será marcada como <strong>Cancelado</strong>."
 					  );
 
 			frappe.confirm(msg_recebido, function () {
@@ -105,13 +105,13 @@ function configurar_botoes_honorarios(frm) {
 					method: "advocacia.advocacia.financeiro.cancelar_pagamento_honorarios",
 					args: { pagamento_name: frm.doc.name },
 					freeze: true,
-					freeze_message: __("Cancelando pagamento..."),
+					freeze_message: __("Cancelando recebimento..."),
 					callback: function (r) {
 						if (!r.message) {
 							return;
 						}
 						frappe.show_alert({
-							message: __("Legal Payment cancelado."),
+							message: __("Recebimento cancelado."),
 							indicator: "green",
 						});
 						frm.reload_doc();

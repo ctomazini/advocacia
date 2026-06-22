@@ -22,12 +22,12 @@ class LegalPayment(Document):
 
 		if self.origin_type == TIPO_HONORARIOS and not self.fee_agreement:
 			frappe.throw(
-				_("Acordo é obrigatório para pagamentos de honorários."),
+				_("Acordo é obrigatório para recebimentos de honorários."),
 				title=_("Campo obrigatório"),
 			)
 		if self.origin_type == TIPO_ATOS and not self.service_record:
 			frappe.throw(
-				_("Service Record é obrigatório para pagamentos de atos."),
+				_("Cobrança de Serviço é obrigatória para recebimentos de atos."),
 				title=_("Campo obrigatório"),
 			)
 
@@ -38,7 +38,7 @@ class LegalPayment(Document):
 			old_status = frappe.db.get_value(self.doctype, self.name, "status")
 			if old_status == "Cancelado":
 				frappe.throw(
-					_("Legal Payment cancelado não pode ser alterado. Exclua o registro se necessário."),
+					_("Recebimento cancelado não pode ser alterado. Exclua o registro se necessário."),
 					title=_("Registro imutável"),
 				)
 
@@ -50,7 +50,7 @@ class LegalPayment(Document):
 			)
 			if existing:
 				frappe.throw(
-					_("Já existe pagamento para a origem {0}.").format(self.installment_origin_id)
+					_("Já existe recebimento para a origem {0}.").format(self.installment_origin_id)
 				)
 
 		self._compor_titulo()
@@ -63,7 +63,7 @@ class LegalPayment(Document):
 
 	def before_save(self):
 		if self.is_new() and self.status == "Cancelado":
-			frappe.throw(_("Não é permitido criar pagamento já cancelado."))
+			frappe.throw(_("Não é permitido criar recebimento já cancelado."))
 		if is_pagamento_atos(self):
 			self.manual_override = 0
 		if not self.manual_override and self.status in ("Pendente", "Vencido"):

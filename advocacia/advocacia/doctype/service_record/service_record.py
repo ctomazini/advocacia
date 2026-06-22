@@ -70,8 +70,8 @@ class ServiceRecord(Document):
 				continue
 			frappe.throw(
 				_(
-					"Não é permitido voltar o ato para Pendente enquanto o pagamento {0} estiver ativo. "
-					"Cancele o pagamento primeiro."
+					"Não é permitido voltar o ato para Pendente enquanto o recebimento {0} estiver ativo. "
+					"Cancele o recebimento primeiro."
 				).format(pagamento_name),
 				title=_("Ato já faturado"),
 			)

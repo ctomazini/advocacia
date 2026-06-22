@@ -64,11 +64,11 @@ def notificar_parcelas_vencidas():
 	)
 	count = 0
 	for p in pagamentos:
-		subject = _("Legal Payment vencido: {0}").format(p.name)
+		subject = _("Recebimento vencido: {0}").format(p.name)
 		if notification_already_sent("Legal Payment", p.name, subject):
 			continue
 		message = _(
-			"O pagamento {0} (vencimento {1}) esta vencido ha 3 dias. Origem: {2}."
+			"O recebimento {0} (vencimento {1}) está vencido há 3 dias. Origem: {2}."
 		).format(
 			p.name,
 			frappe.utils.formatdate(p.due_date),
@@ -105,14 +105,14 @@ def notificar_audiencias_hoje():
 	)
 	count = 0
 	for aud in audiencias:
-		subject = _("Hearing hoje: {0} - {1}").format(
+		subject = _("Audiência hoje: {0} - {1}").format(
 			aud.client or aud.name,
 			aud.type or "",
 		)
 		if notification_already_sent("Hearing", aud.name, subject):
 			continue
 		message = _(
-			"Hearing {0} ({1}) hoje as {2}. Vara: {3}."
+			"Audiência {0} ({1}) hoje às {2}. Vara: {3}."
 		).format(
 			aud.type or "",
 			aud.modality or "",

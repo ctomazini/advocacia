@@ -99,7 +99,7 @@
 				__("Saúde, indicadores e pendências") +
 				"</p></div>" +
 				'<span class="painel-section-link" data-route-list="Legal Payment">' +
-				__("Ver pagamentos") +
+				__("Ver recebimentos") +
 				"</span></div>";
 			html += '<div class="painel-finance-stack">';
 			html += '<div class="painel-finance-stack__health">';

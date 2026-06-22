@@ -211,9 +211,9 @@ def _marcar_pagamento_recebido(pagamento_name):
 
 	doc = frappe.get_doc("Legal Payment", pagamento_name)
 	if doc.status == "Cancelado":
-		frappe.throw(_("Legal Payment cancelado não pode ser alterado."))
+		frappe.throw(_("Recebimento cancelado não pode ser alterado."))
 	if doc.status in ("Recebido", "Repassado"):
-		frappe.throw(_("Legal Payment já está {0}").format(doc.status))
+		frappe.throw(_("Recebimento já está {0}").format(doc.status))
 
 	doc.status = "Recebido"
 	doc.received_date = today()
