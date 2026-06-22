@@ -3,7 +3,7 @@
 Documento permanente de acompanhamento do projeto de modernização de experiência do usuário.
 
 **Criado:** 2026-06-09
-**Última atualização:** 2026-06-09 (Etapa 02 — drift estrutural sidebar)
+**Última atualização:** 2026-06-09 (Etapa 03 — labels verdes do glossário)
 **App:** `advocacia` (Frappe v16)
 
 ---
@@ -239,7 +239,42 @@ Despesas judiciais vinculadas ao processo: taxas judiciais, custas de perícia, 
 
 **Pendências:** —
 
-**Próximas etapas:** Etapa 03 — labels JSON DocTypes (campos EN)
+**Próximas etapas:** Etapa 04 — auditoria pós-implementação (revisão manual + itens âmbar restantes)
+
+---
+
+### Etapa 03 — Aplicar mudanças verdes do glossário
+
+**Status:** Concluída
+**Data:** 2026-06-09
+**Branch:** `ux/step-03-green-risk-labels`
+**Responsável:** Sessão Agent / projeto Advocacia
+
+**Objetivo:** Aplicar exclusivamente divergências classificadas como risco **V** (labels, traduções, menu, seções) do Glossário Sprint 1A, sem alterar schema, DocType names, rotas ou placeholders Word.
+
+**Commits (por grupo funcional):**
+
+| Grupo | Commit | Descrição |
+|-------|--------|-----------|
+| 1 | `3816ee1` | Legal Case: Serviços → Processos (menu, translations, hub, satélites, relatórios) |
+| 2 | `5d1792c` | Financeiro: Recebimentos, Contratos de Honorários, Cobranças de Serviço, etc. |
+| 3 | `412804e` | Cadastros auxiliares + campos EN (Cliente, Vara, Tribunal, Comarca, Tarefa) |
+| 3b | *(HEAD−1)* | Labels restantes: Office Expense, Service Record, Horas Trabalhadas |
+| 4 | — | Deduplicação sidebar: **não necessária** (Etapa 01 confirmou 28 links únicos) |
+
+**Arquivos principais:** `setup/translations.py`, `setup/sidebar.py`, `workspace_sidebar/advocacia.json`, `workspace/advocacia/advocacia.json`, `fixtures/workspace.json`, `adv_case_nav.js`, `case_hub.js`, `public/js/painel/*`, 20+ JSON de DocTypes, `add_field_descriptions.py`, relatórios (labels em `.py`/`.js`).
+
+**DIV resolvidas (V + hub/painel tocados):** DIV-001–DIV-009, DIV-011–DIV-035, DIV-036–DIV-038, DIV-040–DIV-046, DIV-047 *(parcial — mapas ainda duplicados, ver DT-01)*.
+
+**DIV pendentes (Etapa 04+):** nenhuma **V** crítica restante no escopo menu/forms; itens **âmbar** de textos de ajuda (DT-06), manual (DT-04), notificações (DT-02).
+
+**Testes:** **311 + 3 = 314** verdes após cada grupo (`bench --site advocacia.local run-tests --app advocacia`).
+
+**Validação:** `migrate` + `bench build --app advocacia` executados; paridade sidebar confirmada via `test_sidebar_json`.
+
+**Pendências Etapa 04:** auditoria visual no browser; unificar `translations.py` ↔ `adv_case_nav.js` (DT-01); textos de ajuda financeiros (DT-06); `generate_manual.py` / manual (DT-04); notificações EN (DT-02).
+
+**Próximas etapas:** Etapa 04 — auditoria de aderência pós-implementação
 
 ---
 
@@ -489,7 +524,7 @@ Inventário read-only (Etapa 01). **47 itens** agrupados por área. Risco: **V**
 | DT-02 | Notificação `Advocacia - Hearing amanha` com subject/body em inglês (“Hearing amanha”, “Court Branch”) | Baixa | Backlog |
 | DT-03 | Custom Fields Event (`Source DocType`, `Source Name`) visíveis ao admin — fora do glossário jurídico | Baixa | Backlog |
 | DT-04 | `manual_usuario.md` e `generate_manual.py` ainda usam “Serviço”, “Pagamento”, nomes EN de DocType | Média | 11 (docs) |
-| DT-05 | Inconsistência sidebar “Fluxo de Caixa” vs workspace “Fluxo de Caixa Projetado” | Baixa | 02 |
+| DT-05 | Inconsistência sidebar “Fluxo de Caixa” vs workspace “Fluxo de Caixa Projetado” | Baixa | ~~02~~ **Resolvido Etapa 03** |
 | DT-06 | Nenhum texto de ajuda financeiro obrigatório (§ glossário) implementado nos forms/hub | Alta | 08–09 |
 
 ---
@@ -515,9 +550,9 @@ Inventário read-only (Etapa 01). **47 itens** agrupados por área. Risco: **V**
 
 ## Checklist de Segurança
 
-- [ ] Nenhum DocType EN alterado
-- [ ] Nenhum Role alterado
-- [ ] Nenhum Report Slug alterado
-- [ ] Nenhuma rota alterada
-- [ ] Nenhum placeholder Word alterado
-- [ ] Nenhum schema alterado
+- [x] Nenhum DocType EN alterado
+- [x] Nenhum Role alterado
+- [x] Nenhum Report Slug alterado
+- [x] Nenhuma rota alterada
+- [x] Nenhum placeholder Word alterado
+- [x] Nenhum schema alterado
