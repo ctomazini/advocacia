@@ -3,7 +3,7 @@
 Documento permanente de acompanhamento do projeto de modernização de experiência do usuário.
 
 **Criado:** 2026-06-09
-**Última atualização:** 2026-06-09
+**Última atualização:** 2026-06-09 (Etapa 01 — auditoria de aderência)
 **App:** `advocacia` (Frappe v16)
 
 ---
@@ -124,7 +124,16 @@ Despesas do Escritório (Office Expense) — gasto operacional sem vínculo a pr
 
 ### 6. Relatórios
 
-(Auditar slugs reais na Etapa 01 e preencher aqui)
+| Slug (intocável) | Nome exibido atual | Nome oficial Sprint 1A | `ref_doctype` | Onde aparece |
+|------------------|-------------------|------------------------|---------------|--------------|
+| `produtividade` | Produtividade | Produtividade | `Legal Case` | sidebar, workspace |
+| `horas_por_servico` | Horas por Serviço | Horas por Processo | `Time Entry` | sidebar, workspace |
+| `inadimplencia` | Inadimplência | Inadimplência | `Legal Payment` | sidebar, workspace, painel |
+| `fluxo_de_caixa` | Fluxo de Caixa / Fluxo de Caixa Projetado | Fluxo de Caixa Projetado | `Legal Payment` | sidebar, workspace |
+| `honorarios_por_cliente` | Honorários por Cliente | Honorários por Cliente | `Fee Agreement` | sidebar, workspace |
+| `carteira_ativa` | Carteira Ativa | Carteira Ativa | `Legal Case` | sidebar, workspace |
+
+**Nota:** slugs permanecem inalterados (restrição VM). Apenas labels de menu/workspace/report title são elegíveis para correção.
 
 ### 7. Abas e painéis dentro do Processo (hub)
 
@@ -228,9 +237,49 @@ Despesas judiciais vinculadas ao processo: taxas judiciais, custas de perícia, 
 
 **Resultado:** Base normativa pronta para Sprint 1A.
 
-**Pendências:** Etapa 01 (auditoria de aderência ao glossário)
+**Pendências:** —
 
-**Próximas etapas:** Etapa 01 — Auditoria de aderência
+**Próximas etapas:** Etapa 02 — aplicar glossário em `translations.py` e navegação
+
+---
+
+### Etapa 01 — Auditoria de aderência ao glossário
+
+**Status:** Concluída
+**Data:** 2026-06-09
+**Responsável:** Sessão Agent / projeto Advocacia
+
+**Objetivo:** Mapear todas as ocorrências de termos que divergem do Glossário Sprint 1A (somente leitura).
+
+**Arquivos analisados:**
+- `advocacia/advocacia/setup/sidebar.py`
+- `advocacia/workspace_sidebar/advocacia.json`
+- `advocacia/advocacia/workspace/advocacia/advocacia.json`
+- `advocacia/fixtures/workspace.json`
+- `advocacia/advocacia/setup/translations.py`
+- `advocacia/public/js/adv_case_nav.js`
+- `advocacia/public/js/case_hub.js`
+- `advocacia/public/js/painel/*.js`
+- `advocacia/advocacia/doctype/*/*.json` (26 DocTypes)
+- `advocacia/advocacia/report/*/*.json` (6 relatórios)
+- `advocacia/fixtures/notification.json`, `print_format.json`, `kanban_board.json`
+- `advocacia/hooks.py` (fixtures)
+
+**Mudanças realizadas:** Atualização deste documento (divergências, matriz, relatórios §6, débitos).
+
+**Arquivos criados:** Nenhum (somente edição do roadmap).
+
+**Impactos identificados:** 47 divergências catalogadas (DIV-001–DIV-047); 0 alterações no app.
+
+**Riscos identificados:** Duplicação de mapas de labels (`translations.py` vs `adv_case_nav.js`); notificações e custom fields Event em inglês exposto ao admin.
+
+**Testes executados:** Nenhum (auditoria read-only).
+
+**Resultado:** Inventário completo pronto para Sprint 1A (Etapas 02–09).
+
+**Pendências:** Implementar correções por prioridade (menu → translations → forms → hub → painel → help texts).
+
+**Próximas etapas:** Etapa 02 — `translations.py` + sidebar/workspace alinhados ao glossário
 
 ---
 
@@ -274,15 +323,136 @@ Despesas judiciais vinculadas ao processo: taxas judiciais, custas de perícia, 
 
 ---
 
+### DEC-002
+**Contexto:** Menu sidebar usa **Honorários** como label do DocType `Fee Agreement`.
+**Decisão:** Nome oficial na lista/menu: **Contratos de Honorários**. Atalho coloquial “Honorários” aceitável apenas em botões `+` dentro do hub, não como nome do módulo.
+**Motivação:** Diferenciar contrato (Fee Agreement) de conceito genérico “honorários”.
+**Impacto:** sidebar, workspace, translations, adv_case_nav.
+
+---
+
 ## Divergências Encontradas
 
-(Preencher na Etapa 01)
+Inventário read-only (Etapa 01). **47 itens** agrupados por área. Risco: **V** = label/tradução; **A** = hub/painel/mensagem (requer teste); **VM** = proibido alterar neste projeto.
+
+### Menu, workspace e traduções globais
+
+| ID | Termo atual | Glossário Sprint 1A | Onde aparece | Arquivos | Risco |
+|----|-------------|---------------------|--------------|----------|-------|
+| DIV-001 | Serviços | Processos | Sidebar, workspace, shortcuts, translations | `sidebar.py`, `workspace_sidebar/advocacia.json`, `workspace/advocacia/advocacia.json`, `fixtures/workspace.json`, `translations.py`, `adv_case_nav.js` | V |
+| DIV-002 | Pagamentos | Recebimentos | Sidebar, workspace, shortcuts, translations | Idem + `legal_payment_list.js` (filtros UI) | V |
+| DIV-003 | Cobrança de serviços | Cobranças de Serviço | Sidebar, workspace, translations | `sidebar.py`, `translations.py`, `adv_case_nav.js`, `case_hub.js` | V |
+| DIV-004 | Despesas | Despesas do Escritório | Sidebar, workspace, translations | `sidebar.py`, `translations.py` (`Office Expense`) | V |
+| DIV-005 | Honorários (menu DocType) | Contratos de Honorários | Sidebar, workspace, translations | `sidebar.py`, `translations.py` (`Fee Agreement`) | V |
+| DIV-006 | Modelos Word | Modelos de Documento | Sidebar, workspace, translations | `sidebar.py`, `translations.py` | V |
+| DIV-007 | Horas por Serviço | Horas por Processo | Sidebar, workspace, report label | `sidebar.py`, `horas_por_servico.json` | V |
+| DIV-008 | Escritório | Configurações do Escritório | Sidebar, workspace, translations | `sidebar.py`, `translations.py` (`Office Settings`) | V |
+| DIV-009 | Configuração do Escritório | Configurações do Escritório | translations.py | `translations.py` | V |
+| DIV-010 | Documentos do Processo | Documentos do Processo | OK — manter | — | — |
+| DIV-011 | Fluxo de Caixa (sidebar) vs Fluxo de Caixa Projetado (workspace) | Fluxo de Caixa Projetado (uniformizar) | Sidebar vs workspace shortcut | `sidebar.py`, `workspace/advocacia/advocacia.json` | V |
+
+### DocType translations (seed)
+
+| ID | Termo atual | Glossário Sprint 1A | Onde aparece | Arquivos | Risco |
+|----|-------------|---------------------|--------------|----------|-------|
+| DIV-012 | Parcelas de Honorários (`Fee Installment`) | Parcela do Contrato | Tradução DocType child | `translations.py` | V |
+| DIV-013 | Itens de cobrança (`Legal Act Item`) | Ato Cobrado | Tradução DocType child | `translations.py` | V |
+
+### Campos de formulário — inglês exposto (labels JSON)
+
+| ID | Termo atual | Glossário Sprint 1A | Onde aparece | Arquivos | Risco |
+|----|-------------|---------------------|--------------|----------|-------|
+| DIV-014 | Client | Cliente | 12+ DocTypes (Link) | `legal_case.json`, `hearing.json`, `deadline.json`, `legal_task.json`, `fee_agreement.json`, `legal_payment.json`, `service_record.json`, `court_cost.json`, `time_entry.json`, `case_communication.json` | V |
+| DIV-015 | Court Branch | Vara | Legal Case, Hearing | `legal_case.json`, `hearing.json` | V |
+| DIV-016 | Court | Tribunal | Legal Case | `legal_case.json` | V |
+| DIV-017 | Case Phase | Fase Processual | Legal Case | `legal_case.json` | V |
+| DIV-018 | Jurisdiction | Comarca | Legal Case, Court Branch | `legal_case.json`, `court_branch.json` | V |
+| DIV-019 | Nome da Jurisdiction | Nome da Comarca | Jurisdiction | `jurisdiction.json` | V |
+| DIV-020 | Nome do Court | Nome do Tribunal | Court | `court.json` | V |
+| DIV-021 | Nome da Court Branch | Nome da Vara | Court Branch | `court_branch.json` | V |
+| DIV-022 | Descrição da Legal Task | Resumo da tarefa | Legal Task | `legal_task.json` | V |
+| DIV-023 | Gerar Legal Task / Legal Task Gerada | Gerar Tarefa / Tarefa gerada | Case Communication | `case_communication.json` | V |
+| DIV-024 | Percentual Client / Valor Client / Total Client | Percentual do cliente / Valor do cliente / Total cliente | Fee Agreement, Fee Installment | `fee_agreement.json`, `fee_installment.json` | V |
+| DIV-025 | Legal Payment (label child) | Recebimento | Fee Installment | `fee_installment.json` | V |
+| DIV-026 | Data de Repasse ao Client | Data de repasse ao cliente | Fee Installment | `fee_installment.json` | V |
+| DIV-027 | Data de Legal Payment / Forma de Legal Payment | Data de pagamento / Forma de pagamento | Court Cost, Office Expense | `court_cost.json`, `office_expense.json` | V |
+| DIV-028 | Repassar ao Client | Repassar ao cliente | Court Cost | `court_cost.json` | V |
+| DIV-029 | Vencimento e Legal Payment (section) | Vencimento e pagamento | Office Expense | `office_expense.json` | V |
+| DIV-030 | Pagamento (label child Legal Act Item) | Recebimento | Legal Act Item | `legal_act_item.json` | V |
+| DIV-031 | Último pagamento | Último recebimento | Service Record | `service_record.json` | V |
+| DIV-032 | Serviço (Link label) | Processo | Todos os satélites com `legal_case` | 10+ JSON de DocTypes | V |
+| DIV-033 | Cobrança de serviços (Link Legal Payment) | Cobrança de Serviço | Legal Payment | `legal_payment.json` | V |
+| DIV-034 | Honorários (Link Fee Agreement) | Contrato de Honorários | Legal Payment | `legal_payment.json` | V |
+
+### Hub Legal Case — abas e painéis
+
+| ID | Termo atual | Glossário Sprint 1A | Onde aparece | Arquivos | Risco |
+|----|-------------|---------------------|--------------|----------|-------|
+| DIV-035 | Resumo do Serviço | Resumo do Processo | HTML panel | `legal_case.json` | V |
+| DIV-036 | Pagamentos (aba/seção hub) | Recebimentos | Tab/section + case_hub KPIs | `legal_case.json`, `case_hub.js` | A |
+| DIV-037 | Parcelas de Honorários (painel hub) | Recebimentos de Honorários | `legal_case.json`, `case_hub.js` | A |
+| DIV-038 | Cobrança de serviços (painel hub) | Serviços Avulsos | `legal_case.json`, `case_hub.js` | A |
+| DIV-039 | Horas (section) | Horas Trabalhadas | `legal_case.json` | V |
+| DIV-040 | Pagamentos pendentes (KPI hub) | Recebimentos pendentes | `case_hub.js` | A |
+
+### Painel / ações rápidas / navegação JS
+
+| ID | Termo atual | Glossário Sprint 1A | Onde aparece | Arquivos | Risco |
+|----|-------------|---------------------|--------------|----------|-------|
+| DIV-041 | Client (chip ação rápida) | Cliente | Painel hero | `public/js/painel/hero.js` | A |
+| DIV-042 | Serviço (chip) | Processo | Painel hero | `public/js/painel/hero.js` | A |
+| DIV-043 | Legal Task (chip) | Tarefa | Painel hero, timeline fallback | `hero.js`, `timeline.js` | A |
+| DIV-044 | Legal Payment (chip) | Recebimento | Painel hero, financeiro | `hero.js`, `financeiro.js` | A |
+| DIV-045 | Voltar ao Serviço | Voltar ao Processo | Botão satélites | `adv_case_nav.js` | A |
+| DIV-046 | Legal Task (fallback timeline) | Tarefa | Painel timeline | `timeline.js` | A |
+| DIV-047 | Mapa duplicado desatualizado | Espelhar glossário | `DOCTYPE_NAV_LABELS` vs `translations.py` | `adv_case_nav.js` | A |
+
+### Itens auditados — conformes ou VM (sem ação UI)
+
+| Item | Status |
+|------|--------|
+| Slugs relatórios (`produtividade`, `inadimplencia`, …) | VM — intocável |
+| DocType names EN | VM — intocável |
+| Rota `painel` | VM — intocável |
+| Roles Advocacia User/Manager | VM — intocável |
+| Fieldnames EN (`legal_case`, `client`, …) | VM — intocável |
+| Print formats “Serviço / Processo” no recibo | Aceitável (texto misto explicativo) |
+| Botões Gerar Parcelas / Sincronizar Cobrança | Label OK — falta tooltip (DEC-F04, Etapas 07–09) |
+| Seções Dia a Dia, Gestão de Casos, Financeiro, Relatórios, Cadastros | Conformes |
+| Painel do Escritório (page title) | Conforme |
+| Prazos, Audiências, Tarefas, Comunicações (menu) | Conformes |
+| Comarca, Vara, Tribunal, Fase Processual (menu) | Conformes |
+
+---
+
+## Matriz de impacto (Etapa 01)
+
+| Área | Divergências | Arquivos estimados | Etapa alvo sugerida | Risco dominante |
+|------|:------------:|:------------------:|--------------------|-----------------|
+| `translations.py` | 8 | 1 | 02 | V |
+| Sidebar + workspace_sidebar + workspace JSON + fixtures | 9 | 4 | 02 | V |
+| Labels JSON DocTypes (campo Link/Data) | 21 | 15+ | 03–05 | V |
+| Hub `legal_case.json` + `case_hub.js` | 6 | 2 | 06 | A |
+| Painel `public/js/painel/*` | 6 | 4 | 07 | A |
+| `adv_case_nav.js` | 2 | 1 | 02 | A |
+| Textos de ajuda / tooltips financeiros | 0 implementados | 5+ | 08–09 | A |
+| Notificações (subject/body EN) | 2 | 1 | 10+ | A |
+| Relatório label “Horas por Serviço” | 1 | 2 | 02 | V |
+
+**Total divergências acionáveis:** 47 (excl. VM e conformes).
 
 ---
 
 ## Débitos Técnicos Identificados
 
-(Preencher conforme descobertos)
+| ID | Descrição | Severidade | Etapa sugerida |
+|----|-----------|------------|----------------|
+| DT-01 | Dois mapas de labels (`translations.py` e `adv_case_nav.DOCTYPE_NAV_LABELS`) divergem e duplicam manutenção | Média | 02 — unificar fonte |
+| DT-02 | Notificação `Advocacia - Hearing amanha` com subject/body em inglês (“Hearing amanha”, “Court Branch”) | Baixa | Backlog |
+| DT-03 | Custom Fields Event (`Source DocType`, `Source Name`) visíveis ao admin — fora do glossário jurídico | Baixa | Backlog |
+| DT-04 | `manual_usuario.md` e `generate_manual.py` ainda usam “Serviço”, “Pagamento”, nomes EN de DocType | Média | 11 (docs) |
+| DT-05 | Inconsistência sidebar “Fluxo de Caixa” vs workspace “Fluxo de Caixa Projetado” | Baixa | 02 |
+| DT-06 | Nenhum texto de ajuda financeiro obrigatório (§ glossário) implementado nos forms/hub | Alta | 08–09 |
 
 ---
 
