@@ -3,7 +3,7 @@
 Documento permanente de acompanhamento do projeto de modernização de experiência do usuário.
 
 **Criado:** 2026-06-09
-**Última atualização:** 2026-06-09 (Etapa 03 — labels verdes do glossário)
+**Última atualização:** 2026-06-09 (Etapa 04 — auditoria pós-verdes)
 **App:** `advocacia` (Frappe v16)
 
 ---
@@ -239,7 +239,89 @@ Despesas judiciais vinculadas ao processo: taxas judiciais, custas de perícia, 
 
 **Pendências:** —
 
-**Próximas etapas:** Etapa 04 — auditoria pós-implementação (revisão manual + itens âmbar restantes)
+**Próximas etapas:** Etapa 05 — mensagens e feedback UI (pagamento → recebimento)
+
+---
+
+### Etapa 04 — Auditoria pós-mudanças verdes
+
+**Status:** Concluída
+**Data:** 2026-06-09
+**Branch:** `ux/step-03-green-risk-labels` (auditoria read-only sobre commits Etapa 03)
+**Responsável:** Sessão Agent / projeto Advocacia
+**Commit:** `38976dc` — `[UX-STEP-04] Docs: post-green audit results`
+
+**Objetivo:** Garantir que labels verdes da Etapa 03 não introduziram regressões (testes, sidebar, traduções, relatórios, permissões). Somente leitura — zero implementação.
+
+**Pré-requisitos confirmados:**
+- Etapa 03 commitada (`3816ee1` … `599b518`)
+- `bench --site advocacia.local migrate` executado antes da auditoria
+
+#### Validações automatizadas
+
+| # | Verificação | Resultado |
+|---|-------------|-----------|
+| 1 | `run-tests --app advocacia` | **314 OK** (311 + 3 `test_sidebar_json`) |
+| 2 | `test_sidebar_json` isolado | Incluído no suite completo — OK *(execução isolada falhou por lock DB concorrente; suite completa passou)* |
+| 3 | Sidebar no banco (`tabWorkspace Sidebar Item`, parent=Advocacia) | **33 itens** (5 seções + 28 links) — labels alinhados ao glossário |
+| 4 | Traduções DocType no banco (pt + pt-BR) | **23 pares** × 2 idiomas = 46 registros — todos batem com `DOCTYPE_LABELS` |
+| 7 | Script reports (`execute` com filters vazios) | **6/6 OK** — produtividade, horas_por_servico, inadimplencia, fluxo_de_caixa, honorarios_por_cliente, carteira_ativa |
+| 8 | Permissões `Advocacia User` / `Advocacia Manager` | **22 DocTypes** cada — CRUD conforme esperado (User sem delete em transacionais) |
+
+#### Validações manuais (browser)
+
+| # | Verificação | Resultado |
+|---|-------------|-----------|
+| 5 | Hub Legal Case (`SERV-2026-18425`) | **Não executado** — servidor web indisponível no ambiente de auditoria (`chrome-error` em `:8000`). Verificação substituta: labels em `legal_case.json` + `case_hub.js` conforme glossário §7 |
+| 6 | Painel (`/app/painel`) | **Não executado** — mesmo bloqueio. Verificação substituta: `hero.js`, `kpis.js`, `financeiro.js` — chips Cliente/Tarefa/Recebimento OK; links “Ver pagamentos” pendente (AUD-001) |
+
+#### Sidebar no banco (links, pós-migrate)
+
+Ordem idêntica a `SIDEBAR_LINK_ORDER`: Processos, Recebimentos, Contratos de Honorários, Cobranças de Serviço, Despesas do Escritório, Modelos de Documento, Horas por Processo, Fluxo de Caixa Projetado, Configurações do Escritório, etc.
+
+#### Itens verificados sem problema (OK)
+
+- Testes unitários/integração: **314 verdes**, sem regressão vs Etapa 03
+- Paridade código ↔ JSON sidebar (`test_sidebar_json`)
+- Sidebar DB ↔ `sidebar.py` ↔ `workspace_sidebar/advocacia.json`
+- Seed de traduções DocType aplicado no banco (pt + pt-BR)
+- Slugs de relatório intocados (`report_name` = slug EN)
+- Relatórios executam sem exceção; colunas principais em PT (Processo, Cliente, Fase Processual)
+- Permissões por role inalteradas
+- Checklist de segurança Etapa 03 mantida (sem schema/DocType EN/rotas/placeholders)
+- Hub JSON: abas Financeiro, Recebimentos de Honorários, Recebimentos, Serviços Avulsos, Horas Trabalhadas, Resumo do Processo
+- Painel hero: chips Cliente, Processo, Tarefa, Recebimento, Despesa do Escritório
+
+#### Problemas encontrados (AUD-XXX)
+
+| ID | Severidade | Área | Problema | Causa / notas | Etapa sugerida |
+|----|------------|------|----------|---------------|----------------|
+| AUD-001 | **Médio** | Forms + painel + backend | Mensagens/botões ainda usam “pagamento”, “Legal Payment” para **entrada** do cliente | Escopo Etapa 03 foi labels de menu/campo; `legal_payment.js`, `service_record.js`, `handlers.js`, `main.js`, `financeiro.py` (throws visíveis) não foram revisados | **05** |
+| AUD-002 | **Médio** | Hub + forms financeiros | Textos de ajuda obrigatórios (§ glossário) ausentes | DT-06 — banner Financeiro, intros Fee Agreement / Service Record / Legal Payment / Court Cost | **08–09** |
+| AUD-003 | **Baixo** | Arquitetura labels | `translations.py` e `adv_case_nav.DOCTYPE_NAV_LABELS` duplicados | DT-01 — sincronizados pós-Etapa 03, mas sem fonte única | **05** |
+| AUD-004 | **Baixo** | Notificações | Subject/body EN: “Hearing amanha”, “Court Branch”, “servico” | DT-02 — `fixtures/notification.json` | Backlog |
+| AUD-005 | **Baixo** | Documentos hub | `documentos_generate_dialog.js`: “Salve o **serviço** antes…” | Fora do lote Etapa 03 | **05** |
+| AUD-006 | **Baixo** | Hub pills | Pills usam `_nav_label()` → plural de lista (“Tarefas”, “Recebimentos”) | By design para atalho de lista; singular só em chips do painel | Aceitar ou **06** |
+| AUD-007 | **Baixo** | Dashboard Legal Case | Grupos de links ainda “Honorários” (não “Contratos de Honorários”) | Widget Frappe dashboard — baixa visibilidade | **06** |
+| AUD-008 | **Baixo** | Hub aba Horas | Section “Horas Trabalhadas” vs painel “Registro de Horas” | Dois conceitos próximos no mesmo tab | **06** |
+| AUD-009 | **Baixo** | Relatório fluxo_de_caixa | Coluna oculta “Origem DocType” expõe EN | Campo técnico de Dynamic Link | Backlog |
+| AUD-010 | **Baixo** | Manual | `generate_manual.py` / manual ainda com “Serviço”, “Pagamento” | DT-04 | **11** |
+| AUD-011 | **Baixo** | Fee Agreement form | Botão “Re-sincronizar **Legal Payments**” | Label de botão não incluído na Etapa 03 | **05** |
+
+**Críticos:** nenhum (testes verdes, permissões OK, sidebar/traduções OK).
+
+#### Backlog priorizado — Etapa 05+
+
+| Prioridade | Item | AUD / DT |
+|------------|------|----------|
+| P1 | Mensagens e botões: pagamento/Legal Payment → recebimento (forms + painel + throws user-facing) | AUD-001, AUD-005, AUD-011 |
+| P2 | Unificar mapa de labels (`translations.py` → consumo único no JS) | AUD-003 / DT-01 |
+| P3 | Textos de ajuda financeiros (banner hub + intros forms + tooltips DEC-F04) | AUD-002 / DT-06 |
+| P4 | Hub/dashboard polish (grupos dashboard, pills singular/plural, aba Horas) | AUD-006–008 |
+| P5 | Notificações PT | AUD-004 / DT-02 |
+| P6 | Manual e docs operacionais | AUD-010 / DT-04 |
+
+**Próximas etapas:** Etapa 05 — mensagens de feedback UI (AUD-001, AUD-005, AUD-011)
 
 ---
 
@@ -259,7 +341,7 @@ Despesas judiciais vinculadas ao processo: taxas judiciais, custas de perícia, 
 | 1 | `3816ee1` | Legal Case: Serviços → Processos (menu, translations, hub, satélites, relatórios) |
 | 2 | `5d1792c` | Financeiro: Recebimentos, Contratos de Honorários, Cobranças de Serviço, etc. |
 | 3 | `412804e` | Cadastros auxiliares + campos EN (Cliente, Vara, Tribunal, Comarca, Tarefa) |
-| 3b | *(HEAD−1)* | Labels restantes: Office Expense, Service Record, Horas Trabalhadas |
+| 3b | `5dfb494` | Labels restantes: Office Expense, Service Record, Horas Trabalhadas |
 | 4 | — | Deduplicação sidebar: **não necessária** (Etapa 01 confirmou 28 links únicos) |
 
 **Arquivos principais:** `setup/translations.py`, `setup/sidebar.py`, `workspace_sidebar/advocacia.json`, `workspace/advocacia/advocacia.json`, `fixtures/workspace.json`, `adv_case_nav.js`, `case_hub.js`, `public/js/painel/*`, 20+ JSON de DocTypes, `add_field_descriptions.py`, relatórios (labels em `.py`/`.js`).
@@ -520,7 +602,7 @@ Inventário read-only (Etapa 01). **47 itens** agrupados por área. Risco: **V**
 
 | ID | Descrição | Severidade | Etapa sugerida |
 |----|-----------|------------|----------------|
-| DT-01 | Dois mapas de labels (`translations.py` e `adv_case_nav.DOCTYPE_NAV_LABELS`) divergem e duplicam manutenção | Média | 03 — unificar fonte |
+| DT-01 | Dois mapas de labels (`translations.py` e `adv_case_nav.DOCTYPE_NAV_LABELS`) divergem e duplicam manutenção | Média | ~~03~~ Sincronizados Etapa 03 — unificar fonte **Etapa 05** (AUD-003) |
 | DT-02 | Notificação `Advocacia - Hearing amanha` com subject/body em inglês (“Hearing amanha”, “Court Branch”) | Baixa | Backlog |
 | DT-03 | Custom Fields Event (`Source DocType`, `Source Name`) visíveis ao admin — fora do glossário jurídico | Baixa | Backlog |
 | DT-04 | `manual_usuario.md` e `generate_manual.py` ainda usam “Serviço”, “Pagamento”, nomes EN de DocType | Média | 11 (docs) |
