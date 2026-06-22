@@ -182,7 +182,7 @@
 
 	function abrir_dialog_gerar_documentos(frm) {
 		if (!frm || frm.is_new() || !frm.doc?.name) {
-			frappe.msgprint(__("Salve o serviço antes de gerar documentos."));
+			frappe.msgprint(__("Salve o processo antes de gerar documentos."));
 			return;
 		}
 
