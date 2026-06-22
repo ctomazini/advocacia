@@ -22,31 +22,11 @@
 		"Legal Payment",
 	];
 
-	// Espelha setup/sidebar.py SIDEBAR_LINK_ORDER + setup/translations.py DOCTYPE_LABELS.
-	const DOCTYPE_NAV_LABELS = {
-		"Legal Case": "Processos",
-		"Client": "Clientes",
-		"Legal Payment": "Recebimentos",
-		"Legal Task": "Tarefas",
-		"Time Entry": "Registro de Horas",
-		"Service Record": "Cobranças de Serviço",
-		"Hearing": "Audiências",
-		"Case Communication": "Comunicações",
-		"Court Cost": "Custas Processuais",
-		"Fee Agreement": "Contratos de Honorários",
-		"Fee Installment": "Parcela do Contrato",
-		"Deadline": "Prazos",
-		"Document Template": "Modelos de Documento",
-		"Document Kit": "Kits de Documentos",
-		"Case Document": "Documentos do Processo",
-		"Case Phase": "Fase Processual",
-	};
-
 	const HUB_NAV_DOCTYPES = [CASE_DOCTYPE, ...SATELLITE_DOCTYPES];
 
+	// Labels via Translation seed (setup/translations.py) — use __(doctype) no client.
 	function get_doctype_label(doctype) {
-		const label = DOCTYPE_NAV_LABELS[doctype];
-		return label ? __(label) : __(doctype);
+		return __(doctype);
 	}
 
 	function get_case_fieldname(doctype) {
@@ -632,7 +612,6 @@
 			VERSION: ADV_CASE_NAV_VERSION,
 			HUB_CONTEXT_KEY,
 			SATELLITE_DOCTYPES,
-			DOCTYPE_NAV_LABELS,
 			CASE_FIELD_BY_DOCTYPE,
 			get_doctype_label,
 			get_case_fieldname,
