@@ -359,7 +359,7 @@ def resync_pagamentos_acordo(acordo_name: str) -> dict:
 	)
 	sincronizar_pagamentos_do_acordo(acordo)
 	frappe.msgprint(
-		_("Legal Payments re-sincronizados com sucesso."),
+		_("Recebimentos re-sincronizados com sucesso."),
 		title=_("Sincronização"),
 		indicator="green",
 	)

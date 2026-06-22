@@ -5,9 +5,9 @@ frappe.ui.form.on('Fee Agreement', {
         somar_totais(frm);
 
         if (!frm.is_new()) {
-            frm.add_custom_button(__('Re-sincronizar Legal Payments'), function() {
+            frm.add_custom_button(__('Re-sincronizar Recebimentos'), function() {
                 frappe.confirm(
-                    __('Isso vai re-sincronizar todos os pagamentos com as parcelas atuais. Continuar?'),
+                    __('Isso vai re-sincronizar todos os recebimentos com as parcelas atuais. Continuar?'),
                     function() {
                         frappe.call({
                             method: 'advocacia.advocacia.financeiro.resync_pagamentos_acordo',
