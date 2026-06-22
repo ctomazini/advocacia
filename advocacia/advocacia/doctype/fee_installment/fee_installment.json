@@ -539,7 +539,7 @@
   {
    "fieldname": "payment",
    "fieldtype": "Link",
-   "label": "Legal Payment",
+   "label": "Recebimento",
    "options": "Legal Payment",
    "read_only": 1,
    "in_list_view": 1,

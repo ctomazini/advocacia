@@ -150,10 +150,10 @@ frappe.provide("advocacia.painel.hero");
 	        { label: __("Comunicação"), icon: "message-square-plus", dt: "Case Communication" },
 	        { label: __("Legal Task"), icon: "list-plus", dt: "Legal Task" },
 	        { label: __("Honorário"), icon: "file-plus", dt: "Fee Agreement" },
-	        { label: __("Legal Payment"), icon: "circle-dollar-sign", dt: "Legal Payment" },
+	        { label: __("Recebimento"), icon: "circle-dollar-sign", dt: "Legal Payment" },
 	        { label: __("Custa"), icon: "receipt", dt: "Court Cost" },
 	        { label: __("Horas"), icon: "clock", dt: "Time Entry" },
-	        { label: __("Despesa"), icon: "wallet", dt: "Office Expense" },
+	        { label: __("Despesa do Escritório"), icon: "wallet", dt: "Office Expense" },
 	    ];
 	    var h =
 	        '<div class="painel-actions-wrap">' +

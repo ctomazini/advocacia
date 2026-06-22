@@ -212,7 +212,7 @@ frappe.provide("advocacia.painel.financeiro");
 	        (compact ? " painel-section--nested painel-priority-low" : " painel-priority-low") +
 	        '" id="painel-despesas"><div class="painel-section-head">' +
 	        "<div><h2 class='painel-section-title'>" +
-	        __("Despesas") +
+	        __("Despesas do Escritório") +
 	        "</h2>" +
 	        '<p class="painel-section-sub">' +
 	        __("Pendentes · mês calendário: {0}", [U.fmt_currency(total_mes || 0, true)]) +

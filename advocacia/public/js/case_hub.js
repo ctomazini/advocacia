@@ -323,8 +323,8 @@ function adv_hub_render_service_records(frm, records) {
 		$w.html(
 			_adv_hub_empty(
 				"📝",
-				__("Nenhuma cobrança de serviços"),
-				__("+ Cobrança de serviços"),
+				__("Nenhuma cobrança de serviço"),
+				__("+ Cobrança de Serviço"),
 				"new-record"
 			)
 		);
@@ -359,7 +359,7 @@ function adv_hub_render_service_records(frm, records) {
 				<span class="adv-hub-panel__count">${records.length}</span>
 			</h3>
 			<button type="button" class="adv-hub-panel__action" data-hub-action="new-record">
-				${__("+ Cobrança de serviços")}
+				${__("+ Cobrança de Serviço")}
 			</button>
 		</div>
 		${rows}
@@ -649,7 +649,7 @@ function _adv_hub_render_financial_summary(frm, financial) {
 	const billingSection = pendingBillings.length
 		? `<div class="adv-hub-subsection">
 			<div class="adv-hub-subsection__header">
-				<strong>${__("Cobrança de serviços em aberto")}</strong>
+				<strong>${__("Serviços avulsos em aberto")}</strong>
 				<button type="button" class="adv-hub-panel__action" data-hub-action="list-service-records">${__(
 					"Ver todas"
 				)}</button>
@@ -675,7 +675,7 @@ function _adv_hub_render_financial_summary(frm, financial) {
 			}
 		</div>
 		<p class="adv-hub-panel__hint">${__(
-			"Honorários: contrato parcelado do caso. Cobrança de serviços: itens avulsos a faturar ou já emitidos em pagamento."
+			"Honorários: contrato parcelado do caso. Serviços avulsos: itens a faturar ou já emitidos em recebimento."
 		)}</p>
 		<div class="adv-hub-kpi-row">
 			<div class="adv-hub-kpi">
@@ -694,7 +694,7 @@ function _adv_hub_render_financial_summary(frm, financial) {
 				<div class="adv-hub-kpi__value" style="color:var(--orange-500)">${format_currency(
 					summary.total_pending_honorarios
 				)}</div>
-				<div class="adv-hub-kpi__label">${__("Pagamentos pendentes")}</div>
+				<div class="adv-hub-kpi__label">${__("Recebimentos pendentes")}</div>
 			</div>
 			<div class="adv-hub-kpi">
 				<div class="adv-hub-kpi__value" style="color:var(--purple-500)">${format_currency(
@@ -712,7 +712,7 @@ function _adv_hub_render_financial_summary(frm, financial) {
 		${
 			summary.total_pending_service_payments
 				? `<p class="adv-hub-panel__hint">${__(
-						"Cobrança de serviços já emitidas e aguardando recebimento: {0}",
+						"Serviços avulsos já emitidos e aguardando recebimento: {0}",
 						[format_currency(summary.total_pending_service_payments)]
 				  )}</p>`
 				: ""
@@ -742,7 +742,7 @@ function _adv_hub_render_installments(frm, installments) {
 	if (!$w) return;
 
 	if (!installments.length) {
-		$w.html(`<div class="adv-hub-empty">${__("Nenhuma parcela de honorários registrada.")}</div>`);
+		$w.html(`<div class="adv-hub-empty">${__("Nenhuma parcela do contrato registrada.")}</div>`);
 		return;
 	}
 
@@ -793,7 +793,7 @@ function _adv_hub_render_payments(frm, payments) {
 		$w.html(
 			_adv_hub_empty(
 				"💵",
-				__("Nenhum pagamento registrado"),
+				__("Nenhum recebimento registrado"),
 				`+ ${_nav_label("Legal Payment")}`,
 				"new-payment"
 			)

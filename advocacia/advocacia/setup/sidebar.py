@@ -18,17 +18,17 @@ SIDEBAR_LINK_ORDER = (
 	("Documentos do Processo", "Case Document", "DocType"),
 	("Custas Processuais", "Court Cost", "DocType"),
 	# Financeiro
-	("Pagamentos", "Legal Payment", "DocType"),
-	("Honorários", "Fee Agreement", "DocType"),
-	("Cobrança de serviços", "Service Record", "DocType"),
-	("Despesas", "Office Expense", "DocType"),
-	("Modelos Word", "Document Template", "DocType"),
+	("Recebimentos", "Legal Payment", "DocType"),
+	("Contratos de Honorários", "Fee Agreement", "DocType"),
+	("Cobranças de Serviço", "Service Record", "DocType"),
+	("Despesas do Escritório", "Office Expense", "DocType"),
+	("Modelos de Documento", "Document Template", "DocType"),
 	("Kits de Documentos", "Document Kit", "DocType"),
 	# Relatórios
 	("Produtividade", "produtividade", "Report"),
 	("Horas por Processo", "horas_por_servico", "Report"),
 	("Inadimplência", "inadimplencia", "Report"),
-	("Fluxo de Caixa", "fluxo_de_caixa", "Report"),
+	("Fluxo de Caixa Projetado", "fluxo_de_caixa", "Report"),
 	("Honorários por Cliente", "honorarios_por_cliente", "Report"),
 	("Carteira Ativa", "carteira_ativa", "Report"),
 	# Cadastros
@@ -37,7 +37,7 @@ SIDEBAR_LINK_ORDER = (
 	("Tribunal", "Court", "DocType"),
 	("Fase Processual", "Case Phase", "DocType"),
 	("Categoria de Documento", "Document Category", "DocType"),
-	("Escritório", "Office Settings", "DocType"),
+	("Configurações do Escritório", "Office Settings", "DocType"),
 )
 
 SIDEBAR_SECTIONS = (

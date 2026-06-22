@@ -130,7 +130,7 @@
    "idx": 2
   },
   {
-   "group": "Cobrança de serviços",
+   "group": "Cobranças de Serviço",
    "link_doctype": "Service Record",
    "link_fieldname": "legal_case",
    "idx": 3
@@ -1390,25 +1390,25 @@
   {
    "fieldname": "sec_installments",
    "fieldtype": "Section Break",
-   "label": "Parcelas de Honorários",
+   "label": "Recebimentos de Honorários",
    "idx": 31
   },
   {
    "fieldname": "installments_panel",
    "fieldtype": "HTML",
-   "label": "Parcelas de Honorários",
+   "label": "Recebimentos de Honorários",
    "idx": 32
   },
   {
    "fieldname": "sec_payments",
    "fieldtype": "Section Break",
-   "label": "Pagamentos",
+   "label": "Recebimentos",
    "idx": 33
   },
   {
    "fieldname": "payments_panel",
    "fieldtype": "HTML",
-   "label": "Pagamentos",
+   "label": "Recebimentos",
    "idx": 34
   },
   {
@@ -1426,13 +1426,13 @@
   {
    "fieldname": "sec_service_records",
    "fieldtype": "Section Break",
-   "label": "Cobrança de serviços",
+   "label": "Serviços Avulsos",
    "idx": 37
   },
   {
    "fieldname": "service_records_panel",
    "fieldtype": "HTML",
-   "label": "Cobrança de serviços",
+   "label": "Serviços Avulsos",
    "idx": 38
   },
   {

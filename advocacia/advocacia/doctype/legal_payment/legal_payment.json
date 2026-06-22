@@ -58,7 +58,7 @@
    "fieldtype": "Link",
    "in_list_view": 0,
    "in_standard_filter": 1,
-   "label": "Honorários",
+   "label": "Contrato de Honorários",
    "mandatory_depends_on": "eval:doc.origin_type=='Honorários (Parcela)'",
    "options": "Fee Agreement",
    "search_index": 1,
@@ -69,11 +69,11 @@
    "depends_on": "eval:doc.origin_type=='Atos Advocatícios'",
    "fieldname": "service_record",
    "fieldtype": "Link",
-   "label": "Cobrança de serviços",
+   "label": "Cobrança de Serviço",
    "mandatory_depends_on": "eval:doc.origin_type=='Atos Advocatícios'",
    "options": "Service Record",
    "read_only": 1,
-   "description": "Registro de cobrança de serviços vinculado.",
+   "description": "Registro de cobrança de serviço vinculado.",
    "idx": 4
   },
   {

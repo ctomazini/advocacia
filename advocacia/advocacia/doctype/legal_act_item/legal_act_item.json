@@ -446,7 +446,7 @@
   },
   {
    "fieldname": "payment",
-   "label": "Pagamento",
+   "label": "Recebimento",
    "fieldtype": "Link",
    "options": "Legal Payment",
    "read_only": 1,
