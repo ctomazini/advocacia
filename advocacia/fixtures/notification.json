@@ -17,7 +17,7 @@
   "filters": null,
   "from_attach_field": null,
   "is_standard": 0,
-  "message": "<p>O prazo '{{ doc.description }}' do servico {{ doc.legal_case }} vence em {{ doc.notification_days or 3 }} dias ({{ frappe.utils.formatdate(doc.due_date) }}).</p>",
+  "message": "<p>O prazo '{{ doc.description }}' do processo {{ doc.legal_case }} vence em {{ doc.notification_days or 3 }} dias ({{ frappe.utils.formatdate(doc.due_date) }}).</p>",
   "message_type": "Markdown",
   "method": null,
   "minutes_offset": 0,
@@ -69,7 +69,7 @@
   "filters": null,
   "from_attach_field": null,
   "is_standard": 0,
-  "message": "<p>Hearing {{ doc.type }} ({{ doc.modality }}) agendada para {{ frappe.utils.format_datetime(doc.hearing_datetime) }}. Court Branch: {{ doc.court_branch }}.</p>",
+  "message": "<p>Audiência {{ doc.type }} ({{ doc.modality }}) agendada para {{ frappe.utils.format_datetime(doc.hearing_datetime) }}. Vara: {{ doc.court_branch }}.</p>",
   "message_type": "Markdown",
   "method": null,
   "minutes_offset": 0,
@@ -93,7 +93,7 @@
   "sender_email": null,
   "set_property_after_alert": null,
   "slack_webhook_url": null,
-  "subject": "Hearing amanha: {{ doc.client }} - {{ doc.type }}",
+  "subject": "Audiência amanhã: {{ doc.client }} - {{ doc.type }}",
   "value_changed": null
  },
  {
@@ -103,7 +103,7 @@
   "document_type": "Legal Payment",
   "enabled": 1,
   "event": "Value Change",
-  "message": "<p>A parcela {{ doc.name }} ({{ doc.description or doc.title }}) venceu em {{ frappe.utils.formatdate(doc.due_date) }}.</p>",
+  "message": "<p>O recebimento {{ doc.name }} ({{ doc.description or doc.title }}) venceu em {{ frappe.utils.formatdate(doc.due_date) }}.</p>",
   "message_type": "Markdown",
   "module": "Advocacia",
   "name": "Advocacia - Parcela vencida",
@@ -112,7 +112,7 @@
     "receiver_by_role": "Advocacia Manager"
    }
   ],
-  "subject": "Parcela vencida: {{ doc.description or doc.name }}",
+  "subject": "Recebimento vencido: {{ doc.description or doc.name }}",
   "value_changed": "status"
  },
  {
