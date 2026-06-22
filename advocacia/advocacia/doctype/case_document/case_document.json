@@ -28,10 +28,10 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "in_standard_filter": 1,
-   "label": "Serviço",
+   "label": "Processo",
    "options": "Legal Case",
    "reqd": 1,
-   "description": "Serviço (processo ou consultoria) ao qual este documento pertence."
+   "description": "Processo (judicial ou consultoria) ao qual este documento pertence."
   },
   {
    "fetch_from": "legal_case.client",
@@ -88,7 +88,7 @@
    "in_list_view": 1,
    "label": "Título",
    "read_only": 1,
-   "description": "Composto automaticamente: {Categoria} — {Serviço}[ — {Versão}]."
+   "description": "Composto automaticamente: {Categoria} — {Processo}[ — {Versão}]."
   },
   {
    "fieldname": "version_label",

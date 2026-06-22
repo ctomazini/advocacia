@@ -20,7 +20,7 @@ def execute(filters=None):
 def _get_columns():
 	return [
 		{"fieldname": "area", "label": _("Área Jurídica"), "fieldtype": "Data", "width": 140},
-		{"fieldname": "total_servicos", "label": _("Total de Serviços"), "fieldtype": "Int", "width": 110},
+		{"fieldname": "total_servicos", "label": _("Total de Processos"), "fieldtype": "Int", "width": 110},
 		{"fieldname": "em_andamento", "label": _("Em Andamento"), "fieldtype": "Int", "width": 110},
 		{"fieldname": "encerrados", "label": _("Encerrados"), "fieldtype": "Int", "width": 100},
 		{
@@ -208,7 +208,7 @@ def _get_data(filters):
 		)
 
 	report_summary = [
-		int_summary(sum_servicos, _("Serviços"), "Blue"),
+		int_summary(sum_servicos, _("Processos"), "Blue"),
 		currency_summary(sum_honorarios, _("Honorários"), "Green"),
 		currency_summary(sum_custas, _("Custas"), "Orange"),
 		currency_summary(sum_lucro, _("Lucro Líquido"), "Green" if sum_lucro >= 0 else "Red"),

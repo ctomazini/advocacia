@@ -15,7 +15,7 @@ frappe.ui.form.on("Case Communication", {
 		}
 
 		if (frm.doc.legal_case && !frm.is_new()) {
-			frm.add_custom_button(__("Ver Serviço"), function () {
+			frm.add_custom_button(__("Ver Processo"), function () {
 				frappe.set_route("Form", "Legal Case", frm.doc.legal_case);
 			});
 		}

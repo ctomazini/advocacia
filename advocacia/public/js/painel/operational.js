@@ -55,7 +55,7 @@ frappe.provide("advocacia.painel.operational");
 			: U.render_empty_state(
 					"briefcase",
 					__("Nenhum processo ativo"),
-					__("Serviços em andamento aparecerão aqui.")
+					__("Processos em andamento aparecerão aqui.")
 			  );
 
 		return (

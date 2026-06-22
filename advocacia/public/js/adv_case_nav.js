@@ -24,7 +24,7 @@
 
 	// Espelha setup/sidebar.py SIDEBAR_LINK_ORDER + setup/translations.py DOCTYPE_LABELS.
 	const DOCTYPE_NAV_LABELS = {
-		"Legal Case": "Serviços",
+		"Legal Case": "Processos",
 		"Client": "Clientes",
 		"Legal Payment": "Pagamentos",
 		"Legal Task": "Tarefas",
@@ -585,10 +585,10 @@
 			return;
 		}
 
-		frm.add_custom_button(__("Voltar ao Serviço"), () => {
+		frm.add_custom_button(__("Voltar ao Processo"), () => {
 			frappe.set_route("Form", CASE_DOCTYPE, case_name);
 		});
-		frm.change_custom_button_type(__("Voltar ao Serviço"), null, "primary");
+		frm.change_custom_button_type(__("Voltar ao Processo"), null, "primary");
 	}
 
 	function bind_satellite_forms() {

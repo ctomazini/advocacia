@@ -11,7 +11,7 @@ class FeeAgreement(Document):
 		if not self.client and self.legal_case:
 			self.client = frappe.db.get_value("Legal Case", self.legal_case, "client")
 		if not self.client:
-			frappe.throw(_("Client é obrigatório. Selecione um Serviço válido."))
+			frappe.throw(_("Client é obrigatório. Selecione um Processo válido."))
 		self._validar_financeiro()
 		self._validar_parcelas()
 		self._compor_titulo()

@@ -81,11 +81,11 @@
    "fieldtype": "Link",
    "in_list_view": 0,
    "in_standard_filter": 1,
-   "label": "Serviço",
+   "label": "Processo",
    "options": "Legal Case",
    "reqd": 1,
    "search_index": 1,
-   "description": "Serviço ou processo relacionado.",
+   "description": "Processo ou consultoria relacionado.",
    "idx": 5
   },
   {

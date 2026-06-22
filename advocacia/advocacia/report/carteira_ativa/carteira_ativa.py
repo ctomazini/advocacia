@@ -21,7 +21,7 @@ def _get_columns():
 	return [
 		{
 			"fieldname": "legal_case",
-			"label": _("Serviço"),
+			"label": _("Processo"),
 			"fieldtype": "Link",
 			"options": "Legal Case",
 			"width": 120,
@@ -214,7 +214,7 @@ def _get_data(filters):
 	)
 
 	report_summary = [
-		int_summary(len(rows), _("Serviços Ativos"), "Blue"),
+		int_summary(len(rows), _("Processos Ativos"), "Blue"),
 		currency_summary(total_valor_pendente, _("Pendente"), "Orange"),
 		currency_summary(total_valor_vencido, _("Vencido"), "Red"),
 		int_summary(count_com_prazo_7d, _("Prazos em 7 dias"), "Orange"),
@@ -232,5 +232,5 @@ def _empty_chart():
 
 def _empty_summary():
 	return [
-		{"value": 0, "label": _("Serviços Ativos"), "datatype": "Int", "indicator": "Blue"},
+		{"value": 0, "label": _("Processos Ativos"), "datatype": "Int", "indicator": "Blue"},
 	]

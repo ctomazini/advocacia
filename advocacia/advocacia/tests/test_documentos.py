@@ -54,7 +54,7 @@ class TestDocumentos(FrappeTestCase):
 		grupos = [bloco["grupo"] for bloco in result]
 		self.assertIn("Escritório", grupos)
 		self.assertIn("Cliente", grupos)
-		self.assertIn("Serviço / processo", grupos)
+		self.assertIn("Processo", grupos)
 
 	def test_valor_por_extenso(self):
 		result = _valor_por_extenso(8000)

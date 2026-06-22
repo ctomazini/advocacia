@@ -67,7 +67,7 @@ DESCRIPTIONS: dict[str, dict[str, str]] = {
 		"origin_type": "Honorários (Parcela) ou Cobrança de serviços.",
 		"fee_agreement": "Contrato de honorários que originou este pagamento (parcelas).",
 		"service_record": "Cobrança de serviços vinculada.",
-		"legal_case": "Serviço ou processo relacionado.",
+		"legal_case": "Processo ou consultoria relacionado.",
 		"client": "Preenchido automaticamente a partir do serviço ou honorários.",
 		"installment_number": "Número sequencial da parcela no contrato de honorários.",
 		"description": "Descrição exibida na parcela e nos relatórios.",
@@ -83,7 +83,7 @@ DESCRIPTIONS: dict[str, dict[str, str]] = {
 		"receipt": "Comprovante de recebimento anexado.",
 	},
 	"Fee Agreement": {
-		"legal_case": "Serviço ou processo vinculado ao contrato de honorários.",
+		"legal_case": "Processo ou consultoria vinculado ao contrato de honorários.",
 		"client": "Preenchido automaticamente a partir do serviço.",
 		"fee_mode": "Honorários Diretos ou Divisão advogada/cliente (repasse ao cliente).",
 		"status": "Vigente, Quitado ou Cancelado.",
@@ -123,7 +123,7 @@ DESCRIPTIONS: dict[str, dict[str, str]] = {
 		"remarks": "Observações sobre esta parcela.",
 	},
 	"Hearing": {
-		"legal_case": "Serviço ou processo vinculado à audiência.",
+		"legal_case": "Processo ou consultoria vinculado à audiência.",
 		"client": "Preenchido automaticamente a partir do serviço.",
 		"hearing_datetime": "Data e hora da audiência.",
 		"status": "Agendada, Realizada, Adiada ou Cancelada.",
@@ -136,7 +136,7 @@ DESCRIPTIONS: dict[str, dict[str, str]] = {
 		"title": "Título automático no formato ID — descritor.",
 	},
 	"Deadline": {
-		"legal_case": "Serviço ou processo vinculado ao prazo.",
+		"legal_case": "Processo ou consultoria vinculado ao prazo.",
 		"client": "Preenchido automaticamente a partir do serviço.",
 		"due_date": "Data fatal do prazo processual.",
 		"status": "Pendente, Concluído ou Vencido. Vencido é atualizado automaticamente.",
@@ -148,7 +148,7 @@ DESCRIPTIONS: dict[str, dict[str, str]] = {
 		"title": "Título automático no formato ID — descritor.",
 	},
 	"Legal Task": {
-		"legal_case": "Serviço relacionado (opcional).",
+		"legal_case": "Processo relacionado (opcional).",
 		"client": "Preenchido automaticamente a partir do serviço.",
 		"subject": "Descrição curta da tarefa.",
 		"status": "Pendente, Em Andamento, Concluída ou Cancelada.",
@@ -160,7 +160,7 @@ DESCRIPTIONS: dict[str, dict[str, str]] = {
 		"title": "Título automático no formato ID — descritor.",
 	},
 	"Case Communication": {
-		"legal_case": "Serviço relacionado à comunicação (opcional).",
+		"legal_case": "Processo relacionado à comunicação (opcional).",
 		"client": "Client envolvido na comunicação.",
 		"communication_date": "Data e hora da comunicação.",
 		"type": "Canal: Telefone, WhatsApp, E-mail, Reunião, etc.",
@@ -172,7 +172,7 @@ DESCRIPTIONS: dict[str, dict[str, str]] = {
 		"title": "Título automático no formato ID — descritor.",
 	},
 	"Service Record": {
-		"legal_case": "Serviço ou processo vinculado à cobrança.",
+		"legal_case": "Processo ou consultoria vinculado à cobrança.",
 		"client": "Preenchido automaticamente a partir do serviço.",
 		"status": "Em aberto, Parcialmente cobrado ou Cobrado.",
 		"opening_date": "Data de abertura da cobrança de serviços.",
@@ -194,7 +194,7 @@ DESCRIPTIONS: dict[str, dict[str, str]] = {
 		"payment": "Pagamento vinculado quando o item foi faturado.",
 	},
 	"Time Entry": {
-		"legal_case": "Serviço onde a atividade foi realizada.",
+		"legal_case": "Processo onde a atividade foi realizada.",
 		"client": "Preenchido automaticamente a partir do serviço.",
 		"entry_date": "Data da atividade.",
 		"activity": "Descrição curta da atividade realizada.",
@@ -211,7 +211,7 @@ DESCRIPTIONS: dict[str, dict[str, str]] = {
 		"title": "Título automático no formato ID — descritor.",
 	},
 	"Court Cost": {
-		"legal_case": "Serviço ou processo vinculado à custa.",
+		"legal_case": "Processo ou consultoria vinculado à custa.",
 		"description": "Descrição da custa ou taxa.",
 		"type": "Taxa Judicial, Emolumento, Despesa Cartorial, etc.",
 		"amount": "Valor da custa em reais.",

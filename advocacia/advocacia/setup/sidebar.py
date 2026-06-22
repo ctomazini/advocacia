@@ -12,7 +12,7 @@ SIDEBAR_LINK_ORDER = (
 	("Tarefas", "Legal Task", "DocType"),
 	("Comunicações", "Case Communication", "DocType"),
 	# Gestão de Casos
-	("Serviços", "Legal Case", "DocType"),
+	("Processos", "Legal Case", "DocType"),
 	("Clientes", "Client", "DocType"),
 	("Registro de Horas", "Time Entry", "DocType"),
 	("Documentos do Processo", "Case Document", "DocType"),
@@ -26,7 +26,7 @@ SIDEBAR_LINK_ORDER = (
 	("Kits de Documentos", "Document Kit", "DocType"),
 	# Relatórios
 	("Produtividade", "produtividade", "Report"),
-	("Horas por Serviço", "horas_por_servico", "Report"),
+	("Horas por Processo", "horas_por_servico", "Report"),
 	("Inadimplência", "inadimplencia", "Report"),
 	("Fluxo de Caixa", "fluxo_de_caixa", "Report"),
 	("Honorários por Cliente", "honorarios_por_cliente", "Report"),

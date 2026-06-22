@@ -35,7 +35,7 @@ frappe.query_reports["horas_por_servico"] = {
 		},
 		{
 			fieldname: "legal_case",
-			label: __("Serviço"),
+			label: __("Processo"),
 			fieldtype: "Link",
 			options: "Legal Case",
 		},

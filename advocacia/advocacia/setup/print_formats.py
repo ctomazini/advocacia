@@ -13,8 +13,8 @@ PRINT_FORMAT_NAMES = (
 	"Advocacia - Carteira Ativa (Paisagem)",
 	"Advocacia - Produtividade",
 	"Advocacia - Produtividade (Paisagem)",
-	"Advocacia - Horas por Serviço",
-	"Advocacia - Horas por Serviço (Paisagem)",
+	"Advocacia - Horas por Processo",
+	"Advocacia - Horas por Processo (Paisagem)",
 )
 
 _DOCTYPE_PRINT_FORMATS = (
@@ -74,12 +74,12 @@ _REPORT_PRINT_FORMATS = (
 		"landscape": True,
 	},
 	{
-		"name": "Advocacia - Horas por Serviço",
+		"name": "Advocacia - Horas por Processo",
 		"report": "horas_por_servico",
 		"parts": ("reports/_header.html", "reports/_table_all.html", "reports/_footer.html"),
 	},
 	{
-		"name": "Advocacia - Horas por Serviço (Paisagem)",
+		"name": "Advocacia - Horas por Processo (Paisagem)",
 		"report": "horas_por_servico",
 		"parts": ("reports/_header.html", "reports/_table_all.html", "reports/_footer.html"),
 		"landscape": True,

@@ -194,7 +194,7 @@
   {
    "fieldname": "hub_summary_bar",
    "fieldtype": "HTML",
-   "label": "Resumo do Serviço",
+   "label": "Resumo do Processo",
    "idx": 3
   },
   {

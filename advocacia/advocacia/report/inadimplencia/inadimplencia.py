@@ -64,7 +64,7 @@ def _get_columns():
 		},
 		{
 			"fieldname": "servicos",
-			"label": _("Serviços"),
+			"label": _("Processos"),
 			"fieldtype": "Small Text",
 			"width": 250,
 		},

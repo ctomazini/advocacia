@@ -35,13 +35,13 @@
   },
   {
    "fieldname": "legal_case",
-   "label": "Serviço",
+   "label": "Processo",
    "fieldtype": "Link",
    "options": "Legal Case",
    "allow_in_quick_entry": 1,
    "in_list_view": 1,
    "in_standard_filter": 1,
-   "description": "Serviço relacionado (opcional).",
+   "description": "Processo relacionado (opcional).",
    "idx": 2
   },
   {

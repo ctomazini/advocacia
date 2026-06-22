@@ -37,11 +37,11 @@
    "fieldname": "legal_case",
    "fieldtype": "Link",
    "options": "Legal Case",
-   "label": "Serviço",
+   "label": "Processo",
    "reqd": 1,
    "allow_in_quick_entry": 1,
    "in_list_view": 1,
-   "description": "Serviço ou processo vinculado à custa.",
+   "description": "Processo ou consultoria vinculado à custa.",
    "in_standard_filter": 1,
    "idx": 2
   },

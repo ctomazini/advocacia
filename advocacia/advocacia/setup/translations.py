@@ -2,7 +2,7 @@ import frappe
 
 # Nomes exibidos na UI (desk, breadcrumbs, títulos de lista). IDs internos permanecem EN.
 DOCTYPE_LABELS = {
-	"Legal Case": "Serviços",
+	"Legal Case": "Processos",
 	"Client": "Clientes",
 	"Legal Payment": "Pagamentos",
 	"Legal Task": "Tarefas",

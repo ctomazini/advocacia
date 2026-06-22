@@ -24,7 +24,7 @@ def _get_columns():
 	return [
 		{
 			"fieldname": "legal_case",
-			"label": _("Serviço"),
+			"label": _("Processo"),
 			"fieldtype": "Link",
 			"options": "Legal Case",
 			"width": 120,
@@ -260,7 +260,7 @@ def _get_data(filters):
 			"indicator": "Green",
 		},
 		percent_summary(pct_geral, _("% Cobrável"), "Green" if pct_geral >= 70 else "Orange"),
-		int_summary(len(by_servico), _("Serviços c/ horas"), "Blue"),
+		int_summary(len(by_servico), _("Processos c/ horas"), "Blue"),
 		currency_summary(sum_honorarios / sum_total if sum_total else 0, _("Valor/Hora Médio"), "Blue"),
 	]
 

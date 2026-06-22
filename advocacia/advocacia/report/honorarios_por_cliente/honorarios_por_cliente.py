@@ -64,7 +64,7 @@ def _get_columns():
 		},
 		{
 			"fieldname": "qtd_servicos",
-			"label": _("Serviços"),
+			"label": _("Processos"),
 			"fieldtype": "Int",
 			"width": 80,
 		},

@@ -13,7 +13,7 @@ frappe.views.calendar["Hearing"] = {
 			fieldtype: "Link",
 			fieldname: "legal_case",
 			options: "Legal Case",
-			label: __("Serviço"),
+			label: __("Processo"),
 		},
 	],
 };

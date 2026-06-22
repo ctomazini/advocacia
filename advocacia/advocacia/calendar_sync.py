@@ -85,7 +85,7 @@ def _audiencia_subject(doc):
 
 
 def _audiencia_description(doc):
-	parts = [f"Tipo: {doc.type}", f"Serviço: {doc.legal_case}"]
+	parts = [f"Tipo: {doc.type}", f"Processo: {doc.legal_case}"]
 	if doc.modality == "Virtual" and doc.link_virtual:
 		parts.append(f"Link: {doc.link_virtual}")
 	if doc.court_branch:
@@ -96,7 +96,7 @@ def _audiencia_description(doc):
 
 
 def _prazo_description(doc):
-	parts = [f"Serviço: {doc.legal_case}", f"Prioridade: {doc.priority or 'Normal'}"]
+	parts = [f"Processo: {doc.legal_case}", f"Prioridade: {doc.priority or 'Normal'}"]
 	if doc.responsible:
 		parts.append(f"Responsável: {doc.responsible}")
 	if doc.remarks:

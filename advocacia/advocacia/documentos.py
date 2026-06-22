@@ -155,7 +155,7 @@ PLACEHOLDER_REFERENCIA = [
 		],
 	},
 	{
-		"grupo": "Serviço / processo",
+		"grupo": "Processo",
 		"items": [
 			{"placeholder": "servico_codigo", "label": "Código do serviço (ID)", "alias": "legal_case"},
 			{"placeholder": "servico_titulo", "label": "Título do serviço", "alias": "titulo_servico"},
