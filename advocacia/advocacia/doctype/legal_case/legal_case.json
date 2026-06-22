@@ -1486,7 +1486,7 @@
   {
    "fieldname": "sec_time_entries",
    "fieldtype": "Section Break",
-   "label": "Horas",
+   "label": "Horas Trabalhadas",
    "idx": 47
   },
   {

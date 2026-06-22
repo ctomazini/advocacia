@@ -1235,7 +1235,7 @@
   {
    "idx": 18,
    "fieldname": "last_payment",
-   "label": "Último pagamento",
+   "label": "Último recebimento",
    "fieldtype": "Link",
    "options": "Legal Payment",
    "read_only": 1,
@@ -1243,7 +1243,7 @@
    "parentfield": "fields",
    "parenttype": "DocType",
    "doctype": "DocField",
-   "description": "Último pagamento de atos vinculado a este registro."
+   "description": "Último recebimento de atos vinculado a este registro."
   },
   {
    "name": "hat36i4rid",

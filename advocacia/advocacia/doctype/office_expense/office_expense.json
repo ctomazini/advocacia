@@ -89,7 +89,7 @@
   {
    "fieldname": "vencimento_section",
    "fieldtype": "Section Break",
-   "label": "Vencimento e Legal Payment",
+   "label": "Vencimento e Pagamento",
    "idx": 7
   },
   {
@@ -105,7 +105,7 @@
   {
    "fieldname": "payment_date",
    "fieldtype": "Date",
-   "label": "Data de Legal Payment",
+   "label": "Data de Pagamento",
    "description": "Data em que a despesa foi paga.",
    "in_standard_filter": 1,
    "idx": 9
@@ -118,7 +118,7 @@
   {
    "fieldname": "payment_method",
    "fieldtype": "Select",
-   "label": "Forma de Legal Payment",
+   "label": "Forma de Pagamento",
    "options": "PIX\nTED\nBoleto\nDinheiro\nCartão\nDébito Automático",
    "description": "Forma de pagamento: PIX, TED, Boleto, etc.",
    "in_standard_filter": 1,
