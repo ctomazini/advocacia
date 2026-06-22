@@ -55,7 +55,7 @@ frappe.provide("advocacia.painel.timeline");
 	                ? __("Audiência")
 	                : it.type === "prazo"
 	                  ? __("Prazo")
-	                  : __("Legal Task");
+	                  : __("Tarefa");
 	        var tipo_icon =
 	            it.type === "audiencia" ? "milestone" : it.type === "prazo" ? "time" : "checklist";
 	        var pill_map = {

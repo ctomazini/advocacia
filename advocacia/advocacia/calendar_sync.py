@@ -89,7 +89,7 @@ def _audiencia_description(doc):
 	if doc.modality == "Virtual" and doc.link_virtual:
 		parts.append(f"Link: {doc.link_virtual}")
 	if doc.court_branch:
-		parts.append(f"Court Branch: {doc.court_branch}")
+		parts.append(f"Vara: {doc.court_branch}")
 	if doc.remarks:
 		parts.append(f"Obs: {doc.remarks}")
 	return "\n".join(parts)

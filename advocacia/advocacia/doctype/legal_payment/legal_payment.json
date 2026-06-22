@@ -93,7 +93,7 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "in_standard_filter": 1,
-   "label": "Client",
+   "label": "Cliente",
    "options": "Client",
    "read_only": 1,
    "fetch_from": "legal_case.client",

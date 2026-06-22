@@ -19,7 +19,7 @@
  "fields": [
   {
    "fieldname": "jurisdiction_name",
-   "label": "Nome da Jurisdiction",
+   "label": "Nome da Comarca",
    "fieldtype": "Data",
    "reqd": 1,
    "unique": 1,

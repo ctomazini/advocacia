@@ -394,7 +394,7 @@
    "parenttype": "DocType",
    "idx": 5,
    "fieldname": "client_amount",
-   "label": "Valor Client",
+   "label": "Valor Cliente",
    "oldfieldname": null,
    "fieldtype": "Currency",
    "oldfieldtype": null,
@@ -629,7 +629,7 @@
   },
   {
    "fieldname": "transfer_date",
-   "label": "Data de Repasse ao Client",
+   "label": "Data de Repasse ao Cliente",
    "fieldtype": "Date",
    "depends_on": "eval:doc.client_amount > 0",
    "description": "Data do repasse ao cliente, quando aplicável.",

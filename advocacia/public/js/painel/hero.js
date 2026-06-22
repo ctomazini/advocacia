@@ -143,12 +143,12 @@ frappe.provide("advocacia.painel.hero");
 
 	AP.render_acoes_rapidas = function() {
 	    var actions = [
-	        { label: __("Client"), icon: "user-plus", dt: "Client" },
+	        { label: __("Cliente"), icon: "user-plus", dt: "Client" },
 	        { label: __("Processo"), icon: "folder-plus", dt: "Legal Case" },
 	        { label: __("Audiência"), icon: "calendar-plus-2", dt: "Hearing" },
 	        { label: __("Prazo"), icon: "clock-plus", dt: "Deadline" },
 	        { label: __("Comunicação"), icon: "message-square-plus", dt: "Case Communication" },
-	        { label: __("Legal Task"), icon: "list-plus", dt: "Legal Task" },
+	        { label: __("Tarefa"), icon: "list-plus", dt: "Legal Task" },
 	        { label: __("Honorário"), icon: "file-plus", dt: "Fee Agreement" },
 	        { label: __("Recebimento"), icon: "circle-dollar-sign", dt: "Legal Payment" },
 	        { label: __("Custa"), icon: "receipt", dt: "Court Cost" },

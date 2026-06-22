@@ -18,7 +18,7 @@
  "fields": [
   {
    "fieldname": "court_branch_name",
-   "label": "Nome da Court Branch",
+   "label": "Nome da Vara",
    "fieldtype": "Data",
    "reqd": 1,
    "unique": 1,
@@ -35,14 +35,14 @@
   },
   {
    "fieldname": "jurisdiction",
-   "label": "Jurisdiction",
+   "label": "Comarca",
    "fieldtype": "Link",
    "options": "Jurisdiction",
    "reqd": 1,
    "in_list_view": 1,
    "in_standard_filter": 1,
    "allow_in_quick_entry": 1,
-   "description": "Jurisdiction à qual esta vara pertence.",
+   "description": "Comarca à qual esta vara pertence.",
    "idx": 3
   },
   {

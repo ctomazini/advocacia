@@ -139,7 +139,7 @@ def _get_comunicacoes_pendentes(limit=LIST_LIMIT_MAX):
 		elif c.legal_task:
 			status_tarefa = tarefa_status_map.get(c.legal_task)
 			if status_tarefa in ("Pendente", "Em Andamento"):
-				motivo = _("Legal Task em aberto")
+				motivo = _("Tarefa em aberto")
 				urgencia = 1
 			else:
 				continue

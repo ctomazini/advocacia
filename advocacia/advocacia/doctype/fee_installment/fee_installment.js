@@ -33,7 +33,7 @@ frappe.ui.form.on('Fee Installment', {
 
         // Botão Registrar Repasse (só se tem valor cliente e já recebeu)
         if (frm.doc.received_date && frm.doc.client_amount > 0 && !frm.doc.transfer_date) {
-            frm.add_custom_button('↗ Registrar Repasse ao Client', function() {
+            frm.add_custom_button('↗ Registrar Repasse ao Cliente', function() {
                 frappe.confirm(
                     `Confirmar repasse de <b>R$ ${frappe.format(frm.doc.client_amount, {fieldtype:'Currency'})}</b> ao cliente hoje?`,
                     function() {

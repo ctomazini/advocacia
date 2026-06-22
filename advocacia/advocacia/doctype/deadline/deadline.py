@@ -11,7 +11,7 @@ class Deadline(Document):
 		if not self.client and self.legal_case:
 			self.client = frappe.db.get_value("Legal Case", self.legal_case, "client")
 		if not self.client:
-			frappe.throw(_("Client é obrigatório. Selecione um Processo válido."))
+			frappe.throw(_("Cliente é obrigatório. Selecione um Processo válido."))
 		self._compor_titulo()
 
 	def after_insert(self):

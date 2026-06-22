@@ -112,7 +112,7 @@ def notificar_audiencias_hoje():
 		if notification_already_sent("Hearing", aud.name, subject):
 			continue
 		message = _(
-			"Hearing {0} ({1}) hoje as {2}. Court Branch: {3}."
+			"Hearing {0} ({1}) hoje as {2}. Vara: {3}."
 		).format(
 			aud.type or "",
 			aud.modality or "",

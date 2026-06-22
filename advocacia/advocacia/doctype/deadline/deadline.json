@@ -274,7 +274,7 @@
    "parenttype": "DocType",
    "idx": 3,
    "fieldname": "client",
-   "label": "Client",
+   "label": "Cliente",
    "oldfieldname": null,
    "fieldtype": "Link",
    "oldfieldtype": null,

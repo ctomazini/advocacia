@@ -19,7 +19,7 @@
  "fields": [
   {
    "fieldname": "court_name",
-   "label": "Nome do Court",
+   "label": "Nome do Tribunal",
    "fieldtype": "Data",
    "reqd": 1,
    "unique": 1,

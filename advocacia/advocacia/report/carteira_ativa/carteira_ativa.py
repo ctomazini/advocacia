@@ -35,7 +35,7 @@ def _get_columns():
 			"width": 160,
 		},
 		{"fieldname": "area", "label": _("Área"), "fieldtype": "Data", "width": 100},
-		{"fieldname": "fase", "label": _("Case Phase"), "fieldtype": "Data", "width": 130},
+		{"fieldname": "fase", "label": _("Fase Processual"), "fieldtype": "Data", "width": 130},
 		{
 			"fieldname": "proximo_prazo",
 			"label": _("Próximo Prazo"),

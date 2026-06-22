@@ -53,7 +53,7 @@
    "fieldname": "client",
    "fieldtype": "Link",
    "options": "Client",
-   "label": "Client",
+   "label": "Cliente",
    "read_only": 1,
    "fetch_from": "legal_case.client",
    "in_list_view": 0,

@@ -17,7 +17,7 @@ frappe.ui.form.on('Legal Task', {
                     doc: frm.doc,
                     callback: function(r) {
                         frm.reload_doc();
-                        frappe.show_alert({message: '✓ Legal Task concluída!', indicator: 'green'});
+                        frappe.show_alert({message: '✓ Tarefa concluída!', indicator: 'green'});
                     }
                 });
             }, 'primary');
