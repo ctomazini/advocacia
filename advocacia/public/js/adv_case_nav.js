@@ -697,7 +697,8 @@
 
 	window.adv_case_nav_new_doc = function (doctype, defaults) {
 		save_hub_context_from_cur_frm();
-		frappe.new_doc(doctype, defaults);
+		frappe.route_options = defaults || {};
+		frappe.set_route("Form", doctype, "new");
 	};
 
 	window.adv_case_nav_set_route = function () {

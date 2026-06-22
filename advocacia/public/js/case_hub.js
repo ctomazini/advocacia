@@ -1024,12 +1024,10 @@ function adv_hub_render_summary_bar(frm, counts) {
 			${
 				item.readonly
 					? ""
-					: `<span class="adv-hub-summary-pill__add"
+					: `<button type="button" class="adv-hub-summary-pill__add"
 				data-doctype="${frappe.utils.escape_html(item.doctype)}"
 				data-fieldname="${frappe.utils.escape_html(item.fieldname || "")}"
-				data-list-only="${item.listOnly ? "1" : "0"}"
-				data-catalog="${item.catalog ? "1" : "0"}"
-				title="${frappe.utils.escape_html(__("Criar {0}", [item.label]))}">+</span>`
+				title="${frappe.utils.escape_html(__("Criar {0}", [item.label]))}">+</button>`
 			}
 		</div>`;
 		})
@@ -1050,24 +1048,18 @@ function adv_hub_render_summary_bar(frm, counts) {
 	});
 
 	$w.find(".adv-hub-summary-pill__add").on("click", function (e) {
+		e.preventDefault();
 		e.stopPropagation();
 		const doctype = $(this).attr("data-doctype");
 		const fieldname = $(this).attr("data-fieldname");
-		const isCatalog = $(this).attr("data-catalog") === "1";
-		const listOnly = $(this).attr("data-list-only") === "1";
-
-		if (isCatalog) {
-			adv_case_nav_set_route("List", doctype);
-			return;
+		const defaults = {};
+		if (fieldname) {
+			defaults[fieldname] = caseName;
+			if (frm.doc.client) {
+				defaults.client = frm.doc.client;
+			}
 		}
-		if (listOnly || !fieldname) {
-			adv_case_nav_set_route("List", doctype, { [fieldname]: caseName });
-			return;
-		}
-		adv_case_nav_new_doc(doctype, {
-			[fieldname]: caseName,
-			client: frm.doc.client,
-		});
+		adv_case_nav_new_doc(doctype, defaults);
 	});
 }
 
