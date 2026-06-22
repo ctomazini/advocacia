@@ -24,6 +24,7 @@ DOCTYPE_LABELS = {
 	"Document Category": "Categoria de Documento",
 	"Case Document": "Documentos do Processo",
 	"Fee Installment": "Parcelas de Honorários",
+	"Legal Act Item": "Itens de cobrança",
 }
 
 

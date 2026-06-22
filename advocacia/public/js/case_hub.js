@@ -4,6 +4,10 @@
 
 window.advocacia = window.advocacia || {};
 
+function _nav_label(doctype) {
+	return adv_case_nav.get_doctype_label(doctype);
+}
+
 function adv_hub_load(frm) {
 	if (frm.is_new()) {
 		return;
@@ -110,7 +114,7 @@ function adv_hub_render_hearings(frm, hearings) {
 		<div class="adv-hub-panel__header">
 			<h3 class="adv-hub-panel__title">
 				<span class="adv-hub-panel__title-icon">⚖️</span>
-				${__("Audiências")}
+				${_nav_label("Hearing")}
 				<span class="adv-hub-panel__count">${hearings.length}</span>
 			</h3>
 			<button type="button" class="adv-hub-panel__action" data-hub-action="new-hearing">
@@ -183,7 +187,7 @@ function adv_hub_render_deadlines(frm, deadlines) {
 		<div class="adv-hub-panel__header">
 			<h3 class="adv-hub-panel__title">
 				<span class="adv-hub-panel__title-icon">📅</span>
-				${__("Prazos")}
+				${_nav_label("Deadline")}
 				<span class="adv-hub-panel__count">${deadlines.length}</span>
 			</h3>
 			<button type="button" class="adv-hub-panel__action" data-hub-action="new-deadline">
@@ -232,7 +236,7 @@ function adv_hub_render_tasks(frm, tasks) {
 		<div class="adv-hub-panel__header">
 			<h3 class="adv-hub-panel__title">
 				<span class="adv-hub-panel__title-icon">✅</span>
-				${__("Tarefas")}
+				${_nav_label("Legal Task")}
 				<span class="adv-hub-panel__count">${tasks.length}</span>
 			</h3>
 			<button type="button" class="adv-hub-panel__action" data-hub-action="new-task">
@@ -292,7 +296,7 @@ function adv_hub_render_communications(frm, communications) {
 		<div class="adv-hub-panel__header">
 			<h3 class="adv-hub-panel__title">
 				<span class="adv-hub-panel__title-icon">💬</span>
-				${__("Comunicações")}
+				${_nav_label("Case Communication")}
 				<span class="adv-hub-panel__count">${communications.length}</span>
 			</h3>
 			<button type="button" class="adv-hub-panel__action" data-hub-action="new-comm">
@@ -317,7 +321,12 @@ function adv_hub_render_service_records(frm, records) {
 
 	if (!records.length) {
 		$w.html(
-			_adv_hub_empty("📝", __("Nenhuma cobrança de serviços"), __("+ Cobrança"), "new-record")
+			_adv_hub_empty(
+				"📝",
+				__("Nenhuma cobrança de serviços"),
+				__("+ Cobrança de serviços"),
+				"new-record"
+			)
 		);
 		$w.find('[data-hub-action="new-record"]').on("click", () => {
 			adv_case_nav_new_doc("Service Record", { legal_case: frm.doc.name, client: frm.doc.client });
@@ -333,7 +342,7 @@ function adv_hub_render_service_records(frm, records) {
 			<div class="adv-hub-list-row__main">
 				${frappe.utils.escape_html(row.title || row.name)}
 				<span class="adv-hub-list-row__secondary">${__(
-					"{0} ato(s)",
+					"{0} item(ns)",
 					[row.act_count || 0]
 				)} · ${format_currency(row.grand_total || 0)}</span>
 			</div>
@@ -346,11 +355,11 @@ function adv_hub_render_service_records(frm, records) {
 		<div class="adv-hub-panel__header">
 			<h3 class="adv-hub-panel__title">
 				<span class="adv-hub-panel__title-icon">📝</span>
-				${__("Cobrança de serviços")}
+				${_nav_label("Service Record")}
 				<span class="adv-hub-panel__count">${records.length}</span>
 			</h3>
 			<button type="button" class="adv-hub-panel__action" data-hub-action="new-record">
-				${__("+ Cobrança")}
+				${__("+ Cobrança de serviços")}
 			</button>
 		</div>
 		${rows}
@@ -371,7 +380,12 @@ function adv_hub_render_time_entries(frm, payload) {
 
 	if (!items.length) {
 		$w.html(
-			_adv_hub_empty("⏱️", __("Nenhum registro de horas"), __("+ Horas"), "new-time")
+			_adv_hub_empty(
+				"⏱️",
+				__("Nenhum registro de horas"),
+				__("+ Registro de Horas"),
+				"new-time"
+			)
 		);
 		$w.find('[data-hub-action="new-time"]').on("click", () => {
 			adv_case_nav_new_doc("Time Entry", { legal_case: frm.doc.name, client: frm.doc.client });
@@ -398,13 +412,13 @@ function adv_hub_render_time_entries(frm, payload) {
 		<div class="adv-hub-panel__header">
 			<h3 class="adv-hub-panel__title">
 				<span class="adv-hub-panel__title-icon">⏱️</span>
-				${__("Registro de Horas")}
+				${_nav_label("Time Entry")}
 				<span class="adv-hub-panel__count">${items.length}</span>
 			</h3>
 			<div class="adv-hub-panel__actions">
 				<span class="text-muted small">${__("Total")}: <strong>${totalHours}h</strong></span>
 				<button type="button" class="adv-hub-panel__action" data-hub-action="new-time">
-					${__("+ Horas")}
+					${__("+ Registro de Horas")}
 				</button>
 			</div>
 		</div>
@@ -435,7 +449,7 @@ function adv_hub_render_documents(frm, documents) {
 			<div class="adv-hub-panel__header">
 				<h3 class="adv-hub-panel__title">
 					<span class="adv-hub-panel__title-icon">📄</span>
-					${__("Documentos do Processo")}
+				${_nav_label("Case Document")}
 					<span class="adv-hub-panel__count">0</span>
 				</h3>
 				${headerActions}
@@ -502,7 +516,7 @@ function adv_hub_render_documents(frm, documents) {
 		<div class="adv-hub-panel__header">
 			<h3 class="adv-hub-panel__title">
 				<span class="adv-hub-panel__title-icon">📄</span>
-				${__("Documentos do Processo")}
+				${_nav_label("Case Document")}
 				<span class="adv-hub-panel__count">${documents.length}</span>
 			</h3>
 			${headerActions}
@@ -554,7 +568,7 @@ function adv_hub_render_document_kits(frm, kits) {
 		<div class="adv-hub-panel__header">
 			<h3 class="adv-hub-panel__title">
 				<span class="adv-hub-panel__title-icon">📦</span>
-				${__("Kits de Documentos")}
+				${_nav_label("Document Kit")}
 				<span class="adv-hub-panel__count">${(kits || []).length}</span>
 			</h3>
 			<button type="button" class="adv-hub-panel__action" data-hub-action="generate-docs">
@@ -635,7 +649,7 @@ function _adv_hub_render_financial_summary(frm, financial) {
 	const billingSection = pendingBillings.length
 		? `<div class="adv-hub-subsection">
 			<div class="adv-hub-subsection__header">
-				<strong>${__("Cobranças de serviços em aberto")}</strong>
+				<strong>${__("Cobrança de serviços em aberto")}</strong>
 				<button type="button" class="adv-hub-panel__action" data-hub-action="list-service-records">${__(
 					"Ver todas"
 				)}</button>
@@ -654,7 +668,7 @@ function _adv_hub_render_financial_summary(frm, financial) {
 				agreement
 					? `<button type="button" class="adv-hub-panel__action" data-route="Form/Fee Agreement/${frappe.utils.escape_html(
 							agreement.name
-					  )}">${__("Ver honorários")}</button>`
+					  )}">${__("Ver Honorários")}</button>`
 					: `<button type="button" class="adv-hub-panel__action" data-hub-action="new-agreement">${__(
 							"+ Honorários"
 					  )}</button>`
@@ -680,7 +694,7 @@ function _adv_hub_render_financial_summary(frm, financial) {
 				<div class="adv-hub-kpi__value" style="color:var(--orange-500)">${format_currency(
 					summary.total_pending_honorarios
 				)}</div>
-				<div class="adv-hub-kpi__label">${__("Parcelas pendentes")}</div>
+				<div class="adv-hub-kpi__label">${__("Pagamentos pendentes")}</div>
 			</div>
 			<div class="adv-hub-kpi">
 				<div class="adv-hub-kpi__value" style="color:var(--purple-500)">${format_currency(
@@ -692,13 +706,13 @@ function _adv_hub_render_financial_summary(frm, financial) {
 				<div class="adv-hub-kpi__value" style="color:var(--red-500)">${format_currency(
 					summary.total_costs
 				)}</div>
-				<div class="adv-hub-kpi__label">${__("Custas")}</div>
+				<div class="adv-hub-kpi__label">${_nav_label("Court Cost")}</div>
 			</div>
 		</div>
 		${
 			summary.total_pending_service_payments
 				? `<p class="adv-hub-panel__hint">${__(
-						"Cobranças de serviços já emitidas e aguardando recebimento: {0}",
+						"Cobrança de serviços já emitidas e aguardando recebimento: {0}",
 						[format_currency(summary.total_pending_service_payments)]
 				  )}</p>`
 				: ""
@@ -728,7 +742,7 @@ function _adv_hub_render_installments(frm, installments) {
 	if (!$w) return;
 
 	if (!installments.length) {
-		$w.html(`<div class="adv-hub-empty">${__("Nenhuma parcela registrada.")}</div>`);
+		$w.html(`<div class="adv-hub-empty">${__("Nenhuma parcela de honorários registrada.")}</div>`);
 		return;
 	}
 
@@ -755,11 +769,11 @@ function _adv_hub_render_installments(frm, installments) {
 		<div class="adv-hub-panel__header">
 			<h3 class="adv-hub-panel__title">
 				<span class="adv-hub-panel__title-icon">📋</span>
-				${__("Parcelas")}
+				${_nav_label("Fee Installment")}
 				<span class="adv-hub-panel__count">${installments.length}</span>
 			</h3>
 			<button type="button" class="adv-hub-panel__action" data-hub-action="list-agreements">
-				${__("Ver honorários")}
+				${__("Ver Honorários")}
 			</button>
 		</div>
 		${rows}
@@ -777,7 +791,12 @@ function _adv_hub_render_payments(frm, payments) {
 
 	if (!payments.length) {
 		$w.html(
-			_adv_hub_empty("💵", __("Nenhum pagamento registrado"), __("+ Pagamento"), "new-payment")
+			_adv_hub_empty(
+				"💵",
+				__("Nenhum pagamento registrado"),
+				`+ ${_nav_label("Legal Payment")}`,
+				"new-payment"
+			)
 		);
 		$w.find('[data-hub-action="new-payment"]').on("click", () => {
 			adv_case_nav_new_doc("Legal Payment", {
@@ -808,11 +827,11 @@ function _adv_hub_render_payments(frm, payments) {
 		<div class="adv-hub-panel__header">
 			<h3 class="adv-hub-panel__title">
 				<span class="adv-hub-panel__title-icon">💵</span>
-				${__("Pagamentos")}
+				${_nav_label("Legal Payment")}
 				<span class="adv-hub-panel__count">${payments.length}</span>
 			</h3>
 			<button type="button" class="adv-hub-panel__action" data-hub-action="new-payment">
-				${__("+ Pagamento")}
+				${`+ ${_nav_label("Legal Payment")}`}
 			</button>
 		</div>
 		${rows}
@@ -830,7 +849,12 @@ function _adv_hub_render_court_costs(frm, costs) {
 
 	if (!costs.length) {
 		$w.html(
-			_adv_hub_empty("🏛️", __("Nenhuma custa registrada"), __("+ Custa"), "new-cost")
+			_adv_hub_empty(
+				"🏛️",
+				__("Nenhuma custa registrada"),
+				`+ ${_nav_label("Court Cost")}`,
+				"new-cost"
+			)
 		);
 		$w.find('[data-hub-action="new-cost"]').on("click", () => {
 			adv_case_nav_new_doc("Court Cost", { legal_case: frm.doc.name, client: frm.doc.client });
@@ -860,11 +884,11 @@ function _adv_hub_render_court_costs(frm, costs) {
 		<div class="adv-hub-panel__header">
 			<h3 class="adv-hub-panel__title">
 				<span class="adv-hub-panel__title-icon">🏛️</span>
-				${__("Custas Processuais")}
+				${_nav_label("Court Cost")}
 				<span class="adv-hub-panel__count">${costs.length}</span>
 			</h3>
 			<button type="button" class="adv-hub-panel__action" data-hub-action="new-cost">
-				${__("+ Custa")}
+				${`+ ${_nav_label("Court Cost")}`}
 			</button>
 		</div>
 		${rows}
@@ -883,58 +907,50 @@ function adv_hub_render_summary_bar(frm, counts) {
 	const caseName = frm.doc.name;
 	const items = [
 		{
-			icon: "📋",
-			label: __("Fase"),
-			count: counts.phases,
-			doctype: "Legal Case",
-			fieldname: "name",
-			readonly: true,
-		},
-		{
 			icon: "⚖️",
-			label: __("Audiências"),
+			label: _nav_label("Hearing"),
 			count: counts.hearings,
 			doctype: "Hearing",
 			fieldname: "legal_case",
 		},
 		{
 			icon: "📅",
-			label: __("Prazos"),
+			label: _nav_label("Deadline"),
 			count: counts.deadlines,
 			doctype: "Deadline",
 			fieldname: "legal_case",
 		},
 		{
 			icon: "✅",
-			label: __("Tarefas"),
+			label: _nav_label("Legal Task"),
 			count: counts.tasks,
 			doctype: "Legal Task",
 			fieldname: "legal_case",
 		},
 		{
 			icon: "💬",
-			label: __("Comunicações"),
+			label: _nav_label("Case Communication"),
 			count: counts.communications,
 			doctype: "Case Communication",
 			fieldname: "legal_case",
 		},
 		{
 			icon: "⏱️",
-			label: __("Horas"),
+			label: _nav_label("Time Entry"),
 			count: counts.time_entries,
 			doctype: "Time Entry",
 			fieldname: "legal_case",
 		},
 		{
 			icon: "📄",
-			label: __("Documentos"),
+			label: _nav_label("Case Document"),
 			count: counts.documents,
 			doctype: "Case Document",
 			fieldname: "legal_case",
 		},
 		{
 			icon: "📦",
-			label: __("Kits"),
+			label: _nav_label("Document Kit"),
 			count: counts.document_kits,
 			doctype: "Document Kit",
 			fieldname: null,
@@ -946,36 +962,28 @@ function adv_hub_render_summary_bar(frm, counts) {
 		items.push(
 			{
 				icon: "📑",
-				label: __("Honorários"),
+				label: _nav_label("Fee Agreement"),
 				count: counts.fee_agreements,
 				doctype: "Fee Agreement",
 				fieldname: "legal_case",
 			},
 			{
-				icon: "💳",
-				label: __("Parcelas"),
-				count: counts.installments,
-				doctype: "Fee Agreement",
-				fieldname: "legal_case",
-				listOnly: true,
-			},
-			{
 				icon: "💵",
-				label: __("Pagamentos"),
+				label: _nav_label("Legal Payment"),
 				count: counts.payments,
 				doctype: "Legal Payment",
 				fieldname: "legal_case",
 			},
 			{
 				icon: "📝",
-				label: __("Cobranças"),
+				label: _nav_label("Service Record"),
 				count: counts.service_records,
 				doctype: "Service Record",
 				fieldname: "legal_case",
 			},
 			{
 				icon: "🏛️",
-				label: __("Custas"),
+				label: _nav_label("Court Cost"),
 				count: counts.court_costs,
 				doctype: "Court Cost",
 				fieldname: "legal_case",
@@ -984,7 +992,7 @@ function adv_hub_render_summary_bar(frm, counts) {
 	} else {
 		items.push({
 			icon: "📝",
-			label: __("Cobranças"),
+			label: _nav_label("Service Record"),
 			count: counts.service_records,
 			doctype: "Service Record",
 			fieldname: "legal_case",

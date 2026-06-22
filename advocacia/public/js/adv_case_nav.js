@@ -22,7 +22,32 @@
 		"Legal Payment",
 	];
 
+	// Espelha setup/sidebar.py SIDEBAR_LINK_ORDER + setup/translations.py DOCTYPE_LABELS.
+	const DOCTYPE_NAV_LABELS = {
+		"Legal Case": "Serviços",
+		"Client": "Clientes",
+		"Legal Payment": "Pagamentos",
+		"Legal Task": "Tarefas",
+		"Time Entry": "Registro de Horas",
+		"Service Record": "Cobrança de serviços",
+		"Hearing": "Audiências",
+		"Case Communication": "Comunicações",
+		"Court Cost": "Custas Processuais",
+		"Fee Agreement": "Honorários",
+		"Fee Installment": "Parcelas de Honorários",
+		"Deadline": "Prazos",
+		"Document Template": "Modelos Word",
+		"Document Kit": "Kits de Documentos",
+		"Case Document": "Documentos do Processo",
+		"Case Phase": "Fase Processual",
+	};
+
 	const HUB_NAV_DOCTYPES = [CASE_DOCTYPE, ...SATELLITE_DOCTYPES];
+
+	function get_doctype_label(doctype) {
+		const label = DOCTYPE_NAV_LABELS[doctype];
+		return label ? __(label) : __(doctype);
+	}
 
 	function get_case_fieldname(doctype) {
 		return CASE_FIELD_BY_DOCTYPE[doctype] || "legal_case";
@@ -607,7 +632,9 @@
 			VERSION: ADV_CASE_NAV_VERSION,
 			HUB_CONTEXT_KEY,
 			SATELLITE_DOCTYPES,
+			DOCTYPE_NAV_LABELS,
 			CASE_FIELD_BY_DOCTYPE,
+			get_doctype_label,
 			get_case_fieldname,
 			get_case_name,
 			get_case_title,

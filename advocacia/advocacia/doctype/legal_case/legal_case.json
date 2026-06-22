@@ -130,7 +130,7 @@
    "idx": 2
   },
   {
-   "group": "Financeiro",
+   "group": "Cobrança de serviços",
    "link_doctype": "Service Record",
    "link_fieldname": "legal_case",
    "idx": 3
@@ -148,7 +148,7 @@
    "idx": 5
   },
   {
-   "group": "Financeiro",
+   "group": "Custas Processuais",
    "link_doctype": "Court Cost",
    "link_fieldname": "legal_case",
    "idx": 6
@@ -1390,13 +1390,13 @@
   {
    "fieldname": "sec_installments",
    "fieldtype": "Section Break",
-   "label": "Parcelas",
+   "label": "Parcelas de Honorários",
    "idx": 31
   },
   {
    "fieldname": "installments_panel",
    "fieldtype": "HTML",
-   "label": "Parcelas",
+   "label": "Parcelas de Honorários",
    "idx": 32
   },
   {
@@ -1414,7 +1414,7 @@
   {
    "fieldname": "sec_court_costs",
    "fieldtype": "Section Break",
-   "label": "Custas",
+   "label": "Custas Processuais",
    "idx": 35
   },
   {
@@ -1426,7 +1426,7 @@
   {
    "fieldname": "sec_service_records",
    "fieldtype": "Section Break",
-   "label": "Cobranças",
+   "label": "Cobrança de serviços",
    "idx": 37
   },
   {
@@ -1468,7 +1468,7 @@
   {
    "fieldname": "tab_records",
    "fieldtype": "Tab Break",
-   "label": "Registros",
+   "label": "Comunicações e Registro de Horas",
    "idx": 42
   },
   {

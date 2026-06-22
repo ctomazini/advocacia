@@ -73,7 +73,7 @@
    "mandatory_depends_on": "eval:doc.origin_type=='Atos Advocatícios'",
    "options": "Service Record",
    "read_only": 1,
-   "description": "Registro de atos vinculado (cobrança de atos).",
+   "description": "Registro de cobrança de serviços vinculado.",
    "idx": 4
   },
   {
