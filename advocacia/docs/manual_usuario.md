@@ -504,6 +504,8 @@ Sintaxe **docxtpl**: `{{ nome_do_campo }}`. Grupos *condicionais* só têm valor
 | `{{ escritorio_cnpj }}` | CNPJ do escritório (mascarado) | — |
 | `{{ escritorio_oab }}` | OAB do escritório | — |
 | `{{ escritorio_advogada }}` | Advogada(o) principal | — |
+| `{{ escritorio_advogada_cpf }}` | CPF da advogada principal (mascarado) | — |
+| `{{ escritorio_advogada_rg }}` | RG da advogada principal | — |
 | `{{ escritorio_endereco }}` | Endereço profissional | — |
 | `{{ escritorio_registro }}` | Registro SIA/OAB | — |
 | `{{ escritorio_logo }}` | Logo do escritório (imagem — somente em .docx) | — |
@@ -608,6 +610,8 @@ Dados institucionais do escritório: OAB, CNPJ, endereço, logo, dados bancário
 | Registro SIA | Data |  | Registro no SIA/OAB do escritório. |
 | Logo do Escritório | Attach Image |  | Logotipo exibido em documentos gerados (opcional). |
 | Advogada(o) Principal | Data | ✅ | Nome da advogada responsável pelo escritório. |
+| CPF da Advogada(o) | Data |  | CPF da advogada principal. Apenas dígitos, validado automaticamente. |
+| RG da Advogada(o) | Data |  | Documento de identidade da advogada principal. |
 | OAB | Data | ✅ | Número da OAB (apenas dígitos). |
 | Dias padrão de antecedência (prazos) | Int |  | Dias padrão de antecedência para alertas de prazos. |
 | Endereço Completo | Small Text | ✅ | Endereço completo do escritório para documentos. |

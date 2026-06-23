@@ -29,6 +29,8 @@ def _ensure_test_escritorio_config(lawyer_name="Advogada Teste"):
 	cfg.cnpj = "11222333000181"
 	cfg.oab = "OAB/RS 00.000"
 	cfg.lawyer_name = lawyer_name
+	cfg.lawyer_cpf = "52998224725"
+	cfg.lawyer_rg = "1234567890"
 	cfg.address = "Rua Teste, 100, Cidade Teste/RS"
 	cfg.sia_registration = "00000"
 	cfg.bank_name = "Banco Documentos"
@@ -130,6 +132,8 @@ class TestDocumentos(FrappeTestCase):
 		servico = create_test_legal_case()
 		context = _build_context(servico.name)
 		self.assertEqual(context["escritorio_advogada"], "Advogada Teste")
+		self.assertEqual(context["escritorio_advogada_cpf"], "529.982.247-25")
+		self.assertEqual(context["escritorio_advogada_rg"], "1234567890")
 		self.assertEqual(context["escritorio_razao_social"], "Escritorio Teste Advocacia")
 		self.assertEqual(context["escritorio_cnpj"], "11.222.333/0001-81")
 		self.assertEqual(context["escritorio_banco"], "Banco Documentos")

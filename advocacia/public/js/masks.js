@@ -194,6 +194,8 @@ const AdvocaciaMasks = {
 		if (!window.AdvocaciaMasks) return;
 		this.bindMask(frm, "cnpj", this.applyCNPJ, "cnpj");
 		this.formatFormField(frm, "cnpj", this.applyCNPJ);
+		this.bindMask(frm, "lawyer_cpf", this.applyCPF, "cpf");
+		this.formatFormField(frm, "lawyer_cpf", this.applyCPF);
 	},
 
 	setupLegalCaseProcessoMask(frm) {

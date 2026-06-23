@@ -13,6 +13,8 @@
   "office_logo",
   "column_break_1",
   "lawyer_name",
+  "lawyer_cpf",
+  "lawyer_rg",
   "oab",
   "default_notify_days",
   "sec_endereco",
@@ -74,12 +76,26 @@
    "idx": 7
   },
   {
+   "fieldname": "lawyer_cpf",
+   "fieldtype": "Data",
+   "label": "CPF da Advogada(o)",
+   "description": "CPF da advogada principal. Apenas dígitos, validado automaticamente.",
+   "idx": 8
+  },
+  {
+   "fieldname": "lawyer_rg",
+   "fieldtype": "Data",
+   "label": "RG da Advogada(o)",
+   "description": "Documento de identidade da advogada principal.",
+   "idx": 9
+  },
+  {
    "fieldname": "oab",
    "fieldtype": "Data",
    "label": "OAB",
    "reqd": 1,
    "description": "Número da OAB (apenas dígitos).",
-   "idx": 8
+   "idx": 10
   },
   {
    "default": "3",
@@ -87,7 +103,7 @@
    "fieldtype": "Int",
    "label": "Dias padrão de antecedência (prazos)",
    "description": "Dias padrão de antecedência para alertas de prazos sem valor individual.",
-   "idx": 9
+   "idx": 11
   },
   {
    "fieldname": "sec_endereco",

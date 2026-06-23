@@ -9,4 +9,9 @@ frappe.ui.form.on("Office Settings", {
 			AdvocaciaMasks.formatFormField(frm, "cnpj", AdvocaciaMasks.applyCNPJ);
 		}
 	},
+	lawyer_cpf(frm) {
+		if (window.AdvocaciaMasks) {
+			AdvocaciaMasks.formatFormField(frm, "lawyer_cpf", AdvocaciaMasks.applyCPF);
+		}
+	},
 });

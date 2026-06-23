@@ -9,6 +9,8 @@ def boot_session(bootinfo):
 		"cnpj": "",
 		"oab": "",
 		"lawyer_name": "",
+		"lawyer_cpf": "",
+		"lawyer_rg": "",
 		"logo_url": "",
 		"address": "",
 	}
@@ -19,6 +21,8 @@ def boot_session(bootinfo):
 		office["cnpj"] = settings.cnpj or ""
 		office["oab"] = settings.oab or ""
 		office["lawyer_name"] = settings.lawyer_name or ""
+		office["lawyer_cpf"] = settings.lawyer_cpf or ""
+		office["lawyer_rg"] = settings.lawyer_rg or ""
 		office["address"] = settings.address or ""
 		if settings.office_logo:
 			office["logo_url"] = get_url(settings.office_logo)

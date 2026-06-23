@@ -97,6 +97,8 @@ PLACEHOLDER_REFERENCIA = [
 			{"placeholder": "escritorio_cnpj", "label": "CNPJ do escritório (mascarado)"},
 			{"placeholder": "escritorio_oab", "label": "OAB do escritório"},
 			{"placeholder": "escritorio_advogada", "label": "Advogada(o) principal"},
+			{"placeholder": "escritorio_advogada_cpf", "label": "CPF da advogada principal (mascarado)"},
+			{"placeholder": "escritorio_advogada_rg", "label": "RG da advogada principal"},
 			{"placeholder": "escritorio_endereco", "label": "Endereço profissional"},
 			{"placeholder": "escritorio_registro", "label": "Registro SIA/OAB"},
 			{
@@ -543,11 +545,15 @@ def _get_escritorio_context():
 	cfg = frappe.get_single("Office Settings")
 	cnpj_raw = cfg.cnpj or ""
 	cnpj_fmt = formatar_cnpj(cnpj_raw) if cnpj_raw else ""
+	cpf_raw = cfg.lawyer_cpf or ""
+	cpf_fmt = formatar_cpf(cpf_raw) if cpf_raw else ""
 	return {
 		"escritorio_razao_social": cfg.company_name or "",
 		"escritorio_cnpj": cnpj_fmt,
 		"escritorio_oab": cfg.oab or "",
 		"escritorio_advogada": cfg.lawyer_name or "",
+		"escritorio_advogada_cpf": cpf_fmt,
+		"escritorio_advogada_rg": cfg.lawyer_rg or "",
 		"escritorio_endereco": cfg.address or "",
 		"escritorio_registro": cfg.sia_registration or "",
 		"escritorio_banco": cfg.bank_name or "",

@@ -11,7 +11,16 @@ class TestBootSession(IntegrationTestCase):
 
 		self.assertIn("adv_office", bootinfo)
 		self.assertIsInstance(bootinfo.adv_office, dict)
-		for key in ("company_name", "cnpj", "oab", "lawyer_name", "logo_url", "address"):
+		for key in (
+			"company_name",
+			"cnpj",
+			"oab",
+			"lawyer_name",
+			"lawyer_cpf",
+			"lawyer_rg",
+			"logo_url",
+			"address",
+		):
 			self.assertIn(key, bootinfo.adv_office)
 
 	def test_boot_session_handles_missing_settings(self):

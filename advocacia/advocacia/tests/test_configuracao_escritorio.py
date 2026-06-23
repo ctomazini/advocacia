@@ -3,6 +3,9 @@ from frappe.exceptions import ValidationError
 from frappe.tests.utils import FrappeTestCase
 
 
+from advocacia.advocacia.tests.test_setup import VALID_CPF_DIGITS
+
+
 class TestConfiguracaoEscritorio(FrappeTestCase):
 	def tearDown(self):
 		frappe.db.rollback()
@@ -15,6 +18,8 @@ class TestConfiguracaoEscritorio(FrappeTestCase):
 		cfg = frappe.get_single("Office Settings")
 		cfg.company_name = "Escritório Teste Advocacia LTDA"
 		cfg.lawyer_name = "Dra. Teste"
+		cfg.lawyer_cpf = VALID_CPF_DIGITS
+		cfg.lawyer_rg = "MG-12.345.678"
 		cfg.oab = "OAB/RS 123456"
 		cfg.address = "Rua Teste, 100, Porto Alegre/RS"
 		cfg.cnpj = "11222333000181"
@@ -28,6 +33,8 @@ class TestConfiguracaoEscritorio(FrappeTestCase):
 		reloaded = frappe.get_single("Office Settings")
 		self.assertEqual(reloaded.company_name, "Escritório Teste Advocacia LTDA")
 		self.assertEqual(reloaded.lawyer_name, "Dra. Teste")
+		self.assertEqual(reloaded.lawyer_cpf, VALID_CPF_DIGITS)
+		self.assertEqual(reloaded.lawyer_rg, "MG-12.345.678")
 		self.assertEqual(reloaded.oab, "OAB/RS 123456")
 		self.assertEqual(reloaded.bank_name, "Banco Teste")
 		self.assertEqual(reloaded.default_notify_days, 5)
@@ -55,6 +62,14 @@ class TestConfiguracaoEscritorio(FrappeTestCase):
 		with self.assertRaises(ValidationError):
 			cfg.save(ignore_permissions=True)
 		cfg.oab = original
+
+	def test_lawyer_cpf_invalido_falha(self):
+		cfg = frappe.get_single("Office Settings")
+		original = cfg.lawyer_cpf
+		cfg.lawyer_cpf = "111.111.111-11"
+		with self.assertRaises(ValidationError):
+			cfg.save(ignore_permissions=True)
+		cfg.lawyer_cpf = original
 
 	def test_required_endereco_falha(self):
 		cfg = frappe.get_single("Office Settings")

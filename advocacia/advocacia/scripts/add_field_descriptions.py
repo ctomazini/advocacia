@@ -282,6 +282,8 @@ DESCRIPTIONS: dict[str, dict[str, str]] = {
 		"sia_registration": "Registro no SIA/OAB do escritório.",
 		"office_logo": "Logotipo exibido em documentos gerados (opcional).",
 		"lawyer_name": "Nome da advogada responsável pelo escritório.",
+		"lawyer_cpf": "CPF da advogada principal. Apenas dígitos, validado automaticamente.",
+		"lawyer_rg": "Documento de identidade da advogada principal.",
 		"oab": "Número da OAB (apenas dígitos).",
 		"default_notify_days": "Dias padrão de antecedência para alertas de prazos.",
 		"address": "Endereço completo do escritório para documentos.",
