@@ -684,61 +684,6 @@
     max-width: 280px;
     margin: 0 auto;
 }
-.painel-hero--onboarding .painel-hero-pulse {
-    display: none;
-}
-.painel-onboarding {
-    margin: 8px 0 32px;
-}
-.painel-onboarding .painel-empty {
-    padding-bottom: 24px;
-}
-.painel-onboarding-steps {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    max-width: 560px;
-}
-.painel-onboarding-step {
-    display: flex;
-    gap: 14px;
-    align-items: flex-start;
-    padding: 16px 18px;
-    border: 1px solid var(--border-color);
-    border-radius: var(--painel-radius);
-    background: var(--card-bg, var(--bg-color));
-}
-.painel-onboarding-step__n {
-    flex-shrink: 0;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    font-weight: 700;
-    background: var(--primary-light, var(--bg-subtle));
-    color: var(--primary, var(--text-color));
-}
-.painel-onboarding-step__title {
-    margin: 0 0 4px;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-color);
-}
-.painel-onboarding-step__hint {
-    margin: 0 0 10px;
-    font-size: 13px;
-    color: var(--text-muted);
-    line-height: 1.45;
-}
-.painel-onboarding-step__cta {
-    margin-top: 4px;
-}
 .painel-zona-financeira--restricted .painel-empty {
     max-width: 420px;
     margin: 0 auto;
