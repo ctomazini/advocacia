@@ -341,11 +341,11 @@ function gerar_tabela_parcelas(frm) {
     var direto = eh_direto(frm);
 
     if (!parcelas || parcelas <= 0) {
-        frappe.msgprint('Preencha o número de parcelas.');
+        frappe.msgprint(__('Preencha o número de parcelas.'));
         return;
     }
     if (!data_inicio) {
-        frappe.msgprint('Preencha a data da primeira parcela.');
+        frappe.msgprint(__('Preencha a data da primeira parcela.'));
         return;
     }
     if (!total) {
@@ -371,7 +371,7 @@ function gerar_tabela_parcelas(frm) {
         }
         frm.refresh_field('fee_installments');
         somar_totais(frm);
-        frappe.msgprint(parcelas + ' parcelas geradas com sucesso!');
+        frappe.msgprint(__('{0} parcelas geradas com sucesso!', [parcelas]));
         return;
     }
 
@@ -416,7 +416,7 @@ function gerar_tabela_parcelas(frm) {
         }
         frm.refresh_field('fee_installments');
         somar_totais(frm);
-        frappe.msgprint(parcelas + ' parcelas geradas com sucesso!');
+        frappe.msgprint(__('{0} parcelas geradas com sucesso!', [parcelas]));
     }, 'Como distribuir a sucumbência?', 'Gerar');
 }
 

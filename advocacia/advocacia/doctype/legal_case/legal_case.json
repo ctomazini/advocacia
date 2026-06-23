@@ -118,13 +118,13 @@
  ],
  "links": [
   {
-   "group": "Honorários",
+   "group": "Contratos de Honorários",
    "link_doctype": "Fee Agreement",
    "link_fieldname": "legal_case",
    "idx": 1
   },
   {
-   "group": "Honorários",
+   "group": "Recebimentos",
    "link_doctype": "Legal Payment",
    "link_fieldname": "legal_case",
    "idx": 2
@@ -1496,7 +1496,7 @@
   {
    "fieldname": "sec_time_entries",
    "fieldtype": "Section Break",
-   "label": "Horas Trabalhadas",
+   "label": "Registro de Horas",
    "idx": 47
   },
   {

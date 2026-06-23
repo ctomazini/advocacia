@@ -34,6 +34,6 @@
   "name": "Advocacia Tarefas",
   "private": 0,
   "reference_doctype": "Legal Task",
-  "show_labels": 0
+  "show_labels": 1
  }
 ]
