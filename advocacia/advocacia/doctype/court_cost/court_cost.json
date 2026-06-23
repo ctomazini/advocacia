@@ -64,7 +64,7 @@
    "allow_in_quick_entry": 1,
    "in_list_view": 0,
    "options": "Taxa Judicial\nPerícia\nCertidão\nDeslocamento\nCópia/Impressão\nCorreios\nCartório\nDiligência\nOutros",
-   "description": "Taxa Judicial, Emolumento, Despesa Cartorial, etc.",
+   "description": "Taxa judicial, perícia, emolumentos, cartório ou diligência paga em nome do processo.",
    "in_standard_filter": 1,
    "idx": 4
   },
@@ -97,7 +97,7 @@
   {
    "fieldname": "valores_section",
    "fieldtype": "Section Break",
-   "label": "Valores",
+   "label": "Valores e Reembolso",
    "idx": 8
   },
   {
@@ -128,7 +128,7 @@
    "fieldtype": "Check",
    "label": "Repassar ao Cliente",
    "default": "1",
-   "description": "Marque se o valor deve ser repassado ao cliente.",
+   "description": "Marque quando o cliente deve reembolsar o escritório. Desmarque se a custa fica a cargo do escritório.",
    "idx": 12
   },
   {
@@ -136,7 +136,7 @@
    "fieldtype": "Date",
    "label": "Data de Repasse",
    "depends_on": "eval:doc.bill_to_client==1",
-   "description": "Data do repasse ao cliente.",
+   "description": "Data em que o cliente reembolsou o escritório pela custa paga.",
    "in_standard_filter": 1,
    "idx": 13
   },

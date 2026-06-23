@@ -1,5 +1,6 @@
 frappe.ui.form.on("Court Cost", {
 	refresh: function (frm) {
+		setup_court_cost_form_intro(frm);
 		var status = frm.doc.status;
 		if (status === "Pendente") {
 			frm.page.set_indicator(__("Pendente"), "red");
@@ -28,3 +29,12 @@ frappe.ui.form.on("Court Cost", {
 		}
 	},
 });
+
+function setup_court_cost_form_intro(frm) {
+	frm.set_intro(
+		__(
+			"Despesas judiciais vinculadas ao processo: taxas judiciais, custas de perícia, emolumentos, cartório, diligências pagas. Indique quem arca com a despesa (Escritório ou Cliente). Se o cliente reembolsa, registre data e valor."
+		),
+		"blue"
+	);
+}
