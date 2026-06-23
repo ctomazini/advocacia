@@ -225,6 +225,7 @@
  "links": [],
  "modified": "2026-05-31 12:00:00",
  "modified_by": "Administrator",
+ "description": "Nenhum registro de horas.",
  "module": "Advocacia",
  "name": "Time Entry",
  "owner": "Administrator",

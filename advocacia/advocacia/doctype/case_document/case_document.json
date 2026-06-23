@@ -131,6 +131,7 @@
  "links": [],
  "modified": "2026-06-11 12:00:00.000000",
  "modified_by": "Administrator",
+ "description": "Nenhum documento anexado ao processo.",
  "module": "Advocacia",
  "name": "Case Document",
  "naming_rule": "Expression",

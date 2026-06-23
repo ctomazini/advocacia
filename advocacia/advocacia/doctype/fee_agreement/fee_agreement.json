@@ -19,7 +19,7 @@
  "timeline_field": null,
  "sort_field": "modified",
  "sort_order": "DESC",
- "description": null,
+ "description": "Nenhum contrato de honorários cadastrado.",
  "colour": null,
  "read_only": 0,
  "in_create": 0,

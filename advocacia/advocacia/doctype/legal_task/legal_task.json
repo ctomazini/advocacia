@@ -11,6 +11,7 @@
  "naming_rule": "Expression",
  "title_field": "title",
  "search_fields": "subject,client,status",
+ "description": "Nenhuma tarefa cadastrada. Tarefas são atividades internas do escritório, diferentes de prazos processuais.",
  "field_order": [
   "informacoes_section",
   "title",

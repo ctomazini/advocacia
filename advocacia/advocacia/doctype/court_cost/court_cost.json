@@ -195,6 +195,7 @@
  "links": [],
  "modified": "2026-05-31 12:00:00",
  "modified_by": "Administrator",
+ "description": "Nenhuma custa processual registrada.",
  "module": "Advocacia",
  "name": "Court Cost",
  "owner": "Administrator",

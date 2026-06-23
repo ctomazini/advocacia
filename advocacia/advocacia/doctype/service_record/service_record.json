@@ -19,7 +19,7 @@
  "timeline_field": null,
  "sort_field": "modified",
  "sort_order": "DESC",
- "description": "Atos avulsos cobrados do cliente fora do contrato de honorários. Para honorários contratuais, use Contratos de Honorários.",
+ "description": "Nenhuma cobrança de serviço avulso registrada. Para honorários contratuais, use Contratos de Honorários.",
  "colour": null,
  "read_only": 0,
  "in_create": 0,
