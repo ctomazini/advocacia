@@ -9,23 +9,19 @@
 		);
 	}
 
-	function adv_download_generated_file(file_name, file_content_base64) {
-		const binary = atob(file_content_base64);
-		const bytes = new Uint8Array(binary.length);
-		for (let i = 0; i < binary.length; i++) {
-			bytes[i] = binary.charCodeAt(i);
+	function adv_download_generated_file(download_key) {
+		if (!download_key) {
+			return;
 		}
-		const blob = new Blob([bytes], {
-			type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-		});
-		const url = URL.createObjectURL(blob);
-		const link = document.createElement("a");
-		link.href = url;
-		link.download = file_name;
-		document.body.appendChild(link);
-		link.click();
-		document.body.removeChild(link);
-		URL.revokeObjectURL(url);
+		const url =
+			"/api/method/advocacia.advocacia.documentos.download_generated_document?key=" +
+			encodeURIComponent(download_key);
+		const iframe = document.createElement("iframe");
+		iframe.style.display = "none";
+		iframe.setAttribute("aria-hidden", "true");
+		iframe.src = frappe.urllib.get_full_url(url);
+		document.body.appendChild(iframe);
+		window.setTimeout(() => iframe.remove(), 120000);
 	}
 
 	function gerar_documentos_em_lote(frm, template_names) {
@@ -46,9 +42,9 @@
 
 				if (data.gerados && data.gerados.length) {
 					data.gerados.forEach((item, index) => {
-						if (item.file_content) {
+						if (item.download_key) {
 							setTimeout(() => {
-								adv_download_generated_file(item.file_name, item.file_content);
+								adv_download_generated_file(item.download_key);
 							}, index * 250);
 						}
 					});

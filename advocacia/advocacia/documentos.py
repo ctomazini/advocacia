@@ -1,8 +1,8 @@
-import base64
 import io
 import json
 import os
 import re
+import uuid
 from datetime import datetime
 
 import frappe
@@ -805,6 +805,48 @@ def _create_generated_case_document(
 	return doc.name
 
 
+_DOWNLOAD_CACHE_TTL = 300
+
+
+def _stash_generated_download(file_name: str, content: bytes) -> str:
+	key = f"adv_gen_doc:{uuid.uuid4().hex}"
+	frappe.cache.set_value(
+		key,
+		{
+			"user": frappe.session.user,
+			"file_name": file_name,
+			"content": content,
+		},
+		expires_in_sec=_DOWNLOAD_CACHE_TTL,
+	)
+	return key
+
+
+def _pop_cached_download(key: str) -> dict:
+	if not key or not key.startswith("adv_gen_doc:"):
+		frappe.throw(_("Chave de download inválida."))
+
+	payload = frappe.cache.get_value(key)
+	if not payload:
+		frappe.throw(_("Download expirado. Gere o documento novamente."))
+
+	if payload.get("user") != frappe.session.user:
+		frappe.throw(_("Sem permissão para este download."), frappe.PermissionError)
+
+	frappe.cache.delete_value(key)
+	return payload
+
+
+@frappe.whitelist()
+def download_generated_document(key: str) -> None:
+	"""Entrega .docx gerado com Content-Disposition — download direto na pasta padrão."""
+	frappe.has_permission("Legal Case", "read", throw=True)
+	payload = _pop_cached_download(key)
+	frappe.local.response.filename = payload["file_name"]
+	frappe.local.response.filecontent = payload["content"]
+	frappe.local.response.type = "download"
+
+
 def _parse_template_names(template_names):
 	if isinstance(template_names, str):
 		template_names = json.loads(template_names or "[]")
@@ -836,7 +878,9 @@ def gerar_documentos_em_lote(servico_name: str, template_names: str | list) -> d
 					"template": template_name,
 					"title": template_doc.title,
 					"file_name": result["file_name"],
-					"file_content": base64.b64encode(result["content"]).decode("ascii"),
+					"download_key": _stash_generated_download(
+						result["file_name"], result["content"]
+					),
 				}
 			)
 		except Exception as exc:

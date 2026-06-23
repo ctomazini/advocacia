@@ -13,6 +13,7 @@ from advocacia.advocacia.documentos import (
 	_montar_narrativa_pagamento,
 	_valor_por_extenso,
 	gerar_documentos_em_lote,
+	download_generated_document,
 	get_document_placeholder_keys,
 	get_kits_disponiveis,
 	get_placeholders_referencia,
@@ -188,7 +189,13 @@ class TestDocumentos(FrappeTestCase):
 		self.assertEqual(len(result["data"]["gerados"]), 2)
 		for item in result["data"]["gerados"]:
 			self.assertTrue(item["file_name"].endswith(".docx"))
-			self.assertTrue(item["file_content"])
+			self.assertTrue(item["download_key"])
+
+		first = result["data"]["gerados"][0]
+		download_generated_document(first["download_key"])
+		self.assertEqual(frappe.local.response.type, "download")
+		self.assertTrue(first["file_name"].endswith(".docx"))
+		self.assertTrue(frappe.local.response.filecontent)
 
 		case_docs = frappe.get_all(
 			"Case Document",
