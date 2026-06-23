@@ -1141,15 +1141,6 @@ function adv_hub_render_summary_bar(frm, counts) {
 			return `<div class="adv-hub-summary-pill${
 				hasData ? " adv-hub-summary-pill--active" : ""
 			}">
-			<a class="adv-hub-summary-pill__link" href="${listUrl}"
-				data-doctype="${frappe.utils.escape_html(item.doctype)}"
-				data-fieldname="${frappe.utils.escape_html(item.fieldname || "")}"
-				data-catalog="${item.catalog ? "1" : "0"}"
-				title="${frappe.utils.escape_html(__("Ver lista de {0}", [item.label]))}">
-				<span class="adv-hub-summary-pill__icon">${item.icon}</span>
-				<span class="adv-hub-summary-pill__label">${item.label}</span>
-				<span class="adv-hub-summary-pill__count">${item.count || 0}</span>
-			</a>
 			${
 				item.readonly
 					? ""
@@ -1158,6 +1149,17 @@ function adv_hub_render_summary_bar(frm, counts) {
 				data-fieldname="${frappe.utils.escape_html(item.fieldname || "")}"
 				title="${frappe.utils.escape_html(__("Criar {0}", [item.label]))}">+</button>`
 			}
+			<a class="adv-hub-summary-pill__link" href="${listUrl}"
+				data-doctype="${frappe.utils.escape_html(item.doctype)}"
+				data-fieldname="${frappe.utils.escape_html(item.fieldname || "")}"
+				data-catalog="${item.catalog ? "1" : "0"}"
+				title="${frappe.utils.escape_html(__("Ver lista de {0}", [item.label]))}">
+				<span class="adv-hub-summary-pill__head">
+					<span class="adv-hub-summary-pill__count">${item.count || 0}</span>
+					<span class="adv-hub-summary-pill__icon">${item.icon}</span>
+				</span>
+				<span class="adv-hub-summary-pill__label">${item.label}</span>
+			</a>
 		</div>`;
 		})
 		.join("");
