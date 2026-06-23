@@ -5,7 +5,7 @@ import frappe
 PRINT_FORMAT_NAMES = (
 	"Advocacia - Recibo de Honorários",
 	"Advocacia - Resumo do Processo",
-	"Advocacia - Contrato de Honorários",
+	"Advocacia - Cobrança de Honorários",
 	"Advocacia - Inadimplência",
 	"Advocacia - Fluxo de Caixa",
 	"Advocacia - Honorários por Cliente",
@@ -29,7 +29,7 @@ _DOCTYPE_PRINT_FORMATS = (
 		"html_file": "resumo_processo.html",
 	},
 	{
-		"name": "Advocacia - Contrato de Honorários",
+		"name": "Advocacia - Cobrança de Honorários",
 		"doc_type": "Fee Agreement",
 		"html_file": "contrato_honorarios.html",
 	},

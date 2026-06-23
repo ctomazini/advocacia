@@ -190,7 +190,7 @@ PLACEHOLDER_REFERENCIA = [
 		],
 	},
 	{
-		"grupo": "Honorários (condicional)",
+		"grupo": "Cobranças de Honorários (condicional)",
 		"condicional": True,
 		"items": [
 			{"placeholder": "acordo_modo_honorarios", "label": "Modo de honorários"},

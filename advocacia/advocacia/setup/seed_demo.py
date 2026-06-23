@@ -853,7 +853,7 @@ def _seed_templates() -> None:
 	templates = []
 	for titulo, tipo in [
 		(_demo_label("Procuração Ad Judicia"), "Contrato"),
-		(_demo_label("Contrato de Honorários"), "Contrato"),
+		(_demo_label("Cobrança de Honorários"), "Contrato"),
 	]:
 		if frappe.db.exists("Document Template", titulo):
 			templates.append(titulo)

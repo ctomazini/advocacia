@@ -46,7 +46,7 @@ fixtures = [
                 [
                     "Advocacia - Recibo de Honorários",
                     "Advocacia - Resumo do Processo",
-                    "Advocacia - Contrato de Honorários",
+                    "Advocacia - Cobrança de Honorários",
                 ],
             ]
         ],

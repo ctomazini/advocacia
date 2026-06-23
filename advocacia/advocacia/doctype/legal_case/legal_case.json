@@ -118,7 +118,7 @@
  ],
  "links": [
   {
-   "group": "Contratos de Honorários",
+   "group": "Cobranças de Honorários",
    "link_doctype": "Fee Agreement",
    "link_fieldname": "legal_case",
    "idx": 1
@@ -130,7 +130,7 @@
    "idx": 2
   },
   {
-   "group": "Cobranças de Serviço",
+   "group": "Cobranças Individuais",
    "link_doctype": "Service Record",
    "link_fieldname": "legal_case",
    "idx": 3
@@ -1436,13 +1436,13 @@
   {
    "fieldname": "sec_service_records",
    "fieldtype": "Section Break",
-   "label": "Serviços Avulsos",
+   "label": "Cobranças Individuais",
    "idx": 37
   },
   {
    "fieldname": "service_records_panel",
    "fieldtype": "HTML",
-   "label": "Serviços Avulsos",
+   "label": "Cobranças Individuais",
    "idx": 38
   },
   {

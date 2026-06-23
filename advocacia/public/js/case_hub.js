@@ -342,11 +342,11 @@ function adv_hub_render_service_records(frm, records) {
 		$w.html(
 			_adv_hub_empty(
 				"📝",
-				__("Nenhum serviço avulso cobrado."),
+				__("Nenhuma cobrança individual registrada."),
 				__(
-					"Use Cobranças de Serviço para registrar atos individuais cobrados fora do contrato."
+					"Use Cobranças Individuais para registrar atos cobrados fora da cobrança de honorários."
 				),
-				__("+ Cobrança de Serviço"),
+				__("+ Cobrança Individual"),
 				"new-record"
 			)
 		);
@@ -381,7 +381,7 @@ function adv_hub_render_service_records(frm, records) {
 				<span class="adv-hub-panel__count">${records.length}</span>
 			</h3>
 			<button type="button" class="adv-hub-panel__action" data-hub-action="new-record">
-				${__("+ Cobrança de Serviço")}
+				${__("+ Cobrança Individual")}
 			</button>
 		</div>
 		${rows}
@@ -659,11 +659,11 @@ function _adv_hub_finance_narrative_banner() {
 	return `<div class="adv-hub-budget-banner adv-hub-budget-banner--info adv-hub-finance-narrative">
 		<p>${__("O financeiro do processo tem duas fontes de receita:")}</p>
 		<ul class="adv-hub-finance-narrative__list">
-			<li><strong>${__("Honorários Contratuais")}</strong> — ${__(
-				"valor acordado no Contrato de Honorários, dividido em parcelas geradas automaticamente."
+			<li><strong>${__("Cobranças de Honorários")}</strong> — ${__(
+				"valor acordado na Cobrança de Honorários, dividido em parcelas geradas automaticamente."
 			)}</li>
-			<li><strong>${__("Serviços Avulsos")}</strong> — ${__(
-				"atos individuais cobrados fora do contrato."
+			<li><strong>${__("Cobranças Individuais")}</strong> — ${__(
+				"atos cobrados fora da cobrança de honorários."
 			)}</li>
 		</ul>
 		<p>${__(
@@ -703,7 +703,7 @@ function _adv_hub_render_financial_summary(frm, financial) {
 	const billingSection = pendingBillings.length
 		? `<div class="adv-hub-subsection">
 			<div class="adv-hub-subsection__header">
-				<strong>${__("Serviços avulsos em aberto")}</strong>
+				<strong>${__("Cobranças individuais em aberto")}</strong>
 				<button type="button" class="adv-hub-panel__action" data-hub-action="list-service-records">${__(
 					"Ver todas"
 				)}</button>
@@ -723,21 +723,21 @@ function _adv_hub_render_financial_summary(frm, financial) {
 				agreement
 					? `<button type="button" class="adv-hub-panel__action" data-route="Form/Fee Agreement/${frappe.utils.escape_html(
 							agreement.name
-					  )}">${__("Ver Honorários")}</button>`
+					  )}">${__("Ver Cobrança de Honorários")}</button>`
 					: `<button type="button" class="adv-hub-panel__action" data-hub-action="new-agreement">${__(
-							"+ Honorários"
+							"+ Cobrança de Honorários"
 					  )}</button>`
 			}
 		</div>
 		<p class="adv-hub-panel__hint">${__(
-			"Honorários: contrato parcelado do caso. Serviços avulsos: itens a faturar ou já emitidos em recebimento."
+			"Cobranças de honorários: valor parcelado do caso. Cobranças individuais: itens a faturar ou já emitidos em recebimento."
 		)}</p>
 		<div class="adv-hub-kpi-row">
 			<div class="adv-hub-kpi">
 				<div class="adv-hub-kpi__value" style="color:var(--blue-500)">${format_currency(
 					summary.total_contract
 				)}</div>
-				<div class="adv-hub-kpi__label">${__("Honorários contratados")}</div>
+				<div class="adv-hub-kpi__label">${__("Cobrança de honorários")}</div>
 			</div>
 			<div class="adv-hub-kpi">
 				<div class="adv-hub-kpi__value" style="color:var(--green-600)">${format_currency(
@@ -755,7 +755,7 @@ function _adv_hub_render_financial_summary(frm, financial) {
 				<div class="adv-hub-kpi__value" style="color:var(--purple-500)">${format_currency(
 					summary.total_services_unbilled
 				)}</div>
-				<div class="adv-hub-kpi__label">${__("A faturar (serviços)")}</div>
+				<div class="adv-hub-kpi__label">${__("A faturar (individuais)")}</div>
 			</div>
 			<div class="adv-hub-kpi">
 				<div class="adv-hub-kpi__value" style="color:var(--red-500)">${format_currency(
@@ -767,12 +767,12 @@ function _adv_hub_render_financial_summary(frm, financial) {
 		${
 			summary.total_pending_service_payments
 				? `<p class="adv-hub-panel__hint">${__(
-						"Serviços avulsos já emitidos e aguardando recebimento: {0}",
+						"Cobranças individuais já emitidas e aguardando recebimento: {0}",
 						[format_currency(summary.total_pending_service_payments)]
 				  )}</p>`
 				: ""
 		}
-		<div class="adv-hub-stacked-bar" title="${__("{0}% recebido dos honorários contratados", [pctReceived])}">
+		<div class="adv-hub-stacked-bar" title="${__("{0}% recebido da cobrança de honorários", [pctReceived])}">
 			<div class="adv-hub-stacked-bar__segment" style="width:${pctReceived}%;background:var(--green-500)"></div>
 		</div>
 		${billingSection}
@@ -802,9 +802,9 @@ function _adv_hub_render_installments(frm, installments) {
 				"📋",
 				__("Nenhum recebimento de honorários registrado."),
 				__(
-					"Para gerar parcelas, cadastre um Contrato de Honorários para este processo."
+					"Para gerar parcelas, cadastre uma Cobrança de Honorários para este processo."
 				),
-				__("+ Contrato de Honorários"),
+				__("+ Cobrança de Honorários"),
 				"new-agreement"
 			)
 		);
@@ -844,7 +844,7 @@ function _adv_hub_render_installments(frm, installments) {
 				<span class="adv-hub-panel__count">${installments.length}</span>
 			</h3>
 			<button type="button" class="adv-hub-panel__action" data-hub-action="list-agreements">
-				${__("Ver Honorários")}
+				${__("Ver Cobrança de Honorários")}
 			</button>
 		</div>
 		${rows}
@@ -866,9 +866,9 @@ function _adv_hub_render_payments(frm, payments) {
 				"💵",
 				__("Nenhum recebimento registrado."),
 				__(
-					"Para gerar parcelas, cadastre um Contrato de Honorários para este processo."
+					"Para gerar parcelas, cadastre uma Cobrança de Honorários para este processo."
 				),
-				__("+ Contrato de Honorários"),
+				__("+ Cobrança de Honorários"),
 				"new-agreement"
 			)
 		);
@@ -981,7 +981,7 @@ function _adv_hub_render_case_checklist(frm, counts) {
 
 	if ("fee_agreements" in counts) {
 		items.push({
-			label: __("Contrato de Honorários cadastrado"),
+			label: __("Cobrança de Honorários cadastrada"),
 			done: (counts.fee_agreements || 0) > 0,
 			doctype: "Fee Agreement",
 			fieldname: "legal_case",

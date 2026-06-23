@@ -31,7 +31,7 @@ frappe.ui.form.on("Legal Payment", {
 function setup_legal_payment_form_intro(frm) {
 	frm.set_intro(
 		__(
-			"Este registro representa uma parcela a receber (ou já recebida) do cliente. Origem: gerado automaticamente por Contrato de Honorários ou Cobrança de Serviço, ou criado manualmente para entradas avulsas."
+			"Este registro representa uma parcela a receber (ou já recebida) do cliente. Origem: gerado automaticamente por Cobrança de Honorários ou Cobrança Individual, ou criado manualmente para entradas avulsas."
 		),
 		"blue"
 	);
@@ -39,7 +39,7 @@ function setup_legal_payment_form_intro(frm) {
 
 function configurar_botoes_atos(frm) {
 	if (frm.doc.service_record) {
-		frm.add_custom_button(__("Ver Cobrança de Serviço"), function () {
+		frm.add_custom_button(__("Ver Cobrança Individual"), function () {
 			frappe.set_route("Form", "Service Record", frm.doc.service_record);
 		});
 	}

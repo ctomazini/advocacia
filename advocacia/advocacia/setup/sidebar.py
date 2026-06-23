@@ -19,8 +19,8 @@ SIDEBAR_LINK_ORDER = (
 	("Custas Processuais", "Court Cost", "DocType"),
 	# Financeiro
 	("Recebimentos", "Legal Payment", "DocType"),
-	("Contratos de Honorários", "Fee Agreement", "DocType"),
-	("Cobranças de Serviço", "Service Record", "DocType"),
+	("Cobranças de Honorários", "Fee Agreement", "DocType"),
+	("Cobranças Individuais", "Service Record", "DocType"),
 	("Despesas do Escritório", "Office Expense", "DocType"),
 	("Modelos de Documento", "Document Template", "DocType"),
 	("Kits de Documentos", "Document Kit", "DocType"),

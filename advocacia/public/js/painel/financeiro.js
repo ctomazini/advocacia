@@ -134,7 +134,7 @@ frappe.provide("advocacia.painel.financeiro");
 	        (compact ? " painel-section--nested painel-priority-low" : " painel-priority-low") +
 	        '" id="painel-parcelas"><div class="painel-section-head">' +
 	        "<div><h2 class='painel-section-title'>" +
-	        __("Honorários em aberto") +
+	        __("Cobranças de honorários em aberto") +
 	        "</h2>" +
 	        '<p class="painel-section-sub">' +
 	        __("Pendentes e vencidos") +

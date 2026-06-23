@@ -120,7 +120,7 @@ frappe.ui.form.on('Fee Installment', {
 function setup_fee_agreement_form_intro(frm) {
 	frm.set_intro(
 		__(
-			"O Contrato de Honorários define o valor e a forma de cobrança dos serviços advocatícios. Após preencher valores e condições, clique em <strong>Gerar Parcelas</strong> para criar os Recebimentos automaticamente.<br><br>" +
+			"A Cobrança de Honorários define o valor e a forma de cobrança dos serviços advocatícios. Após preencher valores e condições, clique em <strong>Gerar Parcelas</strong> para criar os Recebimentos automaticamente.<br><br>" +
 				"<strong>Modos disponíveis:</strong><br>" +
 				"• <strong>Diretos</strong> — honorários 100% do escritório<br>" +
 				"• <strong>Divisão</strong> — honorários divididos entre advogado e cliente indicado"
@@ -199,7 +199,7 @@ function controlar_grid_parcelas(frm) {
     grid.update_docfield_property(
         'total_amount',
         'label',
-        direto ? 'Valor do Contrato' : 'Valor Total'
+        direto ? 'Valor da Cobrança' : 'Valor Total'
     );
     grid.update_docfield_property('total_amount', 'read_only', direto ? 0 : 1);
     grid.update_docfield_property('lawyer_amount', 'hidden', direto ? 1 : 0);

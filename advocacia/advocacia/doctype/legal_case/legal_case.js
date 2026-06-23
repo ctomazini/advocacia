@@ -12,7 +12,7 @@ frappe.ui.form.on("Legal Case", {
 		}
 		frm.$wrapper?.find(".form-dashboard-section, .form-dashboard, .form-links").hide();
 
-		frm.add_custom_button("+ Honorários", () => {
+		frm.add_custom_button("+ Cobrança de Honorários", () => {
 			frappe.new_doc("Fee Agreement", {
 				legal_case: frm.doc.name,
 				client: frm.doc.client,
