@@ -3,7 +3,7 @@
 Documento permanente de acompanhamento do projeto de modernização de experiência do usuário.
 
 **Criado:** 2026-06-09
-**Última atualização:** 2026-06-22 (Etapa 07 — organização de formulários)
+**Última atualização:** 2026-06-22 (Etapa 08 — onboarding e experiência inicial)
 **App:** `advocacia` (Frappe v16)
 
 ---
@@ -396,7 +396,53 @@ Cobertura de descriptions: **94%** (218/232) — `audit_usability.md`. Tooltips 
 
 **Testes:** Nenhum (auditoria read-only).
 
-**Próximas etapas:** Etapa 07 concluída — ver registro abaixo.
+**Próximas etapas:** Etapa 08 concluída — ver registro abaixo.
+
+---
+
+### Etapa 08 — Onboarding e experiência inicial
+
+**Status:** Concluída
+**Data:** 2026-06-22
+**Branch:** `ux/step-08-onboarding`
+**Responsável:** Sessão Agent / projeto Advocacia
+
+**Objetivo:** Melhorar onboarding reutilizando componentes existentes (empty states, pills, banners). Jornada inicial no painel, quick actions simplificadas, card workspace, checklist do processo no hub e banner narrativo financeiro. Sem novos endpoints, alteração de schema, permissões ou lógica financeira.
+
+**Pré-requisitos confirmados:** Etapa 07 commitada (`1febcaf`).
+
+#### Commits
+
+| Entrega | Escopo principal |
+|---------|------------------|
+| Dashboard onboarding | Jornada 3 passos quando `list_meta.active_cases.total === 0`; KPIs/charts ocultos; quick actions filtradas (+ Cliente, + Processo, + Prazo, + Audiência); chips com prefixo `+`; mensagem financeira para Advocacia User |
+| Workspace Comece Aqui | Card no grid com header explicativo + atalhos Clientes, Painel, Processos (`advocacia.json` + fixture) |
+| Hub checklist | Checklist honorários/prazo/audiência (judicial) na barra de resumo; CTAs `+`; some quando completo |
+| Hub banner financeiro | Banner restrito (User) e narrativa receita (Manager) na aba Financeiro |
+
+#### Entregas implementadas
+
+| Área | Detalhe |
+|------|---------|
+| Painel | `painel_is_onboarding`, `render_onboarding_journey`, `render_financial_restricted` em `hero.js`; branch onboarding em `main.js`; CSS `.painel-onboarding-*` |
+| Workspace | Seção **Comece Aqui** no topo do grid (sem sidebar) |
+| Hub | `_adv_hub_render_case_checklist`, `_adv_hub_finance_narrative_banner`; estilos `.adv-hub-checklist-*` |
+| Perfil User | Zona financeira do painel + aba Financeiro do hub com mensagem Gestor |
+
+#### Testes
+
+| Comando | Resultado |
+|---------|-----------|
+| `bench --site advocacia.local migrate` | OK |
+| `bench --site advocacia.local run-tests --app advocacia` | **314 OK** (311 + 3 sidebar) |
+
+#### Pendências remanescentes (Etapa 09+)
+
+- UX-06-004 breadcrumb title
+- UX-06-008 KPI “Total a receber neste processo”
+- UX-06-009–011 hub pills polish, dashboard grupos
+
+**Próximas etapas:** Etapa 09 — polish UX-06-004/008/009 + avisos operacionais
 
 ---
 
