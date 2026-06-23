@@ -1,6 +1,7 @@
 frappe.ui.form.on("Legal Case", {
 	refresh(frm) {
 		aplicar_mascara_processo_servico(frm);
+		setup_legal_case_form_intro(frm);
 
 		if (frm.is_new()) {
 			return;
@@ -52,6 +53,18 @@ frappe.ui.form.on("Legal Case", {
 		}
 	},
 });
+
+function setup_legal_case_form_intro(frm) {
+	if (!frm.is_new()) {
+		return;
+	}
+	frm.set_intro(
+		__(
+			"O número CNJ e os cadastros judiciais (Comarca, Vara, Tribunal) podem ser preenchidos depois. Consultorias e diligências não exigem CNJ."
+		),
+		"blue"
+	);
+}
 
 function aplicar_mascara_processo_servico(frm) {
 	if (window.AdvocaciaMasks) {
