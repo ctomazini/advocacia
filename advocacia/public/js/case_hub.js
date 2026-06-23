@@ -604,7 +604,18 @@ function adv_hub_render_financial(frm, financial) {
 	];
 
 	if (!financial) {
-		panels.forEach((panel) => {
+		const $summary = frm.fields_dict.financial_summary_panel?.$wrapper;
+		if ($summary) {
+			$summary.html(`<div class="adv-hub-budget-banner adv-hub-budget-banner--info">
+				<div class="adv-hub-budget-banner__head">
+					<strong>${__("Dados financeiros restritos")}</strong>
+				</div>
+				<p class="adv-hub-budget-banner__hint">${__(
+					"Parcelas, recebimentos e indicadores financeiros são visíveis apenas para o perfil Gestor (Advocacia Manager). Solicite acesso ao administrador do sistema."
+				)}</p>
+			</div>`);
+		}
+		panels.slice(1).forEach((panel) => {
 			if (frm.fields_dict[panel]) {
 				frm.fields_dict[panel].$wrapper.html("");
 			}
@@ -616,6 +627,23 @@ function adv_hub_render_financial(frm, financial) {
 	_adv_hub_render_installments(frm, financial.installments || []);
 	_adv_hub_render_payments(frm, financial.payments || []);
 	_adv_hub_render_court_costs(frm, financial.court_costs || []);
+}
+
+function _adv_hub_finance_narrative_banner() {
+	return `<div class="adv-hub-budget-banner adv-hub-budget-banner--info adv-hub-finance-narrative">
+		<p>${__("O financeiro do processo tem duas fontes de receita:")}</p>
+		<ul class="adv-hub-finance-narrative__list">
+			<li><strong>${__("Honorários Contratuais")}</strong> — ${__(
+				"valor acordado no Contrato de Honorários, dividido em parcelas geradas automaticamente."
+			)}</li>
+			<li><strong>${__("Serviços Avulsos")}</strong> — ${__(
+				"atos individuais cobrados fora do contrato."
+			)}</li>
+		</ul>
+		<p>${__(
+			"Ambos geram Recebimentos para controle. Custas Processuais (taxas, perícias) são despesas do processo, não receita."
+		)}</p>
+	</div>`;
 }
 
 function _adv_hub_render_financial_summary(frm, financial) {
@@ -659,6 +687,7 @@ function _adv_hub_render_financial_summary(frm, financial) {
 		: "";
 
 	$w.html(`<div class="adv-hub-panel">
+		${_adv_hub_finance_narrative_banner()}
 		<div class="adv-hub-panel__header">
 			<h3 class="adv-hub-panel__title">
 				<span class="adv-hub-panel__title-icon">💰</span>

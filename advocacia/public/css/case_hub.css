@@ -486,6 +486,15 @@
 	background: var(--orange-500);
 }
 
+.adv-hub-finance-narrative__list {
+	margin: 8px 0 8px 18px;
+	padding: 0;
+}
+
+.adv-hub-finance-narrative__list li {
+	margin-bottom: 4px;
+}
+
 .adv-hub-checklist {
 	border: 1px solid var(--border-color);
 	border-radius: var(--adv-hub-radius);
