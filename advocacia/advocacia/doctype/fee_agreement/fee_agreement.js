@@ -1,5 +1,6 @@
 frappe.ui.form.on('Fee Agreement', {
     refresh: function(frm) {
+        setup_fee_agreement_form_intro(frm);
         controlar_campos(frm);
         controlar_grid_parcelas(frm);
         somar_totais(frm);
@@ -115,6 +116,18 @@ frappe.ui.form.on('Fee Installment', {
 });
 
 // === HELPERS ===
+
+function setup_fee_agreement_form_intro(frm) {
+	frm.set_intro(
+		__(
+			"O Contrato de Honorários define o valor e a forma de cobrança dos serviços advocatícios. Após preencher valores e condições, clique em <strong>Gerar Parcelas</strong> para criar os Recebimentos automaticamente.<br><br>" +
+				"<strong>Modos disponíveis:</strong><br>" +
+				"• <strong>Diretos</strong> — honorários 100% do escritório<br>" +
+				"• <strong>Divisão</strong> — honorários divididos entre advogado e cliente indicado"
+		),
+		"blue"
+	);
+}
 
 function eh_direto(frm) {
     return frm.doc.fee_mode === 'Honorários Diretos';
