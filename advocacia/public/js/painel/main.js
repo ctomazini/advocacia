@@ -66,28 +66,35 @@
 		var limits = d.list_limits || U.painel_merge_list_limits(page);
 		var meta = d.list_meta || {};
 		var horas = d.horas_periodo != null ? d.horas_periodo : d.horas_semana;
+		var onboarding = H.painel_is_onboarding(d);
 		page.painel_list_limits = limits;
 		var content_class = options.animate === false ? " painel-content--stable" : "";
 		var html = '<div class="painel-content' + content_class + '">';
-		html += H.render_header(d.summary, d.kpis, periodo, d.financeiro);
-		html += H.render_filtros_painel(periodo);
-		html += H.render_acoes_rapidas();
-		html += '<div class="painel-zona-critica">';
-		html += '<div class="painel-attention-duo">';
-		html += AT.render(d.atencao);
-		html +=
-			'<div class="painel-proximo-evento-host">' +
-			AG.render_proximo_evento(d.proximo_evento) +
-			"</div>";
-		html += "</div></div>";
-		html += T.render_timeline(d.timeline, periodo, meta.timeline, limits.timeline);
-		html += OP.render(d.active_cases, meta.active_cases, limits.active_cases);
-		html += T.render_comunicacoes_pendentes(
-			d.comunicacoes_pendentes || d.ultimas_comunicacoes,
-			periodo,
-			meta.comunicacoes,
-			limits.comunicacoes
-		);
+		if (onboarding) {
+			html += H.render_header_onboarding();
+			html += H.render_acoes_rapidas(true);
+			html += H.render_onboarding_journey();
+		} else {
+			html += H.render_header(d.summary, d.kpis, periodo, d.financeiro);
+			html += H.render_filtros_painel(periodo);
+			html += H.render_acoes_rapidas(false);
+			html += '<div class="painel-zona-critica">';
+			html += '<div class="painel-attention-duo">';
+			html += AT.render(d.atencao);
+			html +=
+				'<div class="painel-proximo-evento-host">' +
+				AG.render_proximo_evento(d.proximo_evento) +
+				"</div>";
+			html += "</div></div>";
+			html += T.render_timeline(d.timeline, periodo, meta.timeline, limits.timeline);
+			html += OP.render(d.active_cases, meta.active_cases, limits.active_cases);
+			html += T.render_comunicacoes_pendentes(
+				d.comunicacoes_pendentes || d.ultimas_comunicacoes,
+				periodo,
+				meta.comunicacoes,
+				limits.comunicacoes
+			);
+		}
 		if (d.financeiro) {
 			html += '<div class="painel-zona-financeira painel-zona-secundaria">';
 			html +=
@@ -134,6 +141,8 @@
 				limits.custas
 			);
 			html += "</div></div>";
+		} else if (d.is_manager === false && !onboarding) {
+			html += H.render_financial_restricted();
 		}
 		html += "</div>";
 		$container.html(html);

@@ -74,6 +74,120 @@ frappe.provide("advocacia.painel.hero");
 	    return __("Boa noite");
 	}
 
+	AP.painel_is_onboarding = function(d) {
+	    var meta = (d && d.list_meta) || {};
+	    var active = meta.active_cases || {};
+	    return (active.total || 0) === 0;
+	}
+
+	AP.render_header_onboarding = function() {
+	    return (
+	        '<header class="painel-hero painel-hero--onboarding" id="painel-hero">' +
+	        '<h1 class="painel-hero-greeting">' +
+	        H.painel_greeting() +
+	        "</h1>" +
+	        '<p class="painel-hero-date">' +
+	        frappe.utils.escape_html(frappe.datetime.get_today(true)) +
+	        "</p>" +
+	        '<p class="painel-hero-context">' +
+	        frappe.utils.escape_html(
+	            __("Bem-vindo ao escritório. Siga os passos abaixo para começar.")
+	        ) +
+	        "</p></header>"
+	    );
+	}
+
+	AP.render_onboarding_journey = function() {
+	    var steps = [
+	        {
+	            n: 1,
+	            title: __("Cadastrar um Cliente"),
+	            hint: __("Quem você representa — pessoa física ou jurídica."),
+	            dt: "Client",
+	            chip: __("Cliente"),
+	        },
+	        {
+	            n: 2,
+	            title: __("Cadastrar um Processo"),
+	            hint: __("Processo judicial, consultoria ou outro serviço vinculado ao cliente."),
+	            dt: "Legal Case",
+	            chip: __("Processo"),
+	        },
+	        {
+	            n: 3,
+	            title: __("Acessar o processo e configurar"),
+	            hint: __("No hub do processo: prazos, audiências e honorários."),
+	            list_dt: "Legal Case",
+	            chip: __("Ver processos"),
+	        },
+	    ];
+	    var h =
+	        '<section class="painel-onboarding" id="painel-onboarding">' +
+	        U.render_empty_state(
+	            "rocket",
+	            __("Primeiros passos"),
+	            __("Configure o escritório em três etapas.")
+	        );
+	    h += '<ol class="painel-onboarding-steps">';
+	    steps.forEach(function (step) {
+	        h +=
+	            '<li class="painel-onboarding-step">' +
+	            '<span class="painel-onboarding-step__n">' +
+	            step.n +
+	            "</span>" +
+	            '<div class="painel-onboarding-step__body">' +
+	            '<p class="painel-onboarding-step__title">' +
+	            frappe.utils.escape_html(step.title) +
+	            "</p>" +
+	            '<p class="painel-onboarding-step__hint">' +
+	            frappe.utils.escape_html(step.hint) +
+	            "</p>";
+	        if (step.dt) {
+	            h +=
+	                '<button type="button" class="painel-action-chip painel-onboarding-step__cta" data-new-dt="' +
+	                step.dt +
+	                '">' +
+	                U.painel_icon("plus") +
+	                "<span>+ " +
+	                frappe.utils.escape_html(step.chip) +
+	                "</span></button>";
+	        } else if (step.list_dt) {
+	            h +=
+	                '<button type="button" class="painel-action-chip painel-onboarding-step__cta" data-route-list="' +
+	                step.list_dt +
+	                '">' +
+	                U.painel_icon("arrow-right") +
+	                "<span>" +
+	                frappe.utils.escape_html(step.chip) +
+	                "</span></button>";
+	        }
+	        h += "</div></li>";
+	    });
+	    h += "</ol></section>";
+	    return h;
+	}
+
+	AP.render_financial_restricted = function() {
+	    return (
+	        '<div class="painel-zona-financeira painel-zona-secundaria painel-zona-financeira--restricted">' +
+	        '<div class="painel-zona-financeira__head">' +
+	        "<div><h2 class=\"painel-section-title\">" +
+	        __("Financeiro") +
+	        "</h2>" +
+	        '<p class="painel-section-sub">' +
+	        __("Indicadores e recebimentos do escritório") +
+	        "</p></div></div>" +
+	        U.render_empty_state(
+	            "lock",
+	            __("Dados financeiros restritos"),
+	            __(
+	                "Parcelas, recebimentos e indicadores financeiros são visíveis apenas para o perfil Gestor (Advocacia Manager). Solicite acesso ao administrador do sistema."
+	            )
+	        ) +
+	        "</div>"
+	    );
+	}
+
 	AP.render_header = function(resumo, kpis, periodo_dias, financeiro) {
 	    resumo = resumo || {};
 	    kpis = kpis || {};
@@ -141,7 +255,7 @@ frappe.provide("advocacia.painel.hero");
 	    );
 	}
 
-	AP.render_acoes_rapidas = function() {
+	AP.render_acoes_rapidas = function(onboarding) {
 	    var actions = [
 	        { label: __("Cliente"), icon: "user-plus", dt: "Client" },
 	        { label: __("Processo"), icon: "folder-plus", dt: "Legal Case" },
@@ -155,10 +269,16 @@ frappe.provide("advocacia.painel.hero");
 	        { label: __("Horas"), icon: "clock", dt: "Time Entry" },
 	        { label: __("Despesa do Escritório"), icon: "wallet", dt: "Office Expense" },
 	    ];
+	    var onboarding_dts = ["Client", "Legal Case", "Deadline", "Hearing"];
+	    if (onboarding) {
+	        actions = actions.filter(function (a) {
+	            return onboarding_dts.indexOf(a.dt) >= 0;
+	        });
+	    }
 	    var h =
 	        '<div class="painel-actions-wrap">' +
 	        '<p class="painel-actions-label">' +
-	        __("Ações rápidas") +
+	        (onboarding ? __("Comece por aqui") : __("Ações rápidas")) +
 	        "</p>" +
 	        '<div class="painel-actions">';
 	    actions.forEach(function (a) {
@@ -167,7 +287,7 @@ frappe.provide("advocacia.painel.hero");
 	            a.dt +
 	            '">' +
 	            U.painel_icon(a.icon) +
-	            "<span>" +
+	            "<span>+ " +
 	            a.label +
 	            "</span></button>";
 	    });
