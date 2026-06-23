@@ -3,7 +3,7 @@
 Documento permanente de acompanhamento do projeto de modernização de experiência do usuário.
 
 **Criado:** 2026-06-09
-**Última atualização:** 2026-06-22 (Etapa 08 — onboarding e experiência inicial)
+**Última atualização:** 2026-06-22 (Etapa 09 — **ENCERRADO**)
 **App:** `advocacia` (Frappe v16)
 
 ---
@@ -396,7 +396,56 @@ Cobertura de descriptions: **94%** (218/232) — `audit_usability.md`. Tooltips 
 
 **Testes:** Nenhum (auditoria read-only).
 
-**Próximas etapas:** Etapa 08 concluída — ver registro abaixo.
+**Próximas etapas:** Projeto **ENCERRADO** — ver `docs/ux-final-executive-report.md`.
+
+---
+
+### Etapa 09 — Polimento final e encerramento
+
+**Status:** Concluída — **PROJETO ENCERRADO**
+**Data:** 2026-06-22
+**Branch:** `ux/step-09-final-polish`
+**Responsável:** Sessão Agent / projeto Advocacia
+
+**Objetivo:** Refinar empty states do hub, descriptions de listas vazias, list views com indicadores, itens AUD cosméticos, manual do usuário e documentação de encerramento. Sem alterar lógica de negócio, schema, permissões ou relatórios.
+
+**Pré-requisitos confirmados:** Etapa 08 commitada (`cbd508c`).
+
+#### Commits
+
+| Entrega | Escopo |
+|---------|--------|
+| Hub empty states | `_adv_hub_empty` com título + hint + CTA; 9 painéis; CSS `.adv-hub-empty__title/hint` |
+| List descriptions | 10 DocTypes com `description` amigável na list view |
+| List views | Legal Task, Deadline, Hearing — indicadores de status/urgência/data |
+| AUD cosméticos | Legal Case connection groups; aba Horas; fee_agreement `__()`; Kanban labels; print formats |
+| Manual | `manual_usuario.md` — glossário, Processos, fluxo financeiro, documentos Word |
+| Encerramento | `ux-final-executive-report.md`, `audit_usability.md`, roadmap ENCERRADO |
+
+#### Testes
+
+| Comando | Resultado |
+|---------|-----------|
+| `bench --site advocacia.local migrate` | OK |
+| `bench --site advocacia.local run-tests --app advocacia` | **314 OK** |
+
+#### Checklist de segurança final
+
+- [x] Sem renomeação de DocTypes EN
+- [x] Sem alteração de Roles
+- [x] Sem alteração de slugs de relatórios
+- [x] Sem alteração de rotas
+- [x] Sem alteração de placeholders Word
+- [x] Sem alteração de schema / fieldnames
+- [x] Sem alteração de child tables
+- [x] Sem `frappe.db.commit()` novo em handlers/API
+- [x] Suíte de testes verde
+
+#### Pendências documentadas (pós-projeto)
+
+Ver `docs/ux-final-executive-report.md` §6 — UX-06-004, UX-06-008, UX-06-009, UX-06-017/018, AUD-009.
+
+**Relatório executivo:** [ux-final-executive-report.md](./ux-final-executive-report.md)
 
 ---
 

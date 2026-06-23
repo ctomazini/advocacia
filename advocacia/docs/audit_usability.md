@@ -1,6 +1,6 @@
 # Seção 3 — Verificação de Usabilidade
 
-**App:** `advocacia` · **Data:** 2026-06-10 · **Versão:** 1.0.0
+**App:** `advocacia` · **Data:** 2026-06-22 · **Versão:** 1.0.0 (pós-Etapa 09)
 
 ---
 
@@ -29,7 +29,7 @@
 
 ### Campos sem description (14 restantes)
 
-Predominantemente: campos técnicos de sistema, flags internas de sync (`sincronizado_em`, `parcela_origem_id`) e breaks de layout em DocTypes menores. Prioridade baixa — não bloqueiam deploy.
+Predominantemente: campos técnicos de sistema, flags internas de sync (`sincronizado_em`, `parcela_origem_id`) e breaks de layout em DocTypes menores. Prioridade baixa — backlog UX-06-018.
 
 ### Campos financeiros sensíveis
 
@@ -52,8 +52,6 @@ O script acrescenta sufixo *"Visível apenas para Advocacia Manager."* em campos
 
 **Regra:** JS só UX — validação real em `validators.py` no `validate()` do DocType.
 
-**Fallback:** se `jquery.inputmask` disponível (Frappe), usa inputmask nativo; senão `_bindInput` custom.
-
 ### Outros JS globais
 
 | Arquivo | Função |
@@ -61,7 +59,7 @@ O script acrescenta sufixo *"Visível apenas para Advocacia Manager."* em campos
 | `list_nav.js` | Painel e Connections → lista com filtros (`frappe.set_route`) |
 | `list_filters.js` | Barra de filtros responsiva (desktop visível / mobile ⇅) |
 | `list_filters.css` | Layout da barra de filtros padrão |
-| `cliente_from_servico.js` | Preenche cliente ao selecionar serviço |
+| `case_hub.js` | Hub do Processo: abas, empty states, checklist, financeiro |
 | `timer_global.js` | Timer de Time Entry no desk |
 
 ---
@@ -72,88 +70,70 @@ O script acrescenta sufixo *"Visível apenas para Advocacia Manager."* em campos
 
 - Fixture exportada em `fixtures/workspace.json`
 - Sincronizada em `after_migrate` → `setup/workspace.ensure_advocacia_workspace`
-- Cards e links alinhados ao fluxo operacional do escritório
+- Seção **Comece Aqui** (Etapa 08): Clientes, Painel, Processos
 
 ### Sidebar (`setup/sidebar.py`)
 
 | Seção | collapsible | Links |
 |---|---|---|
-| Dia a Dia | 1 | Painel, Prazos, Audiências, Legal Tasks, Comunicações |
-| Gestão de Casos | 1 | Serviços, Clients, Horas, Atos, Custas |
-| Financeiro | 1 | Legal Payments, Honorários, Despesas, Documentos, Kits |
-| Relatórios | 1 (keep_closed) | 6 Script Reports |
-| Cadastros | 1 (keep_closed) | Jurisdiction, Court Branch, Court, Fase, Escritório |
-
-**Fix Frappe v16:** Section Breaks com filhos exigem `collapsible: 1` — sem isso o scroll do desk trava.
-
-**Total links sidebar:** 26 entradas canônicas em `SIDEBAR_LINK_ORDER`.
+| Dia a Dia | 1 | Painel, Prazos, Audiências, Tarefas, Comunicações |
+| Gestão de Casos | 1 | Processos, Clientes, Documentos |
+| Financeiro | 1 | Contratos, Recebimentos, Cobranças, Custas, Despesas |
+| Relatórios | 1 | Script reports PT |
+| Cadastros | 1 | Comarca, Vara, Tribunal, Fases, Modelos |
 
 ---
 
-## 3.4 List views
+## 3.4 Painel do Escritório
 
-12 arquivos `*_list.js` em transacionais principais.
-
-**Filtros padrão (`in_standard_filter`):** 17 DocTypes transacionais expõem Link/Select/Date na barra de filtros — ver `list_filters.js`.
-
-| DocType | hide_name_column | Indicador status | Filtros rápidos |
-|---|---|---|---|
-| Legal Case | ✅ title | via status | ✅ |
-| Client | ✅ nome + badge ID | 🟡 | ✅ |
-| Legal Payment | ✅ | ✅ cores + Origem | ✅ |
-| Fee Agreement | ✅ | ✅ | ✅ |
-| Service Record | ✅ | ✅ | ✅ |
-| Hearing | ✅ | ✅ | ✅ |
-| Deadline | ✅ | ✅ | ✅ |
-| Office Expense | ✅ | ✅ | ✅ |
-| Court Cost | ✅ | ✅ | ✅ |
-| Case Communication | ✅ | 🟡 | ✅ |
-| Legal Task | ✅ | ✅ | ✅ |
-| Time Entry | ✅ | 🟡 | ✅ |
-
-**Gap:** cadastros auxiliares (Jurisdiction, Court Branch, Court) sem `*_list.js` custom — aceitável (poucos registros).
+- Page `/app/painel` — módulos em `public/js/painel/`
+- Onboarding quando sem processos ativos (Etapa 08)
+- Quick actions com chips `+ Cliente`, `+ Processo`, etc.
+- Zona financeira restrita para Advocacia User
 
 ---
 
-## 3.5 Títulos visíveis
+## 3.5 Hub do Processo (`Legal Case`)
 
-| Padrão | Exemplo |
-|---|---|
-| Transacionais | `SERV-2026-0042 — Silva Advogados Ltda` |
-| Client | `CLI-2026-0015 — João da Silva` (title_field = nome) |
-| Cadastros | Nome do campo autoname |
-
-`show_title_field_in_link: 1` nos transacionais — links e painel exibem descritor legível.
-
----
-
-## 3.6 Fluxos operacionais
-
-### Fluxo 1: Novo processo judicial
-
-1. **Client** — CPF/CNPJ validado ✅  
-2. **Jurisdiction / Court Branch / Court** — cadastro rígido ✅  
-3. **Legal Case** — tipo Processo Judicial + CNJ ✅  
-4. **Acordo de Honorarios** — parcelas + sync Legal Payment ✅  
-5. **Painel** — KPIs e timeline ✅  
-
-**Fricção:** 🟡 Orçamento de honorários complexo (modos Misto/Percentual) — descriptions ajudam.
-
-### Fluxo 2: Prazo processual
-
-1. **Deadline** — datas cronológicas validadas ✅  
-2. **Event** — sync automático ✅  
-3. **Notificação** — scheduler diário ✅  
-
-### Fluxo 3: Cobrança de atos
-
-1. **Service Record** — tabela Legal Act Item ✅  
-2. **Gerar pagamento** — whitelist sync ✅  
-3. **Legal Payment** — coluna Origem na list view ✅  
+| Recurso | Status pós-Etapa 09 |
+|---------|---------------------|
+| Checklist setup (honorários, prazo, audiência) | ✅ |
+| Banner narrativo financeiro (Manager) | ✅ |
+| Mensagem perfil User na aba Financeiro | ✅ |
+| Empty states com título + hint + CTA | ✅ Etapa 09 |
+| Pills de atalho por satélite | ✅ (plural por design — UX-06-009 backlog) |
 
 ---
 
-## 3.7 Demo data (dev)
+## 3.6 Layout de formulários
+
+Satélites transacionais usam **Column Break** para campos curtos (Link, Select, Date, Currency). Text Editor e tabelas permanecem full-width.
+
+Oito formulários prioritários reorganizados na Etapa 07 (intros JS, tooltips financeiros, seções colapsáveis).
+
+Detalhes: [audit_form_layout.md](./audit_form_layout.md).
+
+---
+
+## 3.7 List views
+
+| DocType | `hide_name_column` | Indicador / formatter |
+|---------|:------------------:|------------------------|
+| Legal Case | ✅ | status |
+| Legal Payment | ✅ | vencimento + status |
+| Legal Task | ✅ | status + atraso (Etapa 09) |
+| Deadline | ✅ | urgência / vencimento (Etapa 09) |
+| Hearing | ✅ | data passada/futura (Etapa 09) |
+| Fee Agreement | ✅ | — |
+| + 7 outros | ✅ | variados |
+
+### Mensagens de lista vazia (DocType `description`)
+
+11 DocTypes transacionais com texto amigável na list view nativa (Etapa 09).
+
+---
+
+## 3.8 Demo data (dev)
 
 | Comando | Função |
 |---|---|
@@ -164,35 +144,30 @@ O script acrescenta sufixo *"Visível apenas para Advocacia Manager."* em campos
 
 ---
 
-## 3.8 Gaps de usabilidade
+## 3.9 Gaps de usabilidade (pós-Etapa 09)
 
-| Gap | Severidade | Ação sugerida |
+| Gap | Severidade | Status |
 |---|---|---|
-| 14 campos sem description | 🟢 | Completar no próximo sprint UX |
-| Onboarding in-app | 🟡 | Workspace intro ou vídeo |
+| 14 campos sem description | 🟢 | Backlog UX-06-018 |
+| Onboarding in-app | 🟢 | **Resolvido** Etapa 08 (painel + workspace) |
+| Breadcrumb title em satélites | 🟡 | Backlog UX-06-004 |
+| KPI total a receber no hub | 🟡 | Backlog UX-06-008 |
 | Mobile desk | 🟡 | Painel responsivo parcial (CSS vars) |
 | E2E CI | 🟢 | Playwright script manual; CI opcional |
 
 ---
 
-## 3.6 Layout de formulários
+## 3.10 Checklist UX pré-release
 
-Satélites transacionais usam **Column Break** para campos curtos (Link, Select, Date, Currency). Text Editor e tabelas permanecem full-width.
-
-Detalhes por DocType: [audit_form_layout.md](./audit_form_layout.md).
-
----
-
-## 3.9 Checklist UX pré-release
-
-- [ ] `bench build --app advocacia` após JS
-- [ ] Smoke: máscara CNJ em Legal Case novo
-- [ ] Smoke: tooltip em Acordo (campo honorários)
-- [ ] Smoke: sidebar colapsa sem travar scroll
-- [ ] Smoke: lista Legal Payment mostra coluna Origem
-- [ ] Smoke: Connections em Serviço abre lista filtrada
-- [ ] Smoke: filtros visíveis no desktop / ⇅ no mobile
+- [x] `bench build --app advocacia` após JS
+- [x] `bench run-tests --app advocacia` verde (314)
+- [x] Glossário Sprint 1A em painel e hub
+- [x] Empty states hub com orientação
+- [x] Intros financeiros em formulários prioritários
+- [ ] Smoke: máscara CNJ em Legal Case novo (manual)
+- [ ] Smoke: Connections em Processo abre lista filtrada (manual)
+- [ ] Smoke: geração Word download (manual)
 
 ---
 
-*Usabilidade v1.0.0: descriptions 94%, filtros responsivos, connections filtradas, painel modular, forms 2 colunas.*
+*Usabilidade pós-Etapa 09: descriptions 94%, onboarding, empty states hub, list indicators, forms reorganizados, projeto UX encerrado — ver `ux-final-executive-report.md`.*
