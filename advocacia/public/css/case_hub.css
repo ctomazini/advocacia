@@ -583,6 +583,21 @@
 	margin-bottom: 8px;
 }
 
+.adv-hub-empty__title {
+	margin: 0 0 6px;
+	font-size: var(--text-sm);
+	font-weight: 600;
+	color: var(--text-color);
+}
+
+.adv-hub-empty__hint {
+	margin: 0 auto 12px;
+	font-size: var(--text-xs);
+	color: var(--text-muted);
+	line-height: 1.45;
+	max-width: 360px;
+}
+
 .adv-hub-empty__action {
 	display: inline-block;
 	margin-top: 12px;

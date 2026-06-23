@@ -75,7 +75,13 @@ function adv_hub_render_hearings(frm, hearings) {
 
 	if (!hearings.length) {
 		$w.html(
-			_adv_hub_empty("⚖️", __("Nenhuma audiência cadastrada"), __("+ Audiência"), "new-hearing")
+			_adv_hub_empty(
+				"⚖️",
+				__("Nenhuma audiência agendada para este processo."),
+				"",
+				__("+ Audiência"),
+				"new-hearing"
+			)
 		);
 		$w.find('[data-hub-action="new-hearing"]').on("click", () => {
 			adv_case_nav_new_doc("Hearing", {
@@ -136,7 +142,13 @@ function adv_hub_render_deadlines(frm, deadlines) {
 
 	if (!deadlines.length) {
 		$w.html(
-			_adv_hub_empty("📅", __("Nenhum prazo cadastrado"), __("+ Prazo"), "new-deadline")
+			_adv_hub_empty(
+				"📅",
+				__("Nenhum prazo registrado."),
+				__("Cadastre prazos processuais com data fatal."),
+				__("+ Prazo"),
+				"new-deadline"
+			)
 		);
 		$w.find('[data-hub-action="new-deadline"]').on("click", () => {
 			adv_case_nav_new_doc("Deadline", { legal_case: frm.doc.name, client: frm.doc.client });
@@ -209,7 +221,13 @@ function adv_hub_render_tasks(frm, tasks) {
 
 	if (!tasks.length) {
 		$w.html(
-			_adv_hub_empty("✅", __("Nenhuma tarefa pendente"), __("+ Tarefa"), "new-task")
+			_adv_hub_empty(
+				"✅",
+				__("Nenhuma tarefa interna para este processo."),
+				"",
+				__("+ Tarefa"),
+				"new-task"
+			)
 		);
 		$w.find('[data-hub-action="new-task"]').on("click", () => {
 			adv_case_nav_new_doc("Legal Task", { legal_case: frm.doc.name, client: frm.doc.client });
@@ -260,7 +278,8 @@ function adv_hub_render_communications(frm, communications) {
 		$w.html(
 			_adv_hub_empty(
 				"💬",
-				__("Nenhuma comunicação registrada"),
+				__("Nenhuma comunicação registrada."),
+				"",
 				__("+ Comunicação"),
 				"new-comm"
 			)
@@ -323,7 +342,10 @@ function adv_hub_render_service_records(frm, records) {
 		$w.html(
 			_adv_hub_empty(
 				"📝",
-				__("Nenhuma cobrança de serviço"),
+				__("Nenhum serviço avulso cobrado."),
+				__(
+					"Use Cobranças de Serviço para registrar atos individuais cobrados fora do contrato."
+				),
 				__("+ Cobrança de Serviço"),
 				"new-record"
 			)
@@ -382,7 +404,8 @@ function adv_hub_render_time_entries(frm, payload) {
 		$w.html(
 			_adv_hub_empty(
 				"⏱️",
-				__("Nenhum registro de horas"),
+				__("Nenhum registro de horas."),
+				"",
 				__("+ Registro de Horas"),
 				"new-time"
 			)
@@ -456,9 +479,12 @@ function adv_hub_render_documents(frm, documents) {
 			</div>
 			<div class="adv-hub-empty">
 				<div class="adv-hub-empty__icon">📄</div>
-				<div>${__("Nenhum documento registrado")}</div>
+				<p class="adv-hub-empty__title">${__("Nenhum documento anexado.")}</p>
+				<p class="adv-hub-empty__hint">${__(
+					"Use o botão + para fazer upload ou Gerar Documentos para criar a partir de modelos Word."
+				)}</p>
 				<button type="button" class="adv-hub-empty__action" data-hub-action="new-document">
-					${__("+ Enviar documento")}
+					${__("+ Documento")}
 				</button>
 			</div>
 		</div>`);
@@ -611,7 +637,7 @@ function adv_hub_render_financial(frm, financial) {
 					<strong>${__("Dados financeiros restritos")}</strong>
 				</div>
 				<p class="adv-hub-budget-banner__hint">${__(
-					"Parcelas, recebimentos e indicadores financeiros são visíveis apenas para o perfil Gestor (Advocacia Manager). Solicite acesso ao administrador do sistema."
+					"Área restrita ao perfil Gestor. Solicite acesso ao administrador se necessário."
 				)}</p>
 			</div>`);
 		}
@@ -771,7 +797,23 @@ function _adv_hub_render_installments(frm, installments) {
 	if (!$w) return;
 
 	if (!installments.length) {
-		$w.html(`<div class="adv-hub-empty">${__("Nenhuma parcela do contrato registrada.")}</div>`);
+		$w.html(
+			_adv_hub_empty(
+				"📋",
+				__("Nenhum recebimento de honorários registrado."),
+				__(
+					"Para gerar parcelas, cadastre um Contrato de Honorários para este processo."
+				),
+				__("+ Contrato de Honorários"),
+				"new-agreement"
+			)
+		);
+		$w.find('[data-hub-action="new-agreement"]').on("click", () => {
+			adv_case_nav_new_doc("Fee Agreement", {
+				legal_case: frm.doc.name,
+				client: frm.doc.client,
+			});
+		});
 		return;
 	}
 
@@ -822,13 +864,16 @@ function _adv_hub_render_payments(frm, payments) {
 		$w.html(
 			_adv_hub_empty(
 				"💵",
-				__("Nenhum recebimento registrado"),
-				`+ ${_nav_label("Legal Payment")}`,
-				"new-payment"
+				__("Nenhum recebimento registrado."),
+				__(
+					"Para gerar parcelas, cadastre um Contrato de Honorários para este processo."
+				),
+				__("+ Contrato de Honorários"),
+				"new-agreement"
 			)
 		);
-		$w.find('[data-hub-action="new-payment"]').on("click", () => {
-			adv_case_nav_new_doc("Legal Payment", {
+		$w.find('[data-hub-action="new-agreement"]').on("click", () => {
+			adv_case_nav_new_doc("Fee Agreement", {
 				legal_case: frm.doc.name,
 				client: frm.doc.client,
 			});
@@ -880,8 +925,9 @@ function _adv_hub_render_court_costs(frm, costs) {
 		$w.html(
 			_adv_hub_empty(
 				"🏛️",
-				__("Nenhuma custa registrada"),
-				`+ ${_nav_label("Court Cost")}`,
+				__("Nenhuma custa registrada."),
+				__("Registre taxas judiciais, perícias e emolumentos pagos."),
+				__("+ Custa Processual"),
 				"new-cost"
 			)
 		);
@@ -1167,11 +1213,22 @@ function _adv_hub_bind_routes($w) {
 	});
 }
 
-function _adv_hub_empty(icon, msg, btnLabel, actionName) {
+function _adv_hub_empty(icon, title, hint, btnLabel, actionName) {
+	const cta =
+		btnLabel && actionName
+			? `<button type="button" class="adv-hub-empty__action" data-hub-action="${actionName}">${frappe.utils.escape_html(
+					btnLabel
+			  )}</button>`
+			: "";
 	return `<div class="adv-hub-empty">
 		<div class="adv-hub-empty__icon">${icon}</div>
-		<div>${msg}</div>
-		<button type="button" class="adv-hub-empty__action" data-hub-action="${actionName}">${btnLabel}</button>
+		<p class="adv-hub-empty__title">${frappe.utils.escape_html(title)}</p>
+		${
+			hint
+				? `<p class="adv-hub-empty__hint">${frappe.utils.escape_html(hint)}</p>`
+				: ""
+		}
+		${cta}
 	</div>`;
 }
 
