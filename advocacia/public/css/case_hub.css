@@ -486,6 +486,67 @@
 	background: var(--orange-500);
 }
 
+.adv-hub-checklist {
+	border: 1px solid var(--border-color);
+	border-radius: var(--adv-hub-radius);
+	padding: 12px 14px;
+	margin-bottom: 12px;
+	background: var(--control-bg);
+}
+
+.adv-hub-checklist__title {
+	margin: 0 0 8px;
+	font-size: var(--text-sm);
+	font-weight: 600;
+	color: var(--text-color);
+}
+
+.adv-hub-checklist__list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.adv-hub-checklist__item {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: var(--text-sm);
+}
+
+.adv-hub-checklist__item--done {
+	color: var(--text-muted);
+}
+
+.adv-hub-checklist__mark {
+	flex-shrink: 0;
+	width: 1.2em;
+}
+
+.adv-hub-checklist__label {
+	flex: 1;
+}
+
+.adv-hub-checklist__add {
+	flex-shrink: 0;
+	border: 1px solid var(--border-color);
+	border-radius: 4px;
+	background: var(--card-bg, var(--bg-color));
+	color: var(--text-color);
+	font-weight: 600;
+	line-height: 1;
+	padding: 2px 8px;
+	cursor: pointer;
+}
+
+.adv-hub-checklist__add:hover {
+	border-color: var(--primary);
+	color: var(--primary);
+}
+
 .adv-hub-stacked-bar {
 	display: flex;
 	height: 8px;

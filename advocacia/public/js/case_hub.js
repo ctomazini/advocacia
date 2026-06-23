@@ -900,6 +900,60 @@ function _adv_hub_render_court_costs(frm, costs) {
 	_adv_hub_bind_routes($w);
 }
 
+function _adv_hub_render_case_checklist(frm, counts) {
+	const isJudicial = frm.doc.type === "Processo Judicial";
+	const items = [];
+
+	if ("fee_agreements" in counts) {
+		items.push({
+			label: __("Contrato de Honorários cadastrado"),
+			done: (counts.fee_agreements || 0) > 0,
+			doctype: "Fee Agreement",
+			fieldname: "legal_case",
+		});
+	}
+	items.push({
+		label: __("Pelo menos um Prazo registrado"),
+		done: (counts.deadlines || 0) > 0,
+		doctype: "Deadline",
+		fieldname: "legal_case",
+	});
+	if (isJudicial) {
+		items.push({
+			label: __("Pelo menos uma Audiência"),
+			done: (counts.hearings || 0) > 0,
+			doctype: "Hearing",
+			fieldname: "legal_case",
+		});
+	}
+
+	if (!items.some((item) => !item.done)) {
+		return "";
+	}
+
+	const rows = items
+		.map((item) => {
+			const mark = item.done ? "☑" : "☐";
+			const cls = item.done ? " adv-hub-checklist__item--done" : "";
+			const cta = item.done
+				? ""
+				: `<button type="button" class="adv-hub-checklist__add" data-doctype="${frappe.utils.escape_html(
+						item.doctype
+				  )}" data-fieldname="${frappe.utils.escape_html(item.fieldname)}">+</button>`;
+			return `<li class="adv-hub-checklist__item${cls}">
+				<span class="adv-hub-checklist__mark">${mark}</span>
+				<span class="adv-hub-checklist__label">${frappe.utils.escape_html(item.label)}</span>
+				${cta}
+			</li>`;
+		})
+		.join("");
+
+	return `<div class="adv-hub-checklist">
+		<p class="adv-hub-checklist__title">${__("Checklist do processo")}</p>
+		<ul class="adv-hub-checklist__list">${rows}</ul>
+	</div>`;
+}
+
 function adv_hub_render_summary_bar(frm, counts) {
 	const $w = frm.fields_dict.hub_summary_bar?.$wrapper;
 	if (!$w) return;
@@ -1033,7 +1087,22 @@ function adv_hub_render_summary_bar(frm, counts) {
 		})
 		.join("");
 
-	$w.html(`<div class="adv-hub-summary-bar">${pills}</div>`);
+	const checklistHtml = _adv_hub_render_case_checklist(frm, counts);
+	$w.html(`${checklistHtml}<div class="adv-hub-summary-bar">${pills}</div>`);
+
+	$w.find(".adv-hub-checklist__add").on("click", function (e) {
+		e.preventDefault();
+		const doctype = $(this).attr("data-doctype");
+		const fieldname = $(this).attr("data-fieldname");
+		const defaults = {};
+		if (fieldname) {
+			defaults[fieldname] = caseName;
+			if (frm.doc.client) {
+				defaults.client = frm.doc.client;
+			}
+		}
+		adv_case_nav_new_doc(doctype, defaults);
+	});
 
 	$w.find(".adv-hub-summary-pill__link").on("click", function (e) {
 		e.preventDefault();
