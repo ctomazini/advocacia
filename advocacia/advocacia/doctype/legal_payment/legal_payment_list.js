@@ -9,17 +9,13 @@ frappe.listview_settings["Legal Payment"] = {
 				meta.push(__("Venc.") + " " + frappe.datetime.str_to_user(doc.due_date));
 			}
 			if (doc.amount != null && doc.amount !== "") {
-				meta.push(frappe.format(doc.amount, { fieldtype: "Currency" }, null, doc));
+				meta.push(frappe.format_currency(doc.amount));
 			}
 			if (!meta.length) {
-				return frappe.utils.escape_html(subject);
+				return subject;
 			}
-			return (
-				frappe.utils.escape_html(subject) +
-				'<div class="text-muted small">' +
-				frappe.utils.escape_html(meta.join(" · ")) +
-				"</div>"
-			);
+			// List view usa textContent no link — retorno deve ser texto puro (sem HTML).
+			return subject + " · " + meta.join(" · ");
 		},
 		origin_type(value, _df, doc) {
 			const origem = (value || "").trim();
