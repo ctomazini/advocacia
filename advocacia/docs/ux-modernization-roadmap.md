@@ -3,7 +3,7 @@
 Documento permanente de acompanhamento do projeto de modernização de experiência do usuário.
 
 **Criado:** 2026-06-09
-**Última atualização:** 2026-06-22 (Etapa 06 — auditoria UX pós-estabilização de linguagem)
+**Última atualização:** 2026-06-22 (Etapa 07 — organização de formulários)
 **App:** `advocacia` (Frappe v16)
 
 ---
@@ -396,7 +396,71 @@ Cobertura de descriptions: **94%** (218/232) — `audit_usability.md`. Tooltips 
 
 **Testes:** Nenhum (auditoria read-only).
 
-**Próximas etapas:** Etapa 07 — polish hub/navegação/onboarding leve (UX-06-003–007, 009–012); Etapa 08 — textos financeiros e KPI consolidado (UX-06-001, 002, 008); Etapa 09 — polimento P2.
+**Próximas etapas:** Etapa 07 concluída — ver registro abaixo.
+
+---
+
+### Etapa 07 — Organização de formulários
+
+**Status:** Concluída
+**Data:** 2026-06-22
+**Branch:** `ux/step-07-form-organization`
+**Responsável:** Sessão Agent / projeto Advocacia
+
+**Objetivo:** Melhorar agrupamentos, seções, tooltips, descriptions e intros dos formulários prioritários (backlog UX-06-001/002 parcial + UX-06-003/007). Sem alterar fieldnames, schema de dados, child tables, relacionamentos ou lógica de sync.
+
+**Pré-requisitos confirmados:** Etapa 06 commitada (`1807b8d`).
+
+#### Commits (um por formulário)
+
+| Formulário | Commit | Escopo principal |
+|------------|--------|------------------|
+| Legal Case | `2775d3e` | Seção Partes, column break, reorder Detalhes, tooltips CNJ/cadastros, intro CNJ opcional |
+| Fee Agreement | `22d0565` | `field_order` fluxo Vínculo→Valores→Parcelas, intro + tooltip Gerar Parcelas/Sucumbência |
+| Legal Payment | `600d510` | Reorder Vínculos→Financeiro→Comprovante→Sync (colapsável) + intro |
+| Service Record | `45ad74e` | Intro vs honorários, tooltip Sincronizar Cobrança, description list view DocType |
+| Hearing | `d583fb1` | Reorder data/tipo primeiro, tooltips link virtual e cliente |
+| Deadline | `e499fff` | `due_date` destacado, intro Prazo vs Tarefa, tooltip notificação (`deadline.js` novo) |
+| Court Cost | `284b4f7` | Reorder tipo→valor→reembolso, intro custas, descriptions quem arca |
+| Legal Task | `8e92d10` | Reorder campos operacionais, intro diferenciação vs Prazo |
+
+**Commit roadmap:** `[UX-STEP-07] Docs: update modernization roadmap`
+
+#### Textos de ajuda financeiros implementados
+
+| DocType | Intro JS | Tooltips JSON |
+|---------|:--------:|:-------------:|
+| Fee Agreement | ✅ | ✅ Gerar Parcelas, Sucumbência (section) |
+| Service Record | ✅ | ✅ Sincronizar Cobrança (button description) |
+| Legal Payment | ✅ | — (campos existentes) |
+| Court Cost | ✅ | ✅ Repassar ao Cliente / reembolso |
+
+#### Formulários reorganizados
+
+- `Legal Case` — aba Detalhes: Cliente/Tipo → Dados do Processo → Partes → Observações (colapsável)
+- `Fee Agreement` — Vínculo → Valores → Sucumbência → Parcelamento → Parcelas → Totais → Obs
+- `Legal Payment` — Relacionamentos → Financeiro → Controle (comprovante) → Sincronização (colapsável)
+- `Service Record` — Vínculo → Atos → Totais → Cobrança → Obs
+- `Hearing` — Processo/Data/Tipo → Detalhes/modalidade → Obs
+- `Deadline` — Processo/Data fatal/Descrição → Detalhes → Obs
+- `Court Cost` — Identificação → Valores e Reembolso → Controle
+- `Legal Task` — Vínculo + operação → Detalhes (texto)
+
+#### Testes
+
+| Comando | Resultado |
+|---------|-----------|
+| `bench --site advocacia.local migrate` | OK |
+| `bench --site advocacia.local run-tests --app advocacia` | **314 OK** (311 + 3 sidebar) |
+
+#### Pendências remanescentes (Etapa 08+)
+
+- UX-06-004 breadcrumb title (fora do escopo forms-only)
+- UX-06-008 KPI “Total a receber neste processo” (hub backend)
+- UX-06-009–012 hub pills, dashboard grupos, aviso Legal Task sem processo no save
+- Banner normativo aba Financeiro do hub (`case_hub.js` — proibido nesta etapa)
+
+**Próximas etapas:** Etapa 08 — banner hub Financeiro + KPI consolidado + polish UX-06-004/008
 
 ---
 
