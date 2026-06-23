@@ -136,18 +136,12 @@ def validar_cnpj(cnpj):
 
 def _calcular_dv_cnj(numero_20):
 	"""
-	Dígito verificador CNJ — Módulo 97 Base 10 (Resolução CNJ 65/2008).
+	Dígito verificador CNJ — Módulo 97 Base 10 (Resolução CNJ 65/2008, Anexo VIII).
 	numero_20: string com 20 dígitos (inclui DV nas posições 8-9).
 	"""
-	nnnnnnn = numero_20[0:7]
-	aaaa = numero_20[9:13]
-	j = numero_20[13]
-	tr = numero_20[14:16]
-	oooo = numero_20[16:20]
-	valor = int(f"{aaaa}{j}{tr}{oooo}{nnnnnnn}00")
-	resto = valor % 97
-	dv = 98 - resto
-	return str(dv).zfill(2)
+	base = numero_20[0:7] + numero_20[9:20]
+	resto = int(base + "00") % 97
+	return str(98 - resto).zfill(2)
 
 
 def validar_cnj(numero):

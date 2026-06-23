@@ -13,8 +13,8 @@ VALID_CPF = "529.982.247-25"
 VALID_CPF_DIGITS = "52998224725"
 VALID_CNPJ = "11.222.333/0001-81"
 VALID_CNPJ_DIGITS = "11222333000181"
-VALID_CNJ = "0000001-20.2024.8.26.0001"
-VALID_CNJ_DIGITS = "00000012020248260001"
+VALID_CNJ = "0000001-45.2024.8.26.0001"
+VALID_CNJ_DIGITS = "00000014520248260001"
 VALID_CELULAR = "11987654321"
 VALID_FIXO = "1132345678"
 VALID_EMAIL = "teste@example.com"
@@ -50,8 +50,8 @@ def _gerar_cnj_valido():
 	"""Gera CNJ válido único (ano 2024, tribunal 26)."""
 	for _ in range(50):
 		seq = f"{random.randint(1, 9999999):07d}"
-		candidate = f"{seq}20248260001"
-		dv = _calcular_dv_cnj(candidate)
+		placeholder = f"{seq}00" + "2024" + "8" + "26" + "0001"
+		dv = _calcular_dv_cnj(placeholder)
 		numero = f"{seq}{dv}20248260001"
 		if len(numero) == 20:
 			return numero

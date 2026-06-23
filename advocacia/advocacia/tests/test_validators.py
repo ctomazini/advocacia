@@ -64,6 +64,10 @@ class TestValidators(FrappeTestCase):
 	def test_cnj_formatado_valido(self):
 		self.assertEqual(validar_cnj(VALID_CNJ), VALID_CNJ_DIGITS)
 
+	def test_cnj_reais_tjrs_e_trt(self):
+		self.assertEqual(validar_cnj("5005020-54.2023.8.21.5001"), "50050205420238215001")
+		self.assertEqual(validar_cnj("0020416-03.2026.5.04.0305"), "00204160320265040305")
+
 	def test_cnj_curto_invalido(self):
 		with self.assertRaises(ValidationError):
 			validar_cnj("123")
