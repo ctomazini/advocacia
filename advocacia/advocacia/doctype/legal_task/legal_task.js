@@ -1,5 +1,6 @@
 frappe.ui.form.on('Legal Task', {
     refresh: function(frm) {
+        setup_legal_task_form_intro(frm);
         const cores = {
             'Pendente': 'orange',
             'Em Andamento': 'blue',
@@ -24,3 +25,12 @@ frappe.ui.form.on('Legal Task', {
         }
     }
 });
+
+function setup_legal_task_form_intro(frm) {
+    frm.set_intro(
+        __(
+            "<strong>Tarefa interna</strong> — atividade operacional do escritório (ligar, revisar, protocolar internamente). O processo é opcional.<br><br>Não confundir com <strong>Prazo</strong>, que é data fatal do judiciário com consequência processual."
+        ),
+        "blue"
+    );
+}

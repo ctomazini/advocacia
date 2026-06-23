@@ -41,7 +41,7 @@
    "allow_in_quick_entry": 1,
    "in_list_view": 1,
    "in_standard_filter": 1,
-   "description": "Processo relacionado (opcional).",
+   "description": "Processo relacionado (opcional). Tarefas podem ser internas ao escritório.",
    "idx": 2
   },
   {
@@ -53,7 +53,7 @@
    "fetch_from": "legal_case.client",
    "in_list_view": 1,
    "in_standard_filter": 1,
-   "description": "Preenchido automaticamente a partir do serviço.",
+   "description": "Preenchido automaticamente a partir do processo.",
    "idx": 3
   },
   {
@@ -70,7 +70,7 @@
    "in_global_search": 1,
    "bold": 1,
    "allow_in_quick_entry": 1,
-   "description": "Descrição curta da tarefa.",
+   "description": "Resumo da atividade interna (ex.: ligar para cliente, revisar minuta). Não confundir com Prazo processual.",
    "idx": 5
   },
   {
@@ -101,7 +101,7 @@
    "label": "Data Limite",
    "fieldtype": "Date",
    "in_list_view": 1,
-   "description": "Prazo para conclusão da tarefa (opcional).",
+   "description": "Prazo interno para conclusão (opcional). Não substitui Prazo fatal do judiciário.",
    "in_standard_filter": 1,
    "idx": 8
   },
@@ -115,7 +115,7 @@
    "fieldname": "description",
    "label": "Descrição",
    "fieldtype": "Text Editor",
-   "description": "Detalhamento da tarefa e instruções.",
+   "description": "Detalhamento e instruções para quem executará a tarefa.",
    "idx": 10
   },
   {
