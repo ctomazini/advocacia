@@ -19,7 +19,7 @@
  "timeline_field": null,
  "sort_field": "modified",
  "sort_order": "DESC",
- "description": null,
+ "description": "Atos avulsos cobrados do cliente fora do contrato de honorários. Para honorários contratuais, use Contratos de Honorários.",
  "colour": null,
  "read_only": 0,
  "in_create": 0,
@@ -312,7 +312,7 @@
    "print_width": null,
    "columns": 0,
    "default": null,
-   "description": "Preenchido automaticamente a partir do serviço.",
+   "description": "Preenchido automaticamente a partir do processo.",
    "in_list_view": 1,
    "fetch_if_empty": 0,
    "in_filter": 0,
@@ -672,7 +672,7 @@
    "print_width": null,
    "columns": 0,
    "default": null,
-   "description": "Itens de serviço acumulados para cobrança.",
+   "description": "Liste os atos avulsos cobrados fora do Contrato de Honorários principal.",
    "in_list_view": 0,
    "fetch_if_empty": 0,
    "in_filter": 0,
@@ -1288,7 +1288,7 @@
    "print_width": null,
    "columns": 0,
    "default": null,
-   "description": null,
+   "description": "Gera (ou atualiza) um Recebimento com o valor total dos atos listados. O Recebimento aparecerá na aba Financeiro do Processo e na lista de Recebimentos.",
    "in_list_view": 0,
    "fetch_if_empty": 0,
    "in_filter": 0,
@@ -1484,6 +1484,7 @@
   "column_break_info",
   "status",
   "opening_date",
+  "title",
   "atos_section",
   "acts",
   "totais_section",
@@ -1497,8 +1498,7 @@
   "last_payment",
   "generate_billing",
   "observacoes_section",
-  "remarks",
-  "title"
+  "remarks"
  ],
  "states": [
   {
