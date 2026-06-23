@@ -1,3 +1,4 @@
+import base64
 import io
 import json
 import os
@@ -726,7 +727,7 @@ def _build_context(servico_name):
 	return context
 
 
-def _render_and_attach(servico_name, template_doc, context):
+def _render_document(servico_name, template_doc, context):
 	try:
 		from docxtpl import DocxTemplate
 	except ImportError:
@@ -755,19 +756,7 @@ def _render_and_attach(servico_name, template_doc, context):
 		timestamp,
 	)
 
-	anexo = frappe.get_doc(
-		{
-			"doctype": "File",
-			"file_name": nome_arquivo,
-			"content": buffer.read(),
-			"attached_to_doctype": "Legal Case",
-			"attached_to_name": servico_name,
-			"is_private": 1,
-		}
-	)
-	anexo.save(ignore_permissions=True)  # File anexado ao Serviço — permissão de write no Serviço já validada
-
-	return {"file_url": anexo.file_url, "file_name": nome_arquivo}
+	return {"file_name": nome_arquivo, "content": buffer.read()}
 
 
 def _infer_category(template_doc) -> str:
@@ -841,19 +830,13 @@ def gerar_documentos_em_lote(servico_name: str, template_names: str | list) -> d
 			template_doc = frappe.get_doc("Document Template", template_name)
 			if not template_doc.enabled:
 				raise frappe.ValidationError(_("Template desabilitado: {0}").format(template_name))
-			result = _render_and_attach(servico_name, template_doc, context)
-			case_document = _create_generated_case_document(
-				servico_name,
-				template_doc,
-				result["file_url"],
-			)
+			result = _render_document(servico_name, template_doc, context)
 			gerados.append(
 				{
 					"template": template_name,
 					"title": template_doc.title,
 					"file_name": result["file_name"],
-					"file_url": result["file_url"],
-					"case_document": case_document,
+					"file_content": base64.b64encode(result["content"]).decode("ascii"),
 				}
 			)
 		except Exception as exc:

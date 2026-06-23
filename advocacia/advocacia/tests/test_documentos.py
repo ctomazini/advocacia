@@ -186,21 +186,15 @@ class TestDocumentos(FrappeTestCase):
 		self.assertTrue(result["success"])
 		self.assertEqual(result["data"]["total"], 2)
 		self.assertEqual(len(result["data"]["gerados"]), 2)
+		for item in result["data"]["gerados"]:
+			self.assertTrue(item["file_name"].endswith(".docx"))
+			self.assertTrue(item["file_content"])
 
 		case_docs = frappe.get_all(
 			"Case Document",
 			filters={"legal_case": servico.name, "source": "Gerado pelo App"},
-			fields=["name", "category", "status", "file", "version_label"],
 		)
-		self.assertEqual(len(case_docs), 2)
-		for row in case_docs:
-			self.assertEqual(row.status, "Rascunho")
-			self.assertEqual(row.version_label, "v1")
-			self.assertTrue(row.file)
-
-		generated_by_url = {item["file_url"]: item for item in result["data"]["gerados"]}
-		for row in case_docs:
-			self.assertEqual(generated_by_url[row.file]["case_document"], row.name)
+		self.assertEqual(len(case_docs), 0)
 
 	def test_infer_category(self):
 		cases = (

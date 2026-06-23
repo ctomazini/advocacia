@@ -9,6 +9,25 @@
 		);
 	}
 
+	function adv_download_generated_file(file_name, file_content_base64) {
+		const binary = atob(file_content_base64);
+		const bytes = new Uint8Array(binary.length);
+		for (let i = 0; i < binary.length; i++) {
+			bytes[i] = binary.charCodeAt(i);
+		}
+		const blob = new Blob([bytes], {
+			type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+		});
+		const url = URL.createObjectURL(blob);
+		const link = document.createElement("a");
+		link.href = url;
+		link.download = file_name;
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+		URL.revokeObjectURL(url);
+	}
+
 	function gerar_documentos_em_lote(frm, template_names) {
 		frappe.call({
 			method: "advocacia.advocacia.documentos.gerar_documentos_em_lote",
@@ -26,18 +45,28 @@
 				let html = "";
 
 				if (data.gerados && data.gerados.length) {
+					data.gerados.forEach((item, index) => {
+						if (item.file_content) {
+							setTimeout(() => {
+								adv_download_generated_file(item.file_name, item.file_content);
+							}, index * 250);
+						}
+					});
 					html += "<p><strong>" + __("Documentos gerados:") + "</strong></p><ul>";
 					data.gerados.forEach((item) => {
 						html +=
 							"<li>" +
 							frappe.utils.escape_html(item.title || item.template) +
-							' — <a href="' +
-							item.file_url +
-							'" target="_blank">' +
+							" — " +
 							frappe.utils.escape_html(item.file_name) +
-							"</a></li>";
+							"</li>";
 					});
-					html += "</ul>";
+					html +=
+						"</ul><p class=\"text-muted\">" +
+						__(
+							"Os arquivos foram baixados automaticamente. Para arquivar no processo, use + Documento e faça upload manualmente."
+						) +
+						"</p>";
 				}
 
 				if (data.falhas && data.falhas.length) {
@@ -59,7 +88,6 @@
 					indicator: data.falhas && data.falhas.length ? "orange" : "green",
 					wide: true,
 				});
-				frm.reload_doc();
 			},
 		});
 	}
