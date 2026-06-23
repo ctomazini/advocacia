@@ -14,7 +14,7 @@ frappe.ui.form.on("Service Record", {
 function setup_service_record_form_intro(frm) {
 	frm.set_intro(
 		__(
-			"Registre aqui atos individuais prestados ao cliente cobrados <strong>fora</strong> do Contrato de Honorários principal. Exemplos: consulta extra, parecer avulso, diligência não prevista, obtenção de certidões.<br><br>Após adicionar os atos, clique em <strong>Sincronizar Cobrança</strong> para gerar um Recebimento com o valor total."
+			"Registre aqui atos individuais prestados ao cliente cobrados <strong>fora</strong> da Cobrança de Honorários principal. Exemplos: consulta extra, parecer avulso, diligência não prevista, obtenção de certidões.<br><br>Após adicionar os atos, clique em <strong>Sincronizar Cobrança</strong> para gerar um Recebimento com o valor total."
 		),
 		"blue"
 	);

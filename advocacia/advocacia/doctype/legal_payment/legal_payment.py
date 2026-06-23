@@ -27,7 +27,7 @@ class LegalPayment(Document):
 			)
 		if self.origin_type == TIPO_ATOS and not self.service_record:
 			frappe.throw(
-				_("Cobrança de Serviço é obrigatória para recebimentos de atos."),
+				_("Cobrança Individual é obrigatória para recebimentos de atos."),
 				title=_("Campo obrigatório"),
 			)
 
