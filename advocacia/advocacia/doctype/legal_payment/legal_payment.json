@@ -9,7 +9,6 @@
  "engine": "InnoDB",
  "field_order": [
   "sec_relacionamentos",
-  "title",
   "legal_case",
   "client",
   "col_rel_1",
@@ -18,11 +17,6 @@
   "service_record",
   "installment_number",
   "description",
-  "sec_origem",
-  "installment_origin_id",
-  "col_orig_1",
-  "synced_at",
-  "manual_override",
   "sec_financeiro",
   "amount",
   "received_amount",
@@ -31,9 +25,15 @@
   "received_date",
   "status",
   "sec_controle",
-  "remarks",
+  "receipt",
   "col_ctrl_1",
-  "receipt"
+  "remarks",
+  "sec_origem",
+  "installment_origin_id",
+  "col_orig_1",
+  "synced_at",
+  "manual_override",
+  "title"
  ],
  "fields": [
   {
@@ -127,8 +127,9 @@
   {
    "fieldname": "sec_origem",
    "fieldtype": "Section Break",
-   "label": "Origem / Sincronização",
-   "idx": 10
+   "label": "Sincronização (técnico)",
+   "idx": 10,
+   "collapsible": 1
   },
   {
    "fieldname": "installment_origin_id",

@@ -1,6 +1,7 @@
 frappe.ui.form.on("Legal Payment", {
 	refresh(frm) {
 		if (frm.is_new()) {
+			setup_legal_payment_form_intro(frm);
 			return;
 		}
 
@@ -21,10 +22,20 @@ frappe.ui.form.on("Legal Payment", {
 		if (frm.doc.origin_type === "Atos Advocatícios") {
 			configurar_botoes_atos(frm);
 		} else {
+			setup_legal_payment_form_intro(frm);
 			configurar_botoes_honorarios(frm);
 		}
 	},
 });
+
+function setup_legal_payment_form_intro(frm) {
+	frm.set_intro(
+		__(
+			"Este registro representa uma parcela a receber (ou já recebida) do cliente. Origem: gerado automaticamente por Contrato de Honorários ou Cobrança de Serviço, ou criado manualmente para entradas avulsas."
+		),
+		"blue"
+	);
+}
 
 function configurar_botoes_atos(frm) {
 	if (frm.doc.service_record) {
