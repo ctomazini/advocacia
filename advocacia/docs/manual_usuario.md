@@ -1,15 +1,30 @@
 # Manual do Usuário — Advocacia
 
 **Gerado em:** 2026-06-11
-**Versão do app:** 0.7.0
+**Atualizado em:** 2026-06-22 (Etapa 09 — glossário Sprint 1A)
+**Versão do app:** 1.0.0
 
 ---
 
 ## Visão Geral
 
-O sistema **Advocacia** centraliza clientes, processos, audiências, prazos, honorários, pagamentos e documentos para escritórios de advocacia brasileiros.
+O sistema **Advocacia** centraliza clientes, processos, audiências, prazos, honorários, recebimentos e documentos para escritórios de advocacia brasileiros.
 
-O **Serviço** funciona como hub: audiências, prazos, honorários, cobranças de serviços e documentos orbitam um serviço.
+O **Processo** (`Legal Case`) é o hub central: audiências, prazos, contratos de honorários, cobranças de serviço avulso e documentos orbitam um processo.
+
+### Fluxo financeiro (resumo)
+
+O escritório tem **duas fontes de receita**:
+
+1. **Honorários contratuais** — `Contrato de Honorários` → botão **Gerar Parcelas** → `Recebimentos` sincronizados automaticamente.
+2. **Serviços avulsos** — `Cobrança de Serviço` com atos individuais → **Sincronizar Cobrança** → `Recebimentos` de cobrança avulsa.
+
+**Custas Processuais** são despesas do processo (taxas, perícias), não receita. **Despesas do Escritório** são gastos operacionais sem vínculo obrigatório a processo.
+
+### Documentos
+
+- **Upload manual:** anexe arquivos em **Documento do Processo** no hub.
+- **Geração Word:** use **Gerar Documentos** com **Modelos de Documento** (placeholders). O arquivo é **baixado** para revisão; não é anexado automaticamente ao processo até você enviar.
 
 ### Painel
 
@@ -21,7 +36,7 @@ Acesse `/app/painel` para KPIs, listas rápidas (prazos, audiências, tarefas) e
 
 ### Client
 
-Cadastro completo do cliente do escritório. Centraliza dados pessoais, documentação, endereços e contatos. Todo serviço jurídico está vinculado a um cliente.
+Cadastro completo do cliente do escritório. Centraliza dados pessoais, documentação, endereços e contatos. Todo processo está vinculado a um cliente.
 
 **Código automático:** `format:CLI-{YYYY}-{####}`
 
@@ -111,11 +126,11 @@ Fase do processo no fluxo (Distribuído, Sentenciado, etc.).
 
 ---
 
-## Serviço Jurídico (Hub Central)
+## Processos (Hub Central)
 
 ### Legal Case
 
-O **Serviço** é o DocType central (hub) do sistema. Representa um processo judicial ou consultoria jurídica. Audiências, prazos, pagamentos e atos orbitam um Serviço.
+O **Processo** é o DocType central (hub) do sistema. Representa um processo judicial, consultoria ou outro serviço jurídico. Audiências, prazos, recebimentos e cobranças orbitam um processo.
 
 **Código automático:** `format:SERV-{YYYY}-{####}`
 
@@ -145,13 +160,13 @@ O **Serviço** é o DocType central (hub) do sistema. Representa um processo jud
 
 ### Fee Agreement
 
-Contrato de **honorários** do caso: valor contratado, modo (Diretos ou Divisão advogada/cliente), parcelas e vencimentos. Ao salvar, sincroniza **Pagamentos**.
+Contrato de **honorários** do caso: valor contratado, modo (Diretos ou Divisão advogada/cliente), parcelas e vencimentos. Ao salvar, sincroniza **Recebimentos**.
 
 **Código automático:** `format:ACOR-{YYYY}-{####}`
 
 | Campo | Tipo | Obrigatório | Descrição |
 |-------|------|:-----------:|-----------|
-| Serviço | Link | ✅ | Serviço ou processo vinculado ao contrato de honorários. |
+| Processo | Link | ✅ | Serviço ou processo vinculado ao contrato de honorários. |
 | Client | Link |  | Preenchido automaticamente a partir do serviço. |
 | Modo | Select | ✅ | Honorários Diretos ou Divisão advogada/cliente (repasse ao cliente). |
 | Status | Select |  | Vigente, Quitado ou Cancelado. |
@@ -170,7 +185,7 @@ Contrato de **honorários** do caso: valor contratado, modo (Diretos ou Divisão
 | Data Primeira Parcela | Date |  | Vencimento da primeira parcela. |
 | Valor da Parcela | Currency |  | Valor médio por parcela (referência). |
 | Gerar Parcelas | Button |  |  |
-|  | Table |  | Parcelas do contrato. Ao salvar, o sistema gera ou atualiza os pagamentos. |
+|  | Table |  | Parcelas do contrato. Ao salvar, o sistema gera ou atualiza os recebimentos. |
 | Total Advogada | Currency |  | Soma das parcelas da advogada. Calculado automaticamente. |
 | Total Client | Currency |  | Soma das parcelas do cliente. Calculado automaticamente. |
 | Observações | Text Editor |  | Observações contratuais e anotações internas. |
@@ -182,16 +197,16 @@ Contrato de **honorários** do caso: valor contratado, modo (Diretos ou Divisão
 
 ### Legal Payment
 
-Registro de recebimento no caixa do escritório. Origem: parcela de **Honorários** ou **Cobrança de serviços**. Honorários vêm da sync automática; serviços, da cobrança manual.
+Registro de recebimento no caixa do escritório. Origem: parcela de **Honorários** ou **Cobrança de Serviço**. Honorários vêm da sync automática; serviços, da cobrança manual.
 
 **Código automático:** `format:PAG-{YYYY}-{####}`
 
 | Campo | Tipo | Obrigatório | Descrição |
 |-------|------|:-----------:|-----------|
-| Origem | Select |  | Honorários (Parcela) ou Cobrança de serviços. |
+| Origem | Select |  | Honorários (Parcela) ou Cobrança de Serviço. |
 | Honorários | Link |  | Contrato de honorários que originou este pagamento (parcelas). |
-| Cobrança de serviços | Link |  | Cobrança de serviços vinculada. |
-| Serviço | Link | ✅ | Serviço ou processo relacionado. |
+| Cobrança de Serviço | Link |  | Cobrança de Serviço vinculada. |
+| Processo | Link | ✅ | Serviço ou processo relacionado. |
 | Client | Link | ✅ | Preenchido automaticamente a partir do serviço ou honorários. |
 | Nº Parcela | Int |  | Número sequencial da parcela no contrato de honorários. |
 | Descrição | Small Text |  | Descrição exibida na parcela e nos relatórios. |
@@ -217,7 +232,7 @@ Registro de recebimento no caixa do escritório. Origem: parcela de **Honorário
 
 | Campo | Tipo | Obrigatório | Descrição |
 |-------|------|:-----------:|-----------|
-| Serviço | Link | ✅ | Serviço ou processo vinculado à custa. |
+| Processo | Link | ✅ | Serviço ou processo vinculado à custa. |
 | Client | Link |  | Selecione o registro vinculado. Preenchido ou calculado automaticamente pelo sistema. |
 | Tipo | Select | ✅ | Taxa Judicial, Emolumento, Despesa Cartorial, etc. |
 | Descrição | Data | ✅ | Descrição da custa ou taxa. |
@@ -226,7 +241,7 @@ Registro de recebimento no caixa do escritório. Origem: parcela de **Honorário
 | Data de Legal Payment | Date |  | Data em que a custa foi paga. |
 | Repassar ao Client | Check |  | Marque se o valor deve ser repassado ao cliente. |
 | Data de Repasse | Date |  | Data do repasse ao cliente. |
-| Forma de Legal Payment | Select |  | Forma de pagamento: PIX, TED, Dinheiro, etc. |
+| Forma de pagamento | Select |  | Forma de pagamento: PIX, TED, Dinheiro, etc. |
 | Comprovante | Attach |  | Comprovante de pagamento anexado. |
 | Observações | Small Text |  | Observações sobre a custa. |
 | Título | Data |  | Título automático no formato ID — descritor. |
@@ -247,7 +262,7 @@ Registro de recebimento no caixa do escritório. Origem: parcela de **Honorário
 | Status | Select |  | Pendente, Pago ou Atrasado. |
 | Data de Vencimento | Date |  | Data de vencimento. |
 | Data de Legal Payment | Date |  | Data em que a despesa foi paga. |
-| Forma de Legal Payment | Select |  | Forma de pagamento: PIX, TED, Boleto, etc. |
+| Forma de pagamento | Select |  | Forma de pagamento: PIX, TED, Boleto, etc. |
 | Despesa Recorrente | Check |  | Marque se a despesa se repete periodicamente. |
 | Frequência | Select |  | Frequência da recorrência: Mensal, Anual, etc. |
 | Próximo Vencimento | Date |  | Próximo vencimento calculado (despesas recorrentes). |
@@ -269,7 +284,7 @@ Audiências judiciais vinculadas a um serviço. Sincroniza com o calendário Fra
 
 | Campo | Tipo | Obrigatório | Descrição |
 |-------|------|:-----------:|-----------|
-| Serviço | Link | ✅ | Serviço ou processo vinculado à audiência. |
+| Processo | Link | ✅ | Serviço ou processo vinculado à audiência. |
 | Client | Link |  | Preenchido automaticamente a partir do serviço. |
 | Data e Hora | Datetime | ✅ | Data e hora da audiência. |
 | Status | Select |  | Agendada, Realizada, Adiada ou Cancelada. |
@@ -293,7 +308,7 @@ Prazos processuais com data fatal. Notificações automáticas usam `notificatio
 
 | Campo | Tipo | Obrigatório | Descrição |
 |-------|------|:-----------:|-----------|
-| Serviço | Link | ✅ | Serviço ou processo vinculado ao prazo. |
+| Processo | Link | ✅ | Serviço ou processo vinculado ao prazo. |
 | Client | Link |  | Preenchido automaticamente a partir do serviço. |
 | Data do Prazo | Date | ✅ | Data fatal do prazo processual. |
 | Status | Select |  | Pendente, Concluído ou Vencido. Vencido é atualizado automaticamente. |
@@ -314,7 +329,7 @@ Prazos processuais com data fatal. Notificações automáticas usam `notificatio
 
 | Campo | Tipo | Obrigatório | Descrição |
 |-------|------|:-----------:|-----------|
-| Serviço | Link |  | Serviço relacionado (opcional). |
+| Processo | Link |  | Serviço relacionado (opcional). |
 | Client | Link |  | Preenchido automaticamente a partir do serviço. |
 | Descrição da Legal Task | Data | ✅ | Descrição curta da tarefa. |
 | Status | Select |  | Pendente, Em Andamento, Concluída ou Cancelada. |
@@ -335,7 +350,7 @@ Prazos processuais com data fatal. Notificações automáticas usam `notificatio
 
 | Campo | Tipo | Obrigatório | Descrição |
 |-------|------|:-----------:|-----------|
-| Serviço | Link |  | Serviço relacionado à comunicação (opcional). |
+| Processo | Link |  | Serviço relacionado à comunicação (opcional). |
 | Client | Link | ✅ | Client envolvido na comunicação. |
 | Data | Datetime | ✅ | Data e hora da comunicação. |
 | Tipo | Select | ✅ | Canal: Telefone, WhatsApp, E-mail, Reunião, etc. |
@@ -354,13 +369,13 @@ Prazos processuais com data fatal. Notificações automáticas usam `notificatio
 
 ### Service Record
 
-**Cobrança de serviços** — itens avulsos a faturar (consulta, petição, diligência). Use **Sincronizar cobrança** para emitir pagamento total ou parcial.
+**Cobrança de Serviço** — itens avulsos a faturar (consulta, petição, diligência). Use **Sincronizar cobrança** para emitir recebimento total ou parcial.
 
 **Código automático:** `format:ATOS-{YYYY}-{####}`
 
 | Campo | Tipo | Obrigatório | Descrição |
 |-------|------|:-----------:|-----------|
-| Serviço | Link | ✅ | Serviço ou processo vinculado à cobrança. |
+| Processo | Link | ✅ | Serviço ou processo vinculado à cobrança. |
 | Client | Link |  | Preenchido automaticamente a partir do serviço. |
 | Status | Select |  | Em aberto, Parcialmente cobrado ou Cobrado. |
 | Data de Abertura | Date |  | Data de abertura da cobrança de serviços. |
@@ -384,7 +399,7 @@ Prazos processuais com data fatal. Notificações automáticas usam `notificatio
 
 | Campo | Tipo | Obrigatório | Descrição |
 |-------|------|:-----------:|-----------|
-| Serviço | Link | ✅ | Serviço onde a atividade foi realizada. |
+| Processo | Link | ✅ | Serviço onde a atividade foi realizada. |
 | Client | Link |  | Preenchido automaticamente a partir do serviço. |
 | Data | Date | ✅ | Data da atividade. |
 | Responsável | Link |  | Profissional que registrou a atividade. |
@@ -426,7 +441,7 @@ Arquivo do processo vinculado a um **Serviço**. Pode ser enviado manualmente ou
 
 | Campo | Tipo | Obrigatório | Descrição |
 |-------|------|:-----------:|-----------|
-| Serviço | Link | ✅ | Serviço (processo ou consultoria) ao qual este documento pertence. |
+| Processo | Link | ✅ | Serviço (processo ou consultoria) ao qual este documento pertence. |
 | Cliente | Link |  | Preenchido automaticamente a partir do serviço. |
 | Categoria | Link | ✅ | Tipo documental para organização e relatórios. |
 | Status | Select | ✅ | Situação do documento no fluxo do processo. |
@@ -655,22 +670,22 @@ Documentação técnica: [hub_navigation.md](./hub_navigation.md)
 
 ---
 
-## Honorários vs Cobrança de serviços
+## Honorários vs Cobrança de Serviço
 
 | Conceito | Onde cadastrar | Quando usar |
 | --- | --- | --- |
 | **Honorários** (contrato parcelado) | **Honorários** (`Fee Agreement`) | Valor fechado do caso com parcelas programadas |
-| **Cobrança de serviços** (itens avulsos) | **Cobrança de serviços** (`Service Record`) | Cobrar consultas, petições, diligências por evento |
+| **Cobrança de Serviço** (itens avulsos) | **Cobrança de Serviço** (`Service Record`) | Cobrar consultas, petições, diligências por evento |
 | **Registro de horas** | **Time Entry** | Produtividade interna; não gera pagamento automaticamente |
 | **Caixa unificado** | **Pagamentos** (`Legal Payment`) | Todo recebimento (honorários ou serviços) |
 
 ### Modo Divisão advogada/cliente
 
-Dentro de **Honorários**, o modo **Divisão advogada/cliente** reparte o valor entre advogada e cliente (ex.: sucumbência). Continua sendo honorários contratuais — não confundir com Cobrança de serviços.
+Dentro de **Honorários**, o modo **Divisão advogada/cliente** reparte o valor entre advogada e cliente (ex.: sucumbência). Continua sendo honorários contratuais — não confundir com Cobrança de Serviço.
 
 ### Cobrança parcial de serviços
 
-1. Abra **Cobrança de serviços** e cadastre **Itens cobráveis** com valor.
+1. Abra **Cobrança de Serviço** e cadastre **Itens cobráveis** com valor.
 2. Clique **Sincronizar cobrança**.
 3. Marque os itens desejados e informe **Valor a cobrar** (pode ser menor que o total).
 4. O sistema aloca na ordem da lista; se o valor for menor que um item, divide automaticamente.
@@ -695,7 +710,7 @@ Exemplo: R$ 10.000 em um item → cobrar R$ 7.000 agora deixa R$ 3.000 pendente 
 4. Cadastre **Audiências** e **Prazos**
 
 ### Cobrança avulsa de serviços
-1. Crie **Cobrança de serviços** vinculada ao serviço
+1. Crie **Cobrança de Serviço** vinculada ao serviço
 2. Adicione **Itens cobráveis** com valor
 3. **Sincronizar cobrança** — selecione itens e valor parcial se necessário
 4. Registre recebimento em **Pagamentos** quando o cliente pagar
