@@ -3,7 +3,7 @@
 Documento permanente de acompanhamento do projeto de modernização de experiência do usuário.
 
 **Criado:** 2026-06-09
-**Última atualização:** 2026-06-09 (Etapa 05 — ajustes amarelos pós-auditoria)
+**Última atualização:** 2026-06-22 (Etapa 06 — auditoria UX pós-estabilização de linguagem)
 **App:** `advocacia` (Frappe v16)
 
 ---
@@ -239,7 +239,164 @@ Despesas judiciais vinculadas ao processo: taxas judiciais, custas de perícia, 
 
 **Pendências:** —
 
-**Próximas etapas:** Etapa 06 — hub/dashboard polish (AUD-006–008)
+**Próximas etapas:** Etapa 06 concluída — ver registro abaixo; implementação Etapas 07–09
+
+---
+
+### Etapa 06 — Auditoria UX pós-estabilização de linguagem
+
+**Status:** Concluída
+**Data:** 2026-06-22
+**Branch:** `ux/step-05-yellow-risk-adjustments`
+**Responsável:** Sessão Agent / projeto Advocacia
+**Commit:** `[UX-STEP-06] Docs: UX audit post-language-stabilization`
+
+**Objetivo:** Reavaliar o sistema como um todo após Etapas 03–05 (glossário aplicado). Gerar backlog priorizado de melhorias de formulário, onboarding e polimento. **Somente análise** — zero implementação.
+
+**Pré-requisitos confirmados:**
+- Etapa 03 concluída e commitada (`3816ee1` … `5dfb494`) — labels verdes aplicados
+- Etapa 04 concluída — 314 testes OK, AUD-001–011 catalogados
+- Etapa 05 concluída — AUD-001, 003, 004, 005, 011 resolvidos; 314 testes OK
+
+**Método:** Leitura de código (`*.json`, `*.js`, `case_hub.js`, `adv_case_nav.js`, `painel/*`, `sidebar.py`, `audit_usability.md`, `audit_form_layout.md`). Validação visual no browser **não executada** (mesmo bloqueio da Etapa 04); conclusões baseadas em contrato código + auditorias existentes.
+
+#### Auditoria por fluxo
+
+##### Fluxo 1 — Novo cliente
+
+| Critério | Achado |
+|----------|--------|
+| Cliques do painel até salvar | **2 cliques** até o formulário (Painel → chip Cliente → Salvar após preencher). Sidebar: **3+** (Advocacia → Clientes → +). |
+| Campos obrigatórios claros | **Parcial.** `person_type` + `client_name` `reqd`; CPF/CNPJ via `mandatory_depends_on` (exigido no save, não asterisco fixo desde o início). Quick entry cobre tipo, nome e documento. |
+| CPF/CNPJ desde o início | **Sim** no quick entry e save (validação `validators.py`). Máscaras em `masks.js`. |
+| Próximo passo sugerido | **Ausente.** `client.js` só máscaras; sem CTA pós-save (“Cadastrar processo para este cliente?”). Connections Frappe existem mas não guiam estagiário. |
+| Lista Frappe intimida | **Risco médio** para estagiário: list view padrão Frappe com filtros (`list_filters.js` ajuda no desktop). `hide_name_column` + `title_field` melhoram legibilidade. |
+
+##### Fluxo 2 — Novo processo
+
+| Critério | Achado |
+|----------|--------|
+| “Processo” consistente | **Sim** pós-Etapa 03: sidebar “Processos”, satélites Link “Processo”, painel chip “Processo”, hub abas em PT. Residual: prefixo técnico `SERV-` no `autoname` (intocável). |
+| Cadastros auxiliares barreira dia 1 | **Sim, moderado.** Comarca/Vara/Tribunal em Cadastros (`keep_closed: 1`). Links no form **não obrigatórios** (`reqd: 0`). Consultoria/Diligência dispensam CNJ e cadastros judiciais. |
+| Abas no primeiro save | **6 abas** visíveis após save: Detalhes, Andamento, Financeiro, Prazos e Tarefas, Comunicações e Registro de Horas, Documentos. **Pode assustar** estagiário; Detalhes concentra campos editáveis. |
+| CNJ depois | **Sim** — `case_number` `reqd: 0`; `validate()` aceita vazio. Description JSON explica legado/CNJ. **Sem banner/intro** comunicando “pode preencher depois”. |
+| Breadcrumb título vs ID | **Mostra ID** (`SERV-2026-…`). `adv_case_nav.js` `build_case_crumb` usa `case_name`; `build_form_crumb` usa `doc.name`. `get_case_title()` existe mas **não** é usado no breadcrumb. |
+
+##### Fluxo 3 — Nova audiência
+
+| Critério | Achado |
+|----------|--------|
+| Caminhos de criação | **4+:** (1) hub processo `+ Audiência` (prefill `legal_case`+`client`) — **recomendado**; (2) sidebar Audiências; (3) painel chip Audiência (sem prefill); (4) list Audiências + Add; (5) calendário (`hearing_calendar.js`). |
+| Órfã sem processo | **Bloqueada no save** — `legal_case` `reqd: 1`. Sidebar/painel permitem abrir form vazio → erro no save (fricção, não dado órfão). |
+| Quick entry | **Suficiente** para operação: Processo, Data/Hora, Tipo. Modalidade/Vara ficam no form completo. Description cliente ainda diz “serviço” (legado textual). |
+
+##### Fluxo 4 — Prazo vs Tarefa
+
+| Critério | Achado |
+|----------|--------|
+| Distinção clara | **Conceitual no glossário**; na UI só via labels e descriptions (“Data fatal do prazo processual” vs “Prazo para conclusão da tarefa (opcional)”). |
+| Hub | Aba **Prazos e Tarefas** com painéis HTML separados (`deadlines_panel`, `tasks_panel`). |
+| Painel | Chips distintos; KPIs separados (`prazos_urgentes` vs `legal_tasks_pendentes`); timeline badge “Prazo” / “Tarefa”. |
+| Orientação secretária | **Insuficiente.** Sem intro, empty state comparativo ou wizard. `Legal Task.legal_case` **opcional** — tarefa pode existir sem processo (diferente de `Deadline`). |
+
+##### Fluxo 5 — Contrato de honorários → Recebimentos
+
+| Critério | Achado |
+|----------|--------|
+| Fluxo explicado na UI | **Não** — intro obrigatória (§ glossário) **não implementada** (AUD-002). |
+| Tooltip “Gerar Parcelas” | **Ausente** — Button `generate_installments`; DEC-F04 pendente. |
+| Onde ver parcelas | Grid no Fee Agreement (coluna Recebimento clicável); hub aba Financeiro (`installments_panel`, `payments_panel`); lista Recebimentos (`legal_payment_list.js` coluna Origem). |
+| Sucumbência / divisão | Lógica em `fee_agreement.js` (`Honorários Diretos` vs `Acordo com Divisão`); descriptions por campo. **Não autoexplicativo** para secretária — prompt sucumbência só após Gerar Parcelas no modo divisão. |
+
+##### Fluxo 6 — Cobrança de serviço avulso
+
+| Critério | Achado |
+|----------|--------|
+| Diferença Fee Agreement | **Não explicada in-app** (DEC-F02 pendente). Nomes distintos pós-Etapa 03 ajudam. |
+| Tooltip “Sincronizar Cobrança” | **Ausente no botão**; dialog de sync traz texto útil (`sync_hint`). |
+| Onde aparece resultado | Botão “Ver recebimento”; hub Serviços Avulsos + KPI “A faturar”; lista Recebimentos filtrável. |
+
+##### Fluxo 7 — Custas processuais
+
+| Critério | Achado |
+|----------|--------|
+| Custa vs Despesa Escritório | **Estruturalmente separados** (DEC-F05). Menu: Custas em Gestão de Casos; Despesas em Financeiro. |
+| Campo “quem arca” | **Parcial.** `bill_to_client` (Check “Repassar ao Cliente”) — não Select Escritório/Cliente do glossário. Default `1`. |
+| Reembolso documentado | `transfer_date` + descriptions; **sem intro** de fluxo reembolso na UI. |
+
+##### Fluxo 8 — Financeiro consolidado do processo
+
+| Critério | Achado |
+|----------|--------|
+| Aba Financeiro clara | **Parcial.** `_adv_hub_render_financial_summary` com 5 KPIs + barra % recebido + hint curto. Falta banner normativo (AUD-002). |
+| Quantos painéis | **5 blocos:** Resumo, Recebimentos de Honorários, Recebimentos, Custas, Serviços Avulsos (este último em section própria). Não competem, mas **densidade alta**. |
+| “Quanto falta receber” | KPIs separados: `total_pending_honorarios`, `total_services_unbilled`, `total_pending_service_payments`. Usuário **precisa somar mentalmente** — sem total único “a receber deste processo”. |
+
+#### Auditoria de formulários (standalone)
+
+Cobertura de descriptions: **94%** (218/232) — `audit_usability.md`. Tooltips = campo `description` no JSON.
+
+| DocType | Seções lógicas | Tooltips | Obrigatórios primeiro | Tabs adequadas | Descrições |
+|---------|:--------------:|:--------:|:-----------------------:|:--------------:|:----------:|
+| Legal Case | ✅ hub 6 abas | ✅ ~22 | ✅ Cliente+Tipo | ✅ por domínio | ✅ falta intro CNJ/financeiro |
+| Fee Agreement | ✅ Valores/Parcelas/Sucumbência | ✅ 37 | ✅ Processo+Cliente | N/A (form longo) | ✅ falta intro fluxo |
+| Legal Payment | ✅ Origem/Controle | ✅ 18 | 🟡 origem auto | N/A | ✅ intro só se Cancelado |
+| Service Record | ✅ Atos/Cobrança/Totais | ✅ 22 | ✅ Processo | N/A | ✅ falta intro vs honorários |
+| Hearing | ✅ Info/Detalhes/Obs | ✅ 17 | ✅ Processo+Data+Tipo | N/A | ✅ desc. cliente legado |
+| Deadline | ✅ referência layout | ✅ 16 | ✅ Processo+Data+Desc | N/A | ✅ |
+| Legal Task | ✅ Info/Detalhes | ✅ | 🟡 Processo opcional | N/A | ✅ |
+| Court Cost | ✅ Info/Valores/Controle | ✅ | ✅ Processo+Tipo+Valor | N/A | ✅ falta intro reembolso |
+| Case Communication | ✅ | ✅ | ✅ Processo | N/A | ✅ |
+| Time Entry | ✅ | ✅ 16 | 🟡 | N/A | ✅ |
+| Case Document | ✅ | ✅ | ✅ Processo | N/A | ✅ |
+| Office Expense | ✅ | ✅ | ✅ campos core | N/A | ✅ |
+| Client | ✅ PF/PJ/Contatos | ✅ 16 | ✅ Tipo+Nome+doc | N/A | ✅ |
+
+#### Notas por persona
+
+**Advogado titular**
+- Glossário financeiro (Recebimento vs Custa vs Despesa) **correto pós-Etapa 05**; falta texto de ajuda nos forms para sucumbência/divisão.
+- Hub Financeiro entrega KPIs úteis; quer total consolidado “a receber” em um número.
+- CNJ opcional e cadastros rígidos alinhados à prática; breadcrumb com ID é aceitável.
+
+**Secretária jurídica**
+- Painel + chips aceleram cadastros; **Fee Agreement** e sync de cobrança ainda exigem treinamento oral.
+- **Prazo vs Tarefa** — maior risco operacional: nomes similares, tarefa sem processo permitida.
+- Quick entries de Cliente/Processo/Audiência/Prazo são adequados; Fee Agreement sem quick entry (form completo).
+
+**Estagiário (primeiro dia)**
+- 6 abas do processo + lista Frappe padrão = **curva íngreme**; sem onboarding in-app.
+- Sem CTA pós-cliente → processo; audiência pelo painel abre form sem processo (erro no save).
+- Tooltips (descriptions) ajudam ao passar mouse, mas estagiário não descobre sozinho o fluxo honorários→parcelas→recebimentos.
+
+#### Backlog priorizado — pós-Etapa 06
+
+| Prioridade | ID | Item | Área | Esforço | Etapa sugerida |
+|:----------:|:---|:-----|:-----|:--------|:--------------|
+| **P0** | UX-06-001 | Textos de ajuda financeiros obrigatórios (banner hub Financeiro + intros Fee Agreement, Service Record, Legal Payment, Court Cost) | Hub + forms | M | **08** |
+| **P0** | UX-06-002 | Tooltips botões “Gerar Parcelas” e “Sincronizar Cobrança” (DEC-F04) | Forms JS | S | **08** |
+| **P0** | UX-06-003 | Orientação Prazo vs Tarefa (intro aba hub, empty states ou bloco HTML comparativo) | Hub + forms | M | **07** |
+| **P0** | UX-06-004 | Breadcrumb hub/satélites: exibir `title` (`ID — Cliente`) em vez de só `SERV-…` | `adv_case_nav.js` | S | **07** |
+| **P1** | UX-06-005 | CTA pós-save Cliente: “Cadastrar processo para este cliente” | `client.js` | S | **07** |
+| **P1** | UX-06-006 | Chip Audiência/Prazo no painel: prefill último processo ou aviso “selecione o processo no hub” | Painel | S | **07** |
+| **P1** | UX-06-007 | Intro processo novo: CNJ opcional + cadastros judiciais podem wait | `legal_case.js` | S | **07** |
+| **P1** | UX-06-008 | KPI hub “Total a receber neste processo” (honorários pendentes + serviços avulsos) | `case_hub.js` + backend | M | **08** |
+| **P1** | UX-06-009 | Hub pills: revisar singular vs plural (AUD-006) | `case_hub.js` | S | **07** |
+| **P1** | UX-06-010 | Dashboard Legal Case: grupos “Contratos de Honorários” (AUD-007) | `legal_case_dashboard.py` | S | **07** |
+| **P1** | UX-06-011 | Aba Horas: alinhar “Horas Trabalhadas” vs “Registro de Horas” (AUD-008) | `legal_case.json` | S | **07** |
+| **P1** | UX-06-012 | Aviso soft quando Legal Task salva sem processo | `legal_task.js` | S | **07** |
+| **P2** | UX-06-013 | Onboarding primeiro acesso (workspace card ou tour painel) | Workspace/Painel | L | **09** |
+| **P2** | UX-06-014 | Court Cost: label/glossário “Responsável pela Custa” (Escritório/Cliente) vs check | `court_cost.json` | M | **09** |
+| **P2** | UX-06-015 | Corrigir descriptions legadas “serviço” em Hearing/Deadline/Legal Task | JSON | S | **09** |
+| **P2** | UX-06-016 | `fee_agreement.js`: mensagens hardcoded sem `__()` | JS | S | **09** |
+| **P2** | UX-06-017 | Manual / `generate_manual.py` termos legados (AUD-010 / DT-04) | Docs | M | **11** |
+| **P2** | UX-06-018 | Completar 14 descriptions restantes (campos técnicos) | JSON/script | S | **09** |
+
+**Mapeamento AUD/DT → UX-06:** AUD-002 → UX-06-001/002; AUD-006 → UX-06-009; AUD-007 → UX-06-010; AUD-008 → UX-06-011; DT-06 → UX-06-001; DT-04 → UX-06-017.
+
+**Testes:** Nenhum (auditoria read-only).
+
+**Próximas etapas:** Etapa 07 — polish hub/navegação/onboarding leve (UX-06-003–007, 009–012); Etapa 08 — textos financeiros e KPI consolidado (UX-06-001, 002, 008); Etapa 09 — polimento P2.
 
 ---
 
@@ -321,7 +478,7 @@ Ordem idêntica a `SIDEBAR_LINK_ORDER`: Processos, Recebimentos, Contratos de Ho
 | ~~P5~~ | ~~Notificações PT~~ | ~~AUD-004 / DT-02~~ **Etapa 05** |
 | P6 | Manual e docs operacionais | AUD-010 / DT-04 |
 
-**Próximas etapas:** Etapa 06 — hub/dashboard polish (AUD-006–008)
+**Próximas etapas:** Etapa 06 concluída — backlog UX-06-001+; implementação Etapas 07–09
 
 ---
 
@@ -354,9 +511,9 @@ Ordem idêntica a `SIDEBAR_LINK_ORDER`: Processos, Recebimentos, Contratos de Ho
 
 **Validação:** `bench build --app advocacia` + `migrate` (sync fixtures Notification).
 
-**Pendências:** AUD-002 (textos de ajuda financeiros, Etapa 08–09); AUD-006–008 (hub polish, Etapa 06); AUD-009–010 (backlog / Etapa 11).
+**Pendências:** AUD-002 (textos de ajuda financeiros, Etapa 08); AUD-006–008 (catalogados na Etapa 06 → UX-06-009–011); AUD-009–010 (backlog / Etapa 11).
 
-**Próximas etapas:** Etapa 06 — hub/dashboard polish (AUD-006–008)
+**Próximas etapas:** Etapa 06 concluída — ver backlog UX-06; implementação Etapas 07–09
 
 ---
 
@@ -381,7 +538,7 @@ Ordem idêntica a `SIDEBAR_LINK_ORDER`: Processos, Recebimentos, Contratos de Ho
 
 **Arquivos principais:** `setup/translations.py`, `setup/sidebar.py`, `workspace_sidebar/advocacia.json`, `workspace/advocacia/advocacia.json`, `fixtures/workspace.json`, `adv_case_nav.js`, `case_hub.js`, `public/js/painel/*`, 20+ JSON de DocTypes, `add_field_descriptions.py`, relatórios (labels em `.py`/`.js`).
 
-**DIV resolvidas (V + hub/painel tocados):** DIV-001–DIV-009, DIV-011–DIV-035, DIV-036–DIV-038, DIV-040–DIV-046, DIV-047 *(parcial — mapas ainda duplicados, ver DT-01)*.
+**DIV resolvidas (V + hub/painel tocados):** DIV-001–DIV-009, DIV-011–DIV-035, DIV-036–DIV-038, DIV-040–DIV-046, DIV-047 *(resolvido Etapa 05 — DT-01)*.
 
 **DIV pendentes (Etapa 04+):** nenhuma **V** crítica restante no escopo menu/forms; itens **âmbar** de textos de ajuda (DT-06), manual (DT-04), notificações (DT-02).
 
