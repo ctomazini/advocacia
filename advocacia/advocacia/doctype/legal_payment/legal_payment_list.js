@@ -9,7 +9,7 @@ frappe.listview_settings["Legal Payment"] = {
 				meta.push(__("Venc.") + " " + frappe.datetime.str_to_user(doc.due_date));
 			}
 			if (doc.amount != null && doc.amount !== "") {
-				meta.push(frappe.format_currency(doc.amount));
+				meta.push(format_currency(doc.amount || 0));
 			}
 			if (!meta.length) {
 				return subject;
