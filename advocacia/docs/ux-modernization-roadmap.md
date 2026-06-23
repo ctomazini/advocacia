@@ -3,7 +3,7 @@
 Documento permanente de acompanhamento do projeto de modernização de experiência do usuário.
 
 **Criado:** 2026-06-09
-**Última atualização:** 2026-06-22 (Etapa 09 — **ENCERRADO**)
+**Última atualização:** 2026-06-23 (Etapa 09 encerrada; release **v1.1.0**)
 **App:** `advocacia` (Frappe v16)
 
 ---
@@ -989,3 +989,10 @@ Inventário read-only (Etapa 01). **47 itens** agrupados por área. Risco: **V**
 - [x] Nenhuma rota alterada
 - [x] Nenhum placeholder Word alterado
 - [x] Nenhum schema alterado
+
+---
+
+
+---
+
+**Última atualização:** 2026-06-23 23:24 UTC · **Versão do app:** 1.1.0

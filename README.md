@@ -2,7 +2,7 @@
 
 Aplicativo Frappe v16 para gestão jurídica de escritórios de advocacia no Brasil: clientes, serviços/processos, honorários, pagamentos, atos, prazos, audiências, documentos do processo, despesas operacionais, painel operacional, geração de documentos (.docx) e API read-only para agentes IA.
 
-**Versão:** 1.0.0 · **Branch:** `main`
+**Versão:** 1.1.0 · **Branch:** `main`
 
 Documentação: [advocacia/docs/README.md](./advocacia/docs/README.md) (índice) · [CODEBASE.md](./CODEBASE.md) · [REGRAS_ADVOCACIA.md](./REGRAS_ADVOCACIA.md) · [Layout forms](./advocacia/docs/audit_form_layout.md) · [Manual](./advocacia/docs/manual_usuario.md)
 
@@ -83,6 +83,17 @@ python advocacia/advocacia/tests/e2e/playwright_flow.py
 
 Ver [advocacia/docs/e2e_playwright.md](./advocacia/docs/e2e_playwright.md) para requisitos e variáveis.
 
+## Versão
+
+**1.1.0** — UX final (Etapas 07–09), hub pills, download docx, CPF/RG advogada em Office Settings. Ver [advocacia/docs/README.md](./advocacia/docs/README.md#entregas-recentes).
+
 ## Licença
 
 MIT
+
+---
+
+
+---
+
+**Última atualização:** 2026-06-23 23:24 UTC · **Versão do app:** 1.1.0

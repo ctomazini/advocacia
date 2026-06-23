@@ -249,7 +249,7 @@ def generate():
 	try:
 		version = frappe.get_attr("advocacia.__version__")
 	except Exception:
-		version = "0.7.0"
+		version = "1.1.0"
 
 	lines = [
 		"# Manual do Usuário — Advocacia",

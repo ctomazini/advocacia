@@ -137,3 +137,10 @@ bench --site advocacia.local run-tests --app advocacia
 ---
 
 *Gerado para alinhar advocacia ao engenharia. Executar o prompt acima em sessões Agent dedicadas por bloco.*
+
+---
+
+
+---
+
+**Última atualização:** 2026-06-23 23:24 UTC · **Versão do app:** 1.1.0

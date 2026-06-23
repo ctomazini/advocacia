@@ -32,3 +32,10 @@ Relatório JSON em `results/<run_id>/report.json`.
 
 `advocacia/advocacia/tests/e2e/playwright_flow.py` permanece como referência legada.
 Prefira este pacote npm.
+
+---
+
+
+---
+
+**Última atualização:** 2026-06-23 23:24 UTC · **Versão do app:** 1.1.0

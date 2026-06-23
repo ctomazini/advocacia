@@ -1,6 +1,6 @@
 # Documentação — App Advocacia
 
-**Versão:** 1.0.0 · **Branch:** `main` · **Atualizado:** 2026-06-09
+**Versão:** 1.1.0 · **Branch:** `ux/step-09-final-polish` · **Atualizado:** 2026-06-23
 
 ---
 
@@ -24,7 +24,7 @@ Relatórios de conformidade. Consultar junto com [audit-deploy-ready.md](./audit
 
 | Arquivo | Foco | Status jun/2026 |
 | --- | --- | --- |
-| [audit_code.md](./audit_code.md) | Python, whitelists, testes | ✅ 297 testes (jun/2026) |
+| [audit_code.md](./audit_code.md) | Python, whitelists, testes | ✅ 315 testes (jun/2026) |
 | [audit_dashboard.md](./audit_dashboard.md) | Painel backend/frontend modular | ✅ P2 jun/2026 |
 | [audit_data_integrity.md](./audit_data_integrity.md) | CPF/CNPJ/CNJ, sync financeiro | ✅ |
 | [audit_google_calendar.md](./audit_google_calendar.md) | Audiência/Prazo → Event → Google | ✅ |
@@ -59,6 +59,19 @@ Relatórios de conformidade. Consultar junto com [audit-deploy-ready.md](./audit
 
 ## Entregas recentes
 
+### v1.1.0 — UX final + hub + Office Settings (jun/2026)
+
+| Área | Mudança |
+| --- | --- |
+| **UX Etapas 07–09** | Onboarding painel, checklist hub, glossário labels, list views com indicadores, empty states |
+| **Hub Legal Case** | Pills em grid desktop (label em linha própria, sem clipping); carrossel mobile |
+| **Documentos** | Download `.docx` via endpoint (sem diálogo Salvar como); labels Cobranças de Honorários / Individuais |
+| **Office Settings** | CPF e RG da advogada principal + placeholders `escritorio_advogada_cpf` / `escritorio_advogada_rg` |
+| **Validadores** | Correção ordem dígitos verificadores CNJ (Res. 65/2008) |
+| **Painel** | Layout completo restaurado fora do modo onboarding |
+
+Branch de entrega: `ux/step-09-final-polish` → merge em `main`.
+
 ### v1.0.0 — rename DocTypes EN + baseline produção
 
 - 24 DocTypes renomeados PT→EN (Legal Case, Client, Office Settings, …)
@@ -84,7 +97,7 @@ Relatórios de conformidade. Consultar junto com [audit-deploy-ready.md](./audit
 
 ```bash
 bench --site advocacia.local set-config allow_tests true
-bench --site advocacia.local run-tests --app advocacia   # 297 testes (jun/2026)
+bench --site advocacia.local run-tests --app advocacia   # 315 testes (jun/2026)
 ```
 
 E2E browser (opcional, fora da suite Frappe): ver [e2e_playwright.md](./e2e_playwright.md).
@@ -103,3 +116,10 @@ Módulo `advocacia/advocacia/agent_api.py` — endpoints whitelisted read-only:
 | `get_financial_overview` | Manager | KPIs financeiros globais |
 
 Detalhes: [audit_ai_readiness.md](./audit_ai_readiness.md).
+
+---
+
+
+---
+
+**Última atualização:** 2026-06-23 23:24 UTC · **Versão do app:** 1.1.0

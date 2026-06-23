@@ -1,6 +1,6 @@
 # Seção 5 — Layout de formulários (Column Breaks)
 
-**App:** `advocacia` · **Data:** 2026-06-10 · **Versão:** 1.0.0  
+**App:** `advocacia` · **Data:** 2026-06-23 · **Versão:** 1.1.0  
 **Escopo:** todos os DocTypes **exceto** `Legal Case` (hub com abas próprias).
 
 ---
@@ -57,3 +57,10 @@ Ao adicionar campos novos em satélites transacionais, seguir o padrão 2 coluna
 ---
 
 *Complementa [audit_usability.md](./audit_usability.md) §3.6.*
+
+---
+
+
+---
+
+**Última atualização:** 2026-06-23 23:24 UTC · **Versão do app:** 1.1.0

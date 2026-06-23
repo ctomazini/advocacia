@@ -89,3 +89,10 @@ Ao final, o script grava JSON em `ADVOCACIA_E2E_REPORT` com status por DocType (
 ---
 
 *Script introduzido em jun/2026. Não faz parte de `bench run-tests` — execução manual ou CI opcional.*
+
+---
+
+
+---
+
+**Última atualização:** 2026-06-23 23:24 UTC · **Versão do app:** 1.1.0

@@ -1,8 +1,8 @@
 # CODEBASE — App Advocacia (Frappe v16)
 
-> Gerado em **2026-06-10** — inventário pós-P1 reports + P2 painel. Branch **`main`**. Frappe puro, **sem ERPNext**.
+> Gerado em **2026-06-23** — inventário pós-v1.1.0 (UX final + hub pills + Office Settings CPF/RG). Branch **`ux/step-09-final-polish`**.
 
-> **HEAD:** `cc3a398 2026-06-10 14:03:59 +0000 docs: sync codebase, audits and README for P1 reports and P2 painel`
+> **HEAD:** `f92a013` — feat(office-settings): lawyer CPF/RG + placeholders
 
 ---
 
@@ -11,7 +11,7 @@
 | Item | Valor |
 | --- | --- |
 | Nome | advocacia |
-| Versão | 1.0.0 (`pyproject.toml`) |
+| Versão | 1.1.0 (`pyproject.toml`, `advocacia.__version__`) |
 | Framework | Frappe v16.19.0 |
 | Licença | MIT |
 | Branch | main |
@@ -31,6 +31,7 @@
 
 | Área | Mudança |
 | --- | --- |
+| **v1.1.0** | UX Etapas 07–09; hub pills; download docx; Office Settings CPF/RG advogada |
 | **v1.0.0** | 24 DocTypes renomeados PT→EN; tabs no painel; tag `v1.0.0` |
 | **Office Settings** | Logo, dados bancários, `default_notify_days`; seed idempotente |
 | **Documentos** | Referência completa de placeholders; logo inline docx; botão no Legal Case |
@@ -498,6 +499,8 @@ Colunas: `fieldname` | label | fieldtype | options | reqd | unique. Section/Colu
 | sia_registration | Registro SIA | Data |  |  |  |
 | office_logo | Logo do Escritório | Attach Image |  |  |  |
 | lawyer_name | Advogada(o) Principal | Data |  | ✓ |  |
+| lawyer_cpf | CPF da Advogada(o) | Data |  |  |  |
+| lawyer_rg | RG da Advogada(o) | Data |  |  |  |
 | oab | OAB | Data |  | ✓ |  |
 | default_notify_days | Dias padrão de antecedência (prazos) | Int |  |  |  |
 | address | Endereço Completo | Small Text |  | ✓ |  |
@@ -574,7 +577,6 @@ reinstalar_istable → after_install → event fields → translations → sideb
 | get_events | audiencia/prazos | calendar read | *_calendar.js |
 | gerar_proxima_despesa | despesa | create | form |
 | financeiro sync | financeiro | has_permission | hooks |
-
 
 **xcall:** `advocacia.advocacia.painel_api.get_painel_data` (facade — não alterar no JS).
 
@@ -662,3 +664,7 @@ Status Legal Payment: Pendente, Vencido, Recebido, Cancelado, Renegociado, Repas
 | install-app site limpo | ⏳ recomendado pré go-live |
 
 **Conclusão:** código e testes **prontos para produção**; validar reinstall limpo e smoke manual do painel/sidebar antes do go-live.
+
+---
+
+**Última atualização:** 2026-06-23 23:24 UTC · **Versão do app:** 1.1.0

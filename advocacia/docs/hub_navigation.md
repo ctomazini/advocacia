@@ -37,6 +37,19 @@ Lista canônica: `SATELLITE_DOCTYPES` em `adv_case_nav.js`.
 
 ---
 
+## Barra de resumo (summary pills)
+
+Renderizada em `case_hub.js` → `adv_hub_render_summary_bar()` no topo da aba **Detalhes**.
+
+| Viewport | Layout |
+| --- | --- |
+| Desktop (≥769px) | Grid 2→3→4→5 colunas; pill com `+` à esquerda, contador/ícone na 1ª linha, label na 2ª (quebra só entre palavras) |
+| Mobile (≤768px) | Carrossel 2 linhas com scroll horizontal; label em linha única |
+
+CSS: `public/css/case_hub.css` (classes `.adv-hub-summary-*`).
+
+---
+
 ## Funcionalidades
 
 ### Breadcrumb
@@ -151,3 +164,10 @@ Suite Python (regressão geral):
 ```bash
 bench --site advocacia.local run-tests --app advocacia
 ```
+
+---
+
+
+---
+
+**Última atualização:** 2026-06-23 23:24 UTC · **Versão do app:** 1.1.0

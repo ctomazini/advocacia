@@ -2,7 +2,7 @@
 
 **Page:** `painel` (`advocacia/advocacia/page/painel/`)  
 **Backend:** `advocacia/painel/` · **Facade:** `painel_api.py`  
-**Frontend modular:** `public/js/painel/` · **Data:** 2026-06-09 · **Versão app:** 0.7.0
+**Frontend modular:** `public/js/painel/` · **Data:** 2026-06-23 · **Versão app:** 1.1.0
 
 ---
 
@@ -213,3 +213,10 @@ frappe.xcall("advocacia.advocacia.painel_api.get_painel_data", {...})
 ---
 
 *Painel modular desde v0.7.0. Referência estrutural: `engenharia/dashboard/` + `engenharia/public/js/dashboard/`.*
+
+---
+
+
+---
+
+**Última atualização:** 2026-06-23 23:24 UTC · **Versão do app:** 1.1.0

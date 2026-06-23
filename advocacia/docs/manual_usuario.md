@@ -1,7 +1,7 @@
 # Manual do Usuário — Advocacia
 
 **Gerado em:** 2026-06-11
-**Atualizado em:** 2026-06-22 (Etapa 09 — glossário Sprint 1A)
+**Atualizado em:** 2026-06-23 (v1.1.0 — Office Settings CPF/RG advogada, placeholders)
 **Versão do app:** 1.0.0
 
 ---
@@ -726,3 +726,10 @@ Exemplo: R$ 10.000 em um item → cobrar R$ 7.000 agora deixa R$ 3.000 pendente 
 ---
 
 *Regenerar: `bench execute advocacia.advocacia.scripts.generate_manual.generate`*
+
+---
+
+
+---
+
+**Última atualização:** 2026-06-23 23:24 UTC · **Versão do app:** 1.1.0

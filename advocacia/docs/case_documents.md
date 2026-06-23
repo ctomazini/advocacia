@@ -133,6 +133,8 @@ Campos novos relevantes:
 | --- | --- |
 | `cliente_data_nascimento` | Data de nascimento do cliente PF |
 | `cliente_rg_emissor` | Órgão emissor do RG |
+| `escritorio_advogada_cpf` | CPF da advogada principal (mascarado) |
+| `escritorio_advogada_rg` | RG da advogada principal |
 | `acordo_valor_extenso` | Valor total contratado por extenso |
 | `acordo_narrativa_pagamento` | Texto agrupado das parcelas (honorários) |
 | `acordo_parcelas` | Lista para loop Jinja |
@@ -163,3 +165,10 @@ Regenerar tabelas no manual: `bench execute advocacia.advocacia.scripts.generate
 ```bash
 bench --site advocacia.local run-tests --app advocacia
 ```
+
+---
+
+
+---
+
+**Última atualização:** 2026-06-23 23:24 UTC · **Versão do app:** 1.1.0

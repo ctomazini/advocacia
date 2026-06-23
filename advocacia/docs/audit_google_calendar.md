@@ -158,3 +158,10 @@ Espelhar `sync_prazo_to_event`:
 ---
 
 *Paridade estrutural com app `engenharia` (Deadline/Permit → Event). Domínio jurídico: Hearing + Deadline.*
+
+---
+
+
+---
+
+**Última atualização:** 2026-06-23 23:24 UTC · **Versão do app:** 1.1.0

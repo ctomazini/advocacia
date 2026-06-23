@@ -1,6 +1,6 @@
 # Seção 1 — Auditoria de Código Completa
 
-**App:** `advocacia` · **Versão:** 1.0.0 · **Site:** `advocacia.local` · **Data:** 2026-06-10  
+**App:** `advocacia` · **Versão:** 1.1.0 · **Site:** `advocacia.local` · **Data:** 2026-06-23  
 **Referência normativa:** `REGRAS_ADVOCACIA.md` (raiz do repo) · Inventário técnico: `CODEBASE.md`
 
 ---
@@ -42,7 +42,7 @@
 ## 1.2 Cobertura de testes
 
 **Comando:** `bench --site advocacia.local run-tests --app advocacia`  
-**Total:** 283 testes executados, OK (jun/2026). 291 métodos definidos em 45 arquivos.
+**Total:** 315 testes executados, OK (jun/2026).
 
 | DocType / Módulo | Tem teste? | Nº testes* | Funcionalidades testadas | SEM teste |
 |---|---|---|---|---|
@@ -167,3 +167,10 @@
 ---
 
 *Auditoria read-only. Próxima revisão recomendada após upgrade Frappe v17.*
+
+---
+
+
+---
+
+**Última atualização:** 2026-06-23 23:24 UTC · **Versão do app:** 1.1.0

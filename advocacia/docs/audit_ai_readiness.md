@@ -1,6 +1,6 @@
 # Seção 7 — Preparação para IA
 
-**App:** `advocacia` · **Status:** Fase 1 implementada · **Data:** 2026-06-02 · **Versão:** 1.0.0+
+**App:** `advocacia` · **Status:** Fase 1 implementada · **Data:** 2026-06-23 · **Versão:** 1.1.0
 
 ---
 
@@ -119,3 +119,10 @@ Para **Advocacia User**, chaves financeiras são omitidas e `financial_restricte
 ---
 
 *Atualizado pós-implementação Fase 1 (jun/2026). Ver também [crosscheck_engenharia.md](./crosscheck_engenharia.md).*
+
+---
+
+
+---
+
+**Última atualização:** 2026-06-23 23:24 UTC · **Versão do app:** 1.1.0

@@ -1,6 +1,6 @@
 # Seção 2 — Cross-check de Links entre DocTypes
 
-**App:** `advocacia` · **Hub:** `Legal Case` · **Data:** 2026-06-02 · **Versão:** 0.7.0
+**App:** `advocacia` · **Hub:** `Legal Case` · **Data:** 2026-06-23 · **Versão:** 1.1.0
 
 ---
 
@@ -171,3 +171,10 @@ Ao criar DocType que orbita um processo:
 ---
 
 *Mapa estável desde v0.7.0. Alterações de hub exigem migration plan e patch de dados.*
+
+---
+
+
+---
+
+**Última atualização:** 2026-06-23 23:24 UTC · **Versão do app:** 1.1.0

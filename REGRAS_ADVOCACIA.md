@@ -1,6 +1,6 @@
 # REGRAS_ADVOCACIA.md
 
-**App:** `advocacia` · **Frappe v16** (sem ERPNext) · **Versão:** 0.7.1 · **Data:** 2026-06-11  
+**App:** `advocacia` · **Frappe v16** (sem ERPNext) · **Versão:** 1.1.0 · **Data:** 2026-06-23  
 **Branch:** `main` · **Objetivo:** checklist operacional fechado para deploy.
 
 > **Nomenclatura (desde v1.0.0, jun/2026):** DocTypes em **inglês** Title Case (`Legal Case`, `Client`, …); **labels** e mensagens UI em **português**; **`fieldname`** em `snake_case` **majoritariamente inglês** (patches `rename_fields_pt_en.py` — resíduos PT cosméticos documentados em auditorias). **Não** renomear DocTypes sem patch + migrate + testes.
@@ -218,3 +218,10 @@ npm test
 ---
 
 *Norma do app advocacia. Atualizar neste arquivo no mesmo PR que mudar o padrão.*
+
+---
+
+
+---
+
+**Última atualização:** 2026-06-23 23:24 UTC · **Versão do app:** 1.1.0

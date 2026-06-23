@@ -1,6 +1,6 @@
 # Relatório Executivo — Modernização UX App Advocacia
 
-**Data:** 2026-06-22  
+**Data:** 2026-06-23 · **Versão alvo:** 1.1.0  
 **Status do projeto:** ENCERRADO  
 **Branch final:** `ux/step-09-final-polish`  
 **App:** `advocacia` (Frappe v16)
@@ -119,4 +119,11 @@ O projeto **Modernização UX — App Advocacia** é declarado **ENCERRADO** em 
 
 Débitos remanescentes estão catalogados na seção 6 deste relatório e no roadmap (Etapa 09).
 
-**Próximo passo operacional:** merge das branches `ux/step-*` → `main`, `bench migrate` e `bench build --app advocacia` em cada ambiente, smoke test conforme `audit_usability.md` §3.9.
+**Próximo passo operacional:** merge `ux/step-09-final-polish` → `main`, tag `v1.1.0`, `bench migrate` e `bench build --app advocacia` em cada ambiente, smoke test conforme `audit_usability.md` §3.9.
+
+---
+
+
+---
+
+**Última atualização:** 2026-06-23 23:24 UTC · **Versão do app:** 1.1.0

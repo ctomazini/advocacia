@@ -1,6 +1,6 @@
 # Seção 5 — Integridade de Dados e Validações
 
-**App:** `advocacia` · **Módulo:** `validators.py` · **Data:** 2026-06-02 · **Versão:** 0.7.0
+**App:** `advocacia` · **Módulo:** `validators.py` · **Data:** 2026-06-23 · **Versão:** 1.1.0
 
 ---
 
@@ -19,7 +19,7 @@ Testes dedicados: `test_validators.py` (16 métodos).
 | Dígitos verificadores | Algoritmo Receita Federal (módulo 11) |
 | Campo vazio | Permite (validação condicional no controller) |
 
-**Usado em:** `Client` (cpf, cpf_representante), factories de teste, `seed_demo.py` (`_demo_cpf`).
+**Usado em:** `Client` (cpf, cpf_representante), `Office Settings` (`lawyer_cpf`), factories de teste, `seed_demo.py` (`_demo_cpf`).
 
 ### CNPJ (`validar_cnpj`)
 
@@ -75,7 +75,8 @@ Testes dedicados: `test_validators.py` (16 métodos).
 | Client Contact | telefone, celular | `validar_telefone` | `validate()` |
 | Client Contact | email | `validar_email` | `validate()` |
 | Legal Case | numero_processo | `validar_cnj` | `validate()` (se Processo Judicial) |
-| Office Settings | cnpj_escritorio | `validar_cnpj` | `validate()` |
+| Office Settings | cnpj | `validar_cnpj` | `validate()` |
+| Office Settings | lawyer_cpf | `validar_cpf` | `validate()` |
 
 **Princípio:** validação pesada no `.py` do DocType com `frappe.throw()` — JS (`masks.js`) é apenas UX.
 
@@ -161,3 +162,10 @@ Formato: `{name} — {descritor}` com separador `" — "`.
 ---
 
 *Validações são a primeira linha de defesa; máscaras JS não substituem `validators.py`.*
+
+---
+
+
+---
+
+**Última atualização:** 2026-06-23 23:24 UTC · **Versão do app:** 1.1.0

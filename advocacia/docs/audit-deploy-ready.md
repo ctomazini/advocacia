@@ -2,7 +2,7 @@
 
 > **Snapshot histórico** (v0.7.0, jun/2026). Estado atual: [README.md](./README.md), [audit_code.md](./audit_code.md), [audit_dashboard.md](./audit_dashboard.md). **Suíte atual: 283 testes OK.**
 
-**Data:** 2026-06-02  
+**Data:** 2026-06-02 (snapshot histórico) · **Versão atual do app:** 1.1.0 — ver auditorias individuais em [README.md](./README.md)  
 **Commit:** `3810cb0` — feat: office settings, IA, placeholders, painel/reports e docs v1.0.0  
 **Site auditado:** `advocacia.local` (bench nativo, Frappe v16)  
 **Versão app:** 1.0.0 (`pyproject.toml`)  
@@ -327,3 +327,10 @@ bench --site SITE_NOVO install-app advocacia && bench --site SITE_NOVO migrate
 ---
 
 *Auditoria diagnóstica gerada em 2026-06-02. Nenhum arquivo de código foi alterado durante esta execução — apenas este relatório.*
+
+---
+
+
+---
+
+**Última atualização:** 2026-06-23 23:24 UTC · **Versão do app:** 1.1.0

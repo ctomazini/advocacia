@@ -1,6 +1,6 @@
 # Seção 3 — Verificação de Usabilidade
 
-**App:** `advocacia` · **Data:** 2026-06-22 · **Versão:** 1.0.0 (pós-Etapa 09)
+**App:** `advocacia` · **Data:** 2026-06-23 · **Versão:** 1.1.0 (pós-v1.1.0 hub + Office Settings)
 
 ---
 
@@ -171,3 +171,10 @@ Detalhes: [audit_form_layout.md](./audit_form_layout.md).
 ---
 
 *Usabilidade pós-Etapa 09: descriptions 94%, onboarding, empty states hub, list indicators, forms reorganizados, projeto UX encerrado — ver `ux-final-executive-report.md`.*
+
+---
+
+
+---
+
+**Última atualização:** 2026-06-23 23:24 UTC · **Versão do app:** 1.1.0

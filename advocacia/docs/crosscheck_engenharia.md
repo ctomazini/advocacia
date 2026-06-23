@@ -56,3 +56,10 @@ bench --site advocacia.local run-tests --app advocacia
 ```
 
 Smoke manual: `/app/painel` (Saúde, Atenção, Agenda, Financeiro Manager), Kanban **Advocacia Tarefas**, import CSV em Client/Legal Case.
+
+---
+
+
+---
+
+**Última atualização:** 2026-06-23 23:24 UTC · **Versão do app:** 1.1.0
