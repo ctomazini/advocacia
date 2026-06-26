@@ -201,6 +201,12 @@ class TestDocumentos(FrappeTestCase):
 		self.assertTrue(first["file_name"].endswith(".docx"))
 		self.assertTrue(frappe.local.response.filecontent)
 
+		# Download não destrutivo: chave continua válida para o link de fallback.
+		frappe.local.response = frappe._dict()
+		download_generated_document(first["download_key"])
+		self.assertEqual(frappe.local.response.type, "download")
+		self.assertTrue(frappe.local.response.filecontent)
+
 		case_docs = frappe.get_all(
 			"Case Document",
 			filters={"legal_case": servico.name, "source": "Gerado pelo App"},

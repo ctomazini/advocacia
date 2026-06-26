@@ -9,19 +9,29 @@
 		);
 	}
 
-	function adv_download_generated_file(download_key) {
+	function adv_download_url(download_key) {
+		return frappe.urllib.get_full_url(
+			"/api/method/advocacia.advocacia.documentos.download_generated_document?key=" +
+				encodeURIComponent(download_key)
+		);
+	}
+
+	// Âncora com atributo download é confiável em Firefox/Chrome; o servidor
+	// também envia Content-Disposition, então o arquivo vai direto para Downloads.
+	function adv_download_generated_file(download_key, file_name) {
 		if (!download_key) {
 			return;
 		}
-		const url =
-			"/api/method/advocacia.advocacia.documentos.download_generated_document?key=" +
-			encodeURIComponent(download_key);
-		const iframe = document.createElement("iframe");
-		iframe.style.display = "none";
-		iframe.setAttribute("aria-hidden", "true");
-		iframe.src = frappe.urllib.get_full_url(url);
-		document.body.appendChild(iframe);
-		window.setTimeout(() => iframe.remove(), 120000);
+		const link = document.createElement("a");
+		link.href = adv_download_url(download_key);
+		if (file_name) {
+			link.download = file_name;
+		}
+		link.rel = "noopener";
+		link.style.display = "none";
+		document.body.appendChild(link);
+		link.click();
+		window.setTimeout(() => link.remove(), 1000);
 	}
 
 	function gerar_documentos_em_lote(frm, template_names) {
@@ -44,23 +54,33 @@
 					data.gerados.forEach((item, index) => {
 						if (item.download_key) {
 							setTimeout(() => {
-								adv_download_generated_file(item.download_key);
-							}, index * 250);
+								adv_download_generated_file(item.download_key, item.file_name);
+							}, index * 400);
 						}
 					});
 					html += "<p><strong>" + __("Documentos gerados:") + "</strong></p><ul>";
 					data.gerados.forEach((item) => {
-						html +=
-							"<li>" +
+						const label =
 							frappe.utils.escape_html(item.title || item.template) +
 							" — " +
-							frappe.utils.escape_html(item.file_name) +
-							"</li>";
+							frappe.utils.escape_html(item.file_name);
+						if (item.download_key) {
+							html +=
+								'<li><a href="' +
+								frappe.utils.escape_html(adv_download_url(item.download_key)) +
+								'" download="' +
+								frappe.utils.escape_html(item.file_name || "") +
+								'">' +
+								label +
+								"</a></li>";
+						} else {
+							html += "<li>" + label + "</li>";
+						}
 					});
 					html +=
 						"</ul><p class=\"text-muted\">" +
 						__(
-							"Os arquivos foram baixados automaticamente. Para arquivar no processo, use + Documento e faça upload manualmente."
+							"Os arquivos foram baixados automaticamente. Se o download não iniciar, clique no nome do arquivo acima. Para arquivar no processo, use + Documento e faça upload manualmente."
 						) +
 						"</p>";
 				}

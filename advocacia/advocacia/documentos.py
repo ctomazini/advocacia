@@ -828,7 +828,12 @@ def _stash_generated_download(file_name: str, content: bytes) -> str:
 	return key
 
 
-def _pop_cached_download(key: str) -> dict:
+def _get_cached_download(key: str) -> dict:
+	"""Lê o download do cache sem consumir — mantém válido até o TTL.
+
+	Não destrutivo para que o link visível de fallback continue funcionando
+	mesmo após o download automático (browsers que bloqueiam auto-download).
+	"""
 	if not key or not key.startswith("adv_gen_doc:"):
 		frappe.throw(_("Chave de download inválida."))
 
@@ -839,15 +844,14 @@ def _pop_cached_download(key: str) -> dict:
 	if payload.get("user") != frappe.session.user:
 		frappe.throw(_("Sem permissão para este download."), frappe.PermissionError)
 
-	frappe.cache.delete_value(key)
 	return payload
 
 
-@frappe.whitelist()
+@frappe.whitelist(methods=["GET"])
 def download_generated_document(key: str) -> None:
 	"""Entrega .docx gerado com Content-Disposition — download direto na pasta padrão."""
 	frappe.has_permission("Legal Case", "read", throw=True)
-	payload = _pop_cached_download(key)
+	payload = _get_cached_download(key)
 	frappe.local.response.filename = payload["file_name"]
 	frappe.local.response.filecontent = payload["content"]
 	frappe.local.response.type = "download"
