@@ -4,10 +4,13 @@ const AdvocaciaMasks = {
 	},
 
 	onlyCnpjChars(v) {
-		return (v || "")
+		// 12 primeiras: A-Z/0-9; 2 últimas (DV): somente dígitos (Receita Federal).
+		const raw = (v || "")
 			.toUpperCase()
-			.replace(/[^0-9A-Z]/g, "")
-			.substring(0, 14);
+			.replace(/[^0-9A-Z]/g, "");
+		const body = raw.slice(0, 12);
+		const dv = raw.slice(12).replace(/[^0-9]/g, "").slice(0, 2);
+		return body + dv;
 	},
 
 	applyCPF(v) {
@@ -22,7 +25,7 @@ const AdvocaciaMasks = {
 		// CNPJ numérico ou alfanumérico (Receita): 12 chars A-Z/0-9 + 2 DVs numéricos.
 		v = this.onlyCnpjChars(v);
 		if (v.length > 12)
-			return v.replace(/([0-9A-Z]{2})([0-9A-Z]{3})([0-9A-Z]{3})([0-9A-Z]{4})([0-9A-Z]{2})/, "$1.$2.$3/$4-$5");
+			return v.replace(/([0-9A-Z]{2})([0-9A-Z]{3})([0-9A-Z]{3})([0-9A-Z]{4})(\d{2})/, "$1.$2.$3/$4-$5");
 		if (v.length > 8) return v.replace(/([0-9A-Z]{2})([0-9A-Z]{3})([0-9A-Z]{3})([0-9A-Z]{0,4})/, "$1.$2.$3/$4");
 		if (v.length > 5) return v.replace(/([0-9A-Z]{2})([0-9A-Z]{3})([0-9A-Z]{0,3})/, "$1.$2.$3");
 		if (v.length > 2) return v.replace(/([0-9A-Z]{2})([0-9A-Z]{0,3})/, "$1.$2");
@@ -129,6 +132,8 @@ const AdvocaciaMasks = {
 			const opts = { mask: this._inputmaskPattern(inputmaskTipo) };
 			if (inputmaskTipo === "cnpj") {
 				opts.casing = "upper";
+				opts.autoUnmask = true;
+				opts.removeMaskOnSubmit = true;
 			}
 			field.$input.inputmask(opts);
 		} else {

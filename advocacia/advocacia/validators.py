@@ -28,10 +28,13 @@ def limpar_numerico(valor):
 
 
 def limpar_cnpj(valor):
-	"""Normaliza CNPJ: remove máscara, mantém A-Z/0-9, retorna maiúsculas."""
+	"""Normaliza CNPJ: remove máscara, 12 chars A-Z/0-9 + DV só dígitos, maiúsculas."""
 	if valor is None:
 		return ""
-	return re.sub(r"[^0-9A-Za-z]", "", str(valor)).upper()
+	raw = re.sub(r"[^0-9A-Za-z]", "", str(valor)).upper()
+	body = raw[:12]
+	dv = re.sub(r"[^0-9]", "", raw[12:])[:2]
+	return body + dv
 
 
 def formatar_cpf(cpf):
@@ -145,9 +148,9 @@ def validar_cnpj(cnpj):
 			_("As 12 primeiras posições do CNPJ devem ser letras (A-Z) ou dígitos."),
 			title=_("CNPJ inválido"),
 		)
-	if not dv.isdigit():
+	if not dv.isdigit() or len(dv) != 2:
 		frappe.throw(
-			_("Os dígitos verificadores do CNPJ devem ser numéricos."),
+			_("Os 2 últimos caracteres do CNPJ (dígitos verificadores) devem ser números (0-9)."),
 			title=_("CNPJ inválido"),
 		)
 	if _sequencia_repetida(cnpj):
