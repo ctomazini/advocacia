@@ -43,6 +43,13 @@ class TestValidators(FrappeTestCase):
 	def test_cnpj_formatado_valido(self):
 		self.assertEqual(validar_cnpj(VALID_CNPJ), VALID_CNPJ_DIGITS)
 
+	def test_cnpj_alfanumerico_oficial_receita(self):
+		from advocacia.advocacia.validators import _calcular_dv_cnpj
+
+		self.assertEqual(_calcular_dv_cnpj("12ABC34501DE"), "35")
+		self.assertEqual(validar_cnpj("12.ABC.345/01DE-35"), "12ABC34501DE35")
+		self.assertEqual(validar_cnpj("12abc34501de35"), "12ABC34501DE35")
+
 	def test_cnpj_sequencia_invalida(self):
 		with self.assertRaises(ValidationError):
 			validar_cnpj("00.000.000/0000-00")
@@ -50,6 +57,10 @@ class TestValidators(FrappeTestCase):
 	def test_cnpj_curto_invalido(self):
 		with self.assertRaises(ValidationError):
 			validar_cnpj("123")
+
+	def test_cnpj_dv_nao_numerico(self):
+		with self.assertRaises(ValidationError):
+			validar_cnpj("12ABC34501DEAB")
 
 	def test_celular_valido(self):
 		self.assertEqual(validar_telefone(VALID_CELULAR, phone_type="mobile"), VALID_CELULAR)

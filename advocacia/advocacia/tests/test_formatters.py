@@ -16,6 +16,9 @@ class TestFormatters(FrappeTestCase):
 	def test_formatar_cnpj(self):
 		self.assertEqual(formatar_cnpj("11222333000181"), "11.222.333/0001-81")
 
+	def test_formatar_cnpj_alfanumerico(self):
+		self.assertEqual(formatar_cnpj("12ABC34501DE35"), "12.ABC.345/01DE-35")
+
 	def test_formatar_telefone_celular(self):
 		self.assertEqual(formatar_telefone("11987654321"), "(11) 98765-4321")
 

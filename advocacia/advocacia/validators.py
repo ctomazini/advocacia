@@ -27,6 +27,13 @@ def limpar_numerico(valor):
 	return re.sub(r"\D", "", str(valor))
 
 
+def limpar_cnpj(valor):
+	"""Normaliza CNPJ: remove máscara, mantém A-Z/0-9, retorna maiúsculas."""
+	if valor is None:
+		return ""
+	return re.sub(r"[^0-9A-Za-z]", "", str(valor)).upper()
+
+
 def formatar_cpf(cpf):
 	"""Exibição mascarada; aceita valor já limpo do banco."""
 	cpf = limpar_numerico(cpf)
@@ -36,8 +43,8 @@ def formatar_cpf(cpf):
 
 
 def formatar_cnpj(cnpj):
-	"""Exibição mascarada; aceita valor já limpo do banco."""
-	cnpj = limpar_numerico(cnpj)
+	"""Exibição mascarada; aceita CNPJ numérico ou alfanumérico (14 chars)."""
+	cnpj = limpar_cnpj(cnpj)
 	if len(cnpj) != 14:
 		return cnpj
 	return f"{cnpj[:2]}.{cnpj[2:5]}.{cnpj[5:8]}/{cnpj[8:12]}-{cnpj[12:]}"
@@ -103,15 +110,20 @@ def validar_cpf(cpf):
 	return cpf
 
 
+def _valor_ascii_cnpj(char: str) -> int:
+	"""Converte caractere CNPJ para valor numérico (Receita: ASCII − 48)."""
+	return ord(char) - 48
+
+
 def _calcular_dv_cnpj(cnpj_base):
-	"""Calcula os dois dígitos verificadores do CNPJ (base com 12 dígitos)."""
+	"""Calcula os dois DVs do CNPJ (base com 12 chars A-Z/0-9). Módulo 11 + ASCII−48."""
 	pesos1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
 	pesos2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
-	soma = sum(int(cnpj_base[i]) * pesos1[i] for i in range(12))
+	soma = sum(_valor_ascii_cnpj(cnpj_base[i]) * pesos1[i] for i in range(12))
 	d1 = 11 - (soma % 11)
 	d1 = 0 if d1 >= 10 else d1
 	base13 = cnpj_base + str(d1)
-	soma = sum(int(base13[i]) * pesos2[i] for i in range(13))
+	soma = sum(_valor_ascii_cnpj(base13[i]) * pesos2[i] for i in range(13))
 	d2 = 11 - (soma % 11)
 	d2 = 0 if d2 >= 10 else d2
 	return f"{d1}{d2}"
@@ -119,17 +131,28 @@ def _calcular_dv_cnpj(cnpj_base):
 
 def validar_cnpj(cnpj):
 	"""
-	Valida CNPJ pela Receita Federal: limpa, rejeita sequências repetidas,
-	confere dígitos verificadores. Retorna apenas dígitos ou lança erro.
+	Valida CNPJ numérico ou alfanumérico (Receita Federal).
+	Retorna 14 chars sem máscara (A-Z/0-9) ou lança erro.
 	"""
-	cnpj = limpar_numerico(cnpj)
+	cnpj = limpar_cnpj(cnpj)
 	if not cnpj:
 		return cnpj
 	if len(cnpj) != 14:
-		frappe.throw(_("CNPJ deve conter 14 dígitos."), title=_("CNPJ inválido"))
+		frappe.throw(_("CNPJ deve conter 14 caracteres."), title=_("CNPJ inválido"))
+	raiz_ordem, dv = cnpj[:12], cnpj[12:]
+	if not re.fullmatch(r"[0-9A-Z]{12}", raiz_ordem):
+		frappe.throw(
+			_("As 12 primeiras posições do CNPJ devem ser letras (A-Z) ou dígitos."),
+			title=_("CNPJ inválido"),
+		)
+	if not dv.isdigit():
+		frappe.throw(
+			_("Os dígitos verificadores do CNPJ devem ser numéricos."),
+			title=_("CNPJ inválido"),
+		)
 	if _sequencia_repetida(cnpj):
 		frappe.throw(_("CNPJ inválido (sequência repetida)."), title=_("CNPJ inválido"))
-	if cnpj[-2:] != _calcular_dv_cnpj(cnpj[:12]):
+	if dv != _calcular_dv_cnpj(raiz_ordem):
 		frappe.throw(_("CNPJ inválido (dígitos verificadores incorretos)."), title=_("CNPJ inválido"))
 	return cnpj
 

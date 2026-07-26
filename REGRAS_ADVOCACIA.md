@@ -25,9 +25,9 @@
 
 **Links obrigatórios (nunca texto livre):** Jurisdiction, Court Branch, Court, Case Phase, Client, Legal Case.
 
-**Armazenamento:** CPF/CNPJ/CNJ/telefone → só dígitos; e-mail → `.lower()`.
+**Armazenamento:** CPF/CNJ/telefone → só dígitos; CNPJ → 14 chars A-Z/0-9 (sem máscara, maiúsculas; DV numérico); e-mail → `.lower()`.
 
-**Validadores** (`validators.py`): CPF/CNPJ (Receita Federal), CNJ (Módulo 97), telefone (ANATEL), e-mail. Aplicar no `validate()` do DocType — JS (`masks.js`) é só UX.
+**Validadores** (`validators.py`): CPF (Receita), CNPJ numérico/alfanumérico (Receita, ASCII−48), CNJ (Módulo 97), telefone (ANATEL), e-mail. Aplicar no `validate()` do DocType — JS (`masks.js`) é só UX.
 
 **Títulos** (`titulos.py`): `{ID} — {descritor}`; `validate` + `after_insert`; `show_title_field_in_link: 1`.
 

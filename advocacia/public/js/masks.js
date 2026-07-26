@@ -3,6 +3,13 @@ const AdvocaciaMasks = {
 		return (v || "").replace(/\D/g, "");
 	},
 
+	onlyCnpjChars(v) {
+		return (v || "")
+			.toUpperCase()
+			.replace(/[^0-9A-Z]/g, "")
+			.substring(0, 14);
+	},
+
 	applyCPF(v) {
 		v = this.onlyDigits(v).substring(0, 11);
 		if (v.length > 9) return v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
@@ -12,12 +19,13 @@ const AdvocaciaMasks = {
 	},
 
 	applyCNPJ(v) {
-		v = this.onlyDigits(v).substring(0, 14);
+		// CNPJ numérico ou alfanumérico (Receita): 12 chars A-Z/0-9 + 2 DVs numéricos.
+		v = this.onlyCnpjChars(v);
 		if (v.length > 12)
-			return v.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5");
-		if (v.length > 8) return v.replace(/(\d{2})(\d{3})(\d{3})(\d{0,4})/, "$1.$2.$3/$4");
-		if (v.length > 5) return v.replace(/(\d{2})(\d{3})(\d{0,3})/, "$1.$2.$3");
-		if (v.length > 2) return v.replace(/(\d{2})(\d{0,3})/, "$1.$2");
+			return v.replace(/([0-9A-Z]{2})([0-9A-Z]{3})([0-9A-Z]{3})([0-9A-Z]{4})([0-9A-Z]{2})/, "$1.$2.$3/$4-$5");
+		if (v.length > 8) return v.replace(/([0-9A-Z]{2})([0-9A-Z]{3})([0-9A-Z]{3})([0-9A-Z]{0,4})/, "$1.$2.$3/$4");
+		if (v.length > 5) return v.replace(/([0-9A-Z]{2})([0-9A-Z]{3})([0-9A-Z]{0,3})/, "$1.$2.$3");
+		if (v.length > 2) return v.replace(/([0-9A-Z]{2})([0-9A-Z]{0,3})/, "$1.$2");
 		return v;
 	},
 
@@ -87,7 +95,8 @@ const AdvocaciaMasks = {
 	_inputmaskPattern(tipo) {
 		const patterns = {
 			cpf: "999.999.999-99",
-			cnpj: "99.999.999/9999-99",
+			// * = alfanumérico (A-Z/0-9); DV permanece numérico.
+			cnpj: "**.***.***/****-99",
 			cnj: "9999999-99.9999.9.99.9999",
 			mobile: "(99) 99999-9999",
 			fixo: "(99) 9999-9999",
@@ -117,7 +126,11 @@ const AdvocaciaMasks = {
 		}
 
 		if ($.fn.inputmask && inputmaskTipo) {
-			field.$input.inputmask(this._inputmaskPattern(inputmaskTipo));
+			const opts = { mask: this._inputmaskPattern(inputmaskTipo) };
+			if (inputmaskTipo === "cnpj") {
+				opts.casing = "upper";
+			}
+			field.$input.inputmask(opts);
 		} else {
 			this._bindInput(field.$input, maskFn);
 		}
